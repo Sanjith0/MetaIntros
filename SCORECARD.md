@@ -141,6 +141,23 @@ Found and fixed between F35 and F40: the 390 px spec said "every route" but had 
 pages added after it was written (F40 adds them; all 19 fit), and on a phone the run-of-show
 header was crushed beside its clock (F40).
 
+Checkpoint after F45 (14:50 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npm run test:e2e` (production build, cold) | 63 specs, `63 passed (5.8m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Unit | `npm test` | `Tests  241 passed (241)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 337/337 checks passed` (adds `party.seat`) |
+| Demo video | `npm run video` | `saved shots/demo.webm (7564308 bytes, about 62 s)` |
+| CI | `gh run list --branch swarit-features --limit 3` | `success` for F43, F44, F45 |
+
+Found and fixed between F40 and F45: the projector itself showed every member's reasons and
+names, which at a real fair would be the leak (F41 adds a public screen mode, and darkens five
+buttons whose contrast Tailwind 4 had lowered); the creator of a friend group saw no "waiting
+for" line (F44). The network dropped twice during pushes; commits waited locally and went up on
+retry.
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 
