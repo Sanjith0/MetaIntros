@@ -27,7 +27,7 @@ export function FindYourParty({ partyId, meId, spot, lat, lng }: { partyId: stri
   }, [load]);
   useLiveEvents(["party-update"], (_t, d) => {
     if ((d as { partyId?: string })?.partyId === partyId) load();
-  });
+  }, load);
   const me = list.find((a) => a.id === meId);
   const here = list.filter((a) => a.checkedInAt).length;
 

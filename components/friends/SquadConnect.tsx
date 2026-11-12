@@ -13,7 +13,7 @@ interface Data { partyId: string; eventTitle: string; over: boolean; members: Me
 export function SquadConnect({ initial }: { initial: Data }) {
   const [data, setData] = useState(initial);
   const reload = useCallback(() => fetch(`/api/squad/${initial.partyId}/connect`).then((r) => r.json()).then(setData).catch(() => {}), [initial.partyId]);
-  useLiveEvents(["friends"], reload);
+  useLiveEvents(["friends"], reload, reload);
   const add = async (id: string) => {
     setData((d) => ({ ...d, members: d.members.map((m) => (m.id === id ? { ...m, state: "requested" } : m)) }));
     await fetch(`/api/squad/${initial.partyId}/connect`, { method: "POST", body: JSON.stringify({ toId: id }) });

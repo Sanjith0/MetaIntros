@@ -19,13 +19,15 @@ export async function GET(req: Request) {
           /* closed */
         }
       };
-      send(`retry: 2000\n: connected\n\n`);
+      // Real events (not comments) so the client can tell the stream is actually flowing; some
+      // proxies/tunnels buffer SSE, and the client falls back to polling when these don't arrive.
+      send(`retry: 2000\nevent: hello\ndata: {}\n\n`);
       const unsub = subscribe((m) => {
         if (topics.size && !topics.has(m.topic)) return;
         if (m.userIds && !m.userIds.includes(userId)) return;
         send(`event: ${m.topic}\ndata: ${JSON.stringify(m.data ?? {})}\n\n`);
       });
-      const hb = setInterval(() => send(`: hb\n\n`), 15_000);
+      const hb = setInterval(() => send(`event: ping\ndata: {}\n\n`), 5_000);
       const close = () => {
         clearInterval(hb);
         unsub();

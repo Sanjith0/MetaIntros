@@ -47,6 +47,20 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
       setMessages((ms) => (ms.some((m) => m.id === d.message!.id) ? ms : [...ms, d.message!]));
       fetch(`/api/chats/${chat.id}/read`, { method: "POST" }).catch(() => {});
     }
+  }, () => {
+    // polling fallback (stream buffered): pull the thread and merge anything new
+    fetch(`/api/chats/${chat.id}/messages`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j: { archived: boolean; messages: ThreadMessage[] } | null) => {
+        if (!j) return;
+        if (j.archived) setArchived(true);
+        setMessages((ms) => {
+          const seen = new Set(ms.map((m) => m.id));
+          const fresh = j.messages.filter((m) => !seen.has(m.id));
+          return fresh.length ? [...ms, ...fresh] : ms;
+        });
+      })
+      .catch(() => {});
   });
 
   const send = async () => {

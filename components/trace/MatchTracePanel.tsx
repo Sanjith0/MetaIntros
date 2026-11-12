@@ -43,6 +43,12 @@ export function MatchTracePanel({ partyId, dark = false, defaultOpen = true }: {
   useLiveEvents(["trace"], (_t, data) => {
     const d = data as { partyId: string; step: Step };
     if (d?.partyId === partyId) setSteps((s) => (s.some((x) => x.id === d.step.id) ? s : [...s, d.step].sort((a, b) => a.stepIndex - b.stepIndex)));
+  }, () => {
+    // polling fallback: pick up steps written since the first load
+    fetch(`/api/party/${partyId}/trace`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((all: Step[] | null) => all && setSteps((s) => (all.length > s.length ? all : s)))
+      .catch(() => {});
   });
 
   // reveal one step at a time
