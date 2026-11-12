@@ -18,7 +18,7 @@ interface Status {
   clockOffsetMs: number;
   liveUsers: number;
   buckets: Record<string, { size: number; queue: string; users: { id: string; name: string; avatarColor: string; real: boolean; waitedMs: number; event: string | null }[] }[]>;
-  parties: { id: string; status: string; event: string | null; hangout?: boolean; area: string; size: number; real: number; cohesion: number | null }[];
+  parties: { id: string; status: string; event: string | null; hangout?: boolean; area: string; size: number; real: number; accepted?: number; cohesion: number | null }[];
   aiLog: { task: string; source: string; ms: number; error?: string }[];
   joinUrl: string;
   qr: string;
@@ -157,7 +157,7 @@ export default function DemoPage() {
         {s && s.parties.length > 0 && (
           <ul className="mt-3 space-y-1 text-xs" data-testid="demo-parties">
             {s.parties.map((p) => (
-              <li key={p.id} className="rounded-btn bg-surface px-2 py-1">{p.status === "completed" ? "Done: " : "Active: "}{p.size}-squad → {p.hangout ? "new hangout: " : ""}{p.event} · {p.area} · {p.real} real · cohesion {Math.round((p.cohesion ?? 0) * 100)}%</li>
+              <li key={p.id} className="rounded-btn bg-surface px-2 py-1">{p.status === "completed" ? "Done: " : p.status === "confirming" ? `Ready check (${p.accepted ?? 0}/${p.size} in): ` : "Active: "}{p.size}-squad → {p.hangout ? "new hangout: " : ""}{p.event} · {p.area} · {p.real} real · cohesion {Math.round((p.cohesion ?? 0) * 100)}%</li>
             ))}
           </ul>
         )}

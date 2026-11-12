@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { fastForward } from "@/lib/server/expiry";
 import { sendSquadRequest } from "@/lib/server/friending";
@@ -22,7 +23,7 @@ describe("Met through Queue Up", () => {
   it("new friends appear with the event where they met + top shared interest from the talk card; badge works", async () => {
     await joinQueue("p01", { eventId: "ev-boulder-social", targetSize: 4, landmarkId: "lm-rwc-courthouse", locationSource: "manual" });
     await wait(300);
-    await tick();
+    await tickAndAccept();
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: true } });
     await fastForward("p01");
     expect((await getBadges("p01")).friends).toBe(0);

@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
-import { getQueueStatus, joinQueue, leaveQueue, tick } from "@/lib/server/queue";
+import { getQueueStatus, joinQueue, leaveQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { getEventDetail, getFeed, weekendRange } from "@/lib/server/events";
 import { setClockOffsetMs, now as clockNow } from "@/lib/server/clock";
@@ -27,7 +28,7 @@ describe("queue service (DB)", () => {
     const s = await getQueueStatus("p01");
     expect(s.state).toBe("waiting");
     expect(s.found).toBe(6);
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     const done = await getQueueStatus("p01");
     expect(done.state).toBe("matched");
     const party = await prisma.party.findUniqueOrThrow({ where: { id: done.partyId! }, include: { members: true } });
@@ -47,7 +48,7 @@ describe("queue service (DB)", () => {
     await joinQueue("p01", { eventId: null, targetSize: 3, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(200);
     expect(await prisma.queueEntry.count({ where: { status: "waiting", parked: false } })).toBe(1);
-    expect(await tick()).toBe(0);
+    expect(await tickAndAccept()).toBe(0);
   });
 
   it("leaving the queue cancels the entry", async () => {
@@ -60,7 +61,7 @@ describe("queue service (DB)", () => {
   it("'anything this weekend' picks a public event inside the shared window", async () => {
     await joinQueue("p01", { eventId: null, targetSize: 6, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true } });
     expect(party.event!.isPublicVenue).toBe(true);
   });
@@ -69,7 +70,7 @@ describe("queue service (DB)", () => {
     expect(r.ok).toBe(true);
     await wait(300);
     expect((await getQueueStatus("p01")).mode).toBe("hangout");
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true, members: true, chat: true } });
     const ev = party.event!;
     expect(ev.kind).toBe("hangout");
@@ -96,7 +97,7 @@ describe("queue service (DB)", () => {
     expect(await joinQueue("p01", { mode: "hangout", eventId: "ev-indie-guild", targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" })).toMatchObject({ ok: false, error: "bad_mode" });
     await joinQueue("p01", { eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true } });
     expect(party.event!.kind).toBe("event");
   });
@@ -104,15 +105,15 @@ describe("queue service (DB)", () => {
     await setClockOffsetMs(10 * 86_400_000); // what Fast-forward did during the live test
     await joinQueue("p01", { eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    expect(await tick()).toBe(0);
-    expect(await tick()).toBe(0);
+    expect(await tickAndAccept()).toBe(0);
+    expect(await tickAndAccept()).toBe(0);
     expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(0); // no churn
     const s = await getQueueStatus("p01");
     expect(s).toMatchObject({ state: "waiting", problem: "no_events", bucketId: "lm-downtown-pa" });
     // the suggested way out: same size + area, new hangout queue
     expect((await joinQueue("p01", { mode: "hangout", eventId: null, targetSize: 4, landmarkId: s.bucketId, locationSource: "manual" })).ok).toBe(true);
     await wait(300);
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true } });
     expect(party.event!.kind).toBe("hangout");
     expect(party.event!.startsAt.getTime()).toBeGreaterThan((await clockNow()).getTime());
@@ -126,9 +127,9 @@ describe("queue service (DB)", () => {
     await prisma.event.updateMany({ where: { kind: "event" }, data: { startsAt: sat, endsAt: new Date(sat.getTime() + 3600_000) } });
     await joinQueue("p01", { eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    expect(await tick()).toBe(0);
+    expect(await tickAndAccept()).toBe(0);
     expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(1);
-    for (let i = 0; i < 3; i++) expect(await tick()).toBe(0);
+    for (let i = 0; i < 3; i++) expect(await tickAndAccept()).toBe(0);
     expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(1); // cooldown held
     expect((await getQueueStatus("p01")).problem).toBe("no_fit");
   });

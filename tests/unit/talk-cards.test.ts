@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { mockProvider } from "@/lib/ai";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { getTalkCards } from "@/lib/server/talkCards";
 
@@ -22,7 +23,7 @@ describe("talk cards", () => {
     });
     await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 6, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    await tick();
+    await tickAndAccept();
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: true } });
     expect(await prisma.talkCard.count({ where: { partyId: party.id } })).toBe(6 * 5);
     expect(mockProvider().calls.filter((c) => c.task === "talk_cards")).toHaveLength(1); // one call per party
@@ -43,7 +44,7 @@ describe("talk cards", () => {
   it("falls back to template openers when the model is unavailable", async () => {
     await joinQueue("p01", { eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    await tick();
+    await tickAndAccept();
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" } });
     const mine = await getTalkCards(party.id, "p01");
     expect(mine).toHaveLength(3);

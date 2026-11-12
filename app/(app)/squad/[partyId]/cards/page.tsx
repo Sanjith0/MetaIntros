@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { isRevealed } from "@/lib/server/party";
 import { prisma } from "@/lib/db";
 import { getCurrentUserId } from "@/lib/server/session";
 import { getTalkCards } from "@/lib/server/talkCards";
@@ -12,7 +13,7 @@ export default async function CardsPage({ params, searchParams }: { params: Prom
   const { member } = await searchParams;
   const me = await getCurrentUserId();
   const party = await prisma.party.findUnique({ where: { id: partyId }, include: { members: true, chat: { select: { id: true } }, event: { select: { title: true } } } });
-  if (!party || !party.members.some((m) => m.userId === me)) notFound();
+  if (!party || !party.members.some((m) => m.userId === me) || !isRevealed(party.status)) notFound();
   const people = await loadPeople(prisma, party.members.map((m) => m.userId));
   const subjects = new Map<string, CardSubject>([...people.values()].map((p) => [p.id, { id: p.id, name: p.name, profile: p.profile, friends: p.friends }]));
   // defense in depth: re-validate on read

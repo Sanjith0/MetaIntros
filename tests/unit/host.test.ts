@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { mockProvider } from "@/lib/ai";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { afterUserMessage, checkStalls, hostContext, postHostWelcome } from "@/lib/server/host";
 import { postMessage } from "@/lib/server/messages";
@@ -14,7 +15,7 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function formSquad() {
   await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 6, landmarkId: "lm-downtown-pa", locationSource: "manual" });
   await wait(300);
-  await tick();
+  await tickAndAccept();
   const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { chat: true } });
   return { party, chatId: party.chat!.id };
 }
