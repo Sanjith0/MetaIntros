@@ -16,6 +16,7 @@ import { partyFormationAgent, templateRationale } from "@/lib/agents/partyFormat
 import { eventSelectionAgent } from "@/lib/agents/eventSelection";
 import { afterPartyConfirmed } from "./hooks";
 import { planHangout } from "./hangout";
+import { markGroupsMatched } from "./groups";
 import { nowDate } from "@/lib/clock";
 
 const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
@@ -114,6 +115,15 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
   pending.delete(candKey(c));
   await prisma.party.update({ where: { id: partyId }, data: { rationale: agentOut?.rationale ?? templateRationale(c) } });
   if (agentOut) await writeTrace(partyId, agentOut.steps);
+  // Queue together: say which people came as a group (the engine never splits them).
+  const grouped = await prisma.queueEntry.findMany({ where: { id: { in: c.entryIds }, groupId: { not: null } }, select: { groupId: true, userId: true } });
+  const byGroup = new Map<string, string[]>();
+  for (const e of grouped) byGroup.set(e.groupId!, [...(byGroup.get(e.groupId!) ?? []), e.userId]);
+  const togetherSteps: TraceStep[] = [...byGroup.values()].filter((ids) => ids.length > 1).map((ids) => {
+    const names = ids.map((id) => people.get(id)?.name.split(" ")[0] ?? "").filter(Boolean);
+    return { agent: "party_formation", kind: "safety_check", output: { together: ids }, summary: `Kept ${names.slice(0, -1).join(", ")} and ${names[names.length - 1]} together: they queued as a group` };
+  });
+  if (togetherSteps.length) await writeTrace(partyId, togetherSteps);
 
   // Existing-events queue → pick a real event; hangout queue → plan a new one at common ground.
   const choice =
@@ -132,6 +142,7 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
     return { partyId: null, reason: "no_event" };
   }
   await prisma.party.update({ where: { id: partyId }, data: { eventId: event.id, status: "confirmed" } });
+  await markGroupsMatched(partyId);
   await afterPartyConfirmed(partyId);
   publish("party", { type: "formed", partyId, eventId: event.id }, c.userIds);
   publish("badges", {}, c.userIds);

@@ -6,7 +6,7 @@ import { listFriendQueues } from "./friendQueues";
  * The Notifications tab, derived from data Queue Up already keeps (no new table): squads formed, chats
  * that ended, friend requests, friendships made through Queue Up, and upcoming events you're interested in.
  */
-export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue";
+export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue" | "group_invite";
 
 export interface NotificationItem {
   id: string;
@@ -23,7 +23,7 @@ export interface NotificationItem {
 const DAY = 24 * 3600_000;
 
 export async function listNotifications(userId: string, now: Date): Promise<NotificationItem[]> {
-  const [memberships, requests, friendships, rsvps, friendQueues] = await Promise.all([
+  const [memberships, requests, friendships, rsvps, friendQueues, groupInvites] = await Promise.all([
     prisma.partyMember.findMany({
       where: { userId, party: { status: { in: ["confirmed", "completed"] } } },
       include: { party: { include: { event: true, chat: { select: { id: true, archived: true, expiresAt: true } }, members: true } } },
@@ -38,6 +38,7 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       include: { event: true },
     }),
     listFriendQueues(userId),
+    prisma.queueGroupMember.findMany({ where: { userId, status: "invited", group: { status: { in: ["open", "queued"] } } }, include: { group: true } }),
   ]);
 
   const out: NotificationItem[] = [];
@@ -111,6 +112,15 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       href: "/events#friends-queuing",
       at: new Date(q.since),
     });
+  }
+  // Queue together: a friend invited you into their group
+  if (groupInvites.length) {
+    const hosts = await prisma.user.findMany({ where: { id: { in: groupInvites.map((i) => i.group.hostId) } }, select: { id: true, name: true, avatarColor: true } });
+    for (const inv of groupInvites) {
+      const h = hosts.find((x) => x.id === inv.group.hostId);
+      if (!h) continue;
+      out.push({ id: `gi-${inv.id}`, kind: "group_invite", avatar: { name: h.name, color: h.avatarColor }, bold: h.name, text: "invited you to queue together. You'd be in the same squad.", href: "/queue/start", at: inv.createdAt });
+    }
   }
   return out.sort((a, b) => b.at.getTime() - a.at.getTime());
 }

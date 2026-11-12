@@ -107,13 +107,25 @@ describe("friends' queues (DB)", () => {
 
   it("Queue up too joins the same queue, un-parks the friend and records who brought you", async () => {
     const reza = (await listFriendQueues("p01")).find((q) => q.friend.id === "p04")!;
-    const r = await joinFriendQueue("p01", reza.entryId);
+    // "Queue separately" (the secondary action): same queue settings, matched on your own
+    const r = await joinFriendQueue("p01", reza.entryId, { separate: true });
     expect(r.ok).toBe(true);
     const mine = await prisma.queueEntry.findFirstOrThrow({ where: { userId: "p01", status: "waiting" } });
-    expect(mine).toMatchObject({ eventId: "ev-indie-guild", bucketLandmarkId: "lm-menlo-caltrain", targetPartySize: 5, viaFriendId: "p04", visibleToFriends: false });
+    expect(mine).toMatchObject({ eventId: "ev-indie-guild", bucketLandmarkId: "lm-menlo-caltrain", targetPartySize: 5, viaFriendId: "p04", visibleToFriends: false, groupId: null });
     expect((await prisma.queueEntry.findUniqueOrThrow({ where: { id: reza.entryId } })).parked).toBe(false);
     // Jordan's sharing stays off (the default) unless they turn it on
     expect((await prisma.user.findUniqueOrThrow({ where: { id: "p01" } })).queueVisibility).toBe("off");
+  });
+
+  it("Join (the default) puts you in the friend's group, un-parks them, and you land in their squad", async () => {
+    const reza = (await listFriendQueues("p01")).find((q) => q.friend.id === "p04")!;
+    expect(reza.canJoinTogether).toBe(true);
+    expect((await joinFriendQueue("p01", reza.entryId)).ok).toBe(true);
+    const theirs = await prisma.queueEntry.findUniqueOrThrow({ where: { id: reza.entryId } });
+    const mine = await prisma.queueEntry.findFirstOrThrow({ where: { userId: "p01", status: "waiting" } });
+    expect(theirs.parked).toBe(false); // a real person joined their group
+    expect(mine.groupId).toBe(theirs.groupId);
+    expect(mine).toMatchObject({ eventId: "ev-indie-guild", bucketLandmarkId: "lm-menlo-caltrain", targetPartySize: 5, viaFriendId: "p04" });
   });
 
   it("you can't join a queue you can't see", async () => {

@@ -2,7 +2,8 @@ import { prisma } from "@/lib/db";
 import { QueueVisibility } from "@/lib/domain/enums";
 import { canJoinFriendQueue, canSeeQueue, type CantJoinReason, type VisibilitySubject } from "@/lib/match/queueVisibility";
 import { friendIdsOf } from "./events";
-import { joinQueue, notifyFriends, type JoinResult } from "./queue";
+import { getQueueStatus, joinQueue, notifyFriends, type JoinResult } from "./queue";
+import { joinFriendsGroup, maxGroupFor, safeWithGroup, type GroupError } from "./groups";
 import { isAdultBand } from "./signup";
 import { nowDate } from "@/lib/clock";
 import { loadPeople } from "@/lib/profile/load";
@@ -25,8 +26,18 @@ export interface FriendQueue {
   targetSize: number;
   /** "Queuing for Indie Night" etc. Subject-less so callers can put the name first. */
   label: string;
+  /** "Queue separately": same queue settings, matched on your own */
   canJoin: boolean;
-  cantJoinReason?: CantJoinReason | "in_squad" | "started";
+  cantJoinReason?: CantJoinReason | "in_squad" | "started" | "full";
+  /** Their status while waiting: how many of the squad are found so far (counts only, never who) */
+  found?: number;
+  /** How many people are queuing together with them, and which of those are also your friends */
+  together: number;
+  togetherFriends: string[];
+  /** spots left in their queue-together group */
+  room: number;
+  /** "Join": you're added to their group and land in the same squad (safe with everyone in it) */
+  canJoinTogether: boolean;
 }
 
 const LIVE_PARTY = ["forming", "confirming", "confirmed"];
@@ -93,6 +104,14 @@ export async function listFriendQueues(viewerId: string, opts: { eventId?: strin
     if (ev && state === "waiting" && ev.startsAt <= now) continue; // the event already started: nothing to join
     seen.add(e.userId);
     const join = canJoinFriendQueue(viewer, owner);
+    // Queue together: who's already with them (counts; names only for people who are also your friends)
+    const mates = e.groupId
+      ? await prisma.queueEntry.findMany({ where: { groupId: e.groupId, status: { in: ["waiting", "matched"] }, userId: { not: e.userId } }, select: { userId: true, user: { select: { name: true } } } })
+      : [];
+    const room = Math.max(0, maxGroupFor(e.targetPartySize) - 1 - mates.length);
+    const alreadyIn = mates.some((m) => m.userId === viewerId);
+    const safeTogether = state === "waiting" && join.ok && room > 0 && !alreadyIn && (await safeWithGroup(viewerId, [e.userId, ...mates.map((m) => m.userId)]));
+    const found = state === "waiting" ? (await getQueueStatus(e.userId)).found : undefined;
     const q: FriendQueue = {
       entryId: e.id,
       friend: { id: owner.id, name: owner.name, avatarColor: owner.avatarColor },
@@ -104,7 +123,12 @@ export async function listFriendQueues(viewerId: string, opts: { eventId?: strin
       targetSize: e.targetPartySize,
       label: "",
       canJoin: state === "waiting" && join.ok,
-      cantJoinReason: state === "in_squad" ? "in_squad" : join.ok ? undefined : join.reason,
+      cantJoinReason: state === "in_squad" ? "in_squad" : !join.ok ? join.reason : room <= 0 ? "full" : undefined,
+      found,
+      together: mates.length,
+      togetherFriends: mates.filter((m) => friends.has(m.userId)).map((m) => m.user.name.split(" ")[0]),
+      room,
+      canJoinTogether: safeTogether,
     };
     q.label = friendQueueLabel(q);
     out.push(q);
@@ -112,12 +136,20 @@ export async function listFriendQueues(viewerId: string, opts: { eventId?: strin
   return out.sort((a, b) => Number(a.state !== "waiting") - Number(b.state !== "waiting") || b.since.localeCompare(a.since));
 }
 
-/** "Queue up too": join the same queue as a friend (same event or mode, same area, same squad size). */
-export async function joinFriendQueue(viewerId: string, entryId: string): Promise<JoinResult | { ok: false; error: "not_visible" | "cant_join" | "age" }> {
+/**
+ * Join a friend's queue. Default: together — you're added to their queue-together group, so you land in the
+ * same squad. `separate`: the same queue settings, matched on your own (the original "Queue up too").
+ */
+export async function joinFriendQueue(viewerId: string, entryId: string, opts: { separate?: boolean } = {}): Promise<JoinResult | { ok: true; together: true } | { ok: false; error: "not_visible" | "cant_join" | "age" | GroupError }> {
   const me = await prisma.user.findUnique({ where: { id: viewerId }, select: { ageBand: true } });
   if (!me || !isAdultBand(me.ageBand)) return { ok: false, error: "age" };
   const q = (await listFriendQueues(viewerId)).find((x) => x.entryId === entryId);
   if (!q) return { ok: false, error: "not_visible" };
+  if (!opts.separate) {
+    if (!q.canJoinTogether) return { ok: false, error: "cant_join" };
+    const r = await joinFriendsGroup(viewerId, entryId);
+    return r.ok ? { ok: true, together: true } : r;
+  }
   if (!q.canJoin) return { ok: false, error: "cant_join" };
   const entry = await prisma.queueEntry.findUniqueOrThrow({ where: { id: entryId } });
   return joinQueue(viewerId, {

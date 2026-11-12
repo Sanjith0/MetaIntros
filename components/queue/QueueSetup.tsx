@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { CalendarDays, ChevronRight, Crosshair, Lock, MapPin, MapPinned, ShieldCheck } from "lucide-react";
 import { Button, Chip, IconCircle, ListRow } from "@/components/fb";
 import { DateLine } from "@/components/events/DateLine";
+import { QueueTogether, type TogetherRole } from "./QueueTogether";
 
 type Mode = "events" | "hangout";
 
@@ -49,6 +50,13 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [share, setShare] = useState(shareDefault);
+  const [together, setTogether] = useState<TogetherRole>({ role: "none", joined: 1 });
+  const onRole = useCallback((r: TogetherRole) => {
+    setTogether(r);
+    // the squad needs room for the whole group plus at least one new person
+    if (r.role === "host") setSize((n) => (n - 1 < r.joined ? (SIZES.find((x) => x - 1 >= r.joined) ?? n) : n));
+  }, []);
+  const member = together.role === "member";
 
   const join = async (body: Record<string, unknown>) => {
     setBusy(true);
@@ -128,7 +136,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
         <h3 id="size-label" className="text-body font-semibold">Squad size</h3>
         <div className="mt-2 flex gap-2" role="radiogroup" aria-labelledby="size-label">
           {SIZES.map((n) => (
-            <Chip key={n} on={size === n} role="radio" aria-checked={size === n} data-testid={`size-${n}`} onClick={() => setSize(n)} className="min-w-14 justify-center">
+            <Chip key={n} on={size === n} role="radio" aria-checked={size === n} data-testid={`size-${n}`} onClick={() => setSize(n)} disabled={together.role === "host" && n - 1 < together.joined} className="min-w-14 justify-center">
               {n} people
             </Chip>
           ))}
@@ -136,7 +144,9 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
         <p className="mt-1.5 text-meta text-muted">Including you. You&apos;re only matched with people who picked the same size.</p>
       </section>
 
-      <section className="mt-4" aria-labelledby="where-label">
+      <QueueTogether onRole={onRole} />
+
+      {!member && <section className="mt-4" aria-labelledby="where-label">
         <h3 id="where-label" className="px-4 text-body font-semibold">Where you&apos;ll start from</h3>
         {loc.kind !== "manual" ? (
           <>
@@ -168,7 +178,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
             </ul>
           </div>
         )}
-      </section>
+      </section>}
 
       <label className="mx-4 mt-4 flex cursor-pointer items-start gap-3" data-testid="share-with-friends">
         <span className="min-w-0 flex-1">
@@ -200,10 +210,10 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
         </p>
       )}
 
-      {loc.kind !== "manual" && (
+      {loc.kind !== "manual" && !member && (
         <div className={variant === "page" ? "sticky bottom-[calc(52px+env(safe-area-inset-bottom))] mt-4 border-t border-divider bg-surface px-4 py-3" : "px-4 pt-4 pb-1"}>
           <Button variant="primary" size="lg" block disabled={busy || loc.kind === "locating"} onClick={findSquad} data-testid="find-squad" icon={loc.kind === "locating" ? <Crosshair size={18} className="animate-spin" /> : null}>
-            {loc.kind === "locating" ? "Finding your area…" : "Find my squad"}
+            {loc.kind === "locating" ? "Finding your area…" : together.role === "host" && together.joined > 1 ? `Find a squad for ${together.joined} of you` : "Find my squad"}
           </Button>
         </div>
       )}

@@ -222,6 +222,9 @@ model QueueEntry {
   viaFriendId      String?
   /// demo only: a seeded friend's entry the matcher skips until a real person joins the same queue
   parked           Boolean   @default(false)
+  /// queuing together: everyone with the same groupId lands in the same squad (never split)
+  groupId          String?
+  group            QueueGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   @@index([status])
 }
@@ -367,4 +370,35 @@ model DeviceSession {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   lastSeenAt DateTime @default(now())
+}
+
+/// Queue together (like a party in a game): 2+ people who enter the queue as one unit. The matcher fills the
+/// remaining spots and never splits them. Join by invite (friends) or by short code (anyone who passes safety).
+model QueueGroup {
+  id              String   @id @default(cuid())
+  hostId          String
+  /// short join code, unambiguous letters/digits
+  code            String   @unique
+  /// "open" (gathering) | "queued" | "matched" | "closed"
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+
+  members QueueGroupMember[]
+  entries QueueEntry[]
+}
+
+model QueueGroupMember {
+  id          String     @id @default(cuid())
+  groupId     String
+  group       QueueGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId      String
+  /// "invited" | "joined" | "declined" | "left"
+  status      String     @default("invited")
+  invitedById String?
+  /// "invite" | "code" | "friend_queue"
+  via         String     @default("invite")
+  createdAt   DateTime   @default(now())
+
+  @@unique([groupId, userId])
+  @@index([userId, status])
 }

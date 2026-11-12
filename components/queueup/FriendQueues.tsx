@@ -25,6 +25,7 @@ const CANT: Record<string, string> = {
   women_only: "This is a women-only queue.",
   age_band: "Squads are matched within an age range, so you can't join this one.",
   blocked: "You can't join this queue.",
+  full: "Their squad has no room left for friends.",
 };
 
 /**
@@ -97,11 +98,11 @@ function FriendQueueSheet({ q, onClose, nowMs }: { q: FriendQueue | null; onClos
     };
   }, [q]);
 
-  const join = async () => {
+  const join = async (separate = false) => {
     if (!q) return;
     setBusy(true);
     setError(null);
-    const r = await fetch(`/api/friends/queues/${q.entryId}/join`, { method: "POST" }).catch(() => null);
+    const r = await fetch(`/api/friends/queues/${q.entryId}/join`, { method: "POST", body: JSON.stringify({ separate }) }).catch(() => null);
     const j = r ? await r.json().catch(() => ({})) : {};
     if (j.ok) return router.push("/queue");
     setBusy(false);
@@ -121,6 +122,14 @@ function FriendQueueSheet({ q, onClose, nowMs }: { q: FriendQueue | null; onClos
                 Near {q.area}
                 {q.state === "waiting" ? ` · ${minutes(q.since, nowMs)} min in line` : ""} · Squads of {q.targetSize}
               </p>
+              {q.state === "waiting" && (
+                <p className="text-meta text-muted" data-testid="friend-queue-progress">
+                  {q.found ? `${Math.min(q.found, q.targetSize)} of ${q.targetSize} found` : "Looking for matches"}
+                  {q.together > 0
+                    ? ` · with ${q.togetherFriends.length ? q.togetherFriends.join(", ") : ""}${q.togetherFriends.length && q.together > q.togetherFriends.length ? " and " : ""}${q.together > q.togetherFriends.length ? `${q.together - q.togetherFriends.length} other${q.together - q.togetherFriends.length > 1 ? "s" : ""}` : ""}`
+                    : ""}
+                </p>
+              )}
             </div>
           </div>
           {q.event && (
@@ -136,20 +145,33 @@ function FriendQueueSheet({ q, onClose, nowMs }: { q: FriendQueue | null; onClos
             </div>
           )}
           <div className="mt-4 flex flex-col gap-2">
-            {q.canJoin ? (
-              <Button variant="primary" size="lg" block onClick={join} disabled={busy} data-testid="queue-up-too">
+            {q.canJoinTogether ? (
+              <Button variant="primary" size="lg" block onClick={() => join(false)} disabled={busy} data-testid="join-friend-squad">
+                {busy ? "Joining…" : `Join ${first(q.friend.name)}`}
+              </Button>
+            ) : q.canJoin ? (
+              <Button variant="primary" size="lg" block onClick={() => join(true)} disabled={busy} data-testid="queue-up-too">
                 {busy ? "Joining…" : "Queue up too"}
               </Button>
             ) : (
               <p className="rounded-card bg-wash p-3 text-meta text-muted" data-testid="friend-queue-closed">{CANT[q.cantJoinReason ?? ""] ?? "You can't join this queue."}</p>
             )}
+            {q.canJoinTogether && q.canJoin && (
+              <Button variant="secondary" block onClick={() => join(true)} disabled={busy} data-testid="queue-up-too">
+                Queue separately
+              </Button>
+            )}
             {q.event && <ButtonLink href={`/events/${q.event.id}`} variant="secondary" block>View event</ButtonLink>}
           </div>
-          {q.canJoin && (
+          {q.canJoinTogether ? (
+            <p className="mt-2 text-meta text-muted" data-testid="join-together-note">
+              You&apos;ll queue together with {first(q.friend.name)} and land in the same squad. Queue Up fills the other spots.
+            </p>
+          ) : q.canJoin ? (
             <p className="mt-2 text-meta text-muted">
               You&apos;ll be in the same queue, near {q.area}. You might end up in the same squad, but it isn&apos;t guaranteed.
             </p>
-          )}
+          ) : null}
           {error && <p role="alert" className="mt-2 text-meta font-semibold text-badge">{error}</p>}
           <p className="mt-3 flex items-start gap-2 text-meta text-muted">
             <EyeOff size={14} className="mt-0.5 shrink-0" aria-hidden />

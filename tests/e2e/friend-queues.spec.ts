@@ -42,3 +42,17 @@ test("event page lists friends in that queue; Friends tab shows status; sharing 
   await page.getByTestId("queue-up-button").click();
   await expect(page.getByTestId("share-with-friends-toggle")).not.toBeChecked();
 });
+
+test("join a friend's queue: see their status, Join → same group, land in their squad", async ({ page }) => {
+  await gotoReady(page, "/events");
+  await page.locator('[data-testid="friend-queue"][data-friend="p04"]').first().click();
+  const sheet = page.getByTestId("friend-queue-sheet");
+  await expect(sheet.getByTestId("friend-queue-progress")).toContainText(/of 5 found|Looking for matches/);
+  await expect(sheet.getByTestId("join-together-note")).toContainText("same squad");
+  await expect(sheet.getByTestId("queue-up-too")).toContainText("Queue separately"); // still offered
+  await sheet.getByTestId("join-friend-squad").click();
+  await expect(page.getByTestId("queue-screen")).toBeVisible();
+  await expect(page.getByTestId("queue-together-line")).toContainText("Reza");
+  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("party-members")).toContainText("Reza");
+});

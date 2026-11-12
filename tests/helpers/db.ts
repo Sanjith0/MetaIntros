@@ -12,6 +12,8 @@ export async function resetDb() {
     prisma.friendRequest.deleteMany(),
     prisma.partyMember.deleteMany(),
     prisma.queueEntry.deleteMany(),
+    prisma.queueGroupMember.deleteMany(),
+    prisma.queueGroup.deleteMany(),
     prisma.party.deleteMany(),
     prisma.eventRsvp.deleteMany(),
     prisma.friendship.deleteMany(),

@@ -15,6 +15,7 @@ const KIND: Record<NotificationKind, { Icon: typeof Bell; tone: string }> = {
   met: { Icon: Users, tone: "bg-positive" },
   reminder: { Icon: CalendarDays, tone: "bg-date" },
   friend_queue: { Icon: Users, tone: "bg-accent" },
+  group_invite: { Icon: UserPlus, tone: "bg-accent" },
 };
 
 /**
