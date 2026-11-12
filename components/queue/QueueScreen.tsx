@@ -259,7 +259,7 @@ function SquadFound({ party, meId }: { party: Party; meId: string }) {
           </ul>
           {cameWith.length > 0 && (
             <p className="mt-3 text-body" data-testid="came-with">
-              You and {cameWith.map((m) => first(m.user.name)).join(" and ")} + {others.length - cameWith.length} new {others.length - cameWith.length === 1 ? "person" : "people"}
+              You{cameWith.length > 1 ? ", " : " and "}{cameWith.map((m) => first(m.user.name)).join(cameWith.length > 1 ? ", " : " and ").replace(/, ([^,]*)$/, " and $1")} + {others.length - cameWith.length} new {others.length - cameWith.length === 1 ? "person" : "people"}
             </p>
           )}
           {hasSample && <p className="mt-2 text-meta text-muted">Sample people are simulated so the demo works with a small crowd.</p>}

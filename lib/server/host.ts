@@ -63,7 +63,7 @@ export async function postCameTogetherLine(chatId: string, partyId: string) {
   const newcomers = members.filter((m) => !m.groupId || (groups.get(m.groupId)?.length ?? 0) < 2).map((m) => firstName(m.user.name));
   const came = friendGroups.map((g) => andList(g)).join(", and ");
   const body = newcomers.length
-    ? `${came} came together. ${andList(newcomers)}, you're the new ${newcomers.length === 1 ? "face" : "faces"} here. Tell everyone one thing you're looking forward to tonight.`
+    ? `${came} came together. ${andList(newcomers)}, you're the new ${newcomers.length === 1 ? "face" : "faces"} here. Tell everyone one thing you're looking forward to.`
     : `${came} came together. Say hi to each other's friends.`;
   await postMessage(chatId, null, body, "host");
 }
