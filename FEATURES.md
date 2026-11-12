@@ -12,6 +12,14 @@ screenshots in `shots/` and fixed: a fair guest's avatar read "R(" (initials now
 parentheses and non-letters), and the five Dolores Park covers shared near-identical orange
 hues (spread across the wheel, layout picked from a title hash).
 
+## Fixes requested at 10:03 UTC (done before F2)
+
+| Fix | What changed | Proof |
+|---|---|---|
+| CI install | `npm ci` failed on Linux: the macOS-written lockfile referenced `@emnapi/core` and `@emnapi/runtime` without entries. Deleted `node_modules` and `package-lock.json`, ran `npm install`; direct dependency versions unchanged. | `gh run list --branch swarit-features --limit 3` → `completed success Fix CI: regenerate package-lock.json from a clean install ci swarit-features push 43197040278 25s`, after two `failure` runs at install |
+| Cold e2e | The first spec failed on a cold `next dev`. Playwright now runs `next build` and `next start` on port 3210 and stops it after each run. Also removed the build's whole-project tracing warning. | `npm run test:e2e` from a cold start, three runs in a row: `13 passed (54.4s)`, `13 passed (52.1s)`, `13 passed (51.1s)`, all exit 0, server stopped between runs |
+| Phones (390 px) | `tests/mobile.spec.ts` loads every route at 390×844 and fails if any page scrolls sideways; a second test runs Maya's join to MATCH FOUND on a phone. Fixed: chat header tag clipped to "PA", chat composer pushed below the fold, RSVP banner wrapping, a cut-off fair placeholder, and the stage squeezing two fixed columns (now a scrolling page on phones). | `✓ every route fits a 390-pixel phone` · `✓ phone: Maya joins from a 390-pixel screen and sees MATCH FOUND`; `shots/mobile-*.png` (14 screens) |
+
 ## Backlog
 
 | # | Feature | Flag | Status | Proof |

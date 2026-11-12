@@ -130,25 +130,25 @@ export function StageReplay({ initial }: { initial: StageView }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[45] flex flex-col bg-[#0c0d12] text-white" data-testid="stage">
-      <header className="flex flex-wrap items-center gap-4 border-b border-white/10 px-6 py-3">
+    <div className="fixed inset-0 z-[45] flex flex-col overflow-y-auto bg-[#0c0d12] text-white lg:overflow-hidden" data-testid="stage">
+      <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-3 sm:px-6">
         <div>
           <div className="text-[12px] font-semibold uppercase tracking-[0.18em] text-violet-300">Party Queue · Stage</div>
-          <div className="text-[22px] font-bold">Five agents settle one night out</div>
+          <div className="text-[19px] font-bold sm:text-[22px]">Five agents settle one night out</div>
         </div>
         <span data-testid="stage-status" className={`rounded-full px-3 py-1 text-[13px] font-semibold ${board.locked ? "bg-emerald-400/20 text-emerald-300" : "bg-white/10 text-white/80"}`}>
           {status}
         </span>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
           <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-500 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-400">
             Start demo party
           </button>
-          <span className="rounded-full border border-white/20 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white/60">Hackathon prototype, not Facebook</span>
+          <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
         </div>
       </header>
 
       {/* Scrubber */}
-      <div className="flex items-center gap-3 border-b border-white/10 px-6 py-2.5" data-testid="scrubber-bar">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-white/10 px-4 py-2.5 sm:flex-nowrap sm:px-6" data-testid="scrubber-bar">
         <button
           data-testid="play"
           aria-label={playing ? "Pause" : "Play"}
@@ -173,9 +173,9 @@ export function StageReplay({ initial }: { initial: StageView }) {
             setPlaying(false);
             setPos(Number(e.target.value));
           }}
-          className="h-2 flex-1 cursor-pointer accent-violet-400"
+          className="h-2 min-w-[120px] flex-1 cursor-pointer accent-violet-400"
         />
-        <span className="w-[120px] text-right font-mono text-[13px] tabular-nums text-white/70" data-testid="scrub-time">
+        <span className="whitespace-nowrap text-right font-mono text-[13px] tabular-nums text-white/70 sm:w-[120px]" data-testid="scrub-time">
           {tAt(pos).toFixed(1)}s / {tAt(total).toFixed(1)}s
         </span>
         <div className="flex overflow-hidden rounded-[6px] ring-1 ring-white/15">
@@ -199,7 +199,7 @@ export function StageReplay({ initial }: { initial: StageView }) {
 
       {/* Board: plans and signatures at this point in time */}
       {view.plans.length > 0 && (
-        <div className="grid grid-cols-1 gap-3 border-b border-white/10 px-6 py-3 xl:grid-cols-[1fr_auto]">
+        <div className="grid grid-cols-1 gap-3 border-b border-white/10 px-4 py-3 sm:px-6 xl:grid-cols-[1fr_auto]">
           <ul className="flex flex-wrap items-center gap-2" data-testid="stage-plans">
             {view.plans.map((p) => {
               const out = board.unavailable.includes(p.id);
@@ -220,8 +220,8 @@ export function StageReplay({ initial }: { initial: StageView }) {
               );
             })}
           </ul>
-          <div className="flex items-center gap-3" data-testid="signatures">
-            <span className="text-[12px] font-semibold uppercase tracking-wide text-white/50">{board.leading ? `Signatures on ${planTitle(board.locked ?? board.leading)}` : "Signatures"}</span>
+          <div className="flex flex-wrap items-center gap-3" data-testid="signatures">
+            <span className="w-full text-[12px] font-semibold uppercase tracking-wide text-white/50 sm:w-auto">{board.leading ? `Signatures on ${planTitle(board.locked ?? board.leading)}` : "Signatures"}</span>
             {view.members.map((m) => {
               const sig = board.signatures[m.id];
               const ok = sig === "signed" || sig === "conceded";
@@ -243,8 +243,8 @@ export function StageReplay({ initial }: { initial: StageView }) {
       {total === 0 ? (
         <div className="flex flex-1 items-center justify-center text-[20px] text-white/50">Waiting for a party to form…</div>
       ) : (
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 p-4 lg:grid-cols-2">
-          <section className="flex min-h-0 flex-col rounded-[14px] bg-white/[0.03] ring-1 ring-white/10">
+        <div className="grid grid-cols-1 gap-4 p-3 sm:p-4 lg:min-h-0 lg:flex-1 lg:grid-cols-2">
+          <section className="flex flex-col rounded-[14px] bg-white/[0.03] ring-1 ring-white/10 lg:min-h-0">
             <div className="flex items-baseline justify-between border-b border-white/10 px-4 py-3">
               <div>
                 <div className="text-[18px] font-bold">Private</div>
@@ -252,18 +252,18 @@ export function StageReplay({ initial }: { initial: StageView }) {
               </div>
               <div className="shrink-0 whitespace-nowrap pl-3 text-[12px] text-red-300">{board.rejections + board.blocks > 0 ? `${board.rejections} rejecting · ${board.blocks} blocked` : ""}</div>
             </div>
-            <ul ref={privRef} className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3" data-testid="stage-private">
+            <ul ref={privRef} className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-3 lg:max-h-none lg:min-h-0 lg:flex-1" data-testid="stage-private">
               {priv.map((t) => (
                 <Row key={t.id} t={t} />
               ))}
             </ul>
           </section>
-          <section className="flex min-h-0 flex-col rounded-[14px] bg-white/[0.03] ring-1 ring-white/10">
+          <section className="flex flex-col rounded-[14px] bg-white/[0.03] ring-1 ring-white/10 lg:min-h-0">
             <div className="border-b border-white/10 px-4 py-3">
               <div className="text-[18px] font-bold">Shared</div>
               <div className="text-[13px] text-white/50">What the table and each pair actually see. Rejected plans show only as "unavailable".</div>
             </div>
-            <ul ref={sharedRef} className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3" data-testid="stage-shared">
+            <ul ref={sharedRef} className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-3 lg:max-h-none lg:min-h-0 lg:flex-1" data-testid="stage-shared">
               {shared.map((t) => (
                 <Row key={t.id} t={t} />
               ))}

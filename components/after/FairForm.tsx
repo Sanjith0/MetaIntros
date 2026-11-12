@@ -84,7 +84,7 @@ export function FairForm() {
           <div key={i} className="mt-2 grid grid-cols-1 gap-2 rounded-[8px] bg-[var(--color-wash)] p-3 sm:grid-cols-[120px_1fr]">
             <input data-testid={`fair-tag-${i}`} className={input} value={f.tag} onChange={(e) => setFact(i, { tag: e.target.value })} placeholder="topic" maxLength={40} />
             <input data-testid={`fair-text-${i}`} className={input} value={f.text} onChange={(e) => setFact(i, { text: e.target.value })} placeholder="e.g. Plays in a ukulele band" maxLength={120} />
-            <input className={`${input} sm:col-span-2`} value={f.ask} onChange={(e) => setFact(i, { ask: e.target.value })} placeholder="Something people can ask you about it (optional)" maxLength={120} />
+            <input className={`${input} sm:col-span-2`} value={f.ask} onChange={(e) => setFact(i, { ask: e.target.value })} placeholder="A question people can ask you (optional)" maxLength={120} />
             <label className="flex items-center gap-2 text-[13px] sm:col-span-2">
               <input type="checkbox" checked={f.approved} onChange={(e) => setFact(i, { approved: e.target.checked })} className="accent-[var(--color-pq)]" />
               OK to share with my party

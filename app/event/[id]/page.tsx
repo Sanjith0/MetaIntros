@@ -64,8 +64,8 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               >
                 <IconSparkle className="text-[var(--color-pq)]" />
                 <FacePile people={v.party.members.map((m) => ({ id: m.id, name: m.name, hue: m.hue }))} size={28} />
-                <span className="text-[15px] font-semibold text-[var(--color-pq-ink)]">Your party · 5 going</span>
-                <span className="ml-auto text-[12px] font-semibold uppercase tracking-wide text-[var(--color-pq)]">Party Queue</span>
+                <span className="whitespace-nowrap text-[15px] font-semibold text-[var(--color-pq-ink)]">Your party · 5 going</span>
+                <span className="ml-auto hidden text-[12px] font-semibold uppercase tracking-wide text-[var(--color-pq)] sm:inline">Party Queue</span>
               </Link>
             )}
           </div>

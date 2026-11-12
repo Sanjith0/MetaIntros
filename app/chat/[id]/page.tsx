@@ -22,7 +22,7 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
   const people = Object.fromEntries([...s.profiles.values()].map((p) => [p.id, { name: p.name, firstName: p.firstName, hue: p.avatarHue }]));
 
   return (
-    <main className="flex bg-white" style={{ height: "calc(100vh - 56px)" }} data-testid="chat-page">
+    <main className="flex h-[calc(100dvh-79px)] bg-white sm:h-[calc(100dvh-56px)]" data-testid="chat-page">
       {/* Sidebar */}
       <aside className="hidden w-[360px] shrink-0 flex-col border-r border-[var(--color-divider)] md:flex">
         <h1 className="px-4 pb-2 pt-3 text-[24px] font-bold">Chats</h1>
@@ -52,11 +52,13 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
         <header className="flex h-16 shrink-0 items-center gap-3 border-b border-[var(--color-divider)] px-4 shadow-[0_1px_2px_rgb(0_0_0/0.06)]">
           <FacePile people={view.members.filter((m) => m.id !== viewer).slice(0, 2).map((m) => ({ id: m.id, name: m.name, hue: m.hue }))} size={36} max={2} />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 truncate text-[17px] font-semibold" data-testid="chat-title">
+            <div className="truncate text-[17px] font-semibold" data-testid="chat-title">
               {view.chat.title}
+            </div>
+            <div className="flex items-center gap-2 text-[13px] text-[var(--color-ink-2)]">
+              {view.members.length} members
               {view.chat.partyId && <span className="rounded bg-[var(--color-pq-soft)] px-1.5 py-0.5 text-[11px] font-semibold uppercase text-[var(--color-pq)]">Party Queue</span>}
             </div>
-            <div className="text-[13px] text-[var(--color-ink-2)]">{view.members.length} members</div>
           </div>
           <div className="hidden -space-x-2 sm:flex">
             {view.members.map((m) => (
