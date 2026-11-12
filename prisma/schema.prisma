@@ -61,6 +61,8 @@ model User {
   talkCardsOwned   TalkCard[]      @relation("CardOwner")
   talkCardsAbout   TalkCard[]      @relation("CardSubject")
   sessions         DeviceSession[]
+  queueGroupsLed   QueueGroup[]       @relation("QueueGroupLeader")
+  queueGroupSeats  QueueGroupMember[]
 }
 
 model TasteProfile {
@@ -222,8 +224,48 @@ model QueueEntry {
   viaFriendId      String?
   /// demo only: a seeded friend's entry the matcher skips until a real person joins the same queue
   parked           Boolean   @default(false)
+  /// Queue with friends: entries sharing a groupId (a QueueGroup id) are matched as one unit, never
+  /// split. A plain column, not a relation, so adding it is a simple ALTER TABLE in SQLite.
+  groupId          String?
 
   @@index([status])
+  @@index([groupId])
+}
+
+/// Queue with friends: a host plus the friends they invited, queuing together for one squad.
+model QueueGroup {
+  id               String    @id @default(cuid())
+  hostId           String
+  host             User      @relation("QueueGroupLeader", fields: [hostId], references: [id], onDelete: Cascade)
+  /// Same settings for everyone in it (copied onto each member's QueueEntry when the host starts)
+  mode             String    @default("events")
+  eventId          String?
+  targetPartySize  Int       @default(5)
+  bucketLandmarkId String
+  lat              Float
+  lng              Float
+  locationSource   String    @default("manual")
+  /// "gathering" (friends are answering) | "queued" | "matched" | "cancelled"
+  status           String    @default("gathering")
+  createdAt        DateTime  @default(now())
+  startedAt        DateTime?
+
+  members QueueGroupMember[]
+}
+
+model QueueGroupMember {
+  id          String     @id @default(cuid())
+  groupId     String
+  userId      String
+  group       QueueGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// "host" | "invited" | "in" | "declined" | "left"
+  status      String     @default("invited")
+  invitedAt   DateTime   @default(now())
+  respondedAt DateTime?
+
+  @@unique([groupId, userId])
+  @@index([userId, status])
 }
 
 model Party {
@@ -258,6 +300,8 @@ model PartyMember {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   joinedAt    DateTime  @default(now())
   checkedInAt DateTime?
+  /// Queue with friends: members who queued together share this id (talk cards, host and connect use it)
+  groupId     String?
   photoOptIn  Boolean   @default(false)
   photoUrl    String?
 
