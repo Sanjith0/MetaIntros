@@ -77,4 +77,16 @@ export const GUARANTEES: Guarantee[] = [
     see: { label: "What if… on the projector", href: "/stage" },
     test: "tests/unit/whatif.test.ts",
   },
+  {
+    title: "Consent can be taken back",
+    how: "Stop sharing a fact and every card, opener and line built from it is rewritten on everyone's phone, including what phones replay.",
+    see: { label: "Stop sharing, on your data page", href: "/me" },
+    test: "tests/unit/revoke.test.ts",
+  },
+  {
+    title: "The room can watch without anything leaking",
+    how: "The room's view is sanitized on the server: anonymous seats, code's rows, no names, no words; a test records its live stream.",
+    see: { label: "The room's view", href: "/stage?screen=room" },
+    test: "tests/unit/followalong.test.ts",
+  },
 ];

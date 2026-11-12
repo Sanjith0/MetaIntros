@@ -31,7 +31,8 @@ Each of these works in the app and has a test; `/how` links to all of them.
 | Every machine-written line is grounded | **Why this?** under any card, door card or chat opener |
 | The room can watch without anything leaking | `/stage` → **Public screen**, then scan the QR: the room's view is sanitized on the server |
 | Nothing is kept longer than the night | `/safety` → **Forget my night**, or wait: it's deleted when the chat closes; `/me` lists everything held about you |
-| When things go wrong, nobody is blamed | `/demo` → **Show a no-match**; `/party` → **Can't make it?** (the seat is refilled) |
+| Consent can be taken back | `/me` → **Stop sharing** a fact: every card and line built from it is rewritten on everyone's phone; your consent history is there too |
+| When things go wrong, nobody is blamed | `/demo` → **Show a no-match**; `/party` → **Can't make it?** (the seat is refilled), **Switch to plan B** (three of five ask), **Leave quietly** at the door |
 | It scales | `/evals` → **At fair scale**: 100 guests, 20 parties, every plan valid, 0 leaks |
 
 ## Run it
@@ -85,7 +86,7 @@ projector, press **?** for the presenter keys (**B** for big text in a large roo
    `/demo` sets up the next beat: Dev and Ana queue for Sunday with their standing party; Maya
    taps the invite, types her own sentence, and the three land in one party with two new people.
 8. **Why it's built this way.** `/how`: one diagram of what each piece sees and where code
-   decides, and 11 guarantees, each with a **See it** link to where it works in the app. `/evals`: the leak test four ways (one prompt, one prompt + verifier, five agents +
+   decides, and 13 guarantees, each with a **See it** link to where it works in the app. `/evals`: the leak test four ways (one prompt, one prompt + verifier, five agents +
    verifier, a code solver).
 
 **If nothing fits:** on `/demo`, **Show a no-match (rules clash)** queues the five with Ana's curfew
@@ -137,7 +138,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `STANDING_QUEUE` | a standing party (3+ who all picked each other) queues together again from `/runitback`: one invite each, they wait for each other, land in one party with new people, and each types their own sentence |
 | `ROGUE_MODE` | **Rogue model** switch on `/demo` (off by default): every agent says yes to everything and tries to tell the table its person's rules; the stage shows code overriding each bad yes and the verifier blocking each line |
 | `STAGE_PARTIES` | a party switcher on `/stage` once there's more than one: "Sun · Ferry Building · talking"; pin one (kept in the URL) or follow new parties |
-| `PROOF_HUB` | `/how` as a proof hub: each of 11 guarantees links to where it can be seen working in the app and names its test |
+| `PROOF_HUB` | `/how` as a proof hub: each of 13 guarantees links to where it can be seen working in the app and names its test |
 | `SCALE_TEST` | **At fair scale** on `/evals`: 50, 100 or 200 fictional guests through the real loop in a sandbox; parties, timing, lock-to-MATCH FOUND, invalid plans, leaks, real calls |
 | `AGENT_STORY` | "How your agent did it" in your receipt: your own agent's moves round by round (turned down, held out, agreed, signed) and where code stepped in |
 | `CHAT_WHY` | **Why this?** in the group chat too: under the pinned plan and each suggested opener |

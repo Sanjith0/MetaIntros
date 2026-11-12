@@ -189,6 +189,22 @@ Found and fixed between F50 and F55: after switching to plan B the chat kept the
 title (F54); the Event page said "a party has formed here" twice once the impact line showed
 (F55).
 
+Checkpoint after F60 (16:08 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npm run test:e2e` (production build, cold) | 78 specs, `78 passed (8.3m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Unit | `npm test` | `Tests  273 passed (273)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 339/339 checks passed` |
+| Demo video | `npm run video` | `saved shots/demo.webm (7551905 bytes, about 62 s)` |
+
+`/how` now lists 13 guarantees (adds: consent can be taken back; the room can watch without
+anything leaking), and the README's judges table points at Stop sharing, plan B and Leave
+quietly. Found and fixed between F55 and F60: taking back a fact first left its copy in the
+event log that phones replay (F57); the bell showed a count on the notifications page itself
+(F58); after leaving quietly the door still offered "running late" (F59).
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 

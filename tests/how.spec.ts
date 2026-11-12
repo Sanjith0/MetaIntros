@@ -13,7 +13,7 @@ test("how it works: the diagram and the guarantees", async ({ page }) => {
   await expect(svg).toContainText("Judge · code");
   await expect(svg).toContainText("Verifier · code");
   await expect(svg).toContainText("no reason, no name");
-  await expect(page.getByTestId("how-guarantees").locator("li")).toHaveCount(11);
+  await expect(page.getByTestId("how-guarantees").locator("li")).toHaveCount(13);
   await page.getByTestId("guarantee-9").getByTestId("guarantee-see").click();
   await expect(page).toHaveURL(/\/safety$/);
   await page.goBack();
