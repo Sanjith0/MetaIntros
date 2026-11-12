@@ -67,6 +67,13 @@ MODEL_API_KEY=... pnpm ai:warm   # ~100 calls per squad (a room of 12 Companions
    - **No internet:** phones on the same Wi-Fi use `http://<laptop-ip>:3000/join`. Browsers block GPS on plain HTTP, so they pick a landmark area instead.
 3. **Pick the same size.** Everyone chooses the **same party size**, for example 4 judges + you = size 5, and you'll be matched together.
 
+### One global clock
+
+The app runs on a single clock: real time plus a demo offset that only ever moves forward. Every stored timestamp, expiry, countdown and "x min ago" on every phone reads from it (`lib/clock.ts`). Database `@default(now())` columns are filled from it too.
+
+- **Fast-forward: end event** advances the clock for everyone to just after the squad's event ends, and ends that event's squad chats on the spot.
+- **Reset & reseed** never moves the clock back. It rebuilds the world around the clock, in the next weekend that's still ahead, so the scripted demo works again straight away.
+
 ---
 
 ## Architecture

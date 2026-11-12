@@ -3,7 +3,8 @@ import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
 import { getQueueStatus, joinQueue, leaveQueue, tick } from "@/lib/server/queue";
 import { setSetting } from "@/lib/server/settings";
-import { getEventDetail, getFeed } from "@/lib/server/events";
+import { getEventDetail, getFeed, weekendRange } from "@/lib/server/events";
+import { setClockOffsetMs, now as clockNow } from "@/lib/server/clock";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -98,5 +99,41 @@ describe("queue service (DB)", () => {
     expect(await tick()).toBe(1);
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true } });
     expect(party.event!.kind).toBe("event");
+  });
+  it("clock fast-forwarded past every event: 'any event' queuers wait with a reason instead of form→cancel looping", async () => {
+    await setClockOffsetMs(10 * 86_400_000); // what Fast-forward did during the live test
+    await joinQueue("p01", { eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
+    await wait(300);
+    expect(await tick()).toBe(0);
+    expect(await tick()).toBe(0);
+    expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(0); // no churn
+    const s = await getQueueStatus("p01");
+    expect(s).toMatchObject({ state: "waiting", problem: "no_events", bucketId: "lm-downtown-pa" });
+    // the suggested way out: same size + area, new hangout queue
+    expect((await joinQueue("p01", { mode: "hangout", eventId: null, targetSize: 4, landmarkId: s.bucketId, locationSource: "manual" })).ok).toBe(true);
+    await wait(300);
+    expect(await tick()).toBe(1);
+    const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true } });
+    expect(party.event!.kind).toBe("hangout");
+    expect(party.event!.startsAt.getTime()).toBeGreaterThan((await clockNow()).getTime());
+    await setClockOffsetMs(0);
+  });
+
+  it("no event fits the squad: no squad is formed, the room is not re-run every tick, and the user sees a no_fit reason", async () => {
+    // Move every event to Saturday 3:30am — inside the weekend, but outside anyone's free time.
+    const { start } = weekendRange(await clockNow());
+    const sat = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1, 3, 30);
+    await prisma.event.updateMany({ where: { kind: "event" }, data: { startsAt: sat, endsAt: new Date(sat.getTime() + 3600_000) } });
+    await joinQueue("p01", { eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
+    await wait(300);
+    expect(await tick()).toBe(0);
+    // The Companion engine checks a squad can actually meet before forming it, so nothing is formed then cancelled.
+    expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(0);
+    const rooms = await prisma.matchRoom.count();
+    expect(rooms).toBe(1);
+    for (let i = 0; i < 3; i++) expect(await tick()).toBe(0);
+    expect(await prisma.matchRoom.count()).toBe(rooms); // the room is not re-run every tick
+    expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(0);
+    expect((await getQueueStatus("p01")).problem).toBe("no_fit");
   });
 });

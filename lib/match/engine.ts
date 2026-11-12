@@ -303,10 +303,11 @@ export async function runTickAsync(
       proposal.candidates.some((c) => c.entryIds.join() === chosen!.entryIds.join()) &&
       validateParty(chosen.userIds.map((u) => people.get(u)!)).ok;
     if (!valid) chosen = proposal.candidates[0];
-    if (await commit(proposal, chosen!)) {
-      chosen!.entryIds.forEach((id) => taken.add(id));
-      formed++;
-    }
+    const ok = await commit(proposal, chosen!);
+    // Formed or not, these entries are done for this tick: a failed commit (no event fits, someone
+    // left) must not be retried by the next anchor with the same people within the same pass.
+    chosen!.entryIds.forEach((id) => taken.add(id));
+    if (ok) formed++;
   }
   return formed;
 }
@@ -364,8 +365,11 @@ export async function runRoomsAsync(
         any = true;
       }
     }
-    // A room is used once per tick: leftover fillers must not form another squad before they are withdrawn.
-    if (any) room.forEach((r) => taken.add(r.entryId));
+    // A room runs once per tick, whatever the outcome: leftover fillers must not form another squad
+    // before they are withdrawn, and a room that failed must not be re-run by its next anchor in the
+    // same pass (each run is ~80 model calls).
+    room.forEach((r) => taken.add(r.entryId));
+    void any;
   }
   return formed;
 }

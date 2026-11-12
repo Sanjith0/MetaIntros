@@ -142,6 +142,17 @@ describe("orchestrator", () => {
     expect(out.parties.map((p) => p.members)).toEqual([[m[0], m[3], m[4]]]);
   });
 
+  it("composeParties avoids a squad someone would decline at sign-off when there is another option", () => {
+    const m = adults.slice(0, 5);
+    const vs = verdicts(m, 60);
+    vs.get(m[1])!.set(m[2], v(10)); // m1 would decline a squad with m2
+    const table = [{ id: "prop-" + m[0], by: m[0], members: [m[0], m[1], m[2]], line: "", backers: [] }];
+    const want = new Map([[m[0], new Set(m.slice(1))]]);
+    const out = orc.composeParties({ circle: { id: "c1", theme: "", members: m }, table, want, verdicts: vs, people, targetSize: 3, exclude: [], priority: [m[0]], onlyPriority: true });
+    expect(out).toHaveLength(1);
+    expect(out[0].members.includes(m[1]) && out[0].members.includes(m[2])).toBe(false);
+  });
+
   it("composeParties places priority people first and can combine overlapping proposals", () => {
     const m = adults.slice(0, 7);
     const circle = { id: "c1", theme: "", members: m };

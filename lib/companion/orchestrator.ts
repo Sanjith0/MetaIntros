@@ -17,6 +17,13 @@ export const MAX_ROOM = 30;
 export const MAX_PICKS = 4;
 export const MAX_DEEP = 5;
 export const GAP = 25;
+/**
+ * Below this pair score the deterministic (fallback) Companion declines a squad at sign-off (see
+ * rounds.groupRespond). It matches the widest level of the queue engine's search (minPairwise 0.15
+ * in lib/match/engine.ts LEVELS), so the stand-in never refuses a pair the baseline matcher accepts.
+ * Real Muse Companions decide for themselves.
+ */
+export const SIGN_OFF_FLOOR = 15;
 
 export interface Verdict {
   score: number;
@@ -310,17 +317,24 @@ export function composeParties(input: Pick<FormInput, "circle" | "table" | "want
   };
   const support = new Map<string, number>();
   for (const row of table) support.set(setKey(row.members), (support.get(setKey(row.members)) ?? 0) + 1 + row.backers.length);
-  const quality = (g: string[]) => links(g) * 10 + (support.get(setKey(g)) ?? 0) * 5 + mean(g) / 100;
+  const weakest = (g: string[]) => {
+    let min = 100;
+    for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) min = Math.min(min, pairScore(verdicts, g[i], g[j]));
+    return min;
+  };
+  // A squad nobody will sign off on is worth less than any squad everyone can live with.
+  const quality = (g: string[]) => (weakest(g) >= SIGN_OFF_FLOOR ? 1_000_000 : 0) + links(g) * 10 + (support.get(setKey(g)) ?? 0) * 5 + mean(g) / 100;
   const valid = (g: string[], used: Set<string>) =>
     g.length === targetSize && g.every((id) => inCircle.has(id) && !used.has(id)) && !excluded.has(setKey(g)) &&
     validateParty(g.map((id) => people.get(id)!)).ok && g.every((id) => chosen(id, g, want)) && feasible(g);
 
-  const grow = (seed: string, used: Set<string>): string[] | null => {
+  const grow = (seed: string, used: Set<string>, strict: boolean): string[] | null => {
     const g = [seed];
     while (g.length < targetSize) {
       let best: { id: string; score: number } | null = null;
       for (const c of members) {
         if (used.has(c) || g.includes(c) || !g.every((x) => ok(x, c)) || !g.some((x) => wants(x, c)) || !feasible([...g, c])) continue;
+        if (strict && g.some((x) => pairScore(verdicts, x, c) < SIGN_OFF_FLOOR)) continue;
         const score = g.reduce((n, x) => n + wants(x, c) + wants(c, x), 0) * 1000 + g.reduce((n, x) => n + pairScore(verdicts, x, c), 0) / g.length;
         if (!best || score > best.score) best = { id: c, score };
       }
@@ -335,7 +349,7 @@ export function composeParties(input: Pick<FormInput, "circle" | "table" | "want
   const seeds = [...priority, ...(input.onlyPriority ? [] : members.filter((m) => !priority.includes(m)))];
   for (const seed of seeds) {
     if (used.has(seed)) continue;
-    const options = [...table.filter((r) => r.members.includes(seed)).map((r) => [...r.members].sort()), grow(seed, used)]
+    const options = [...table.filter((r) => r.members.includes(seed)).map((r) => [...r.members].sort()), grow(seed, used, true), grow(seed, used, false)]
       .filter((g): g is string[] => Boolean(g) && valid(g as string[], used));
     const best = options.sort((a, b) => quality(b) - quality(a) || setKey(a).localeCompare(setKey(b)))[0];
     if (!best) continue;

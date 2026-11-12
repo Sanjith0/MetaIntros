@@ -11,12 +11,12 @@ import { makePairScorer } from "@/lib/match/compat";
 import type { Candidate, QueueItem } from "@/lib/match/engine";
 import type { Person } from "@/lib/profile/load";
 import { rankEvents, type GroupContext } from "@/lib/match/eventFit";
-import { rankHangouts, type Spot } from "@/lib/match/hangoutFit";
+import { rankHangouts } from "@/lib/match/hangoutFit";
 import { dislikeTags } from "@/lib/profile/builder";
-import SPOTS from "@/data/seed/spots.json";
 import { ensureBriefs } from "./briefs";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
+import { HANGOUT_SPOTS, hangoutHorizon } from "./hangout";
 import { publish } from "./bus";
 
 export interface PendingRoom {
@@ -31,11 +31,11 @@ interface State {
   pending: Map<string, PendingRoom>;
   /** room signature → member sets that could not be committed */
   failed: Map<string, string[][]>;
-  /** room signatures that ended with nothing to commit */
-  settled: Set<string>;
+  /** room signatures that ended with nothing to commit → their entry ids */
+  settled: Map<string, Set<string>>;
 }
 const g = globalThis as unknown as { __quRooms?: State };
-const state = () => (g.__quRooms ??= { pending: new Map(), failed: new Map(), settled: new Set() });
+const state = () => (g.__quRooms ??= { pending: new Map(), failed: new Map(), settled: new Map() });
 
 const candKey = (c: Pick<Candidate, "entryIds">) => [...c.entryIds].sort().join(",");
 
@@ -83,11 +83,11 @@ async function feasibility(anchor: QueueItem, room: QueueItem[], people: Map<str
     return { sharedWindows: groupCohesion(ps, score).sharedWindows, tagCounts, dislikes, center: landmarks.get(anchor.bucketId)!, size: ps.length };
   };
   if (mode === "hangout") {
-    const horizon = new Date(now.getTime() + 7 * 86_400_000);
+    const horizon = hangoutHorizon(now); // exactly what the Hangout Planner will use
     return (members) => {
       const g = context(members);
       const areas = members.map((m) => landmarks.get(entryOf.get(m)!.bucketId)!);
-      return rankHangouts(SPOTS as Spot[], { sharedWindows: g.sharedWindows, tagCounts: g.tagCounts, dislikes: g.dislikes, size: g.size, memberAreas: areas }, now, horizon).some((o) => o.ok);
+      return rankHangouts(HANGOUT_SPOTS, { sharedWindows: g.sharedWindows, tagCounts: g.tagCounts, dislikes: g.dislikes, size: g.size, memberAreas: areas }, now, horizon).some((o) => o.ok);
     };
   }
   const { end } = weekendRange(now);
@@ -95,10 +95,15 @@ async function feasibility(anchor: QueueItem, room: QueueItem[], people: Map<str
   return (members) => rankEvents(events, context(members), now).some((r) => r.ok);
 }
 
-export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Map<string, Person>): Promise<Candidate[]> {
+/**
+ * Run the Companion engine for one room. `onNoFit` is called with the real people's entry ids when
+ * the Companions found groups but none of them had a place and time they could all make.
+ */
+export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Map<string, Person>, onNoFit?: (entryIds: string[]) => void): Promise<Candidate[]> {
   const s = state();
   const signature = room.map((r) => r.entryId).sort().join(",");
-  if (s.settled.has(signature)) return [];
+  // The same people (or a subset of them) already talked and found no squad: don't run them again.
+  if ([...s.settled.values()].some((done) => room.every((r) => done.has(r.entryId)))) return [];
   const userIds = room.map((r) => r.userId);
   const entryOf = new Map(room.map((r) => [r.userId, r]));
   const real = userIds.filter((u) => !people.get(u)!.isSimulated);
@@ -111,7 +116,9 @@ export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Ma
   announce(row.stage, row.note);
   try {
     // A brief costs a model call only when a real person is in the room.
-    const feasible = await feasibility(anchor, room, people);
+    const canMeet = await feasibility(anchor, room, people);
+    let ruledOut = 0;
+    const feasible = canMeet && ((members: string[]) => (canMeet(members) ? true : (ruledOut++, false)));
     const briefs = await ensureBriefs(userIds.map((u) => people.get(u)!), ctx, () => real.length > 0);
     const result = await runRoom({
       ids: userIds,
@@ -161,7 +168,10 @@ export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Ma
       data: { stage, note: candidates.length ? "Squad chosen" : "No squad clicked yet", result: toJson({ circles: result.circles.map((c) => ({ id: c.id, theme: c.theme, size: c.members.length })), squads: candidates.length, revisedAfterSignOff: result.vetoed.length, modelCalls: result.calls }) },
     });
     announce(stage, "");
-    if (!candidates.length) s.settled.add(signature);
+    if (!candidates.length) {
+      s.settled.set(signature, new Set(room.map((r) => r.entryId)));
+      if (ruledOut > 0) onNoFit?.(room.filter((r) => r.userId === anchor.userId || !people.get(r.userId)!.isSimulated).map((r) => r.entryId));
+    }
     return candidates;
   } catch (e) {
     console.error("[room]", e);

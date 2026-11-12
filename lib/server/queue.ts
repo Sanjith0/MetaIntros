@@ -12,6 +12,9 @@ import { formParty } from "./pipeline";
 import { matchRoom, roomStageFor } from "./rooms";
 import { checkStalls } from "./host";
 import { sweepExpiredChats } from "./expiry";
+import { now as clockNow } from "./clock";
+import { weekendRange } from "./events";
+import { nowMs } from "@/lib/clock";
 
 // ───────────────────────── join / leave ─────────────────────────
 
@@ -80,8 +83,19 @@ export async function leaveQueue(userId: string) {
 
 // ───────────────────────── status ─────────────────────────
 
+/**
+ * Why a waiting entry can't currently be matched (shown on the queue screen, and the entry is
+ * skipped by the matcher so it doesn't form-and-cancel parties every tick):
+ * - no_events: "any event" queue, but no upcoming public events remain this weekend
+ * - event_started: queued from an event that has already started
+ * - no_fit: a squad formed but no event/spot fit everyone; retried after a cooldown
+ */
+export type QueueProblem = "no_events" | "event_started" | "no_fit";
+
 export interface QueueStatus {
   state: "idle" | "waiting" | "matched";
+  problem?: QueueProblem;
+  bucketId?: string;
   entryId?: string;
   targetSize?: number;
   mode?: QueueMode;
@@ -104,8 +118,9 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
   const waiting = await waitingItems();
   const people = await loadPeople(prisma, waiting.map((w) => w.userId));
   const landmarks = await landmarkMap();
+  const problems = await entryProblems(waiting);
   const anchor = waiting.find((w) => w.entryId === entry.id);
-  const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: Date.now(), fillMode: await getFillMode() }) : { found: 1, userIds: [userId] };
+  const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: nowMs(), fillMode: await getFillMode() }) : { found: 1, userIds: [userId] };
   const users = await prisma.user.findMany({ where: { id: { in: pf.userIds } }, select: { id: true, name: true, avatarColor: true } });
   const room = await roomStageFor(userId);
   return {
@@ -117,7 +132,9 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
     mode: entry.mode as QueueMode,
     eventId: entry.eventId,
     bucketName: entry.bucketLandmark.name,
-    waitedMs: Date.now() - entry.joinedAt.getTime(),
+    bucketId: entry.bucketLandmarkId,
+    problem: problems.get(entry.id),
+    waitedMs: nowMs() - entry.joinedAt.getTime(),
     found: pf.found,
     foundUsers: pf.userIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean),
   };
@@ -143,6 +160,31 @@ async function landmarkMap() {
   return new Map((await prisma.landmark.findMany()).map((l) => [l.id, l]));
 }
 
+const NO_FIT_COOLDOWN_MS = 30_000;
+const cooldowns = () => ((globalThis as unknown as { __quCooldown?: Map<string, number> }).__quCooldown ??= new Map());
+
+/** Entries that can't be served right now, and why (see QueueProblem). */
+async function entryProblems(waiting: QueueItem[]): Promise<Map<string, QueueProblem>> {
+  const out = new Map<string, QueueProblem>();
+  if (!waiting.length) return out;
+  const now = await clockNow();
+  const { end } = weekendRange(now);
+  const anyEventsLeft = waiting.some((w) => (w.mode ?? "events") === "events" && !w.eventId)
+    ? (await prisma.event.count({ where: { kind: "event", isPublicVenue: true, startsAt: { gt: now, lt: end } } })) > 0
+    : true;
+  const specific = [...new Set(waiting.map((w) => w.eventId).filter(Boolean))] as string[];
+  const started = new Set(
+    specific.length ? (await prisma.event.findMany({ where: { id: { in: specific }, startsAt: { lte: now } }, select: { id: true } })).map((e) => e.id) : [],
+  );
+  const cd = cooldowns();
+  for (const w of waiting) {
+    if ((w.mode ?? "events") === "events" && !w.eventId && !anyEventsLeft) out.set(w.entryId, "no_events");
+    else if (w.eventId && started.has(w.eventId)) out.set(w.entryId, "event_started");
+    else if ((cd.get(w.entryId) ?? 0) > nowMs()) out.set(w.entryId, "no_fit");
+  }
+  return out;
+}
+
 let ticking = false;
 
 /** One matchmaking pass over the whole queue. Safe to call concurrently (re-entrancy guarded). */
@@ -152,7 +194,11 @@ export async function tick(): Promise<number> {
   try {
     const aiMode = await getSetting("aiMode", "");
     if (process.env.NODE_ENV !== "test" && (aiMode === "cache" || aiMode === "live")) setAiMode(aiMode);
-    const waiting = await waitingItems();
+    const all = await waitingItems();
+    const problems = await entryProblems(all);
+    // Unservable entries sit out (no form-then-cancel loop every tick); their screens explain why.
+    const waiting = all.filter((w) => !problems.has(w.entryId));
+    for (const w of all.filter((x) => problems.has(x.entryId) && !x.isSimulated)) publish("queue", { type: "problem" }, [w.userId]);
     if (waiting.length < 2) return 0;
     const people = await loadPeople(prisma, waiting.map((w) => w.userId));
     const landmarks = await landmarkMap();
@@ -162,13 +208,25 @@ export async function tick(): Promise<number> {
       waiting,
       people,
       landmarks,
-      { now: Date.now(), fillMode, mixedFillDelayMs },
+      { now: nowMs(), fillMode, mixedFillDelayMs },
       // The Companion engine decides who goes together. Wait until a real user's room has finished filling.
-      async (anchor: QueueItem, room: QueueItem[]) => (room.some((r) => fillPending(r.entryId)) ? [] : matchRoom(anchor, room, people)),
+      async (anchor: QueueItem, room: QueueItem[]) =>
+        room.some((r) => fillPending(r.entryId))
+          ? []
+          : matchRoom(anchor, room, people, (entryIds) => {
+              // The Companions found people, but no event or spot works for any of their groups.
+              for (const id of entryIds) cooldowns().set(id, nowMs() + NO_FIT_COOLDOWN_MS);
+              for (const r of room.filter((x) => entryIds.includes(x.entryId))) publish("queue", { type: "problem" }, [r.userId]);
+            }),
       async (p: Proposal, c: Candidate) => {
-        const partyId = await formParty(p, c, people);
-        if (partyId) await Promise.all(c.entryIds.map((id) => cleanupSimFor(id)));
-        return Boolean(partyId);
+        const r = await formParty(p, c, people);
+        if (r.partyId) await Promise.all(c.entryIds.map((id) => cleanupSimFor(id)));
+        else if ("reason" in r && r.reason === "no_event") {
+          // Nothing fits this squad right now: let them wait it out instead of retrying every tick.
+          for (const id of c.entryIds) cooldowns().set(id, nowMs() + NO_FIT_COOLDOWN_MS);
+          for (const u of c.userIds) publish("queue", { type: "problem" }, [u]);
+        }
+        return Boolean(r.partyId);
       },
     );
     // push fresh "players found" counts to waiting real users

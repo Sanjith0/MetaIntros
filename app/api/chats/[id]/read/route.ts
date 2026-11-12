@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { markChatRead } from "@/lib/server/chats";
 import { getCurrentUserId } from "@/lib/server/session";
 import { publish } from "@/lib/server/bus";
+import { now } from "@/lib/server/clock";
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const userId = await getCurrentUserId();
-  await markChatRead(userId, id, new Date());
+  await markChatRead(userId, id, await now());
   publish("badges", {}, [userId]);
   return NextResponse.json({ ok: true });
 }

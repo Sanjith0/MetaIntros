@@ -14,6 +14,8 @@ interface Status {
   mode?: "events" | "hangout";
   eventId?: string | null;
   bucketName?: string;
+  bucketId?: string;
+  problem?: "no_events" | "event_started" | "no_fit";
   waitedMs?: number;
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
@@ -116,6 +118,8 @@ export function QueueScreen() {
         </div>
       </div>
 
+      {status.problem && <QueueProblemBanner status={status} />}
+
       <p className="mt-6 text-center text-lg font-extrabold" data-testid="players-found">
         Players found: <span className="text-[#67e8f9]">{found}</span>/{n}
       </p>
@@ -146,6 +150,37 @@ export function QueueScreen() {
           );
         })}
       </ul>
+    </div>
+  );
+}
+
+const PROBLEM_TEXT: Record<NonNullable<Status["problem"]>, string> = {
+  no_events: "There are no upcoming events left this weekend to sort your squad into.",
+  event_started: "This event has already started, so we can't form a squad for it.",
+  no_fit: "We found people, but no event works for everyone's free time and tastes yet. We'll keep trying.",
+};
+
+function QueueProblemBanner({ status }: { status: Status }) {
+  const [busy, setBusy] = useState(false);
+  const hangout = status.mode === "hangout";
+  const text = hangout && status.problem === "no_fit" ? "We found people, but no public spot near all of you works for everyone's free time yet. We'll keep trying." : PROBLEM_TEXT[status.problem!];
+  const switchToHangout = async () => {
+    setBusy(true);
+    await fetch("/api/queue/join", {
+      method: "POST",
+      body: JSON.stringify({ mode: "hangout", eventId: null, targetSize: status.targetSize, landmarkId: status.bucketId, locationSource: "manual" }),
+    }).catch(() => {});
+    window.location.href = "/queue";
+  };
+  return (
+    <div className="mt-5 rounded-xl bg-amber-400/15 p-3 text-sm text-amber-100 ring-1 ring-amber-300/40" data-testid="queue-problem" data-problem={status.problem}>
+      <p>{text}</p>
+      {!hangout && (
+        <button type="button" disabled={busy} onClick={switchToHangout} data-testid="switch-to-hangout"
+          className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-white py-2 font-bold text-[#3b0f7a] disabled:opacity-60">
+          <Sparkles size={15} /> Plan a new hangout instead
+        </button>
+      )}
     </div>
   );
 }

@@ -17,7 +17,7 @@ import type { SocialStyle } from "@/lib/profile/builder";
 import type { Person } from "@/lib/profile/load";
 import type { Brief, OpenView } from "./brief";
 import { auditPrompt, safeMessage, type Msg } from "./checks";
-import { MAX_PICKS, makeResolver, setKey, type TableResponse, type TableRow, type Verdict } from "./orchestrator";
+import { MAX_PICKS, SIGN_OFF_FLOOR, makeResolver, setKey, type TableResponse, type TableRow, type Verdict } from "./orchestrator";
 
 export interface RoundCtx {
   brief: Brief;
@@ -381,7 +381,7 @@ export async function groupSpeak(c: RoundCtx, members: string[], intros: Map<str
 export async function groupRespond(c: RoundCtx, members: string[], lines: { from: string; say: string }[], verdicts: Map<string, Verdict>) {
   const others = members.filter((id) => id !== c.me.id).sort();
   const scoreOf = (id: string) => verdicts.get(id)?.score ?? fallbackVerdict(c.me, c.people.get(id)!).score;
-  const objection = others.some((id) => !pairAllowed(c.me, c.people.get(id)!) || scoreOf(id) < 30);
+  const objection = others.some((id) => !pairAllowed(c.me, c.people.get(id)!) || scoreOf(id) < SIGN_OFF_FLOOR);
   const r = await round(
     c, "companion_group2",
     {

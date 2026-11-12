@@ -30,7 +30,7 @@ describe("squad chat expiry", () => {
     const chat = await prisma.chat.findFirstOrThrow({ where: { type: "squad" }, include: { party: true } });
     expect(chat.archived).toBe(true);
     expect(chat.party!.status).toBe("completed");
-    expect((await now()).getTime()).toBeGreaterThan(chat.expiresAt!.getTime());
+    expect((await now()).getTime()).toBeGreaterThanOrEqual(chat.expiresAt!.getTime()); // ended now, not 24h later
     expect(await postMessage(chat.id, "p01", "hello?")).toEqual({ ok: false, error: "archived" });
     const sys = await prisma.chatMessage.findFirstOrThrow({ where: { chatId: chat.id, kind: "system" }, orderBy: { createdAt: "desc" } });
     expect(sys.body).toBe(ARCHIVE_NOTICE);

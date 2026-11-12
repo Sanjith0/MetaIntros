@@ -11,6 +11,7 @@ import { nearestLandmark } from "@/lib/geo";
 import { ME_ID } from "./generate";
 import { buildTasteProfile } from "@/lib/profile/builder";
 import { toJson } from "@/lib/json";
+import { setWorldWeekendInMemory } from "@/lib/clock";
 
 export { ME_ID };
 
@@ -23,8 +24,21 @@ export function weekendFriday(now: Date): Date {
   return d;
 }
 
-export function eventTimes(now: Date, dayOffset: number, start: string, durationMin: number) {
+/** Friday evening events start at 18:00; seeding after 17:00 Friday uses the next weekend. */
+const SEED_CUTOFF_MIN = 17 * 60;
+
+/**
+ * The weekend the demo world is seeded into: this weekend if its Friday-evening events are still
+ * ahead of `now`, otherwise the next one (e.g. reseeding after Fast-forward past Friday night).
+ */
+export function seedWeekendFriday(now: Date): Date {
   const fri = weekendFriday(now);
+  const cutoff = new Date(fri.getFullYear(), fri.getMonth(), fri.getDate(), 0, SEED_CUTOFF_MIN);
+  return now >= cutoff ? new Date(fri.getFullYear(), fri.getMonth(), fri.getDate() + 7) : fri;
+}
+
+export function eventTimes(now: Date, dayOffset: number, start: string, durationMin: number) {
+  const fri = seedWeekendFriday(now);
   const startsAt = new Date(fri.getFullYear(), fri.getMonth(), fri.getDate() + dayOffset, 0, hhmmToMin(start));
   return { startsAt, endsAt: new Date(startsAt.getTime() + durationMin * 60_000) };
 }
@@ -39,7 +53,9 @@ export interface SeedOptions {
  * Live users and all Queue Up activity (parties, squad chats …) are cleared too.
  */
 export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {}) {
-  const now = opts.now ?? new Date();
+  // The global clock (lib/clock.ts) survives a reseed; the world is rebuilt around *its* now.
+  const clockRow = await prisma.appSetting.findUnique({ where: { key: "clockOffsetMs" } });
+  const now = opts.now ?? new Date(Date.now() + (Number(clockRow?.value) || 0));
   const source = opts.source ?? new MockGraphSource();
   const graphUsers = source.listUserIds().map((id) => source.getUser(id));
 
@@ -52,7 +68,7 @@ export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {})
         "availability", "tasteProfile", "deviceSession", "user", "appSetting",
       ] as const) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (tx as any)[m].deleteMany();
+        await (tx as any)[m].deleteMany(m === "appSetting" ? { where: { key: { not: "clockOffsetMs" } } } : undefined);
       }
 
       await tx.landmark.createMany({ data: LANDMARKS });
@@ -190,13 +206,15 @@ export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {})
       await tx.appSetting.createMany({
         data: [
           { key: "seededAt", value: now.toISOString() },
+          { key: "weekendStart", value: seedWeekendFriday(now).toISOString() },
           { key: "fillMode", value: "simulated" },
-          { key: "clockOffsetMs", value: "0" },
+          // clockOffsetMs is deliberately absent: the global clock is never reset by a reseed
         ],
       });
     },
     { timeout: 60_000 },
   );
+  setWorldWeekendInMemory(seedWeekendFriday(now).getTime());
 
   return { users: graphUsers.length };
 }

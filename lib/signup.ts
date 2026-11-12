@@ -3,6 +3,7 @@ import { AgeBand, Gender } from "@/lib/domain/enums";
 import type { GraphUser } from "@/lib/graph/schema";
 import { SIGNUP_CHIPS, VOCAB_BY_TAG } from "@/lib/graph/vocabulary";
 import { hashString } from "@/lib/rng";
+import { nowDate } from "@/lib/clock";
 
 export const AVAIL_SLOTS = [
   { id: "fri-eve", label: "Fri evening", day: "fri", start: "17:00", end: "24:00" },
@@ -37,7 +38,7 @@ export type SignupInput = z.infer<typeof SignupInput>;
 const BAND_AGE: Record<AgeBand, number> = { "13-15": 14, "16-17": 16, "18-24": 21, "25+": 28 };
 
 /** Build the same Graph-shaped payload a persona has, so live users share the pipeline. */
-export function graphFromSignup(id: string, input: SignupInput, now = new Date()): GraphUser {
+export function graphFromSignup(id: string, input: SignupInput, now = nowDate()): GraphUser {
   const [first, ...rest] = input.name.split(/\s+/);
   const pages = input.interests.flatMap((t) => {
     const v = VOCAB_BY_TAG.get(t)!;

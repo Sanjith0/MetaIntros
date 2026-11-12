@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { haversineKm } from "@/lib/geo";
 import { weekendFriday } from "@/lib/seed/seed";
 import type { WeightedTag } from "@/lib/profile/builder";
+import { worldWeekendStartMs } from "@/lib/clock";
 
 export type FeedTab = "foryou" | "nearby" | "weekend";
 export const FEED_TABS: { id: FeedTab; label: string }[] = [
@@ -22,8 +23,14 @@ export interface FeedEvent extends Event {
   myRsvp: string | null;
 }
 
+/**
+ * "This weekend": the demo world's seeded weekend (see seedWeekendFriday) while `now` is in the
+ * week leading up to it or inside it; otherwise the calendar weekend.
+ */
 export function weekendRange(now: Date) {
-  const start = weekendFriday(now);
+  const w = worldWeekendStartMs();
+  const inWorld = w !== undefined && now.getTime() >= w - 7 * 86_400_000 && now.getTime() < w + 3 * 86_400_000;
+  const start = inWorld ? new Date(w) : weekendFriday(now);
   const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 3);
   return { start, end };
 }
