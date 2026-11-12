@@ -6,6 +6,8 @@ import { IconChat, IconDoor, IconLock, IconPin, IconSparkle } from "@/components
 import { PartyLive } from "@/components/party/PartyLive";
 import { SecretPanel } from "@/components/party/SecretPanel";
 import { LeaveParty } from "@/components/party/LeaveParty";
+import { WhyPlanCard } from "@/components/party/WhyPlanCard";
+import { whyThisPlan } from "@/lib/server/why";
 import { flag } from "@/lib/flags";
 import { secretView } from "@/lib/server/secret";
 import { clock12, dayLabel, price } from "@/lib/format";
@@ -52,6 +54,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
   const others = v.members.filter((m) => m.id !== viewer);
   const cardFor = (id: string) => v.cards.find((c) => c.subjectId === id);
   const secret = flag("SECRET_PANEL") ? secretView(v.party.id, viewer) : null;
+  const why = flag("WHY_PLAN") ? whyThisPlan(v.party.id, viewer) : null;
 
   return (
     <main className="mx-auto grid max-w-[1040px] grid-cols-1 gap-4 px-4 py-5 lg:grid-cols-[1fr_380px]">
@@ -129,6 +132,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
           </ul>
         </section>
 
+        {why && <WhyPlanCard v={why} />}
         {secret && <SecretPanel v={secret} />}
 
         {/* The public table */}

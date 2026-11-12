@@ -29,6 +29,8 @@ const DEFAULTS = {
   FAIR_HOST: true,
   /** F12: /evals: the leak test four ways (one prompt, one prompt + verifier, five agents + verifier, solver). */
   EVALS_PAGE: true,
+  /** F13: a "why this plan" card on /party built only from code checks. */
+  WHY_PLAN: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;
