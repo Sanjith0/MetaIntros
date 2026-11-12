@@ -40,10 +40,32 @@ export async function postHostWelcome(partyId: string) {
   if (await prisma.chatMessage.count({ where: { chatId: chat.id, kind: "host" } })) return;
   await postMessage(chat.id, null, w.value.welcome, "host");
   await postMessage(chat.id, null, `Icebreaker: ${w.value.icebreaker}`, "host");
+  await postCameTogetherLine(chat.id, partyId);
   await writeTrace(partyId, [
     { agent: "host", kind: "decision", output: { interestTag: w.value.interestTag, source: w.source }, summary: `Posted welcome + icebreaker about ${label(w.value.interestTag).toLowerCase() || "the weekend"} (shared by ${ctx.shared.find((s) => s.tag === w.value.interestTag)?.count ?? 0} members)` },
   ]);
   scheduleSimulatedBanter(chat.id, partyId).catch(() => {});
+}
+
+const firstName = (n: string) => n.split(" ")[0];
+const andList = (xs: string[]) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+
+/**
+ * Queue with friends: one plain host line (template, no model call) so friends don't huddle and the
+ * new people get pulled in. Names only; it never says how anyone knows each other beyond "came together".
+ */
+export async function postCameTogetherLine(chatId: string, partyId: string) {
+  const members = await prisma.partyMember.findMany({ where: { partyId }, include: { user: { select: { name: true } } }, orderBy: { joinedAt: "asc" } });
+  const groups = new Map<string, string[]>();
+  for (const m of members) if (m.groupId) groups.set(m.groupId, [...(groups.get(m.groupId) ?? []), firstName(m.user.name)]);
+  const friendGroups = [...groups.values()].filter((g) => g.length > 1);
+  if (!friendGroups.length) return;
+  const newcomers = members.filter((m) => !m.groupId || (groups.get(m.groupId)?.length ?? 0) < 2).map((m) => firstName(m.user.name));
+  const came = friendGroups.map((g) => andList(g)).join(", and ");
+  const body = newcomers.length
+    ? `${came} came together. ${andList(newcomers)}, you're the new ${newcomers.length === 1 ? "face" : "faces"} here. Tell everyone one thing you're looking forward to tonight.`
+    : `${came} came together. Say hi to each other's friends.`;
+  await postMessage(chatId, null, body, "host");
 }
 
 /** A couple of simulated squadmates answer the icebreaker so the demo chat feels alive (no model calls). */

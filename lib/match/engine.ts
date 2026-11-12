@@ -70,6 +70,8 @@ export interface Candidate {
   /** specific event any member queued for (null = "anything") */
   eventId: string | null;
   cohesion: CohesionResult;
+  /** Queue with friends: userId → groupId for members who queued together (absent when nobody did) */
+  cameTogether?: Record<string, string>;
 }
 
 export interface Proposal {
@@ -257,11 +259,13 @@ export function findProposal(
     if (!validateParty(members).ok) continue; // belt and braces
     const cohesion = groupCohesion(members, score, cameTogetherMap(g));
     if (cohesion.score < level.minCohesion || cohesion.minPairwise < level.minPairwise) continue;
+    const together = cameTogetherMap(g);
     candidates.push({
       entryIds: g.map((x) => x.entryId),
       userIds: g.map((x) => x.userId),
       eventId: g.find((x) => x.eventId)?.eventId ?? null,
       cohesion,
+      ...(together.size ? { cameTogether: Object.fromEntries(together) } : {}),
     });
   }
   if (!candidates.length) return null;

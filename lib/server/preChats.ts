@@ -5,13 +5,17 @@ import { loadPeople } from "@/lib/profile/load";
 import { writeTrace } from "./trace";
 
 export async function generatePreChats(partyId: string) {
-  const ids = (await prisma.partyMember.findMany({ where: { partyId }, select: { userId: true } })).map((m) => m.userId).sort();
+  const rows = await prisma.partyMember.findMany({ where: { partyId }, select: { userId: true, groupId: true } });
+  const ids = rows.map((m) => m.userId).sort();
+  // Queue with friends: friends who came together don't need a simulated pre-chat.
+  const cameWith = new Map(rows.map((m) => [m.userId, m.groupId]));
   const people = await loadPeople(prisma, ids);
   let modelCalls = 0, n = 0;
   for (let i = 0; i < ids.length; i++) {
     for (let j = i + 1; j < ids.length; j++) {
       const a = people.get(ids[i]), b = people.get(ids[j]);
       if (!a || !b) continue;
+      if (cameWith.get(a.id) != null && cameWith.get(a.id) === cameWith.get(b.id)) continue;
       const useModel = !a.isSimulated || !b.isSimulated;
       const r = await runPreChat(a, b, useModel);
       if (useModel) modelCalls++;

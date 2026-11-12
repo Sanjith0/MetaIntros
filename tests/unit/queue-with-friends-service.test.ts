@@ -53,6 +53,19 @@ describe("queue with friends (DB)", () => {
     expect(members).toHaveLength(5);
     expect(members.filter((m) => m.groupId === groupId).map((m) => m.userId).sort()).toEqual(["p01", "p02", "p04"]);
     expect(members.filter((m) => m.groupId === null)).toHaveLength(2);
+
+    // talk cards and pre-chats only between people who didn't come together
+    const cards = await prisma.talkCard.findMany({ where: { partyId: done.partyId! } });
+    expect(cards.some((c) => ["p01", "p02", "p04"].includes(c.ownerId) && ["p01", "p02", "p04"].includes(c.subjectId))).toBe(false);
+    expect(cards).toHaveLength(5 * 4 - 3 * 2);
+    expect(await prisma.preChat.count({ where: { partyId: done.partyId! } })).toBe(10 - 3);
+    // the AI host names who came together and pulls the new people in (template line)
+    const chat = await prisma.chat.findUniqueOrThrow({ where: { partyId: done.partyId! } });
+    const host = await prisma.chatMessage.findMany({ where: { chatId: chat.id, kind: "host" } });
+    expect(host.some((m) => m.body.includes("came together") && m.body.includes("new faces"))).toBe(true);
+    // the formation trace says the friends were kept together
+    const step = await prisma.agentTrace.findFirst({ where: { partyId: done.partyId!, toolName: "keepFriendsTogether" } });
+    expect(step?.summary).toMatch(/Kept .* together/);
   });
 
   it("a real friend gets an invite and can say no", async () => {
