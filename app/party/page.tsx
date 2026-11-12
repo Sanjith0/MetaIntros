@@ -18,6 +18,7 @@ import { queueStatus } from "@/lib/server/queue";
 import { noMatchView } from "@/lib/server/nomatch";
 import { explainSources } from "@/lib/server/provenance";
 import { WhyLine } from "@/components/party/WhyLine";
+import { isForgotten } from "@/lib/server/forget";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
@@ -56,8 +57,9 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
   const myOwnVerdicts = s.verdicts.filter((x) => x.partyId === v.party.id && x.ownerId === viewer && x.round === 1);
   const others = v.members.filter((m) => m.id !== viewer);
   const cardFor = (id: string) => v.cards.find((c) => c.subjectId === id);
-  const secret = flag("SECRET_PANEL") ? secretView(v.party.id, viewer) : null;
-  const why = flag("WHY_PLAN") ? whyThisPlan(v.party.id, viewer) : null;
+  const forgotten = flag("FORGET_ME") && isForgotten(v.party.id, viewer);
+  const secret = flag("SECRET_PANEL") && !forgotten ? secretView(v.party.id, viewer) : null;
+  const why = flag("WHY_PLAN") && !forgotten ? whyThisPlan(v.party.id, viewer) : null;
   const noMatch = flag("NO_MATCH") ? noMatchView(v.party.id, viewer) : null;
   const waiting = noMatch?.requeued ? queueStatus(viewer) : null;
 
@@ -169,6 +171,14 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
 
         {why && <WhyPlanCard v={why} />}
         {secret && <SecretPanel v={secret} />}
+        {forgotten && (
+          <section className="rounded-[12px] bg-white p-4 text-[14px] text-[var(--color-ink-2)] shadow-[var(--shadow-card)]" data-testid="party-forgotten">
+            <IconLock size={16} className="mr-1 inline" /> You asked Party Queue to forget your sentence, rules and reasons from this night. They&apos;re gone from the server.{" "}
+            <Link href="/safety" className="font-semibold text-[var(--color-link)]">
+              Safety
+            </Link>
+          </section>
+        )}
 
         {/* The public table */}
         <section className="rounded-[8px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="party-table">
@@ -206,6 +216,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
 
       {/* Your receipt: only you see this */}
       <aside className="flex flex-col gap-4">
+        {!forgotten && (
         <section className="rounded-[8px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="receipt">
           <h2 className="flex items-center gap-2 text-[17px] font-semibold">
             <IconLock size={18} /> Your agent's receipt
@@ -254,6 +265,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
             </>
           )}
         </section>
+        )}
         {flag("SAFETY_PAGE") && (
           <Link href="/safety" className="block rounded-[8px] bg-white p-3 text-[14px] font-semibold text-[var(--color-link)] shadow-[var(--shadow-card)]" data-testid="party-safety-link">
             Safety: block, leave or report →

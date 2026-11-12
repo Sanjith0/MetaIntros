@@ -4,11 +4,13 @@ import { notFound } from "next/navigation";
 import { IconCheck } from "@/components/icons";
 import { LeaveParty } from "@/components/party/LeaveParty";
 import { SafetyPeople } from "@/components/safety/SafetyPeople";
+import { ForgetNight } from "@/components/safety/ForgetNight";
+import { isForgotten } from "@/lib/server/forget";
 import { flag } from "@/lib/flags";
 import { queueStatus } from "@/lib/server/queue";
 import { partyPeople } from "@/lib/server/safety";
 import { partyForViewer } from "@/lib/server/social";
-import { profile } from "@/lib/server/store";
+import { profile, store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 
 export const metadata: Metadata = { title: "Safety" };
@@ -77,6 +79,13 @@ export default async function SafetyPage() {
           <p className="mt-2 text-[14px] text-[var(--color-ink-2)]">You're not in a party or the queue right now.</p>
         )}
       </section>
+
+      {flag("FORGET_ME") && party && (party.status === "locked" || party.status === "failed") && (
+        <section className="rounded-[12px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="safety-forget">
+          <h2 className="text-[17px] font-bold">Forget my night</h2>
+          <ForgetNight partyId={party.id} title={party.planId ? (store().plans.get(party.planId)?.title ?? "this party") : "this party"} done={isForgotten(party.id, viewer)} />
+        </section>
+      )}
 
       <section className="rounded-[12px] bg-white p-4 shadow-[var(--shadow-card)]">
         <h2 className="text-[17px] font-bold">People from your parties</h2>

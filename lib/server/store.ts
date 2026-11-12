@@ -64,6 +64,8 @@ export interface Store {
   avoidSets: Set<string>;
   /** After a no-match: people whose own rules closed every plan there (told only themselves). partyId -> userIds. */
   nothingFits: Map<string, string[]>;
+  /** People who asked to forget their private data from a party: `${partyId}:${userId}`. */
+  forgotten: Set<string>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -109,6 +111,7 @@ function fresh(): Store {
     prompts: new Map(),
     avoidSets: new Set(),
     nothingFits: new Map(),
+    forgotten: new Set(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

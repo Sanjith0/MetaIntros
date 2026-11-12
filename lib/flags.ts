@@ -52,6 +52,8 @@ const DEFAULTS = {
   NO_MATCH: true,
   /** F23: "Why this?" under every card and opener: the approved facts it was written from, in plain words. */
   WHY_LINE: true,
+  /** F24: "Forget my night" on /safety: delete your private data from a party, then a scan of the whole server store proves it's gone. */
+  FORGET_ME: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
