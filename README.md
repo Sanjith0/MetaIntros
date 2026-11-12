@@ -27,16 +27,22 @@ Meta Model API, copy `.env.example` to `.env.local` and fill in `META_API_KEY`,
 per night (`MODEL_CALL_CAP`); the key is never printed or logged.
 
 `PQ_PACE_MS` (default 600) slows the agents' talk so the stage can show it live. Set it to 0
-for instant results.
+for instant results, or change it at runtime from `/demo`.
+
+**Real phones on the same Wi-Fi:** run `npm run dev:lan` and open `/phones` on the laptop. Each
+person scans their own QR code (it opens `/join/<id>`, the user switcher reached from a camera).
+Tap each phone once so it can play sound.
 
 ## The demo path
 
 **One browser, about two minutes.** Use the user switcher (top right) to change who you are.
+`/demo` is the presenter's control panel: reset, pre-queue the other four, pace, **Lock now**,
+recorded or live answers, a forced agent timeout, and the door's frame source.
 
-1. Open the projector view at `/stage` in a second window and click **Start demo party**, or
-   follow the steps below to drive it from Maya's phone.
-2. To drive it by hand, queue the other four first:
-   `curl -X POST localhost:3000/api/demo/start -H 'content-type: application/json' -d '{"mode":"four"}'`
+1. Open the projector view at `/stage` in a second window. It replays the talk with a scrubber:
+   rejections in red, holds in amber, signatures landing, and each agent's latency.
+2. On `/demo`, click **Pre-queue Dev, Ana, Kai, Zoe** (or
+   `curl -X POST localhost:3000/api/demo/start -H 'content-type: application/json' -d '{"mode":"four"}'`).
 3. As **Maya**, open **Rooftop Sunset Session** from the Events tab and tap **Find my party**.
    Type `chill people, out by eleven, under twenty bucks, nowhere I have to drink`. The private
    preview shows her rules (done by 11 PM, $20 or less, no drink minimum) and the lines she
@@ -45,10 +51,12 @@ for instant results.
    "unavailable" (with no reason), Kai holds for one round, then all five sign the
    **Dolores Night Market**.
 5. **MATCH FOUND** appears with a chime. Open the group chat: the plan is pinned and each
-   person has one suggested opener. `/party` shows the party card and Maya's private receipt.
-   The Night Market's Event page shows **Your party · 5 going**.
-6. Open `/door`, tap **I'm here**, then post the fixture frame (`fixtures/frames/dev-at-door.json`)
-   with `curl -X POST localhost:3000/api/demo/frame`. Dev's card appears: how you're
+   person has one suggested opener. `/party` shows the party card and **Maya's secret**: her
+   rules in her own words and what her agent turned down, beside "What the party knows",
+   which a scan of the other four phones keeps at "Nothing". The Night Market's Event page
+   shows **Your party · 5 going**.
+6. Open `/door`, tap **I'm here**, then click **Dev arrives** on `/demo` (or post the fixture
+   frame `fixtures/frames/dev-at-door.json` with `curl -X POST localhost:3000/api/demo/frame`). Dev's card appears: how you're
    connected, what you have in common, and what to say. (`POST /api/frames` takes any Frame
    directly.)
 7. Open `/runitback`, pick people privately, and see only the mutual pairs. `/fair` shows the
@@ -58,7 +66,19 @@ for instant results.
 that all five show MATCH FOUND within 2 seconds of `plan.locked`, with sound. A 60-second
 recording is at `shots/demo.webm` (`npm run video` re-records it).
 
-`POST /api/demo/reset` clears all state.
+`POST /api/demo/reset` clears all state and resets the model settings.
+
+## Phase 2 layers (each behind a flag in `lib/flags.ts`, default on)
+
+| Flag | What it adds |
+|---|---|
+| `STAGE_SCRUBBER` | `/stage` replay with a scrubber, play/pause, speed and Live; board rebuilt at any point |
+| `SECRET_PANEL` | Maya's secret on her own `/party`: her rules, her receipt, and a computed "what the party knows" |
+| `REAL_PHONES` | `/phones` QR join on the local network, presence, server-clock acks, sound unlock, vibration |
+| `MODEL_READINESS` | streamed verdicts, per-agent latency, labelled fallbacks on timeout, recorded replays |
+| `DEMO_PANEL` | `/demo` presenter controls |
+
+Turn one off with `PQ_FLAG_<NAME>=0`. `FEATURES.md` lists every feature with its proof.
 
 ## What works
 
@@ -102,7 +122,9 @@ recording is at `shots/demo.webm` (`npm run video` re-records it).
 
 - **Model**: no key was available, so everything ran on the deterministic mock. The real
   client, prompts, timeouts, validation and fallbacks are in place (`model/client.ts`);
-  `npm run talk:real` times one real table talk when a key is set.
+  `npm run talk:real` times one real table talk when a key is set. `npm run record` saves a run
+  to `fixtures/recordings/demo-party.json`; the committed recording came from the mock model and
+  says so when replayed.
 - **Recognition**: `matchFrame` uses a stub that maps a fixture key to a member and never reads
   pixels. Plug a module in with `setMatcher()`.
 - **Door device identity**: `POST /api/frames` trusts the frame's `viewerId`.
@@ -116,7 +138,7 @@ recording is at `shots/demo.webm` (`npm run video` re-records it).
 
 ```bash
 npm run typecheck
-npm test                     # 52 unit tests (vitest)
+npm test                     # 77 unit tests (vitest)
 npm test -- queue            # one failing fixture per formation rule
 npm test -- agents           # the four required agent cases and more
 npm run contract:check       # fixtures and events against the Zod contracts
@@ -136,12 +158,13 @@ CI (`.github/workflows/ci.yml`) runs typecheck, unit tests and the contract chec
 ```
 contracts/   Zod schemas and the realtime event catalogue
 fixtures/    40 fictional profiles, friend graph, Groups, 15 events, the demo party, door frames
-model/       the Meta Model API client (mock by default)
+model/       the Meta Model API client (mock by default), settings, recordings
 lib/agents/  brief, agent turns, table talk, judge, verifier, pair talk, orchestrator
 lib/queue/   party formation rules
 lib/server/  in-memory store, event bus, queue, views, door, after
 lib/door/    the recognition interface and stub
 app/         routes: /events /event/[id] /queue /party /chat/[id] /stage /door /runitback /fair
+             /phones /join/[id] /demo
 evals/       eval harness, cases and PLAN.md
 reference/   the Facebook reference written from REA
 tests/       unit (vitest) and Playwright specs

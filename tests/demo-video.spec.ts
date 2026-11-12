@@ -10,6 +10,7 @@ const TARGET_MS = 60_000;
 test("record the 60-second demo path", async ({ browser, baseURL, request }) => {
   test.setTimeout(180_000);
   await request.post("/api/demo/reset");
+  await request.post("/api/demo/settings", { data: { paceMs: 650 } }); // a watchable pace on the production server
   await request.post("/api/demo/start", { data: { mode: "four" } }); // Dev, Ana, Kai, Zoe already queued
 
   fs.mkdirSync("test-results/video", { recursive: true });
@@ -56,14 +57,14 @@ test("record the 60-second demo path", async ({ browser, baseURL, request }) => 
   mark("group chat");
   await page.waitForTimeout(5000);
 
-  // 5. The party card and Maya's private receipt.
+  // 5. The party card, then Maya's secret: her rules on her phone, and what the party knows (nothing).
   await page.goto("/party");
   await expect(page.getByTestId("party-card")).toBeVisible();
   mark("party card");
-  await page.waitForTimeout(3000);
-  await page.getByTestId("receipt").scrollIntoViewIfNeeded();
-  await page.mouse.wheel(0, 400);
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(2500);
+  await page.getByTestId("secret-panel").scrollIntoViewIfNeeded();
+  mark("Maya's secret");
+  await page.waitForTimeout(3500);
 
   // 6. The Event page now shows the RSVP: your party, 5 going.
   await page.goto(`/event/${DEMO_PARTY.expectedPlanEventId}`);
@@ -96,6 +97,7 @@ test("record the 60-second demo path", async ({ browser, baseURL, request }) => 
   if (left > 0) await page.waitForTimeout(left);
   mark("end");
 
+  await request.delete("/api/demo/settings");
   const video = page.video()!;
   await ctx.close();
   fs.mkdirSync("shots", { recursive: true });

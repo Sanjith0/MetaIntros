@@ -33,6 +33,22 @@ sentence with the private preview (12 s), party forming (17 s), the table fillin
 card and her receipt (40 s), the RSVP on the Event page (46 s), Dev's card at the door (50 s),
 and a mutual run-it-back pick (57 s).
 
+## Phase 2 (branch `swarit-features`)
+
+Features land behind flags in `lib/flags.ts`; `FEATURES.md` holds each one's proof. Checkpoint
+after F5 (10:36 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npx playwright test` (production build, cold) | 18 specs, `18 passed (2.5m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Unit | `npm test` | `Tests  77 passed (77)` |
+| Demo video | `npm run video` | `saved shots/demo.webm (5407687 bytes, about 60 s)`; timeline 0.1s events, 4.3s event, 11.4s sentence and private preview, 16.4s party forming, 18.0s the table live, 30.5s MATCH FOUND, 35.5s group chat, 40.6s party card, 43.1s Maya's secret, 46.7s event RSVP, 50.8s door card, 57.5s run it back |
+| CI | `gh run list --branch swarit-features` | `success` since the lockfile fix |
+
+Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
+build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
+
 ## Facebook reference (Step 1)
 
 FACEBOOK_LAYER: no REA reference for the logged-in states. REA (`rea-agents` 6.8.0,
