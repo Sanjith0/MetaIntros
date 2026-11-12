@@ -24,6 +24,7 @@ export default defineConfig({
     url: `http://localhost:${PORT}/api/health`,
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
-    env: { DATABASE_URL: "file:./e2e.db", PORT: String(PORT), AI_MODE: "cache" },
+    // NETWORK_DISABLED: every E2E run doubles as an offline (Wi-Fi died) run
+    env: { DATABASE_URL: "file:./e2e.db", PORT: String(PORT), AI_MODE: "cache", NETWORK_DISABLED: "1" },
   },
 });
