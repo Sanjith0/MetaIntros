@@ -80,6 +80,8 @@ const DEFAULTS = {
   TELL_A_FRIEND: true,
   /** F37: find each other at the venue: "running late" and "where we meet", on everyone's door screen and in the chat. */
   FIND_EACH_OTHER: true,
+  /** F38: "Add to calendar" on /party: the locked plan as an .ics file, local times, names nobody. */
+  ADD_TO_CALENDAR: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

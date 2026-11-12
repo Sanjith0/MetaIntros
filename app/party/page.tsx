@@ -105,6 +105,11 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
                   <Link href="/runitback" data-testid="open-runitback" className="press flex h-9 items-center gap-1.5 rounded-[6px] bg-[var(--color-btn-2)] px-3 text-[15px] font-semibold">
                     Run it back
                   </Link>
+                  {flag("ADD_TO_CALENDAR") && (
+                    <a href="/api/party/ics" download data-testid="add-to-calendar" className="press flex h-9 items-center gap-1.5 rounded-[6px] bg-[var(--color-btn-2)] px-3 text-[15px] font-semibold">
+                      Add to calendar
+                    </a>
+                  )}
                 </div>
               </>
             ) : (
