@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoReady, resetDemo } from "./helpers";
+import { gotoReady, resetDemo, lockIn } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -11,7 +11,7 @@ test("after the event: add squadmates → simulated members accept → Met throu
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-downtown-pa").click();
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page, 30_000);
   await page.getByTestId("open-squad-chat").click();
   await expect(page.getByTestId("composer")).toBeVisible();
   await page.request.post("/api/demo/fast-forward");

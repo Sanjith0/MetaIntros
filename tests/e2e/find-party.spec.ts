@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoReady, resetDemo } from "./helpers";
+import { gotoReady, resetDemo, lockIn } from "./helpers";
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
 
@@ -14,7 +14,7 @@ test("check-ins sync across members; party photos visible only inside the party"
   await a.getByTestId("size-4").click();
   await a.getByTestId("choose-area").click();
   await a.getByTestId("area-lm-downtown-pa").click();
-  await expect(a.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(a, 30_000);
   const status = await (await a.request.get("/api/queue/status")).json();
   const party = await (await a.request.get(`/api/party/${status.partyId}`)).json();
   const mateId = party.members.map((m: { userId: string }) => m.userId).find((u: string) => u !== "p01");

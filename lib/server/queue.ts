@@ -11,6 +11,7 @@ import { getFillMode, getSetting } from "./settings";
 import { formParty, chooseCandidate } from "./pipeline";
 import { checkStalls } from "./host";
 import { sweepExpiredChats } from "./expiry";
+import { sweepReadyChecks } from "./readyCheck";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { nowMs } from "@/lib/clock";
@@ -329,6 +330,7 @@ export function ensureTicker() {
     tick().catch((e) => console.error("[queue tick]", e));
     checkStalls().catch((e) => console.error("[stalls]", e));
     sweepExpiredChats().catch((e) => console.error("[expiry]", e));
+    sweepReadyChecks().catch((e) => console.error("[ready check]", e));
   }, Number(process.env.QUEUE_TICK_MS ?? 2000));
 }
 

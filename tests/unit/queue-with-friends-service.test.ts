@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
 import { getQueueStatus, leaveQueue, tick } from "@/lib/server/queue";
 import { setSetting } from "@/lib/server/settings";
+import { declineParty } from "@/lib/server/readyCheck";
+import { tickAndAccept } from "../helpers/squad";
 import {
   askToJoin, cancelGroup, createGroup, friendsForQueue, getGroupView, pendingInvites, respondToInvite, startGroup,
 } from "@/lib/server/queueGroups";
@@ -50,7 +52,7 @@ describe("queue with friends (DB)", () => {
     // Every newcomer has to fit both friends, so this squad forms once the search has widened
     // (about 30s of waiting in the seeded world): wind the shared join time back instead of sleeping.
     await prisma.queueEntry.updateMany({ where: { status: "waiting", parked: false }, data: { joinedAt: new Date(Date.now() - 31_000) } });
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     const done = await getQueueStatus("p01");
     expect(done.state).toBe("matched");
     const members = await prisma.partyMember.findMany({ where: { partyId: done.partyId! } });
@@ -104,6 +106,37 @@ describe("queue with friends (DB)", () => {
     await leaveQueue("p20");
     const left = await prisma.queueEntry.findMany({ where: { groupId, status: "waiting" } });
     expect(left.map((e) => e.userId).sort()).toEqual(["p01", "p30"]);
+  });
+
+  it("if a newcomer passes on the ready check, the friends go back into the queue together", async () => {
+    const { groupId } = (await createGroup("p01", settings(5), ["p20", "p30"])) as { groupId: string };
+    await startGroup("p01", groupId);
+    const joined = (await prisma.queueEntry.findFirstOrThrow({ where: { userId: "p01", groupId } })).joinedAt;
+    await wait(300);
+    await prisma.queueEntry.updateMany({ where: { status: "waiting", parked: false }, data: { joinedAt: new Date(Date.now() - 31_000) } });
+    expect(await tick()).toBe(1);
+    const { partyId } = await getQueueStatus("p01");
+    const newcomer = (await prisma.partyMember.findFirstOrThrow({ where: { partyId: partyId!, groupId: null } })).userId;
+    await prisma.user.update({ where: { id: newcomer }, data: { isSimulated: false } });
+    expect(await declineParty(newcomer, partyId!)).toMatchObject({ ok: true, status: "cancelled" });
+    const back = await prisma.queueEntry.findMany({ where: { groupId, status: "waiting" } });
+    expect(back.map((e) => e.userId).sort()).toEqual(["p01", "p20", "p30"]);
+    expect(new Set(back.map((e) => e.joinedAt.getTime())).size).toBe(1);
+    expect(back[0].joinedAt.getTime()).toBeLessThan(joined.getTime());
+    expect(await prisma.queueEntry.count({ where: { userId: newcomer, status: "waiting" } })).toBe(0);
+  });
+
+  it("a friend who passes stays out; the rest of the friends go back together", async () => {
+    const { groupId } = (await createGroup("p01", settings(5), ["p20", "p30"])) as { groupId: string };
+    await startGroup("p01", groupId);
+    await wait(300);
+    await prisma.queueEntry.updateMany({ where: { status: "waiting", parked: false }, data: { joinedAt: new Date(Date.now() - 31_000) } });
+    expect(await tick()).toBe(1);
+    const { partyId } = await getQueueStatus("p01");
+    await prisma.user.update({ where: { id: "p20" }, data: { isSimulated: false } });
+    await declineParty("p20", partyId!);
+    const back = await prisma.queueEntry.findMany({ where: { groupId, status: "waiting" } });
+    expect(back.map((e) => e.userId).sort()).toEqual(["p01", "p30"]);
   });
 
   it("the host can cancel before queuing", async () => {

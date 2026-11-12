@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo, gotoReady } from "./helpers";
+import { resetDemo, gotoReady, lockIn } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -19,7 +19,18 @@ test("join from an event page (GPS) → queue fills → party found → squad ba
   await expect(page.getByTestId("queue-screen")).toBeVisible();
   await expect(page.getByTestId("players-found")).toContainText("of 5");
   await expect(page.getByTestId("player-slots").locator("li")).toHaveCount(5);
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  // ready check: sample squadmates are already in; Jordan sees first name + last initial and what they share
+  await expect(page.getByTestId("ready-check")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("ready-count")).toHaveText("4 of 5 in");
+  await expect(page.locator('[data-testid="party-member"][data-accepted="1"]')).toHaveCount(4);
+  await expect(page.locator('[data-testid="party-member"]').nth(1)).toContainText(/\S+ [A-Z]\./);
+  await expect(page.getByTestId("ready-timer")).toContainText(/^(10:00|9:\d\d) left$/);
+  await expect(page.getByTestId("open-squad-chat")).toHaveCount(0);
+  expect((await page.request.get(`/api/party/${(await (await page.request.get("/api/queue/status")).json()).partyId}/trace`)).status()).toBe(409);
+  await gotoReady(page, "/events");
+  await expect(page.getByTestId("status-card")).toHaveAttribute("data-status", "accept");
+  await page.getByTestId("status-action").click();
+  await lockIn(page);
   await expect(page.getByTestId("party-members").locator("li")).toHaveCount(5);
   await expect(page.getByTestId("party-event")).toContainText("Indie Night");
   // "How we matched you" opens in a sheet: code checks and AI lines, each AI line with its source
@@ -85,7 +96,15 @@ test("live mode: four real people pick size 4 and land in the same squad", async
     await expect(p.getByTestId("queue-screen")).toBeVisible();
     pages.push(p);
   }
-  for (const p of pages) await expect(p.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  for (const p of pages) await expect(p.getByTestId("ready-check")).toBeVisible({ timeout: 30_000 });
+  // everyone is real, so the squad waits for all four "I'm in"s
+  await pages[0].getByTestId("accept-party").click();
+  await expect(pages[0].getByTestId("waiting-on")).toContainText("Waiting on 3 more");
+  await expect(pages[1].getByTestId("ready-count")).toHaveText("1 of 4 in");
+  for (const p of pages.slice(1, 3)) await p.getByTestId("accept-party").click();
+  await expect(pages[3].getByTestId("open-squad-chat")).toHaveCount(0);
+  await lockIn(pages[3]);
+  for (const p of pages) await expect(p.getByTestId("party-found")).toBeVisible({ timeout: 15_000 });
   const ids = [];
   for (const p of pages) {
     const s = await (await p.request.get("/api/queue/status")).json();
@@ -105,7 +124,7 @@ test("new hangout queue: Events → Plan a hangout → squad gets a squad-only h
   await page.getByTestId("area-lm-downtown-pa").click();
 
   await expect(page.getByTestId("queue-kind")).toContainText("New hangout");
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page, 30_000);
   await expect(page.getByTestId("party-found")).toContainText("a new hangout");
   await page.getByTestId("trace-toggle").click();
   await expect.poll(() => page.locator('[data-testid="trace-step"]').filter({ hasText: "Hangout plan" }).count(), { timeout: 15_000 }).toBeGreaterThanOrEqual(2);
@@ -140,4 +159,37 @@ test("queue type switch: 'any event' can flip to 'new hangout' before joining", 
   // from a specific event there is no switch
   await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
   await expect(page.getByTestId("queue-mode-hangout")).toHaveCount(0);
+});
+
+test("live mode: one person says 'Not for me' → they leave quietly, the others go back into the queue", async ({ browser, request }) => {
+  await request.post("/api/demo/settings", { data: { fillMode: "live" } });
+  const pages = [];
+  for (const name of ["Eve", "Finn", "Gia", "Hal"]) {
+    const ctx = await browser.newContext();
+    const p = await ctx.newPage();
+    await gotoReady(p, "/join");
+    await p.getByTestId("join-name").fill(name);
+    await p.getByTestId("join-age-18-24").click();
+    await p.getByTestId("join-gender-none").click();
+    await p.getByTestId("join-sample").click();
+    await expect(p).toHaveURL(/\/events/);
+    await gotoReady(p, "/queue/start?mode=anything");
+    await p.getByTestId("size-4").click();
+    await p.getByTestId("choose-area").click();
+    await p.getByTestId("area-lm-downtown-pa").click();
+    await expect(p.getByTestId("queue-screen")).toBeVisible();
+    pages.push(p);
+  }
+  for (const p of pages) await expect(p.getByTestId("ready-check")).toBeVisible({ timeout: 30_000 });
+  await pages[0].getByTestId("accept-party").click();
+  await expect(pages[0].getByTestId("waiting-on")).toBeVisible();
+  await pages[3].getByTestId("decline-party").click();
+  await expect(pages[3]).toHaveURL(/\/events/);
+  for (const p of pages.slice(0, 3)) {
+    await expect(p.getByTestId("queue-screen")).toBeVisible({ timeout: 15_000 });
+    await expect(p.getByTestId("ready-check-notice")).toHaveAttribute("data-notice", "requeued");
+    await expect(p.getByTestId("ready-check-notice")).not.toContainText("Hal"); // declines are invisible
+    await expect(p.getByTestId("players-found")).toContainText("of 4");
+  }
+  expect((await (await pages[3].request.get("/api/queue/status")).json()).state).toBe("idle");
 });

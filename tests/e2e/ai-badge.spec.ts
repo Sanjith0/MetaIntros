@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo, gotoReady } from "./helpers";
+import { resetDemo, gotoReady, lockIn } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -20,7 +20,7 @@ test("AI output says where it came from, in plain words, and offline runs never 
   await page.getByTestId("size-5").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-downtown-pa").click();
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page);
 
   // "How we matched you": AI lines carry their source; the status sits in a footnote
   await page.getByTestId("trace-toggle").click();

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoReady, resetDemo, trackConsoleErrors } from "./helpers";
+import { gotoReady, lockIn, resetDemo, trackConsoleErrors } from "./helpers";
 
 const SHOTS = process.env.FRIENDS_SHOTS_DIR;
 const shot = async (page: import("@playwright/test").Page, name: string) => {
@@ -60,7 +60,8 @@ test("queue with friends: invite → friends say yes → start → one squad wit
   await expect(page.getByTestId("players-found")).toContainText("of 5");
   await shot(page, "04-queue");
 
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 60_000 }); // newcomers must fit both friends: ~30s
+  // newcomers must fit both friends (~30s), then Jordan taps "I'm in" (sample friends accept on their own)
+  await lockIn(page, 60_000);
   await expect(page.getByTestId("party-members").locator("li")).toHaveCount(5);
   await expect(page.getByTestId("came-with")).toHaveText(/^You, \w+ and \w+ \+ 2 new people$/);
   await page.waitForTimeout(1500); // members pop in staggered

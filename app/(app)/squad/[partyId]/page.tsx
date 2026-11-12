@@ -4,7 +4,7 @@ import { CalendarDays, ChevronRight, MapPin, MessageCircle, MessageSquareQuote, 
 import { TopBar } from "@/components/fb/TopBar";
 import { Avatar, FacePile, IconCircle, ListRow, Section, Stack } from "@/components/fb";
 import { TraceRow } from "@/components/trace/TraceList";
-import { getPartyForUser } from "@/lib/server/party";
+import { getPartyForUser, isRevealed } from "@/lib/server/party";
 import { getCurrentUserId } from "@/lib/server/session";
 import { squadName } from "@/lib/server/squadChat";
 import { fmtEventWhen, fmtTime } from "@/lib/format";
@@ -23,7 +23,7 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
   const { partyId } = await params;
   const me = await getCurrentUserId();
   const p = await getPartyForUser(me, partyId);
-  if (!p?.event) notFound();
+  if (!p?.event || !isRevealed(p.status)) notFound();
   const ev = p.event;
   const people = p.members.map((m) => ({ ...m.user, checkedIn: Boolean(m.checkedInAt) }));
   const others = people.filter((u) => u.id !== me);

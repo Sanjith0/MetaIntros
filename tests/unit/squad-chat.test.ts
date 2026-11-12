@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { listInbox } from "@/lib/server/chats";
 import { getBadges, markTabSeen } from "@/lib/server/badges";
@@ -20,7 +21,7 @@ describe("squad chat", () => {
     expect((await getBadges("p01")).chats).toBe(0);
     await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 6, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: true, event: true, chat: true } });
     const chat = party.chat!;
     expect(chat.type).toBe("squad");

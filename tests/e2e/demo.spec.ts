@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoReady, trackConsoleErrors } from "./helpers";
+import { gotoReady, trackConsoleErrors, lockIn } from "./helpers";
 
 test.setTimeout(210_000); // the scripted demo must finish in < 3.5 minutes
 
@@ -34,7 +34,7 @@ test("scripted demo flow end-to-end (simulated mode, ~20s queue)", async ({ page
   await expect(page.getByTestId("players-found")).toContainText("of 6");
   await expect.poll(async () => page.getByTestId("player-filled").count(), { timeout: 25_000 }).toBeGreaterThanOrEqual(3);
   // 4. squad forms; "How we matched you" opens in a sheet
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 40_000 });
+  await lockIn(page, 40_000);
   await page.getByTestId("trace-toggle").click();
   await expect.poll(() => page.getByTestId("trace-step").count(), { timeout: 20_000 }).toBeGreaterThanOrEqual(8);
   await page.keyboard.press("Escape");
