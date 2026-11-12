@@ -41,18 +41,28 @@ export function MuseMark({ size = 16 }: { size?: number }) {
 }
 
 export function AiModeBadge() {
-  const [mode, setMode] = useState<string | null>(null);
+  const [h, setH] = useState<{ ai: string; degraded: boolean; stats?: { lastError: string | null } } | null>(null);
   useEffect(() => {
-    fetch("/api/health").then((r) => r.json()).then((d) => setMode(d.ai)).catch(() => setMode("mock"));
+    let alive = true;
+    const load = () =>
+      fetch("/api/health")
+        .then((r) => r.json())
+        .then((d) => alive && setH(d))
+        .catch(() => alive && setH({ ai: "mock", degraded: false }));
+    load();
+    const t = setInterval(load, 5000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+    };
   }, []);
-  if (!mode) return null;
+  if (!h) return null;
+  const label = h.ai !== "muse" ? "Mock AI" : h.degraded ? "Muse ⚠ fallback" : "Muse live";
+  const cls = h.ai !== "muse" ? "bg-amber-100 text-amber-800" : h.degraded ? "bg-red-100 text-red-700" : "bg-violet-100 text-muse";
+  const title = h.ai !== "muse" ? "No API key: deterministic fallback" : h.degraded ? `Last model call failed (${h.stats?.lastError}); using fallback` : "Live Muse models";
   return (
-    <span
-      data-testid="ai-mode"
-      title={mode === "muse" ? "Live Muse models" : "No API key: deterministic fallback matcher"}
-      className={`text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${mode === "muse" ? "bg-violet-100 text-muse" : "bg-amber-100 text-amber-800"}`}
-    >
-      {mode === "muse" ? "Muse live" : "Mock AI"}
+    <span data-testid="ai-mode" title={title} className={`text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded whitespace-nowrap ${cls}`}>
+      {label}
     </span>
   );
 }

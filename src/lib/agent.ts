@@ -253,7 +253,7 @@ export async function* formCrew(eventId: string, seekerId: string, filters: Queu
         aiMode = "fallback";
       }
     } else {
-      yield { type: "step", id: "fallback", label: "Model output failed validation", detail: "Falling back to the deterministic matcher" };
+      yield { type: "step", id: "fallback", label: "Model unavailable or output invalid", detail: "Using the deterministic matcher instead (labeled as fallback)" };
     }
   }
 

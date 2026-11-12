@@ -186,7 +186,7 @@ export default function QueuePage({ params }: { params: Promise<{ id: string }> 
                 <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-bounce [animation-delay:150ms]" />
                 <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-bounce [animation-delay:300ms]" />
               </span>
-              thinking
+              <ThinkingLine />
             </div>
           )}
 
@@ -225,4 +225,15 @@ function Radar({ status }: { status: Status | null }) {
         })}
     </div>
   );
+}
+
+const WEIGHING = ["Comparing everyone's free time", "Checking energy levels: chill vs. loud", "Looking for taste clashes", "Weighing budgets", "Finding shared groups and events", "Checking walking distance to the show"];
+
+function ThinkingLine() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setI((x) => (x + 1) % WEIGHING.length), 1600);
+    return () => clearInterval(t);
+  }, []);
+  return <span key={i} className="fade-up">{WEIGHING[i]}…</span>;
 }

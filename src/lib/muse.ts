@@ -15,6 +15,21 @@ export const MODELS = {
 const REASONING_HEADROOM = Number(process.env.MUSE_REASONING_HEADROOM ?? 3000);
 const REASONING_EFFORT = process.env.MUSE_REASONING_EFFORT ?? "low"; // "" to omit
 
+// Call stats so the UI badge can't claim "Muse live" while calls are silently failing.
+const g = globalThis as unknown as { __museStats?: { ok: number; fail: number; lastError: string | null; lastOkAt: number | null; lastFailAt: number | null } };
+export const museStats = () => (g.__museStats ??= { ok: 0, fail: 0, lastError: null, lastOkAt: null, lastFailAt: null });
+function record(ok: boolean, err?: string) {
+  const st = museStats();
+  if (ok) {
+    st.ok++;
+    st.lastOkAt = Date.now();
+  } else {
+    st.fail++;
+    st.lastFailAt = Date.now();
+    st.lastError = err ?? "unknown";
+  }
+}
+
 export const museEnabled = () => Boolean(BASE && KEY) && process.env.FORCE_MOCK_AI !== "1";
 
 interface CallOpts {
@@ -87,12 +102,16 @@ export async function museJson<T>(opts: CallOpts): Promise<T | null> {
   let r = await rawCall(opts, true);
   if (r.status === -1) r = await rawCall(opts, true);
   if (r.status === 400 || r.status === 422) r = await rawCall(opts, false);
-  return extractJson<T>(r.text);
+  const parsed = extractJson<T>(r.text);
+  record(parsed != null, parsed == null ? (r.text ? "unparseable JSON" : `HTTP ${r.status} / empty`) : undefined);
+  return parsed;
 }
 
 export async function museText(opts: CallOpts): Promise<string | null> {
   if (!museEnabled()) return null;
   let r = await rawCall(opts, false);
   if (r.status === -1) r = await rawCall(opts, false);
-  return r.text?.trim() || null;
+  const t = r.text?.trim() || null;
+  record(t != null, t == null ? `HTTP ${r.status} / empty` : undefined);
+  return t;
 }

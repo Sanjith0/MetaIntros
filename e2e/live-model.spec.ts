@@ -44,3 +44,10 @@ test("pre-chat keeps grounded topics and drops invented ones", async ({ request 
     expect(c.spark).toBe(4);
   }
 });
+
+test("health is not degraded after successful model calls", async ({ request }) => {
+  await formCrew(request, filters({ womenOnly: true }));
+  const h = await (await request.get("/api/health")).json();
+  expect(h.degraded).toBe(false);
+  expect(h.stats.ok).toBeGreaterThan(0);
+});
