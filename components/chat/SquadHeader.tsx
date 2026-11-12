@@ -7,14 +7,15 @@ import { Avatar } from "@/components/Avatar";
 import { MatchTracePanel } from "@/components/trace/MatchTracePanel";
 import { fmtDuration, fmtEventWhen } from "@/lib/format";
 import type { SquadHeaderInfo } from "@/lib/server/squadChat";
+import { nowMs } from "@/lib/clock";
 
 export type SquadHeaderData = SquadHeaderInfo;
 
 export function SquadHeader({ squad, meId, children }: { squad: SquadHeaderData; meId: string; children?: React.ReactNode }) {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
-    setNow(Date.now());
-    const t = setInterval(() => setNow(Date.now()), 30_000);
+    setNow(nowMs());
+    const t = setInterval(() => setNow(nowMs()), 30_000);
     return () => clearInterval(t);
   }, []);
   const start = new Date(squad.event.startsAt);

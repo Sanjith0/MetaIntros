@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"hey I'm Swarit - usually hunting for vinyl or planning a hike that definitely doesn't start early morning haha - what are you into?\"}, {\"speaker\": \"B\", \"text\": \"haha same chill energy - I'm test, I'm big into cycling around the city, EDM shows, and art museums when I want to slow down\"}, {\"speaker\": \"A\", \"text\": \"oh nice, I'm all about indie and live music so we could totally trade - I'll show you my favorite intimate live spots if you put me on to a good EDM set\"}, {\"speaker\": \"B\", \"text\": \"deal. And we can swap outdoor stories too - you bring climbing beta, I'll bring cycling routes\"}, {\"speaker\": \"A\", \"text\": \"perfect, plus coffee + vinyl digging is my ideal chill day if you're down for that vibe too\"}], \"sparks\": [\"Indie / Live music x EDM - trading live show recs and festival stories\", \"Outdoor adventures - climbing vs cycling routes and hiking spots\", \"Chill hang - coffee + vinyl digging and art museums\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 218,
+    "completionTokens": 765
+  },
+  "savedAt": "2026-11-12T19:48:50.083Z"
+}

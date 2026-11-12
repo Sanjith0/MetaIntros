@@ -30,9 +30,20 @@ const SCRIPT = [
   "Chats badge → squad chat + AI host welcome",
   "Open talk cards (swipe)",
   "Find your party → I'm here",
-  "Fast-forward past the event → chat archives",
+  "Fast-forward: the event ends for everyone → chat archives",
   "Add squad as friends → Met through Queue Up",
 ];
+
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+function fmtClock(ms: number) {
+  const d = new Date(ms);
+  return `${DAYS[d.getDay()]} ${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, "0")} ${d.getHours() < 12 ? "AM" : "PM"}`;
+}
+
+function fmtOffset(ms: number) {
+  const h = Math.round(ms / 3_600_000);
+  return h >= 24 ? `${Math.floor(h / 24)}d ${h % 24}h` : `${h}h`;
+}
 
 export default function DemoPage() {
   const [s, setS] = useState<Status | null>(null);
@@ -63,10 +74,17 @@ export default function DemoPage() {
           className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 font-bold"><RotateCcw size={16} /> {busy === "reset" ? "Resetting…" : "Reset & reseed"}</button>
         <Link href="/events" data-testid="demo-start" className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#1877f2] to-[#9333ea] py-3 font-bold"><Play size={16} /> Start as Me</Link>
         <button type="button" data-testid="demo-ff" onClick={() => act("ff", "/api/demo/fast-forward")}
-          className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 text-sm font-semibold"><FastForward size={16} /> Fast-forward time</button>
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 text-sm font-semibold"><FastForward size={16} /> Fast-forward: end event</button>
         <button type="button" data-testid="demo-kick" onClick={() => act("kick", "/api/demo/kick-live")}
           className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 text-sm font-semibold"><UserX size={16} /> Kick live users ({s?.liveUsers ?? 0})</button>
       </section>
+
+      {s && (
+        <p className="mt-3 text-xs text-[#c7d2fe]" data-testid="global-clock">
+          Global clock: <b className="text-white">{fmtClock(Date.now() + s.clockOffsetMs)}</b>
+          {s.clockOffsetMs > 60_000 ? ` (fast-forwarded ${fmtOffset(s.clockOffsetMs)})` : " (real time)"} · same for every phone
+        </p>
+      )}
 
       <section className="mt-5">
         <h2 className="flex items-center gap-1.5 text-sm font-bold"><Users size={16} /> Who fills the queue?</h2>

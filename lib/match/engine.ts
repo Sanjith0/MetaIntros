@@ -285,10 +285,11 @@ export async function runTickAsync(
       proposal.candidates.some((c) => c.entryIds.join() === chosen!.entryIds.join()) &&
       validateParty(chosen.userIds.map((u) => people.get(u)!)).ok;
     if (!valid) chosen = proposal.candidates[0];
-    if (await commit(proposal, chosen!)) {
-      chosen!.entryIds.forEach((id) => taken.add(id));
-      formed++;
-    }
+    const ok = await commit(proposal, chosen!);
+    // Formed or not, these entries are done for this tick: a failed commit (no event fits, someone
+    // left) must not be retried by the next anchor with the same people within the same pass.
+    chosen!.entryIds.forEach((id) => taken.add(id));
+    if (ok) formed++;
   }
   return formed;
 }

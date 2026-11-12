@@ -4,6 +4,7 @@ import { getClockOffsetMs } from "./clock";
 import { getSetting } from "./settings";
 import { publish } from "./bus";
 import { cancelAllSims } from "./queue";
+import { nowMs } from "@/lib/clock";
 
 export async function demoStatus() {
   const [waiting, parties, liveUsers] = await Promise.all([
@@ -27,7 +28,7 @@ export async function demoStatus() {
     const queue = w.mode === "hangout" ? "hangout" : w.eventId ? "event" : "any event";
     let g = b.find((x) => x.size === w.targetPartySize && x.queue === queue);
     if (!g) b.push((g = { size: w.targetPartySize, queue, users: [] }));
-    g.users.push({ id: w.user.id, name: w.user.name, avatarColor: w.user.avatarColor, real: !w.user.isSimulated, waitedMs: Date.now() - w.joinedAt.getTime(), event: w.event?.title ?? null });
+    g.users.push({ id: w.user.id, name: w.user.name, avatarColor: w.user.avatarColor, real: !w.user.isSimulated, waitedMs: nowMs() - w.joinedAt.getTime(), event: w.event?.title ?? null });
   }
   return {
     fillMode: await getSetting("fillMode", "simulated"),

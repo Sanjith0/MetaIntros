@@ -16,6 +16,7 @@ import { partyFormationAgent, templateRationale } from "@/lib/agents/partyFormat
 import { eventSelectionAgent } from "@/lib/agents/eventSelection";
 import { afterPartyConfirmed } from "./hooks";
 import { planHangout } from "./hangout";
+import { nowDate } from "@/lib/clock";
 
 const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
 const candKey = (c: Candidate) => [...c.entryIds].sort().join(",");
@@ -79,14 +80,20 @@ export function setEventChooser(fn: EventChooser) {
 }
 
 
-/** Commit a chosen candidate as a party. Returns null (no party) if anything fails validation. */
-export async function formParty(p: Proposal, c: Candidate, people: Map<string, Person>): Promise<string | null> {
+export type FormFailure = "unsafe" | "claim" | "no_event";
+
+/**
+ * Commit a chosen candidate as a party. Returns the party id, or the reason no party formed:
+ * "unsafe" (safety re-check failed), "claim" (someone already left/matched), "no_event"
+ * (no existing event / hangout spot fits this squad — everyone goes back to the queue).
+ */
+export async function formParty(p: Proposal, c: Candidate, people: Map<string, Person>): Promise<{ partyId: string } | { partyId: null; reason: FormFailure }> {
   const members = c.userIds.map((u) => people.get(u)!);
-  if (!validateParty(members).ok) return null;
+  if (!validateParty(members).ok) return { partyId: null, reason: "unsafe" };
 
   // Claim the entries atomically: if any is no longer waiting, abort.
   const partyId = await prisma.$transaction(async (tx) => {
-    const claimed = await tx.queueEntry.updateMany({ where: { id: { in: c.entryIds }, status: "waiting" }, data: { status: "matched", matchedAt: new Date() } });
+    const claimed = await tx.queueEntry.updateMany({ where: { id: { in: c.entryIds }, status: "waiting" }, data: { status: "matched", matchedAt: nowDate() } });
     if (claimed.count !== c.entryIds.length) throw new Error("entries no longer waiting");
     const party = await tx.party.create({
       data: {
@@ -102,7 +109,7 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
     await tx.queueEntry.updateMany({ where: { id: { in: c.entryIds } }, data: { partyId: party.id } });
     return party.id;
   }).catch(() => null);
-  if (!partyId) return null;
+  if (!partyId) return { partyId: null, reason: "claim" };
   const agentOut = pending.get(candKey(c));
   pending.delete(candKey(c));
   await prisma.party.update({ where: { id: partyId }, data: { rationale: agentOut?.rationale ?? templateRationale(c) } });
@@ -122,12 +129,12 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
       prisma.queueEntry.updateMany({ where: { id: { in: c.entryIds } }, data: { status: "waiting", partyId: null, matchedAt: null } }),
       prisma.party.update({ where: { id: partyId }, data: { status: "cancelled" } }),
     ]);
-    return null;
+    return { partyId: null, reason: "no_event" };
   }
   await prisma.party.update({ where: { id: partyId }, data: { eventId: event.id, status: "confirmed" } });
   await afterPartyConfirmed(partyId);
   publish("party", { type: "formed", partyId, eventId: event.id }, c.userIds);
   publish("badges", {}, c.userIds);
   publish("demo", { type: "party", partyId });
-  return partyId;
+  return { partyId };
 }

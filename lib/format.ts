@@ -1,3 +1,4 @@
+import { nowDate } from "@/lib/clock";
 const DAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -14,7 +15,7 @@ export function fmtEventWhen(start: Date, end?: Date) {
 
 export const fmtMonth = (d: Date) => MON[d.getMonth()].toUpperCase();
 
-export function timeAgo(d: Date, now = new Date()) {
+export function timeAgo(d: Date, now = nowDate()) {
   const s = Math.max(0, Math.round((now.getTime() - d.getTime()) / 1000));
   if (s < 60) return "now";
   const m = Math.round(s / 60);

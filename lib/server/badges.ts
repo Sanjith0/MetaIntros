@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { nowDate } from "@/lib/clock";
 
 export type Tab = "home" | "events" | "friends" | "chats" | "profile";
 export const TABS: Tab[] = ["home", "events", "friends", "chats", "profile"];
@@ -10,7 +11,7 @@ export async function getTabSeen(userId: string, tab: Tab): Promise<Date> {
   return row ? new Date(row.value) : new Date(0);
 }
 
-export async function markTabSeen(userId: string, tab: Tab, at = new Date()) {
+export async function markTabSeen(userId: string, tab: Tab, at = nowDate()) {
   await prisma.appSetting.upsert({
     where: { key: key(userId, tab) },
     create: { key: key(userId, tab), value: at.toISOString() },

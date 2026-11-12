@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"hey Adi! it's test - saw you're into EDM, Pickleball, and Anime too, that's literally my chill trifecta\"}, {\"speaker\": \"B\", \"text\": \"no way! I'm Adi - I'm super active with all three. Are you more rave-till-dawn or dink-till-dawn? lol\"}, {\"speaker\": \"A\", \"text\": \"haha why not both? We could trade anime recs between pickleball games\"}, {\"speaker\": \"B\", \"text\": \"love that! I also live for hackathons and saw you're into startups - we should brainstorm a pickleball anime rave app\"}, {\"speaker\": \"A\", \"text\": \"omg that's chaotic and brilliant, I'm so in. We can debut it at the event\"}, {\"speaker\": \"B\", \"text\": \"bet! First match, then playlist swap, then world domination\"}], \"sparks\": [\"EDM + Pickleball combo - rave energy meets court energy\", \"Anime rec swap - perfect chill hang\", \"Hackathon x Startups idea - building something fun together\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 222,
+    "completionTokens": 713
+  },
+  "savedAt": "2026-11-12T19:48:55.731Z"
+}
