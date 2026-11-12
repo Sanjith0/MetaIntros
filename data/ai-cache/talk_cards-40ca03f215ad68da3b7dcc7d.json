@@ -1,0 +1,11 @@
+{
+  "text": "{\"pairs\": [{\"owner\": \"live-50fa170a\", \"subject\": \"live-51b468a1\", \"openers\": [\"I saw we both gravitate to low-key, chill weekends — are you skipping the big party scene tonight too?\", \"Quick trade — I can share an indie live show rec if you have an EDM festival story?\"]}, {\"owner\": \"live-50fa170a\", \"subject\": \"live-64dc3764\", \"openers\": [\"Hey Adi — I saw you're in Peninsula Hikers too, got a favorite sunset trail around here?\", \"Do you have a go-to post-hike coffee spot? I'm always looking for hiking + coffee combos.\"]}, {\"owner\": \"live-51b468a1\", \"subject\": \"live-50fa170a\", \"openers\": [\"Hey Swarit — looks like we're both on team low-key, chill weekends. What does your ideal low-key weekend look like?\", \"Want to trade recs? I love EDM live shows and I saw you're into indie / live music.\"]}, {\"owner\": \"live-51b468a1\", \"subject\": \"live-64dc3764\", \"openers\": [\"Hey Adi — saw you're in Palo Alto Pickleball and follow Insomniac Events, that's rave energy meets court energy!\", \"Are you in Bay Area Anime Watch Party and Bay Area Hackers too? We overlap on anime, edm, hackathons, and pickleball — what have you been into lately?\"]}, {\"owner\": \"live-64dc3764\", \"subject\": \"live-50fa170a\", \"openers\": [\"Hey Swarit — I saw you're into hiking and in Bay Area Hiking Buddies, any sunset trails you'd recommend?\", \"Do you have a favorite post-hike coffee spot? I'm trying to find good hiking + coffee combos.\"]}, {\"owner\": \"live-64dc3764\", \"subject\": \"live-51b468a1\", \"openers\": [\"I saw you follow Insomniac Events and you're in Palo Alto Pickleball — how do you balance rave energy and court energy?\", \"Looks like we both are into edm, pickleball, anime, and hackathons — I saw you follow Studio Ghibli and Devpost, any recent favorites?\"]}]}",
+  "task": "talk_cards",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 581,
+    "completionTokens": 1019
+  },
+  "savedAt": "2026-11-12T19:48:58.875Z"
+}
