@@ -4,6 +4,8 @@ import { EVENTS, LANDMARKS, VENUES, profileById } from "@/data/seed";
 import { fromMin, pretty, toMin, walkMinutes } from "@/lib/geo";
 import { museEnabled, museJson } from "@/lib/muse";
 import { parseTime } from "@/lib/time";
+import { icebreaker } from "@/lib/icebreakers";
+import { preChat } from "@/lib/prechat";
 import { hookSummary, pairScore, shared, tasteScore } from "@/lib/signals";
 import { crewFor, saveCrew, state, visibleQueue } from "@/lib/store";
 import type { Crew, FormStep, MeetupPlan, Profile, QueueFilters, Swap } from "@/lib/types";
@@ -336,6 +338,8 @@ export async function* formCrew(eventId: string, seekerId: string, filters: Queu
     aiMode,
   };
   saveCrew(crew);
+  // Warm the caches so the crew page, icebreakers and pre-chat open instantly in the live demo.
+  void Promise.all(final.flatMap((id) => [icebreaker(seekerId, id), preChat(seekerId, id)])).catch(() => {});
   yield { type: "crew", crew };
 }
 
