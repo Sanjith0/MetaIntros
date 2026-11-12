@@ -22,6 +22,13 @@ test("join from an event page (GPS) → queue fills → party found → squad ba
   await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("party-members").locator("li")).toHaveCount(5);
   await expect(page.getByTestId("party-event")).toContainText("Indie Night");
+  // agent trace streams in step by step
+  await expect(page.getByTestId("trace-panel")).toBeVisible();
+  await expect(page.getByTestId("trace-step").first()).toBeVisible();
+  await expect.poll(() => page.getByTestId("trace-step").count(), { timeout: 15_000 }).toBeGreaterThanOrEqual(7);
+  await expect(page.locator('[data-testid="trace-step"][data-kind="safety_check"]').first()).toBeVisible();
+  await page.getByTestId("trace-toggle").click();
+  await expect(page.getByTestId("trace-steps")).toHaveCount(0);
 
   await page.getByTestId("view-event").click();
   await expect(page.getByTestId("squad-banner")).toBeVisible();
