@@ -22,6 +22,7 @@ export const EVENT_TYPES = [
   "queue.tick",
   "party.forming",
   "party.dissolved",
+  "party.nomatch",
   "agent.verdict",
   "table.message",
   "pair.message",
@@ -79,6 +80,13 @@ export const PartyDissolvedPayload = z
   })
   .strict();
 
+/** No plan fit all five. Like party.dissolved, it can't carry a reason or a name. */
+export const PartyNoMatchPayload = z
+  .object({
+    partyId: Id,
+  })
+  .strict();
+
 export const PlanLockedPayload = z.object({
   partyId: Id,
   planId: Id,
@@ -109,6 +117,7 @@ export const PAYLOADS = {
   "queue.tick": QueueTickPayload,
   "party.forming": PartyFormingPayload,
   "party.dissolved": PartyDissolvedPayload,
+  "party.nomatch": PartyNoMatchPayload,
   "agent.verdict": Verdict,
   "table.message": TableMessage,
   "pair.message": PairMessage,
@@ -147,6 +156,7 @@ export const PQEvent = z.discriminatedUnion("type", [
   envelope("queue.tick"),
   envelope("party.forming"),
   envelope("party.dissolved"),
+  envelope("party.nomatch"),
   envelope("agent.verdict"),
   envelope("table.message"),
   envelope("pair.message"),

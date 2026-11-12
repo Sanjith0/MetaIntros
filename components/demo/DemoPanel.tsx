@@ -89,6 +89,9 @@ export function DemoPanel({ people }: { people: Person[] }) {
             <button className={violet} data-testid="demo-run-all" onClick={() => act("Party started", "/api/demo/start", { body: JSON.stringify({ mode: "all" }) })}>
               Queue all five (start the talk)
             </button>
+            <button className={grey} data-testid="demo-clash" onClick={() => act("Queued five whose rules clash", "/api/demo/start", { body: JSON.stringify({ mode: "clash" }) })}>
+              Show a no-match (rules clash)
+            </button>
             <button className={`${btn} bg-[var(--color-ink)] text-white`} data-testid="demo-lock" disabled={!talking} onClick={() => act("Lock now", "/api/demo/lock")}>
               Lock now
             </button>

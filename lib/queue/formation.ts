@@ -136,7 +136,7 @@ export interface Formed {
  * waited longest. When `mustInclude` is given (the person who just
  * joined), only parties containing them are considered.
  */
-export function formParty(cands: Candidate[], opts: { mustInclude?: string; nameOf?: (id: string) => string } = {}): Formed | null {
+export function formParty(cands: Candidate[], opts: { mustInclude?: string; nameOf?: (id: string) => string; avoid?: (ids: string[]) => boolean } = {}): Formed | null {
   const nameOf = opts.nameOf ?? ((id: string) => id);
   const waiting = cands
     .filter((c) => c.entry.status === "waiting" && c.profile.age >= MIN_AGE)
@@ -162,6 +162,7 @@ export function formParty(cands: Candidate[], opts: { mustInclude?: string; name
     for (const combo of combinations(bucket, PARTY_SIZE)) {
       if (++tried > 50_000) break; // hard ceiling; buckets are small in practice
       if (opts.mustInclude && !combo.some((c) => c.profile.id === opts.mustInclude)) continue;
+      if (opts.avoid?.(combo.map((c) => c.profile.id))) continue; // these five already found no plan together
       if (checkParty(combo, nameOf).length === 0) {
         return { members: combo, bridges: partyBridges(combo.map((c) => c.profile), nameOf, combo.map((c) => c.entry)) };
       }

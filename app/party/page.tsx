@@ -15,6 +15,7 @@ import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 import { memberPartyViewForViewer } from "@/lib/server/views";
 import { queueStatus } from "@/lib/server/queue";
+import { noMatchView } from "@/lib/server/nomatch";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
@@ -55,6 +56,8 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
   const cardFor = (id: string) => v.cards.find((c) => c.subjectId === id);
   const secret = flag("SECRET_PANEL") ? secretView(v.party.id, viewer) : null;
   const why = flag("WHY_PLAN") ? whyThisPlan(v.party.id, viewer) : null;
+  const noMatch = flag("NO_MATCH") ? noMatchView(v.party.id, viewer) : null;
+  const waiting = noMatch?.requeued ? queueStatus(viewer) : null;
 
   return (
     <main className="mx-auto grid max-w-[1040px] grid-cols-1 gap-4 px-4 py-5 lg:grid-cols-[1fr_380px]">
@@ -98,9 +101,38 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
             ) : (
               <>
                 <h1 className="text-[22px] font-bold" data-testid="party-status">
-                  {v.party.status === "failed" ? "No plan worked tonight" : "Your agents are talking"}
+                  {noMatch ? (noMatch.requeued ? "No plan fit all five of you" : `Nothing near ${noMatch.landmark} fits your rules tonight`) : v.party.status === "failed" ? "No plan worked tonight" : "Your agents are talking"}
                 </h1>
-                <p className="text-[15px] text-[var(--color-ink-2)]">Five agents, one table. Code locks the plan the moment all five sign.</p>
+                {noMatch?.requeued && (
+                  <div data-testid="nomatch" data-requeued="true">
+                    <p className="text-[15px] text-[var(--color-ink-2)]">
+                      Code checked every plan against everyone&apos;s rules, and none worked for all five. Nobody was told whose rules clashed, and neither are you.
+                    </p>
+                    <p className="mt-2 text-[15px] font-semibold" data-testid="nomatch-queue">
+                      {waiting?.entry.status === "waiting" ? `You're back at the front of the queue near ${waiting.entry.landmark}.` : "You're back at the front of the queue."} You won&apos;t be matched with these same five again tonight.
+                    </p>
+                    <Link href={noMatch.eventId ? `/queue?event=${noMatch.eventId}` : "/queue"} className="press mt-3 inline-flex rounded-[6px] bg-[var(--color-pq)] px-4 py-2 text-[15px] font-semibold text-white">
+                      See the queue
+                    </Link>
+                  </div>
+                )}
+                {noMatch && !noMatch.requeued && (
+                  <div data-testid="nomatch" data-requeued="false">
+                    <p className="text-[15px] text-[var(--color-ink-2)]">Every plan there breaks at least one of your own rules. Only you can see this.</p>
+                    <ul className="mt-2 flex flex-wrap gap-1.5" data-testid="nomatch-rules">
+                      {noMatch.ownRules!.map((r) => (
+                        <li key={r} className="rounded-full bg-[var(--color-wash)] px-2.5 py-1 text-[13px] font-semibold">
+                          {r}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-2 text-[15px] text-[var(--color-ink-2)]">Try Anywhere tonight, or say it a little differently.</p>
+                    <Link href={noMatch.eventId ? `/queue?event=${noMatch.eventId}` : "/queue"} className="press mt-3 inline-flex rounded-[6px] bg-[var(--color-pq)] px-4 py-2 text-[15px] font-semibold text-white">
+                      Queue again
+                    </Link>
+                  </div>
+                )}
+                {!noMatch && <p className="text-[15px] text-[var(--color-ink-2)]">Five agents, one table. Code locks the plan the moment all five sign.</p>}
                 {flag("CHAT_LIFECYCLE") && v.party.status !== "failed" && (
                   <div className="mt-3">
                     <LeaveParty partyId={v.party.id} />

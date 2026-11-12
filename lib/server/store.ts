@@ -60,6 +60,10 @@ export interface Store {
   reports: { id: string; reporterId: string; subjectId: string; partyId: string | null; reason: string; note: string; at: string }[];
   /** The exact prompts each agent received, for the projector: `${partyId}:${ownerId}:${round}`. */
   prompts: Map<string, { system: string; user: string }>;
+  /** Five-person sets whose rules left no plan: formation never puts them together again. Sorted ids joined by commas. */
+  avoidSets: Set<string>;
+  /** After a no-match: people whose own rules closed every plan there (told only themselves). partyId -> userIds. */
+  nothingFits: Map<string, string[]>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -103,6 +107,8 @@ function fresh(): Store {
     standing: new Map(),
     reports: [],
     prompts: new Map(),
+    avoidSets: new Set(),
+    nothingFits: new Map(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

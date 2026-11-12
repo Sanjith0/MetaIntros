@@ -48,6 +48,8 @@ const DEFAULTS = {
   LEAK_TEST: true,
   /** F21: "What if" on the stage: re-run the table in a sandbox without one member's rule. */
   WHAT_IF: true,
+  /** F22: when no plan fits all five, everyone goes back to the front of the queue, nobody is blamed, and the same five never re-form. */
+  NO_MATCH: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

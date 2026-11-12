@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 
 const Body = z.object({
   /** "four": queue Dev, Ana, Kai and Zoe so Maya's join forms the party. "all": queue all five. */
-  mode: z.enum(["four", "all"]).default("four"),
+  /** "clash": all five, with Ana's and Zoe's rules changed so no plan fits everyone (the no-match path). */
+  mode: z.enum(["four", "all", "clash"]).default("four"),
   reset: z.boolean().default(true),
 });
 
@@ -16,10 +17,11 @@ const Body = z.object({
 export async function POST(req: Request) {
   const body = Body.parse(await req.json().catch(() => ({})));
   if (body.reset) resetStore();
-  const ids = body.mode === "all" ? ["dev", "ana", "kai", "zoe", "maya"] : ["dev", "ana", "kai", "zoe"];
+  const ids = body.mode === "four" ? ["dev", "ana", "kai", "zoe"] : ["dev", "ana", "kai", "zoe", "maya"];
+  const sentence = (id: string) => (body.mode === "clash" ? DEMO_PARTY.clashSentences[id] : undefined) ?? DEMO_PARTY.sentences[id]!;
   let partyId: string | null = null;
   for (const id of ids) {
-    const r = await joinQueue({ userId: id, eventId: DEMO_PARTY.entryEventId, sentence: DEMO_PARTY.sentences[id]!, consentBridges: true });
+    const r = await joinQueue({ userId: id, eventId: DEMO_PARTY.entryEventId, sentence: sentence(id), consentBridges: true });
     partyId = r.partyId ?? partyId;
   }
   return NextResponse.json({ ok: true, queued: ids, partyId });

@@ -183,7 +183,8 @@ export function StageReplay({ initial, leakTest = false, whatIf = false }: { ini
   }, [visible]);
   const recorded = view.traces.find((t) => t.meta?.source === "recorded" && t.meta.note) ?? view.traces.find((t) => t.meta?.source === "recorded");
 
-  const status = board.locked ? "Locked" : board.round >= 1 ? `Round ${board.round}` : total ? "Forming" : "Waiting";
+  const noMatch = visible.some((t) => t.meta?.kind === "nomatch");
+  const status = board.locked ? "Locked" : noMatch ? "No match" : board.round >= 1 ? `Round ${board.round}` : total ? "Forming" : "Waiting";
   const planTitle = (id: string | null) => view.plans.find((p) => p.id === id)?.title ?? "";
 
   const Row = ({ t }: { t: Trace }) => {

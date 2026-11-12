@@ -63,6 +63,11 @@ Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/
    decides. `/evals`: the leak test four ways (one prompt, one prompt + verifier, five agents +
    verifier, a code solver).
 
+**If nothing fits:** on `/demo`, **Show a no-match (rules clash)** queues the five with Ana's curfew
+and Zoe's budget changed so no plan works for all of them. The projector says **No match**;
+every phone says no plan fit all five, nobody was told whose rules clashed, and they're back at
+the front of the queue (never with these same five again).
+
 If a live model is slow, **Lock now** on `/demo` makes code pick the best plan that passes
 everyone's rules. `npm run test:demo` runs the core path with five browser contexts; a
 60-second recording is at `shots/demo.webm` (`npm run video`): Maya's phone from the Events
@@ -96,6 +101,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `CONTEXT_AUDIT` | every agent prompt checked by code for other members' private words; per-turn chip and the exact prompt on `/stage` |
 | `LEAK_TEST` | **Try to leak it** on `/stage`: type a line as any agent; the verifier blocks it live, and nothing reaches a phone |
 | `WHAT_IF` | **What if…** on `/stage` after the lock: take rules away and re-run the same five in a sandbox (mock model, nothing live touched) |
+| `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
 
@@ -140,7 +146,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 154 unit tests (vitest)
+npm test                       # 160 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

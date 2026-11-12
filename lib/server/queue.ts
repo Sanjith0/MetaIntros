@@ -117,10 +117,12 @@ export async function reform(startTalk = true): Promise<string | null> {
   return tryForm(undefined, startTalk);
 }
 
+export const setKey = (ids: string[]) => [...ids].sort().join(",");
+
 async function tryForm(mustInclude: string | undefined, startTalk: boolean): Promise<string | null> {
   const s = store();
   const cands: Candidate[] = s.queue.filter((e) => e.status === "waiting").map((entry) => ({ entry, profile: profile(entry.userId) }));
-  const formed = formParty(cands, { mustInclude, nameOf: (id) => profile(id).name });
+  const formed = formParty(cands, { mustInclude, nameOf: (id) => profile(id).name, avoid: (ids) => s.avoidSets.has(setKey(ids)) });
   if (!formed) return null;
 
   const joiner = formed.members.find((m) => m.profile.id === mustInclude) ?? formed.members[0]!;

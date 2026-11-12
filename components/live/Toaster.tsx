@@ -70,6 +70,10 @@ export function Toaster({ people, keyboard = true }: { people: Directory; keyboa
         push({ id: e.id, title: "Party Queue", body: "Your party changed before the plan was set. Nobody was named. You're back at the front of the queue.", href: "/queue", layer: true });
         router.refresh();
         break;
+      case "party.nomatch":
+        push({ id: e.id, title: "Party Queue", body: "No plan fit all five of you. Nobody was told why. Open your party for what's next.", href: "/party", layer: true });
+        router.refresh();
+        break;
       case "party.forming":
         push({ id: e.id, title: "Party Queue", body: "Your party of five is forming. Your agents are talking it over.", href: "/party", layer: true });
         break;

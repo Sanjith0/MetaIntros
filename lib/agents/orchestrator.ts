@@ -25,7 +25,9 @@ export function runParty(partyId: string, opts: RunOptions = {}): Promise<void> 
     const [table, pairs] = await Promise.all([runTableTalk(partyId, opts), runPairTalk(partyId, { paceMs: opts.paceMs })]);
     if (store().operator.cancelled.has(partyId)) return; // someone left before the lock
     if (!table) {
-      trace(partyId, "shared", "judge", null, "No match", "No plan worked for everyone. Members stay in the queue.");
+      // Imported here: the no-match handler re-forms through the queue, which imports this file.
+      if (flag("NO_MATCH")) await (await import("@/lib/server/nomatch")).handleNoMatch(partyId);
+      else trace(partyId, "shared", "judge", null, "No match", "No plan worked for everyone.");
       return;
     }
     finalize(partyId, table, pairs);

@@ -32,7 +32,10 @@ tab, group chat and notifications.
    RSVP, and a group chat opens with the plan pinned and one suggested opener per person.
 6. At the door, a card (or a glasses heads-up view) says who is in front of you and what to
    say. Nothing is inferred from a face.
-7. Afterwards, everyone privately picks who they'd see again. Only mutual picks are revealed;
+7. If no plan fits all five, code says so without blaming anyone: everyone is back at the front
+   of the queue, the same five never re-form, and anyone whose own rules close every plan
+   there is told so privately, with a way to queue for anywhere tonight.
+8. Afterwards, everyone privately picks who they'd see again. Only mutual picks are revealed;
    everyone else sees the same "queue again" card.
 
 On the projector, every agent turn carries a context audit: code checks each prompt, before
@@ -53,7 +56,7 @@ column is computed by scanning everything the other four can load, and it stays 
 - A code judge, a verifier for public lines, and pair talk where the model only picks fact ids.
 - A projector view with a scrubber that rebuilds the board (plans, signatures, the lock) at
   any moment of the replay.
-- Vitest (154 unit tests), Playwright (35+ end-to-end specs on a production build, including
+- Vitest (160 unit tests), Playwright (35+ end-to-end specs on a production build, including
   five phones at once, 390-pixel layouts and axe accessibility checks), and an eval harness.
 
 ## The leak test

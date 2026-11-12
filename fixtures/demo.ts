@@ -15,6 +15,11 @@ export const DEMO_PARTY = {
     kai: "games or something hands-on, nothing too loud",
     zoe: "open to anything, just want to meet people, budget around 25",
   } as Record<string, string>,
+  /** F22's no-match demo: Ana's curfew closes the market, Zoe's budget closes the clay studio, so nothing fits all five. */
+  clashSentences: {
+    ana: "outdoors if possible, low-key, home by 9:30",
+    zoe: "open to anything, just want to meet people, budget around 15",
+  } as Record<string, string>,
   /** What the demo expects code to lock. */
   expectedPlanEventId: "evt-night-market",
   rooftopEventId: "evt-rooftop",
