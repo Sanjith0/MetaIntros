@@ -368,3 +368,74 @@ model DeviceSession {
   createdAt  DateTime @default(now())
   lastSeenAt DateTime @default(now())
 }
+
+// ── Squad album → posts & stories ────────────────────────────────────────────────────────────
+// Standalone models: no relation fields were added to User/Party/Event (other work owns those).
+// partyId/uploaderId/authorId/eventId are plain ids: every read re-checks membership and existence,
+// and purgeSocialOrphans() (lib/server/album.ts) clears rows left behind when a user or squad is deleted.
+
+/// One photo in a squad's shared album. Squad members only; it outlives the squad chat (it's the memory).
+model AlbumPhoto {
+  id         String      @id @default(cuid())
+  partyId    String
+  uploaderId String
+  /// data:image/(png|jpeg|webp);base64,… (client-resized, server size-capped)
+  dataUrl    String
+  caption    String?
+  /// "Squadmates can include this in a post": the uploader's per-photo consent (default on)
+  shareable  Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  postPhotos PostPhoto[]
+
+  @@index([partyId, createdAt])
+  @@index([uploaderId])
+}
+
+/// A feed post or a 24h story. Audience and per-photo consent are enforced in code (lib/server/posts.ts).
+model Post {
+  id        String      @id @default(cuid())
+  authorId  String
+  /// "post" | "story"
+  kind      String      @default("post")
+  caption   String      @default("")
+  /// "friends" | "only_me"
+  audience  String      @default("friends")
+  /// the squad (and its event) this is about: "at <event> with my Queue Up squad"
+  partyId   String?
+  eventId   String?
+  /// when the AI host drafted it: "live" | "cache" | "mock" | "fallback"
+  aiSource  String?
+  /// the author changed the AI-drafted caption before posting
+  aiEdited  Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  photos    PostPhoto[]
+
+  @@index([authorId, createdAt])
+  @@index([partyId])
+}
+
+/// Ordered photo references. Deleting an album photo drops it from every post (cascade).
+model PostPhoto {
+  id       String     @id @default(cuid())
+  postId   String
+  photoId  String
+  position Int
+  post     Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  photo    AlbumPhoto @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, photoId])
+  @@index([photoId])
+}
+
+/// Each member's answer to "Share the outing" for one squad, so the prompt stops showing.
+model ShareChoice {
+  id        String   @id @default(cuid())
+  partyId   String
+  userId    String
+  /// "own" | "ai" | "none"
+  choice    String
+  postId    String?
+  createdAt DateTime @default(now())
+
+  @@unique([partyId, userId])
+}

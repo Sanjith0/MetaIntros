@@ -5,6 +5,7 @@ import { MockGraphSource } from "@/lib/graph/source";
 import type { GraphUser } from "@/lib/graph/schema";
 import { toJson } from "@/lib/json";
 import { randomUUID } from "node:crypto";
+import { purgeSocialOrphans } from "./socialOrphans";
 
 async function persist(prisma: PrismaClient, g: GraphUser, extra: { ageBand: string; gender: string | null; womenOnlyParty: boolean }) {
   const p = buildTasteProfile(g);
@@ -75,6 +76,7 @@ export async function deleteLiveUser(prisma: PrismaClient, userId: string) {
   const u = await prisma.user.findUnique({ where: { id: userId }, select: { isLive: true } });
   if (!u?.isLive) return false;
   await prisma.user.delete({ where: { id: userId } });
+  await purgeSocialOrphans(prisma); // their album photos and posts go too
   return true;
 }
 
@@ -84,5 +86,6 @@ export async function deleteLiveUser(prisma: PrismaClient, userId: string) {
  */
 export async function sweepExpiredSignups(prisma: PrismaClient, now = new Date()) {
   const r = await prisma.user.deleteMany({ where: { isLive: true, createdAt: { lt: new Date(now.getTime() - SIGNUP_TTL_MS) } } });
+  if (r.count) await purgeSocialOrphans(prisma);
   return r.count;
 }

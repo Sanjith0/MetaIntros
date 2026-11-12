@@ -71,6 +71,7 @@ export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {})
     async (tx) => {
       // children first
       for (const m of [
+        "postPhoto", "post", "albumPhoto", "shareChoice",
         "agentTrace", "preChat", "talkCard", "chatMessage", "chatMember", "chat", "friendRequest",
         "partyMember", "queueEntry", "party", "eventRsvp", "friendship", "event", "landmark", "block",
         "availability", "tasteProfile", "deviceSession", "user", "appSetting",
