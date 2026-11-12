@@ -5,8 +5,8 @@ test("Maya goes from an event page to meeting her crew", async ({ page, request 
   await request.post("/api/reset");
 
   // 1. Event page with the Crews entry point
-  await page.goto("/events");
-  await page.getByTestId("event-pale-hour").click();
+  await page.goto("/");
+  await page.getByTestId("feed-event").click();
   await expect(page.getByTestId("crew-entry")).toContainText("Going solo? Join a crew.");
   await page.getByTestId("join-crew").click();
 

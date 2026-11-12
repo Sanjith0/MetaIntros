@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { Camera, ChevronLeft, Image as ImageIcon, Phone, PlusCircle, SendHorizontal, ThumbsUp, Video } from "lucide-react";
 import { use, useEffect, useRef, useState } from "react";
 import { EVENTS, ME, profileById } from "@/data/seed";
 import { post } from "@/lib/client";
@@ -32,7 +33,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
   return (
     <div className="h-dvh flex flex-col bg-white">
       <header className="h-14 px-2 flex items-center gap-2 border-b border-line/60">
-        <Link href={`/crew/${id}`} className="w-9 h-9 grid place-items-center text-xl text-fb" aria-label="Back">←</Link>
+        <Link href={`/crew/${id}`} className="w-9 h-9 grid place-items-center text-fb" aria-label="Back"><ChevronLeft size={28} /></Link>
         <div className="flex -space-x-2">
           {crew.memberIds.slice(0, 3).map((m) => (
             <Avatar key={m} p={profileById(m)!} size={28} ring="#fff" />
@@ -40,7 +41,11 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         </div>
         <div className="min-w-0">
           <div className="font-semibold text-[15px] truncate">{crew.vibe || "Crew"} · {ev.title.split(" — ")[0]}</div>
-          <div className="text-xs text-sub">{crew.memberIds.length} people</div>
+          <div className="text-xs text-sub">{crew.memberIds.length} people · Crew</div>
+        </div>
+        <div className="ml-auto flex gap-3 pr-2 text-[#0866ff]">
+          <Phone size={22} fill="currentColor" />
+          <Video size={24} fill="currentColor" />
         </div>
       </header>
       <main className="flex-1 overflow-y-auto px-3 py-3 space-y-2" data-testid="chat">
@@ -68,16 +73,21 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
         })}
         <div ref={end} />
       </main>
-      <footer className="p-2 border-t border-line/60 flex gap-2">
+      <footer className="p-2 flex gap-2 items-center text-fb">
+        <PlusCircle size={24} fill="currentColor" color="#fff" className="shrink-0" style={{ color: "#0866ff" }} />
+        <Camera size={24} className="shrink-0" />
+        <ImageIcon size={24} className="shrink-0" />
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && send()}
           placeholder="Aa"
-          className="flex-1 h-10 rounded-full bg-[#f0f2f5] px-4 outline-none"
+          className="flex-1 min-w-0 h-9 rounded-full bg-[#f0f2f5] px-4 outline-none text-ink"
           data-testid="chat-input"
         />
-        <button onClick={send} disabled={sending} className="text-fb font-semibold px-3" data-testid="chat-send">Send</button>
+        <button onClick={send} disabled={sending} className="text-fb w-9 h-9 grid place-items-center shrink-0" data-testid="chat-send" aria-label="Send">
+          {text.trim() ? <SendHorizontal size={22} fill="currentColor" /> : <ThumbsUp size={22} fill="currentColor" />}
+        </button>
       </footer>
     </div>
   );

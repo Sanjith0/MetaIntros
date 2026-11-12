@@ -6,7 +6,7 @@ export default function Glasses() {
   const p = profileById("priya")!;
   return (
     <div className="min-h-dvh flex flex-col">
-      <TopBar back="/events" title="Glasses · P3 concept" />
+      <TopBar back="/menu" title="Glasses · P3 concept" />
       <main className="flex-1 p-3 space-y-3">
         <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-gradient-to-b from-[#2b2440] via-[#3d2b4f] to-[#1a1424]">
           <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 30% 20%, #ffb86b55, transparent 40%), radial-gradient(circle at 75% 30%, #ff5c7a44, transparent 35%)" }} />
@@ -27,7 +27,7 @@ export default function Glasses() {
           <p>• Any crewmate can tap “hide me” at any time.</p>
         </section>
       </main>
-      <TabBar active="/glasses" />
+      <TabBar active="/menu" />
     </div>
   );
 }

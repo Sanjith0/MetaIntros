@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Bell, CalendarDays, ChevronLeft, House, Menu, MessageCircle, MonitorPlay, Plus, Search, Users } from "lucide-react";
 import type { Profile } from "@/lib/types";
 
 export function Avatar({ p, size = 40, blurred = false, ring }: { p: Pick<Profile, "name" | "hue"> & { lastName?: string }; size?: number; blurred?: boolean; ring?: string }) {
@@ -56,40 +57,67 @@ export function AiModeBadge() {
   );
 }
 
-export function TopBar({ title, back }: { title?: string; back?: string }) {
-  return (
-    <header className="sticky top-0 z-20 bg-white border-b border-line/60 h-14 px-3 flex items-center gap-2">
-      {back ? (
-        <Link href={back} aria-label="Back" className="w-9 h-9 grid place-items-center rounded-full hover:bg-fbbg text-xl">
-          ←
+export function TopBar({ title, back, right }: { title?: string; back?: string; right?: React.ReactNode }) {
+  if (!back) {
+    return (
+      <header className="sticky top-0 z-20 bg-white h-14 px-4 flex items-center gap-2">
+        <Link href="/" className="text-fb font-bold text-[30px] tracking-[-0.04em] leading-none" aria-label="Facebook home">
+          facebook
         </Link>
-      ) : (
-        <span className="text-fb font-bold text-[28px] tracking-tight leading-none">facebook</span>
-      )}
-      {title && <h1 className="font-semibold text-[17px] truncate">{title}</h1>}
-      <div className="ml-auto flex items-center gap-2">
+        <AiModeBadge />
+        <div className="ml-auto flex items-center gap-2">
+          {right}
+          <IconCircle label="Create"><Plus size={20} strokeWidth={2.6} /></IconCircle>
+          <IconCircle label="Search"><Search size={20} strokeWidth={2.6} /></IconCircle>
+          <IconCircle label="Messenger" href="/crews"><MessageCircle size={20} strokeWidth={2.6} /></IconCircle>
+        </div>
+      </header>
+    );
+  }
+  return (
+    <header className="sticky top-0 z-20 bg-white border-b border-line/50 h-12 px-1 flex items-center gap-1">
+      <Link href={back} aria-label="Back" className="w-10 h-10 grid place-items-center rounded-full active:bg-fbbg">
+        <ChevronLeft size={28} strokeWidth={2.2} />
+      </Link>
+      {title && <h1 className="font-bold text-[17px] truncate">{title}</h1>}
+      <div className="ml-auto flex items-center gap-1 pr-2">
+        {right}
         <AiModeBadge />
       </div>
     </header>
   );
 }
 
+function IconCircle({ children, label, href }: { children: React.ReactNode; label: string; href?: string }) {
+  const cls = "w-9 h-9 rounded-full bg-[#e4e6eb] grid place-items-center text-ink";
+  return href ? (
+    <Link href={href} aria-label={label} className={cls}>{children}</Link>
+  ) : (
+    <button aria-label={label} className={cls}>{children}</button>
+  );
+}
+
 const tabs = [
-  { href: "/", label: "Home", icon: "⌂" },
-  { href: "/events", label: "Events", icon: "▦" },
-  { href: "/crews", label: "Crews", icon: "◎" },
-  { href: "/glasses", label: "Glasses", icon: "◉" },
+  { href: "/", label: "Home", Icon: House },
+  { href: "/video", label: "Video", Icon: MonitorPlay },
+  { href: "/friends", label: "Friends", Icon: Users },
+  { href: "/events", label: "Events", Icon: CalendarDays },
+  { href: "/notifications", label: "Notifications", Icon: Bell },
+  { href: "/menu", label: "Menu", Icon: Menu },
 ];
 
 export function TabBar({ active }: { active: string }) {
   return (
-    <nav className="sticky bottom-0 z-20 bg-white border-t border-line/60 grid grid-cols-4">
-      {tabs.map((t) => (
-        <Link key={t.href} href={t.href} className={`py-2 flex flex-col items-center text-[11px] ${active === t.href ? "text-fb font-semibold" : "text-sub"}`}>
-          <span className="text-lg leading-none">{t.icon}</span>
-          {t.label}
-        </Link>
-      ))}
+    <nav className="sticky bottom-0 z-20 bg-white border-t border-line/50 grid grid-cols-6 pb-[env(safe-area-inset-bottom)]">
+      {tabs.map(({ href, label, Icon }) => {
+        const on = active === href;
+        return (
+          <Link key={href} href={href} aria-label={label} className={`pt-2 pb-1.5 flex flex-col items-center gap-0.5 text-[10.5px] ${on ? "text-fb font-semibold" : "text-sub"}`}>
+            <Icon size={24} strokeWidth={on ? 2.4 : 1.9} fill={on && label !== "Menu" ? "currentColor" : "none"} fillOpacity={on ? 0.15 : 0} />
+            {label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }
