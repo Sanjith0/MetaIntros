@@ -39,3 +39,16 @@ describe("docs (F18)", () => {
     expect(d).toMatch(/Hackathon prototype, not Facebook/);
   });
 });
+
+describe("/how proof hub (F29)", () => {
+  it("every guarantee points at a real page and a real test", async () => {
+    const fs = await import("node:fs");
+    const { GUARANTEES } = await import("@/lib/how");
+    expect(GUARANTEES.length).toBeGreaterThanOrEqual(11);
+    for (const g of GUARANTEES) {
+      expect(fs.existsSync(g.test), g.test).toBe(true);
+      const route = g.see.href.split("?")[0]!.replace(/^\//, "");
+      expect(fs.existsSync(`app/${route}/page.tsx`), g.see.href).toBe(true);
+    }
+  });
+});

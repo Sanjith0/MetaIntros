@@ -62,6 +62,8 @@ const DEFAULTS = {
   ROGUE_MODE: true,
   /** F28: the projector lists every party (place, night, status) and can pin one; by default it follows new parties. */
   STAGE_PARTIES: true,
+  /** F29: /how as a proof hub: every guarantee links to where it can be seen working, and names its test. */
+  PROOF_HUB: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

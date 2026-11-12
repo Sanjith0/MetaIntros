@@ -66,7 +66,7 @@ Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/
    `/demo` sets up the next beat: Dev and Ana queue for Sunday with their standing party; Maya
    taps the invite, types her own sentence, and the three land in one party with two new people.
 8. **Why it's built this way.** `/how`: one diagram of what each piece sees and where code
-   decides. `/evals`: the leak test four ways (one prompt, one prompt + verifier, five agents +
+   decides, and 11 guarantees, each with a **See it** link to where it works in the app. `/evals`: the leak test four ways (one prompt, one prompt + verifier, five agents +
    verifier, a code solver).
 
 **If nothing fits:** on `/demo`, **Show a no-match (rules clash)** queues the five with Ana's curfew
@@ -118,6 +118,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `STANDING_QUEUE` | a standing party (3+ who all picked each other) queues together again from `/runitback`: one invite each, they wait for each other, land in one party with new people, and each types their own sentence |
 | `ROGUE_MODE` | **Rogue model** switch on `/demo` (off by default): every agent says yes to everything and tries to tell the table its person's rules; the stage shows code overriding each bad yes and the verifier blocking each line |
 | `STAGE_PARTIES` | a party switcher on `/stage` once there's more than one: "Sun · Ferry Building · talking"; pin one (kept in the URL) or follow new parties |
+| `PROOF_HUB` | `/how` as a proof hub: each of 11 guarantees links to where it can be seen working in the app and names its test |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -163,7 +164,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 186 unit tests (vitest)
+npm test                       # 187 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

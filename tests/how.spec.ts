@@ -13,6 +13,13 @@ test("how it works: the diagram and the guarantees", async ({ page }) => {
   await expect(svg).toContainText("Judge · code");
   await expect(svg).toContainText("Verifier · code");
   await expect(svg).toContainText("no reason, no name");
-  await expect(page.getByTestId("how-guarantees").locator("li")).toHaveCount(7);
+  await expect(page.getByTestId("how-guarantees").locator("li")).toHaveCount(11);
+  await page.getByTestId("guarantee-9").getByTestId("guarantee-see").click();
+  await expect(page).toHaveURL(/\/safety$/);
+  await page.goBack();
+  await expect(page.getByTestId("how-guarantees")).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: "shots/f29-proof-hub.png", fullPage: true });
   await page.screenshot({ path: "shots/f18-how.png", animations: "disabled", fullPage: true });
 });
