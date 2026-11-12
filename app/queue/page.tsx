@@ -36,9 +36,11 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
     : [];
   const inviter = duo ? friends.find((f) => f.id === duo) ?? null : null;
   const standingGroup = group && flag("STANDING_QUEUE") ? s.standing.get(group) : undefined;
+  const friendGroup = group && flag("FRIEND_GROUP") ? s.friendGroups.get(group) : undefined;
+  const groupMembers = standingGroup?.memberIds ?? friendGroup?.memberIds;
   const standing =
-    standingGroup && standingGroup.memberIds.includes(viewer)
-      ? { partyId: group!, others: standingGroup.memberIds.filter((id) => id !== viewer).map((id) => ({ id, firstName: s.profiles.get(id)!.firstName })) }
+    groupMembers && groupMembers.includes(viewer)
+      ? { partyId: group!, kind: (friendGroup ? "friends" : "standing") as "friends" | "standing", others: groupMembers.filter((id) => id !== viewer).map((id) => ({ id, firstName: s.profiles.get(id)!.firstName })) }
       : null;
 
   return (
@@ -81,7 +83,17 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
             voice={flag("VOICE_SENTENCE")}
             editable={flag("EDIT_SENTENCE")}
             memory={flag("AGENT_MEMORY") ? memoryOf(viewer).map((m) => ({ tag: m.tag, label: LABEL[m.tag] ?? m.tag, from: m.from })) : []}
-            standing={standing ?? (active?.group ? { partyId: active.group.of, others: (s.standing.get(active.group.of)?.memberIds ?? []).filter((id) => id !== viewer).map((id) => ({ id, firstName: s.profiles.get(id)!.firstName })) } : null)}
+            standing={
+              standing ??
+              (active?.group
+                ? {
+                    partyId: active.group.of,
+                    kind: s.friendGroups.has(active.group.of) ? "friends" : "standing",
+                    others: (s.standing.get(active.group.of)?.memberIds ?? s.friendGroups.get(active.group.of)?.memberIds ?? []).filter((id) => id !== viewer).map((id) => ({ id, firstName: s.profiles.get(id)!.firstName })),
+                  }
+                : null)
+            }
+            friendGroups={flag("FRIEND_GROUP")}
             night={flag("NIGHT_QUEUE") ? { nearCount: candidatePlans(e.landmark, e.date).length, tonightCount: nightPlans(e.date).length } : null}
             initialStatus={
               active

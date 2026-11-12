@@ -134,6 +134,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `PUBLIC_SCREEN` | **Public screen** on `/stage` (`?screen=public`): for a screen the whole room can see; plans, a signature count, code's rows and captions only: no names, no reasons, no one's words |
 | `SEAT_REFILL` | **Can't make it?** on `/party` after the lock: the plan stands; someone waiting nearby whose own rules pass it, and who fits the party, takes the seat (their agent meets the other four); the others are told one person couldn't make it, never who |
 | `AUTO_FORGET` | forget by default: every member's private data from a night (sentence, rules, reasons, prompts) is deleted automatically when the party chat closes, 12 hours after the event, unless you choose "Keep it instead" on `/safety` |
+| `FRIEND_GROUP` | bring up to three friends from the queue sheet: one invite each, the group waits for everyone, lands in one party with new people, and each types their own sentence |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -180,7 +181,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 234 unit tests (vitest)
+npm test                       # 237 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

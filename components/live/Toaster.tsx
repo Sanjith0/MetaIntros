@@ -61,7 +61,9 @@ export function Toaster({ people, keyboard = true }: { people: Directory; keyboa
           id: e.id,
           title: "Party Queue",
           body: group
-            ? `${from?.firstName ?? "Someone"} wants your standing party to queue again. You'd all be in one party, with new people.`
+            ? group.startsWith("grp-")
+              ? `${from?.firstName ?? "A friend"} wants to queue with you as a group. You'd all be in one party, with new people.`
+              : `${from?.firstName ?? "Someone"} wants your standing party to queue again. You'd all be in one party, with new people.`
             : `${from?.firstName ?? "A friend"} wants to queue with you. You'd be in the same party.`,
           href: group ? `/queue?event=${e.payload.eventId}&group=${group}` : `/queue?event=${e.payload.eventId}&duo=${e.payload.fromId}`,
           layer: true,

@@ -31,6 +31,8 @@ interface Status {
 export interface Standing {
   partyId: string;
   others: { id: string; firstName: string }[];
+  /** F44: a friend group rather than a standing party. */
+  kind?: "standing" | "friends";
 }
 
 export interface Friend {
@@ -80,6 +82,7 @@ export function QueueSheet({
   standing = null,
   editable = false,
   memory = [],
+  friendGroups = false,
 }: {
   eventId: string;
   landmark: string;
@@ -99,7 +102,10 @@ export function QueueSheet({
   editable?: boolean;
   /** F39: what your agent remembers from last time (yours only). */
   memory?: { tag: string; label: string; from: string }[];
+  /** F44: offer bringing up to three friends. */
+  friendGroups?: boolean;
 }) {
+  const [groupPick, setGroupPick] = useState<string[]>([]);
   const [useMemory, setUseMemory] = useState(true);
   const [sentence, setSentence] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -167,7 +173,8 @@ export function QueueSheet({
         sentence,
         consentBridges: consent,
         approvedLineIds: Object.keys(approved).filter((k) => approved[k]),
-        duoWith: standing ? null : duoWith || null,
+        duoWith: standing || groupPick.length >= 2 ? null : duoWith || null,
+        friendIds: !standing && groupPick.length >= 2 ? groupPick : undefined,
         groupOf: standing?.partyId ?? null,
         useMemory,
         scope,
@@ -244,11 +251,13 @@ export function QueueSheet({
                   : `Waiting for ${friends.find((f) => f.id === status!.duo!.with)?.name.split(" ")[0] ?? "your friend"} to join you`}
               </p>
             )}
-            {status!.group && standing && (
+            {status!.group && (standing || friendGroups) && (
               <p className="mt-1 text-[13px] font-semibold text-[var(--color-pq-ink)]" data-testid="queue-group">
                 {status!.group.waitingFor.length === 0
-                  ? `Your standing party is all in: you'll land together, with ${5 - status!.group.joined.length} new ${5 - status!.group.joined.length === 1 ? "person" : "people"}`
-                  : `Waiting for ${status!.group.waitingFor.map((id) => standing.others.find((o) => o.id === id)?.firstName ?? "someone").join(" and ")} to join you`}
+                  ? `${standing?.kind === "standing" ? "Your standing party" : "Your group"} is all in: you'll land together, with ${5 - status!.group.joined.length} new ${5 - status!.group.joined.length === 1 ? "person" : "people"}`
+                  : `Waiting for ${status!.group.waitingFor
+                      .map((id) => standing?.others.find((o) => o.id === id)?.firstName ?? friends.find((f) => f.id === id)?.name.split(" ")[0] ?? "someone")
+                      .join(" and ")} to join you`}
               </p>
             )}
             {editable && (
@@ -333,7 +342,8 @@ export function QueueSheet({
     <div className="p-5">
       {standing && (
         <div className="mb-3 rounded-[8px] bg-[var(--color-pq-soft)] px-3 py-2 text-[14px] font-semibold text-[var(--color-pq-ink)]" data-testid="standing-invite">
-          Queuing with your standing party: {standing.others.map((o) => o.firstName).join(" and ")}. You&apos;ll all land in one party, with new people. Your sentence is still only yours.
+          {standing.kind === "friends" ? "Queuing with friends:" : "Queuing with your standing party:"} {standing.others.map((o) => o.firstName).join(" and ")}. You&apos;ll all land in one party, with new
+          people. Your sentence is still only yours.
         </div>
       )}
       {invitedBy && !standing && (
@@ -453,6 +463,28 @@ export function QueueSheet({
         </div>
       )}
 
+      {friendGroups && friends.length >= 2 && !standing && (
+        <fieldset className="mt-3 rounded-[8px] border border-[var(--color-divider)] px-3 py-2" data-testid="group-pick">
+          <legend className="px-1 text-[13px] font-semibold text-[var(--color-ink-3)]">Or bring a group (up to 3 friends)</legend>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            {friends.map((f) => (
+              <label key={f.id} className="flex items-center gap-1.5 text-[14px]">
+                <input
+                  type="checkbox"
+                  data-testid={`group-friend-${f.id}`}
+                  checked={groupPick.includes(f.id)}
+                  disabled={!groupPick.includes(f.id) && groupPick.length >= 3}
+                  onChange={(e) => setGroupPick((g) => (e.target.checked ? [...g, f.id] : g.filter((x) => x !== f.id)))}
+                />
+                {f.name.split(" ")[0]}
+              </label>
+            ))}
+          </div>
+          <span className="mt-0.5 block text-[12px] text-[var(--color-ink-2)]">
+            {groupPick.length >= 2 ? `You'll all land in one party with ${5 - 1 - groupPick.length} new ${5 - 1 - groupPick.length === 1 ? "person" : "people"}. Each of them types their own sentence.` : "Pick two or three. For one friend, use the menu above."}
+          </span>
+        </fieldset>
+      )}
       {duoEnabled && friends.length > 0 && !standing && (
         <label className="mt-3 block text-[13px] font-semibold text-[var(--color-ink-3)]">
           Bring a friend (optional)

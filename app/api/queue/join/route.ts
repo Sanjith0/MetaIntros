@@ -11,6 +11,7 @@ const Body = z.object({
   duoWith: z.string().nullable().optional(),
   groupOf: z.string().nullable().optional(),
   useMemory: z.boolean().optional(),
+  friendIds: z.array(z.string()).max(3).optional(),
   scope: z.enum(["event", "night"]).optional(),
   settings: z.object({ womenOnly: z.boolean(), notOnlyWoman: z.boolean() }).optional(),
 });

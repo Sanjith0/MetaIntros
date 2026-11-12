@@ -19,6 +19,8 @@ export interface JoinInput {
   approvedLineIds?: string[];
   /** Queue together with this friend (duo queue). */
   duoWith?: string | null;
+  /** F44: start a group with these friends (two or three of them; one friend is a duo). */
+  friendIds?: string[];
   /** F39: add what your agent remembers to your preferences (default yes, if there is anything). */
   useMemory?: boolean;
   /** Queue together with your standing party (the party id it came from). Everyone in it lands in one party. */
@@ -62,10 +64,27 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
     if (p.blocks.includes(friend.id) || friend.blocks.includes(p.id)) throw new Error("You can't queue with that person.");
   }
   let groupWith: string[] = [];
-  if (input.groupOf) {
-    const standing = flag("STANDING_QUEUE") ? s.standing.get(input.groupOf) : undefined;
-    if (!standing || !standing.memberIds.includes(input.userId)) throw new Error("You can only queue with your own standing party.");
-    groupWith = [...standing.memberIds];
+  let groupOf = input.groupOf ?? null;
+  // F44: start a friend group (two or three friends; with one it's a duo).
+  if (!groupOf && input.friendIds && input.friendIds.length >= 2 && flag("FRIEND_GROUP")) {
+    const ids = [...new Set(input.friendIds)].filter((id) => id !== input.userId);
+    if (ids.length < 2 || ids.length > 3) throw new Error("Bring up to three friends.");
+    if (input.duoWith) throw new Error("Queue with a group or with one friend, not both.");
+    for (const id of ids) {
+      const f = s.profiles.get(id);
+      if (!f || !areFriends(input.userId, id)) throw new Error("You can only queue with friends.");
+      if (eligibleToQueue(f)) throw new Error("One of your friends can't join Party Queue.");
+      if (p.blocks.includes(id) || f.blocks.includes(p.id)) throw new Error("You can't queue with that person.");
+    }
+    groupOf = `grp-${input.userId}-${nextId("g")}`;
+    s.friendGroups.set(groupOf, { by: input.userId, memberIds: [input.userId, ...ids] });
+  }
+  if (groupOf) {
+    const standing = flag("STANDING_QUEUE") ? s.standing.get(groupOf) : undefined;
+    const friends = flag("FRIEND_GROUP") ? s.friendGroups.get(groupOf) : undefined;
+    const members = standing?.memberIds ?? friends?.memberIds;
+    if (!members || !members.includes(input.userId)) throw new Error(friends === undefined && standing === undefined && groupOf.startsWith("grp-") ? "That group isn't open any more." : "You can only queue with your own standing party.");
+    groupWith = [...members];
   }
   if (input.settings) p.settings = { ...p.settings, ...input.settings };
 
@@ -86,7 +105,7 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
     briefId: built.brief.id,
     consentBridges: input.consentBridges,
     duoWith: input.duoWith ?? null,
-    groupOf: input.groupOf ?? null,
+    groupOf,
     groupWith,
     scope: input.scope === "night" && flag("NIGHT_QUEUE") ? "night" : "event",
     joinedAt: nowIso(),

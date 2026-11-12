@@ -75,6 +75,8 @@ export interface Store {
   /** F43: `${partyId}:${userId}` who chose to keep their private data after the night, and who had it deleted automatically. */
   keepNight: Set<string>;
   autoForgotten: Set<string>;
+  /** F44: friend groups queuing together: id -> who started it and everyone in it. */
+  friendGroups: Map<string, { by: string; memberIds: string[] }>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -126,6 +128,7 @@ function fresh(): Store {
     dropped: new Set(),
     keepNight: new Set(),
     autoForgotten: new Set(),
+    friendGroups: new Map(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

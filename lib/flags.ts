@@ -92,6 +92,8 @@ const DEFAULTS = {
   SEAT_REFILL: true,
   /** F43: private data from a night is deleted automatically when the party chat closes, unless you choose to keep it. */
   AUTO_FORGET: true,
+  /** F44: bring up to three friends: you all land in one party, with new people; each types their own sentence. */
+  FRIEND_GROUP: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
