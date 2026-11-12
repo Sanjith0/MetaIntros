@@ -126,6 +126,8 @@ const DEFAULTS = {
   LEAVE_QUIETLY: true,
   /** F60: consent history on /me: what you agreed to, when, and what you took back. */
   CONSENT_HISTORY: true,
+  /** F61: your agent's story tells what happened after the lock: a switch to plan B, or the open seat you took. */
+  STORY_CHANGES: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

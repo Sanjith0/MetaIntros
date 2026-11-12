@@ -85,3 +85,26 @@ describe("the story says when your agent used what it remembers (F56)", () => {
     for (const id of ["dev", "ana", "kai", "zoe"]) expect(JSON.stringify(agentStory(pid, id))).not.toContain("remembers");
   });
 });
+
+describe("the story after the lock (F61)", () => {
+  it("is on by default; a switch to plan B is told, and the lock still names the plan five signed", async () => {
+    const { flag: f } = await import("@/lib/flags");
+    const { askToSwitch } = await import("@/lib/server/switchplan");
+    expect(f("STORY_CHANGES")).toBe(true);
+    process.env.PQ_PACE_MS = "0";
+    const pid = await locked();
+    for (const id of ["maya", "dev", "kai"]) askToSwitch(pid, id);
+    const t = texts(pid, "ana");
+    expect(t).toContain("L|Code locked Dolores Night Market with all five signatures.");
+    expect(t.at(-1)).toBe("L|Your party switched to plan B: Open Studio: Clay and Tea (three of five asked). It fits your rules too.");
+  });
+
+  it("someone who took an open seat is told just that, not a negotiation they weren't in", async () => {
+    const { cantMakeIt } = await import("@/lib/server/refill");
+    process.env.PQ_PACE_MS = "0";
+    const pid = await locked();
+    await joinQueue({ userId: "sam", eventId: D.entryEventId, sentence: "anything chill works for me", consentBridges: true, startTalk: false });
+    await cantMakeIt(pid, "maya");
+    expect(texts(pid, "sam")).toEqual(["L|You took an open seat on Dolores Night Market, a plan that was already set. Code checked it fits your rules."]);
+  });
+});

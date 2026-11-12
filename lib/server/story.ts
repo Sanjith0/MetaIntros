@@ -58,8 +58,23 @@ export function agentStory(partyId: string, ownerId: string): StoryStep[] | null
     steps.push({ round, text, tone: "agent" });
     if (v.overriddenByCode) steps.push({ round, text: "Code overrode that: the plan breaks one of your rules.", tone: "code" });
   }
+  // F61: what happened after the lock is code's doing, and the story says so.
+  const changes = flag("STORY_CHANGES");
+  const seatTaker = changes && mine.length === 1 && mine[0]!.privateReason.includes("open seat");
+  if (seatTaker) steps.length = 0;
+  const lockTrace = s.traces.find((t) => t.partyId === partyId && t.meta?.kind === "locked");
   if (party.status === "locked" && party.planId) {
-    steps.push({ round: null, text: `Code locked ${title(party.planId)} ${party.lockedBy === "signatures" ? "with all five signatures" : "as the best plan that passes everyone's rules"}.`, tone: "code" });
+    const lockedId = (changes && lockTrace?.meta?.planId) || party.planId;
+    if (seatTaker) {
+      steps.push({ round: null, text: `You took an open seat on ${title(lockedId)}, a plan that was already set. Code checked it fits your rules.`, tone: "code" });
+    } else {
+      steps.push({ round: null, text: `Code locked ${title(lockedId)} ${party.lockedBy === "signatures" ? "with all five signatures" : "as the best plan that passes everyone's rules"}.`, tone: "code" });
+    }
+    if (changes) {
+      for (const t of s.traces.filter((x) => x.partyId === partyId && x.meta?.kind === "switched" && x.meta.planId)) {
+        steps.push({ round: null, text: `Your party switched to plan B: ${title(t.meta!.planId!)} (three of five asked). It fits your rules too.`, tone: "code" });
+      }
+    }
   } else if (party.status === "failed") {
     steps.push({ round: null, text: "No plan fit all five. Nobody was told why.", tone: "code" });
   }

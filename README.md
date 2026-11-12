@@ -170,6 +170,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `NOTIFICATIONS_LIST` | notifications, kept: a bell with an unread count in the top bar and `/notifications`, built from the events only you were sent, in the toasts' words |
 | `LEAVE_QUIETLY` | **Leave quietly** on `/door`: one plain goodbye in the chat as your own message, no reason owed, "Headed home" on the others' door screens, a ready text for your friend, and a link to Safety |
 | `CONSENT_HISTORY` | consent history on `/me` (and in the download): what you agreed to and when (how you're tied, lines your agent may share, memory, keeping a night) and what you took back |
+| `STORY_CHANGES` | your agent's story tells what happened after the lock, in code's voice: a switch to plan B, or the open seat you took |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -217,7 +218,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 273 unit tests (vitest)
+npm test                       # 275 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests
