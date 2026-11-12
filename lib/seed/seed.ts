@@ -9,6 +9,8 @@ import { ageFromBirthday, DAY_INDEX, genderFromGraph, hhmmToMin } from "@/lib/gr
 import { ageBandFor, normalizePair } from "@/lib/domain/enums";
 import { nearestLandmark } from "@/lib/geo";
 import { ME_ID } from "./generate";
+import { buildTasteProfile } from "@/lib/profile/builder";
+import { toJson } from "@/lib/json";
 
 export { ME_ID };
 
@@ -80,7 +82,23 @@ export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {})
         }),
       });
 
-      // TASTE_PROFILES (added in part 2.1)
+      await tx.tasteProfile.createMany({
+        data: graphUsers.map((g) => {
+          const p = buildTasteProfile(g);
+          return {
+            id: `tp-${g.id}`,
+            userId: g.id,
+            likes: toJson(p.likes),
+            dislikes: toJson(p.dislikes),
+            groups: toJson(p.groups),
+            music: toJson(p.music),
+            eventHistory: toJson(p.eventHistory),
+            interestTags: toJson(p.interestTags),
+            embedding: p.embedding,
+            socialStyle: p.socialStyle,
+          };
+        }),
+      });
 
       await tx.availability.createMany({
         data: graphUsers.flatMap((g) =>

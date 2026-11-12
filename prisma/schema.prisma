@@ -70,7 +70,7 @@ model TasteProfile {
   groups       Json
   music        Json
   eventHistory Json
-  /// normalized interest tags, e.g. ["climbing","indie-music"]
+  /// [{ tag, weight }] normalized, non-sensitive interest tags (weight desc)
   interestTags Json
   /// number[]
   embedding    Json
