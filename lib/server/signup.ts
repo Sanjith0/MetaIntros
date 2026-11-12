@@ -59,3 +59,30 @@ export async function createSampleLiveUser(
   };
   return persist(prisma, g, input);
 }
+
+/** What /join promises: live sign-ups are deleted 24 hours after they're created (or sooner, on request). */
+export const SIGNUP_TTL_MS = 24 * 3600_000;
+
+/** Queue Up is 18+. Age is self-declared in this demo; this is the gate at sign-up and at the queue. */
+export const isAdultBand = (band: string) => band === "18-24" || band === "25+";
+
+/**
+ * Delete one live sign-up and everything keyed to them (profile, availability, sessions, RSVPs, queue
+ * entries, squad memberships, chat memberships, requests, talk cards via cascades). Their chat messages stay
+ * in the thread with no sender, so other people's conversations don't break. Seeded personas can't be deleted.
+ */
+export async function deleteLiveUser(prisma: PrismaClient, userId: string) {
+  const u = await prisma.user.findUnique({ where: { id: userId }, select: { isLive: true } });
+  if (!u?.isLive) return false;
+  await prisma.user.delete({ where: { id: userId } });
+  return true;
+}
+
+/**
+ * Remove every live sign-up older than the TTL. Cheap; called from sign-up and the demo panel's poll.
+ * Deliberately real time, not the global demo clock: a Fast-forward must never delete judges mid-demo.
+ */
+export async function sweepExpiredSignups(prisma: PrismaClient, now = new Date()) {
+  const r = await prisma.user.deleteMany({ where: { isLive: true, createdAt: { lt: new Date(now.getTime() - SIGNUP_TTL_MS) } } });
+  return r.count;
+}

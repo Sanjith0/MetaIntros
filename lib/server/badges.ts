@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/db";
 import { nowDate } from "@/lib/clock";
+import { now as clockNow } from "./clock";
+import { listNotifications, unreadCount } from "./notifications";
 
-export type Tab = "home" | "events" | "friends" | "chats" | "profile";
-export const TABS: Tab[] = ["home", "events", "friends", "chats", "profile"];
+/** Tab-bar tabs plus "chats" (the Messages button in the top bar). */
+export type Tab = "home" | "video" | "friends" | "events" | "notifications" | "profile" | "chats";
+export const TABS: Tab[] = ["home", "video", "friends", "events", "notifications", "profile", "chats"];
 
 const key = (userId: string, tab: Tab) => `tabSeen:${userId}:${tab}`;
 
@@ -38,10 +41,11 @@ export async function unreadByChat(userId: string): Promise<Map<string, number>>
  * friends: incoming requests + Queue Up friendships since the last Friends-tab visit.
  */
 export async function getBadges(userId: string): Promise<Record<Tab, number>> {
-  const [chatsSeen, friendsSeen, eventsSeen] = await Promise.all([
+  const [chatsSeen, friendsSeen, eventsSeen, notifSeen] = await Promise.all([
     getTabSeen(userId, "chats"),
     getTabSeen(userId, "friends"),
     getTabSeen(userId, "events"),
+    getTabSeen(userId, "notifications"),
   ]);
   const memberships = await prisma.chatMember.findMany({ where: { userId }, select: { chatId: true, lastReadAt: true } });
   let chats = 0;
@@ -57,5 +61,6 @@ export async function getBadges(userId: string): Promise<Record<Tab, number>> {
     where: { source: "queue_up", createdAt: { gt: friendsSeen }, OR: [{ userAId: userId }, { userBId: userId }] },
   });
   const squads = await prisma.partyMember.count({ where: { userId, party: { status: "confirmed", createdAt: { gt: eventsSeen } } } });
-  return { home: 0, events: squads, friends: requests + newFriends, chats, profile: 0 };
+  const notifications = unreadCount(await listNotifications(userId, await clockNow()), notifSeen);
+  return { home: 0, video: 0, events: squads, friends: requests + newFriends, notifications, chats, profile: 0 };
 }
