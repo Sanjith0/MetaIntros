@@ -11,6 +11,7 @@ import { clock12, eventWhen, price } from "@/lib/format";
 import { eventView } from "@/lib/server/social";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
+import { queuePulse } from "@/lib/server/pulse";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   const suggested = [...s.events.values()].filter((x) => x.id !== e.id && x.landmark === e.landmark).slice(0, 3);
   const queued = s.queue.find((q) => q.userId === viewer && q.status === "waiting");
   const partyHere = v.party?.planHere && v.party.status === "locked";
+  const pulse = queuePulse(e.id, viewer);
 
   return (
     <main data-testid="event-page">
@@ -55,6 +57,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             <div className="mt-1 text-[17px] text-[var(--color-ink-2)]">
               {e.venueName} · {e.city}
             </div>
+
+            {pulse && !partyHere && (
+              <div className="mt-2 flex items-center gap-1.5 text-[14px] font-semibold text-[var(--color-pq-ink)]" data-testid="queue-pulse">
+                <IconSparkle size={16} className="shrink-0 text-[var(--color-pq)]" /> {pulse.text}
+              </div>
+            )}
 
             {partyHere && v.party && (
               <Link

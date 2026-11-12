@@ -106,6 +106,8 @@ const DEFAULTS = {
   WIDEN_SEARCH: true,
   /** F50: your one sentence can be in Spanish: the same rules and preferences, your own words kept as your words. */
   SPANISH_SENTENCE: true,
+  /** F51: queue pulse on the Event page: how many are waiting near here tonight (counts only; "a few" under three). */
+  QUEUE_PULSE: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
