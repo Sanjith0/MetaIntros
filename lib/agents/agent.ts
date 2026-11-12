@@ -3,6 +3,8 @@ import type { Brief, CandidatePlan } from "@/contracts";
 import { callModel, type ModelSource } from "@/model/client";
 import { ownerChecks } from "./judge";
 import { NEUTRAL_PHRASES, type NeutralId, type PublicLine } from "./verifier";
+import { auditContext, keepPrompt, type ContextAudit } from "./audit";
+import { flag } from "@/lib/flags";
 
 /* --------------------------------- types --------------------------------- */
 
@@ -56,6 +58,8 @@ export interface TurnResult<T> {
   source: ModelSource;
   ms: number;
   note?: string;
+  /** What was in this agent's prompt, checked by code before the call. */
+  context?: ContextAudit;
 }
 
 /* ------------------------------- scoring ------------------------------- */
@@ -189,13 +193,21 @@ Reply: {"decision":"sign|concede|hold","planId":"...","privateReason":"...","pub
 
 /* ------------------------------ the calls ------------------------------ */
 
+function audited(ctx: TurnContext): { user: string; context?: ContextAudit } {
+  const user = promptFor(ctx);
+  if (!flag("CONTEXT_AUDIT")) return { user };
+  keepPrompt(ctx.partyId, ctx.brief.ownerId, ctx.round, SYSTEM, user);
+  return { user, context: auditContext(user, ctx.partyId, ctx.brief.ownerId) };
+}
+
 export async function round1Turn(ctx: TurnContext): Promise<TurnResult<Round1Out>> {
+  const { user, context } = audited(ctx);
   const r = await callModel({
     role: "spark",
     task: "table.round1",
     agent: ctx.brief.ownerId,
     system: SYSTEM,
-    user: promptFor(ctx),
+    user,
     schema: Round1Out,
     mock: () => mockRound1(ctx),
     fallback: () => mockRound1(ctx),
@@ -203,19 +215,20 @@ export async function round1Turn(ctx: TurnContext): Promise<TurnResult<Round1Out
   // Every plan must have exactly one verdict; fill gaps from the deterministic agent.
   const base = mockRound1(ctx);
   const verdicts = ctx.plans.map((p) => r.value.verdicts.find((v) => v.planId === p.id) ?? base.verdicts.find((v) => v.planId === p.id)!);
-  return { out: { verdicts, publicLine: r.value.publicLine }, source: r.source, ms: r.ms, note: r.note };
+  return { out: { verdicts, publicLine: r.value.publicLine }, source: r.source, ms: r.ms, note: r.note, context };
 }
 
 export async function laterTurn(ctx: TurnContext): Promise<TurnResult<LaterOut>> {
+  const { user, context } = audited(ctx);
   const r = await callModel({
     role: "spark",
     task: `table.round${ctx.round}`,
     agent: ctx.brief.ownerId,
     system: SYSTEM,
-    user: promptFor(ctx),
+    user,
     schema: LaterOut,
     mock: () => mockLater(ctx),
     fallback: () => mockLater(ctx),
   });
-  return { out: r.value, source: r.source, ms: r.ms, note: r.note };
+  return { out: r.value, source: r.source, ms: r.ms, note: r.note, context };
 }

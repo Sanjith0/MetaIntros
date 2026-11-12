@@ -3,6 +3,7 @@ import { publish } from "@/lib/server/bus";
 import { nextId, nowIso, profile, store } from "@/lib/server/store";
 import { trace } from "@/lib/server/trace";
 import { laterTurn, round1Turn, type LaterOut, type PublicTableRow, type Round1Out, type TurnContext } from "./agent";
+import type { ContextAudit } from "./audit";
 import { feasibleFor, ownerChecks, partyChecks, rankPlans } from "./judge";
 import { verifyPublicLine, type NeutralId, type PublicLine } from "./verifier";
 import { flag } from "@/lib/flags";
@@ -58,6 +59,20 @@ async function streamed<T>(briefs: Brief[], start: (b: Brief) => Promise<T>, han
 
 function logCall(partyId: string, ownerId: string, round: number, turn: { source: ModelSource; ms: number; note?: string }) {
   store().agentCalls.push({ partyId, ownerId, round, source: turn.source, ms: turn.ms, note: turn.note ?? null });
+}
+
+/** The context audit for the stage, and a red trace if a prompt ever held someone else's private words. */
+function ctxMeta(turn: { context?: ContextAudit }) {
+  return turn.context ? { chars: turn.context.chars, own: turn.context.own, others: turn.context.others.length } : undefined;
+}
+
+function reportAudit(partyId: string, ownerId: string, round: number, turn: { context?: ContextAudit }) {
+  const found = turn.context?.others ?? [];
+  if (!found.length) return;
+  trace(partyId, "private", "judge", ownerId, `Context audit failed for ${profile(ownerId).firstName}'s agent`, found.map((f) => `Held ${profile(f.ownerId).firstName}'s private words: "${f.text}"`).join("\n"), {
+    tone: "block",
+    meta: { round },
+  });
 }
 
 const turnLabel = (turn: { source: ModelSource; ms: number; note?: string }) =>
@@ -171,6 +186,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
 
   await streamed(briefs, (b) => round1Turn(ctxFor(b, 1, null)), async (b, turn) => {
     logCall(partyId, b.ownerId, 1, turn);
+    reportAudit(partyId, b.ownerId, 1, turn);
     const out = (opts.override?.(b.ownerId, 1, turn.out) as Round1Out | undefined) ?? turn.out;
     const own: Record<string, number> = {};
     const lines: string[] = [];
@@ -203,7 +219,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
     const anyReject = s.verdicts.some((v) => v.partyId === partyId && v.ownerId === b.ownerId && v.round === 1 && v.decision === "reject");
     trace(partyId, "private", "table", b.ownerId, agentTitle(b.ownerId, 1, turn), lines.join("\n"), {
       tone: anyReject ? "reject" : "accept",
-      meta: { kind: "verdicts", round: 1, source: turn.source, ms: turn.ms, note: turn.note },
+      meta: { kind: "verdicts", round: 1, source: turn.source, ms: turn.ms, note: turn.note, context: ctxMeta(turn) },
     });
     speak(party, b, 1, out.publicLine, "neutral-hello");
     await pauseFor(pace(), partyId);
@@ -253,6 +269,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
     const lead = leading;
     await streamed(briefs, (b) => laterTurn(ctxFor(b, round, lead.id, prefs.get(b.ownerId))), async (b, turn) => {
       logCall(partyId, b.ownerId, round, turn);
+      reportAudit(partyId, b.ownerId, round, turn);
       const raw = (opts.override?.(b.ownerId, round, turn.out) as LaterOut | undefined) ?? turn.out;
       let decision = raw.decision;
       let planId = raw.planId;
@@ -276,7 +293,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
       if (decision !== "hold") signatures.push(b.ownerId);
       trace(partyId, "private", "table", b.ownerId, agentTitle(b.ownerId, round, turn), `${decision.toUpperCase()} ${plans.find((p) => p.id === planId)?.title ?? planId}: ${verdict.privateReason}`, {
         tone: decision === "hold" ? "hold" : "sign",
-        meta: { kind: "verdicts", round, decision, planId, source: turn.source, ms: turn.ms, note: turn.note },
+        meta: { kind: "verdicts", round, decision, planId, source: turn.source, ms: turn.ms, note: turn.note, context: ctxMeta(turn) },
       });
       speak(party, b, round, raw.publicLine, decision === "hold" ? "neutral-thinking" : "neutral-in");
       await pauseFor(pace(), partyId);

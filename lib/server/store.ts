@@ -58,6 +58,8 @@ export interface Store {
   standing: Map<string, { memberIds: string[]; chatId: string }>;
   /** Safety reports. Stored for a human review queue; never shown in the app, never told to the subject. */
   reports: { id: string; reporterId: string; subjectId: string; partyId: string | null; reason: string; note: string; at: string }[];
+  /** The exact prompts each agent received, for the projector: `${partyId}:${ownerId}:${round}`. */
+  prompts: Map<string, { system: string; user: string }>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -100,6 +102,7 @@ function fresh(): Store {
     agentCalls: [],
     standing: new Map(),
     reports: [],
+    prompts: new Map(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

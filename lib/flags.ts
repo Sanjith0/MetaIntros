@@ -42,6 +42,8 @@ const DEFAULTS = {
   UX_STATES: true,
   /** F18: /how: the architecture diagram and the guarantees, for judges. */
   HOW_PAGE: true,
+  /** F19: every agent prompt is audited by code for other members' private words; the stage shows it per turn. */
+  CONTEXT_AUDIT: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -23,6 +23,33 @@ const TONE: Record<string, string> = {
 
 const SPEEDS = [1, 2, 4] as const;
 
+interface PromptView {
+  title: string;
+  system: string;
+  user: string;
+  audit: { chars: number; own: number; others: { ownerId: string; text: string }[] };
+}
+
+/** The context audit for one agent turn: what code found in the prompt before it went to the model. */
+function ContextChip({ t, onOpen }: { t: Trace; onOpen: () => void }) {
+  const c = t.meta?.context;
+  if (!c) return null;
+  const clean = c.others === 0;
+  return (
+    <button
+      onClick={onOpen}
+      data-testid="context-chip"
+      data-others={c.others}
+      data-actor={t.actorId}
+      data-round={t.meta?.round}
+      title="Open the exact prompt this agent got"
+      className={`rounded px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide underline-offset-2 hover:underline ${clean ? "bg-emerald-400/15 text-emerald-200" : "bg-red-500 text-white"}`}
+    >
+      {clean ? `own brief only ✓ · ${(c.chars / 1000).toFixed(1)}k chars` : `held ${c.others} of someone else's words`}
+    </button>
+  );
+}
+
 const fmtMs = (ms: number) => (ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ms}ms`);
 
 /** Where an agent's answer came from, and how long it took. */
@@ -65,6 +92,20 @@ function Body({ text }: { text: string }) {
  * the board (plans, signatures, the lock) from the trace up to that point.
  */
 export function StageReplay({ initial }: { initial: StageView }) {
+  const [prompt, setPrompt] = useState<PromptView | null>(null);
+  const openPrompt = async (t: Trace) => {
+    if (!t.actorId || !t.meta?.round) return;
+    const r = await fetch(`/api/stage/prompt?party=${t.partyId}&owner=${t.actorId}&round=${t.meta.round}`, { cache: "no-store" });
+    if (r.ok) setPrompt({ title: t.title, ...((await r.json()) as Omit<PromptView, "title">) });
+  };
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!prompt) return;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setPrompt(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [prompt]);
   const [view, setView] = useState(initial);
   const [pos, setPos] = useState(initial.traces.length ? 0 : 0);
   const [playing, setPlaying] = useState(initial.traces.length > 0);
@@ -155,6 +196,7 @@ export function StageReplay({ initial }: { initial: StageView }) {
             {(t.tone === "reject" || t.tone === "block") && <span className="rounded bg-red-500/80 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">{t.tone === "block" ? "Blocked" : "Rejected"}</span>}
             <span className="text-[15px] font-semibold text-white">{t.title}</span>
             <SourceChip meta={t.meta} />
+            <ContextChip t={t} onOpen={() => openPrompt(t)} />
           </div>
           <Body text={t.body} />
         </div>
@@ -164,6 +206,38 @@ export function StageReplay({ initial }: { initial: StageView }) {
 
   return (
     <div className="fixed inset-0 z-[45] flex flex-col overflow-y-auto bg-[#0c0d12] text-white lg:overflow-hidden" data-testid="stage">
+      {prompt && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-label="Agent prompt" onClick={(e) => e.target === e.currentTarget && setPrompt(null)}>
+          <div className="flex max-h-[88vh] w-full max-w-[860px] flex-col rounded-[14px] bg-[#14151c] ring-1 ring-white/15" data-testid="prompt-view">
+            <div className="flex items-start gap-3 border-b border-white/10 p-4">
+              <div className="min-w-0 flex-1">
+                <div className="text-[12px] font-semibold uppercase tracking-[0.14em] text-violet-300">The exact prompt</div>
+                <div className="text-[18px] font-bold">{prompt.title}</div>
+                <div className="mt-1 text-[13px] text-white/70" data-testid="prompt-audit">
+                  {prompt.audit.others.length === 0
+                    ? `Checked by code before the call: ${prompt.audit.own} of its own rules, and none of the other four members' private words.`
+                    : `Checked by code: held someone else's private words (${prompt.audit.others.length}).`}
+                </div>
+              </div>
+              <button ref={closeRef} onClick={() => setPrompt(null)} className="rounded-[6px] bg-white/10 px-3 py-1.5 text-[13px] font-semibold hover:bg-white/20">
+                Close
+              </button>
+            </div>
+            <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap p-4 font-mono text-[12px] leading-relaxed text-white/80" tabIndex={0} data-testid="prompt-text">
+              {prompt.system}
+              {"\n\n"}
+              {(() => {
+                const [json, ask] = prompt.user.split("\n\n");
+                try {
+                  return JSON.stringify(JSON.parse(json ?? ""), null, 2) + "\n\n" + (ask ?? "");
+                } catch {
+                  return prompt.user;
+                }
+              })()}
+            </pre>
+          </div>
+        </div>
+      )}
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-3 sm:px-6">
         <div>
           <div className="text-[12px] font-semibold uppercase tracking-[0.18em] text-violet-300">Party Queue · Stage</div>

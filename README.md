@@ -88,6 +88,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `VOICE_SENTENCE` | **off by default**: say your sentence instead of typing it |
 | `UX_STATES` | skip link, MATCH FOUND focus and Escape, chat send retry |
 | `HOW_PAGE` | `/how`: the architecture diagram and what code guarantees |
+| `CONTEXT_AUDIT` | every agent prompt checked by code for other members' private words; per-turn chip and the exact prompt on `/stage` |
 
 ## Routes
 
@@ -132,7 +133,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 133 unit tests (vitest)
+npm test                       # 143 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

@@ -372,6 +372,8 @@ export const Trace = z.object({
       ms: z.number().optional(),
       /** Why a fallback answered (for example "timeout after 2500 ms"), or where a replay came from. */
       note: z.string().optional(),
+      /** Context audit of this agent's prompt: size, own rules given, other members' private phrases found (expected 0). */
+      context: z.object({ chars: z.number(), own: z.number(), others: z.number() }).optional(),
     })
     .optional(),
 });
