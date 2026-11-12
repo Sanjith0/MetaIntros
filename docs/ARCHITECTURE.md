@@ -64,6 +64,12 @@ flowchart TB
 | "What the party knows" is computed, not claimed | `lib/server/secret.ts` scans what each other member can load | `tests/unit/secret.test.ts` (a planted leak turns it red) |
 | Nothing inferred from a face | `lib/door/recognition.ts`: a matcher may only return a gallery id or null | `tests/unit/door.test.ts` |
 | Reports never reach the reported person | `lib/server/safety.ts` publishes no event | `tests/unit/safety.test.ts` |
+| Each agent's prompt holds its own brief and nobody else's private words, checked per call | `lib/agents/audit.ts` (before every model call), shown per turn on `/stage` | `tests/unit/audit.test.ts` (a planted phrase is caught) |
+| A line typed as any agent still has to pass the verifier; the test posts nothing | `lib/server/attempt.ts` (same `verifyPublicLine`) | `tests/unit/leak.test.ts` |
+| A no-match blames nobody: the event can't carry a reason or a name, and the same five never re-form | `contracts/events.ts` (strict `PartyNoMatchPayload`), `lib/server/nomatch.ts`, `lib/queue/formation.ts` (`avoid`) | `tests/unit/nomatch.test.ts` |
+| Every card and opener can say which approved facts it came from, without ids or an unnamed third person | `lib/server/provenance.ts` | `tests/unit/provenance.test.ts` |
+| "Forget my night" deletes your private data, then a scan of every stored value proves it | `lib/server/forget.ts` (`scanStore`) | `tests/unit/forget.test.ts` |
+| Sandbox runs ("What if", preflight) never touch live state or spend a real model call | `lib/server/store.ts` (`runIsolated`), `model/client.ts` (`withMockModel`) | `tests/unit/whatif.test.ts`, `tests/unit/preflight.test.ts` |
 
 ## Modules
 
