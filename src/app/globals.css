@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-fb: #0866ff;
+  --color-fb-dark: #0753d1;
+  --color-fbbg: #f0f2f5;
+  --color-ink: #050505;
+  --color-sub: #65676b;
+  --color-line: #ced0d4;
+  --color-muse: #7b3fe4;
+  --font-sans: "Segoe UI Historic", "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+body {
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.pop-in { animation: pop-in 420ms cubic-bezier(.2,.9,.3,1.2) both; }
+
+@keyframes fade-up {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.fade-up { animation: fade-up 360ms ease-out both; }
+
+@keyframes radar {
+  from { transform: scale(0.2); opacity: .7; }
+  to { transform: scale(1.6); opacity: 0; }
+}
+.radar { animation: radar 2.4s ease-out infinite; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.muse-shimmer {
+  background: linear-gradient(90deg, #7b3fe4, #0866ff, #e44fa4, #7b3fe4);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes match-found {
+  0% { letter-spacing: 0.6em; opacity: 0; }
+  100% { letter-spacing: 0.08em; opacity: 1; }
+}
+.match-found { animation: match-found 700ms ease-out both; }
