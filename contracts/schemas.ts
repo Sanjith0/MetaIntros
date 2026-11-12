@@ -308,6 +308,8 @@ export const Frame = z.object({
   /** Opaque frame payload. The stub never looks at pixels. */
   image: z.string().max(2_000_000).optional(),
   fixtureKey: z.string().optional(),
+  /** Where the frame came from. A recorded clip is labelled as recorded wherever it shows. */
+  source: z.enum(["live", "fixture", "recorded"]).optional(),
 });
 export type Frame = z.infer<typeof Frame>;
 
@@ -316,7 +318,7 @@ export const Spotted = z.object({
   viewerId: Id,
   partyId: Id,
   subjectId: Id.nullable(),
-  method: z.enum(["stub", "tap"]),
+  method: z.enum(["stub", "tap", "recorded"]),
   at: IsoTime,
 });
 export type Spotted = z.infer<typeof Spotted>;

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DoorClient } from "@/components/door/DoorClient";
 import { FRAME_SOURCES, frameSource } from "@/lib/door/source";
+import { flag } from "@/lib/flags";
 import { clock12 } from "@/lib/format";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
@@ -29,6 +30,7 @@ export default async function DoorPage() {
   }
 
   const lastSpotted = [...s.spotted].reverse().find((x) => x.viewerId === viewer && x.partyId === v.party.id && x.subjectId);
+  const initialMethod = lastSpotted?.method ?? "stub";
 
   return (
     <main className="mx-auto max-w-[480px] px-4 py-5" data-testid="door-page">
@@ -38,6 +40,11 @@ export default async function DoorPage() {
         <div className="text-[15px] text-[var(--color-ink-2)]">
           {plan.venueName} · from {clock12(plan.start)}
         </div>
+        {flag("GLASSES_VIEW") && (
+          <Link href="/door/glasses" data-testid="open-glasses" className="mt-1 inline-block text-[13px] font-semibold text-[var(--color-link)]">
+            Glasses view
+          </Link>
+        )}
       </div>
       <DoorClient
         partyId={v.party.id}
@@ -45,6 +52,7 @@ export default async function DoorPage() {
         members={v.members.map((m) => ({ id: m.id, name: m.name, firstName: m.firstName, hue: m.hue, arrived: m.arrived }))}
         cards={v.cards}
         initialSpotted={lastSpotted?.subjectId ?? null}
+        initialMethod={initialMethod}
         cameraOn={frameSource() !== "tap-only"}
         sourceLabel={FRAME_SOURCES.find((f) => f.id === frameSource())!.label}
       />

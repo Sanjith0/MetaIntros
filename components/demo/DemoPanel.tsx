@@ -10,7 +10,7 @@ interface Status {
   phones: { id: string; connected: boolean }[];
   settings: { simulateLatency: boolean; timeoutAgent: string | null; agentTimeoutMs: number; source: "live" | "recorded"; paceMs: number | null };
   mockModel: boolean;
-  frameSource: "fixture" | "tap-only";
+  frameSource: "fixture" | "recorded-clip" | "tap-only";
 }
 
 interface Person {
@@ -144,8 +144,21 @@ export function DemoPanel({ people }: { people: Person[] }) {
             <button className={on(st?.frameSource === "fixture")} data-testid="frames-fixture" onClick={() => act("Fixture frames", "/api/demo/frame-source", { body: JSON.stringify({ source: "fixture" }) })}>
               Fixture frames
             </button>
+            <button className={on(st?.frameSource === "recorded-clip")} data-testid="frames-clip" onClick={() => act("Recorded clip", "/api/demo/frame-source", { body: JSON.stringify({ source: "recorded-clip" }) })}>
+              Recorded clip
+            </button>
             <button className={on(st?.frameSource === "tap-only")} data-testid="frames-tap-only" onClick={() => act("Camera off", "/api/demo/frame-source", { body: JSON.stringify({ source: "tap-only" }) })}>
               Camera off (tap only)
+            </button>
+          </div>
+          <div className="mt-2">
+            <button
+              className={grey}
+              data-testid="play-clip"
+              disabled={st?.frameSource !== "recorded-clip" || st?.party?.status !== "locked"}
+              onClick={() => act("Playing the recorded clip into Maya's door and glasses", "/api/demo/clip", { body: JSON.stringify({ viewerId: "maya" }) })}
+            >
+              ▶ Play the arrivals clip to Maya
             </button>
           </div>
           <div className="mt-3 text-[13px] font-semibold">After the event</div>

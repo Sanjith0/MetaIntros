@@ -35,7 +35,8 @@ export function Toaster({ people }: { people: Directory }) {
   };
 
   useLiveEvents((e) => {
-    if (pathname?.startsWith("/stage")) return; // the projector never shows a member's notifications
+    // The projector never shows a member's notifications; the glasses show only their own heads-up card.
+    if (pathname?.startsWith("/stage") || pathname?.startsWith("/door/glasses")) return;
     switch (e.type) {
       case "match.found": {
         const shownAt = serverNow(); // server clock, so phones with drifting clocks still report true lag
@@ -82,7 +83,7 @@ export function Toaster({ people }: { people: Directory }) {
       }
       case "member.spotted": {
         const s = e.payload;
-        if (!s.subjectId || pathname === "/door") return; // the door card already shows it
+        if (!s.subjectId || pathname?.startsWith("/door")) return; // the door card already shows it
         push({ id: e.id, title: "At the door", body: `${people[s.subjectId]?.firstName ?? "Someone"} from your party is here.`, href: "/door", layer: true, who: s.subjectId });
         break;
       }

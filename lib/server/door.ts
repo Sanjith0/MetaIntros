@@ -35,7 +35,7 @@ export async function spotFromFrame(raw: unknown): Promise<Spotted> {
   const party = lockedParty(frame.partyId, frame.viewerId);
   const gallery = party.memberIds.filter((id) => id !== frame.viewerId).map((userId) => ({ userId }));
   const { subjectId } = await matchFrame(frame, gallery);
-  const spotted: Spotted = { frameId: frame.id, viewerId: frame.viewerId, partyId: party.id, subjectId, method: "stub", at: nowIso() };
+  const spotted: Spotted = { frameId: frame.id, viewerId: frame.viewerId, partyId: party.id, subjectId, method: frame.source === "recorded" ? "recorded" : "stub", at: nowIso() };
   store().spotted.push(spotted);
   publish("member.spotted", spotted, [frame.viewerId]);
   return spotted;

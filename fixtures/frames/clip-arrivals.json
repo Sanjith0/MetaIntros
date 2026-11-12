@@ -1,0 +1,11 @@
+{
+  "name": "arrivals at the night market door",
+  "note": "A recorded clip of fixture frames for the demo. It carries fixture keys, not pixels; the stub matcher maps each key to a party member who opted in.",
+  "viewerId": "maya",
+  "frames": [
+    { "atMs": 0, "fixtureKey": "door-frame-dev" },
+    { "atMs": 2500, "fixtureKey": "door-frame-ana" },
+    { "atMs": 5000, "fixtureKey": "door-frame-zoe" },
+    { "atMs": 7500, "fixtureKey": "door-frame-kai" }
+  ]
+}

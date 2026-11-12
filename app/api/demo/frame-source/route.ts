@@ -4,7 +4,7 @@ import { frameSource, setFrameSource } from "@/lib/door/source";
 
 export const dynamic = "force-dynamic";
 
-const Body = z.object({ source: z.enum(["fixture", "tap-only"]) });
+const Body = z.object({ source: z.enum(["fixture", "recorded-clip", "tap-only"]) });
 
 export function GET() {
   return NextResponse.json({ source: frameSource() });

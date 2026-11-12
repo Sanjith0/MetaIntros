@@ -21,6 +21,8 @@ const DEFAULTS = {
   BRIDGE_PRIVACY: true,
   /** F8: chat lifecycle: I'm here pings, leaving before the lock without attribution, expiry after the event. */
   CHAT_LIFECYCLE: true,
+  /** F9: a glasses (heads-up) view on the same Spotted contract, and a recorded-clip frame source labelled as recorded. */
+  GLASSES_VIEW: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

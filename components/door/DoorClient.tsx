@@ -23,6 +23,7 @@ export function DoorClient({
   members,
   cards,
   initialSpotted,
+  initialMethod = "stub",
   cameraOn = true,
   sourceLabel = "",
 }: {
@@ -31,12 +32,13 @@ export function DoorClient({
   members: Member[];
   cards: Card[];
   initialSpotted: string | null;
+  initialMethod?: string;
   cameraOn?: boolean;
   sourceLabel?: string;
 }) {
   const [here, setHere] = useState(members.find((m) => m.id === viewerId)?.arrived ?? false);
   const [arrived, setArrived] = useState(() => new Set(members.filter((m) => m.arrived).map((m) => m.id)));
-  const [spotted, setSpotted] = useState<{ id: string; method: string } | null>(initialSpotted ? { id: initialSpotted, method: "stub" } : null);
+  const [spotted, setSpotted] = useState<{ id: string; method: string } | null>(initialSpotted ? { id: initialSpotted, method: initialMethod } : null);
 
   useLiveEvents((e) => {
     if (e.type === "member.spotted" && e.payload.viewerId === viewerId && e.payload.partyId === partyId) {
@@ -87,7 +89,14 @@ export function DoorClient({
             <div className="flex items-center gap-4 bg-gradient-to-br from-[var(--color-pq)] to-[var(--color-pq-2)] px-5 py-5 text-white">
               <Avatar name={who.name} hue={who.hue} size={64} />
               <div>
-                <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-white/80">{spotted?.method === "tap" ? "You tapped" : "In front of you"}</div>
+                <div className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-white/80">
+                  {spotted?.method === "tap" ? "You tapped" : "In front of you"}
+                  {spotted?.method === "recorded" && (
+                    <span className="rounded bg-amber-300 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-black" data-testid="door-recorded">
+                      Recorded clip
+                    </span>
+                  )}
+                </div>
                 <div className="text-[28px] font-extrabold leading-tight" data-testid="door-card-name">
                   {who.firstName}
                 </div>
