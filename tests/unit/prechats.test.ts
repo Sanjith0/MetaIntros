@@ -30,6 +30,11 @@ describe("companion pre-chats", () => {
     const rows = await prisma.preChat.findMany({ where: { partyId: party.id } });
     expect(rows).toHaveLength((5 * 4) / 2);
     expect(rows.every((r) => r.simulated)).toBe(true);
+    // pairs with Me went through the (mock) model; persona-only pairs are templates, and each row says so
+    expect(rows.filter((r) => r.aiSource === "mock")).toHaveLength(4);
+    expect(rows.filter((r) => r.aiSource === "template")).toHaveLength(6);
+    const trace = await prisma.agentTrace.findFirstOrThrow({ where: { partyId: party.id, agent: "companion" } });
+    expect((trace.output as { source: string }).source).toBe("mock");
 
     // model calls only for pairs with a real person (Me), and each prompt has exactly two profiles
     const calls = mockProvider().calls.filter((c) => c.task === "companion_prechat");

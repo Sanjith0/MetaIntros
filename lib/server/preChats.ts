@@ -3,11 +3,13 @@ import { toJson } from "@/lib/json";
 import { runPreChat } from "@/lib/agents/companion";
 import { loadPeople } from "@/lib/profile/load";
 import { writeTrace } from "./trace";
+import { combineSources, type AgentSource } from "@/lib/ai/status";
 
 export async function generatePreChats(partyId: string) {
   const ids = (await prisma.partyMember.findMany({ where: { partyId }, select: { userId: true } })).map((m) => m.userId).sort();
   const people = await loadPeople(prisma, ids);
   let modelCalls = 0, n = 0;
+  const sources: AgentSource[] = [];
   for (let i = 0; i < ids.length; i++) {
     for (let j = i + 1; j < ids.length; j++) {
       const a = people.get(ids[i]), b = people.get(ids[j]);
@@ -15,16 +17,17 @@ export async function generatePreChats(partyId: string) {
       const useModel = !a.isSimulated || !b.isSimulated;
       const r = await runPreChat(a, b, useModel);
       if (useModel) modelCalls++;
+      sources.push(r.source);
       await prisma.preChat.upsert({
         where: { partyId_userAId_userBId: { partyId, userAId: a.id, userBId: b.id } },
-        create: { partyId, userAId: a.id, userBId: b.id, transcript: toJson(r.value.transcript), sparks: toJson(r.value.sparks), simulated: true },
-        update: { transcript: toJson(r.value.transcript), sparks: toJson(r.value.sparks) },
+        create: { partyId, userAId: a.id, userBId: b.id, transcript: toJson(r.value.transcript), sparks: toJson(r.value.sparks), simulated: true, aiSource: r.source },
+        update: { transcript: toJson(r.value.transcript), sparks: toJson(r.value.sparks), aiSource: r.source },
       });
       n++;
     }
   }
   await writeTrace(partyId, [
-    { agent: "companion", kind: "decision", output: { preChats: n, modelCalls },
+    { agent: "companion", kind: "decision", output: { preChats: n, modelCalls, source: combineSources(sources) },
       summary: `Companion agents ran ${n} simulated pre-chats (each saw only its two profiles) to find conversation sparks` },
   ]);
   return n;
@@ -38,5 +41,6 @@ export async function getPreChatsFor(partyId: string, ownerId: string) {
     transcript: r.transcript as { speaker: "A" | "B"; text: string }[],
     sparks: r.sparks as string[],
     simulated: r.simulated,
+    source: r.aiSource,
   }));
 }

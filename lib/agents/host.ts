@@ -80,7 +80,7 @@ export async function generateReply(ctx: HostContext, recent: { from: string; te
     fallback,
     maxTokens: 120,
   });
-  return ai.value.reply;
+  return { reply: ai.value.reply, source: ai.source };
 }
 
 export function stallNudge(ctx: HostContext, n: number) {

@@ -11,10 +11,12 @@ import { cacheGet, cacheKey, cachePut } from "./cache";
 import { MockProvider } from "./providers/mock";
 import { fallbackFromEnv, museFromEnv } from "./providers/openaiCompat";
 import type { AiMode, AiSource, ChatMessage, LlmProvider } from "./types";
+import { summarizeAi, type AiStatus } from "./status";
 
 export type { AiMode, AiSource } from "./types";
+export type { AiStatus } from "./status";
 
-const g = globalThis as unknown as { __quAi?: { mode?: AiMode; mock: MockProvider; calls: number; log: AiLogEntry[] } };
+const g = globalThis as unknown as { __quAi?: { mode?: AiMode; mock: MockProvider; calls: number; log: AiLogEntry[]; pending?: number } };
 const state = (g.__quAi ??= { mock: new MockProvider(), calls: 0, log: [] });
 
 export interface AiLogEntry {
@@ -22,10 +24,25 @@ export interface AiLogEntry {
   source: AiSource;
   ms: number;
   error?: string;
+  /** epoch ms when the call finished */
+  at?: number;
 }
 
 export const mockProvider = () => state.mock;
 export const aiLog = () => state.log;
+/** Live network calls to Muse in flight right now (drives the "what Muse is weighing" lines). */
+export const aiPending = () => state.pending ?? 0;
+
+/** Truthful snapshot for the UI badge: built only from the mode, the key and real call results. */
+export function aiStatus(): AiStatus {
+  return summarizeAi({
+    mode: getAiMode(),
+    hasKey: Boolean(process.env.MODEL_API_KEY),
+    model: process.env.MUSE_MODEL ?? "muse-spark-1.1",
+    log: state.log,
+    pending: aiPending(),
+  });
+}
 
 export function getAiMode(): AiMode {
   if (state.mode) return state.mode;
@@ -88,7 +105,7 @@ export async function runAi<T>(c: AiCall<T>): Promise<AiResult<T>> {
   ];
   const mode = getAiMode();
   const done = (r: AiResult<T>) => {
-    state.log.push({ task: c.task, source: r.source, ms: Date.now() - t0, error: r.error });
+    state.log.push({ task: c.task, source: r.source, ms: Date.now() - t0, error: r.error, at: Date.now() });
     if (state.log.length > 200) state.log.shift();
     return r;
   };
@@ -121,7 +138,10 @@ export async function runAi<T>(c: AiCall<T>): Promise<AiResult<T>> {
   for (const p of providers) {
     try {
       state.calls++;
-      const r = await callProvider(p, c.task, messages, c as AiCall<unknown>);
+      state.pending = (state.pending ?? 0) + 1;
+      const r = await callProvider(p, c.task, messages, c as AiCall<unknown>).finally(() => {
+        state.pending = Math.max(0, (state.pending ?? 1) - 1);
+      });
       const value = parse(r.text);
       cachePut(key, r.text, { task: c.task, model: r.model, provider: p.name, usage: r.usage });
       return done({ value, source: "live" });

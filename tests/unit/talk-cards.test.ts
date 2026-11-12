@@ -49,6 +49,7 @@ describe("talk cards", () => {
     expect(mine).toHaveLength(3);
     for (const c of mine) {
       expect(c.content.generatedBy).toBe("template");
+      expect(c.content.aiSource).toBe("fallback");
       expect(c.content.openers.length).toBeGreaterThanOrEqual(2);
     }
   });
