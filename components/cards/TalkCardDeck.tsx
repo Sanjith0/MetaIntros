@@ -5,12 +5,14 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Bot, CalendarCheck, Copy, Heart, MessageSquareQuote, Sparkles, Users, Zap } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import type { CardContent, ClaimKind } from "@/lib/cards/claims";
+import { AiSourceBadge, AiStatusBadge } from "@/components/ai/AiBadges";
 
 interface PreChat {
   meIsA: boolean;
   transcript: { speaker: "A" | "B"; text: string }[];
   sparks: string[];
   simulated: boolean;
+  source?: string | null;
 }
 interface Card {
   subject: { id: string; name: string; avatarColor: string };
@@ -55,6 +57,7 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
           <h1 className="font-bold leading-tight">Talk cards</h1>
           <p className="text-xs text-fb-muted">{eventTitle} · swipe through your squad</p>
         </div>
+        <AiStatusBadge className="ml-auto" />
       </div>
       <div ref={strip} onScroll={onScroll} className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none]" data-testid="card-strip">
         {cards.map((c) => (
@@ -88,7 +91,9 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
                   {c.content.claims.length === 0 && <li className="text-sm text-fb-muted">You&apos;ll find out together 🙂</li>}
                 </ul>
                 <div>
-                  <p className="mb-1 flex items-center gap-1.5 text-sm font-bold"><MessageSquareQuote size={16} /> Try opening with</p>
+                  <p className="mb-1 flex items-center gap-1.5 text-sm font-bold"><MessageSquareQuote size={16} /> Try opening with
+                    <span className="ml-auto" data-testid="openers-source"><AiSourceBadge source={c.content.aiSource ?? (c.content.generatedBy === "template" ? "template" : null)} /></span>
+                  </p>
                   <ul className="space-y-1.5" data-testid="card-openers">
                     {c.content.openers.map((o) => (
                       <li key={o}>
@@ -105,6 +110,7 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
                   <details className="rounded-xl border border-dashed border-[#c4b5fd] bg-[#faf8ff] p-2" data-testid="prechat">
                     <summary className="flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-queue-glow">
                       <Bot size={15} /> Companion pre-chat
+                      <AiSourceBadge source={c.preChat.source} />
                       <span className="ml-auto rounded bg-[#ede9fe] px-1.5 text-[10px] font-bold uppercase tracking-wide" data-testid="prechat-label">AI simulation</span>
                     </summary>
                     <p className="mt-1 text-[11px] text-fb-muted">Simulated by your companion AIs using only your two profiles — these are not real messages.</p>

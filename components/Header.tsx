@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MessageCircle, Search } from "lucide-react";
 import { Avatar } from "./Avatar";
+import { AiStatusBadge } from "./ai/AiBadges";
 
 export function Header({ me }: { me: { name: string; avatarColor: string } }) {
   return (
@@ -9,6 +10,7 @@ export function Header({ me }: { me: { name: string; avatarColor: string } }) {
         facebook
       </Link>
       <div className="flex items-center gap-2">
+        <AiStatusBadge />
         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-fb-bg">
           <Search size={18} />
         </span>

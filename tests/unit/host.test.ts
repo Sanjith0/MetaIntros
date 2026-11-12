@@ -35,6 +35,8 @@ describe("AI host", () => {
     expect(host[0].body).toMatch(/Indie Night/);
     expect(host[0].body).toMatch(/The Guild Theatre/);
     expect(host.filter((m) => m.body.startsWith("🎲 Icebreaker")).length).toBe(1);
+    // every host message records who wrote it, so the chat can badge it honestly
+    for (const m of host) expect(["mock", "fallback"]).toContain(m.aiSource);
   });
 
   it("the icebreaker references a real interest that ≥2 squad members share", async () => {
@@ -62,6 +64,7 @@ describe("AI host", () => {
     await afterUserMessage(chatId, "p01", "@host where do we meet?");
     const last = await prisma.chatMessage.findFirstOrThrow({ where: { chatId, kind: "host" }, orderBy: { createdAt: "desc" } });
     expect(last.body).toBe("Meet at the front entrance at 7:20!");
+    expect(last.aiSource).toBe("mock");
   });
 
   it("nudges a stalled chat (at most twice)", async () => {

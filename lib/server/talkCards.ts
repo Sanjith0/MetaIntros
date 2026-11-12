@@ -31,7 +31,7 @@ export async function generateTalkCards(partyId: string) {
 
   let stripped = 0;
   for (const p of pairs) {
-    const raw: CardContent = { claims: p.claims, openers: openers(p), generatedBy: source === "fallback" ? "template" : "model" };
+    const raw: CardContent = { claims: p.claims, openers: openers(p), generatedBy: source === "fallback" ? "template" : "model", aiSource: source };
     let card = validateCard(raw, subjects);
     if (card.openers.length === 0) card = { ...card, openers: tpl(p) };
     stripped += card.stripped ?? 0;

@@ -38,8 +38,8 @@ export async function postHostWelcome(partyId: string) {
   const w = await generateWelcome(ctx);
   // re-check after the (possibly slow) model call
   if (await prisma.chatMessage.count({ where: { chatId: chat.id, kind: "host" } })) return;
-  await postMessage(chat.id, null, w.value.welcome, "host");
-  await postMessage(chat.id, null, `🎲 Icebreaker: ${w.value.icebreaker}`, "host");
+  await postMessage(chat.id, null, w.value.welcome, "host", w.source);
+  await postMessage(chat.id, null, `🎲 Icebreaker: ${w.value.icebreaker}`, "host", w.source);
   await writeTrace(partyId, [
     { agent: "host", kind: "decision", output: { interestTag: w.value.interestTag, source: w.source }, summary: `Posted welcome + icebreaker about ${label(w.value.interestTag).toLowerCase() || "the weekend"} (shared by ${ctx.shared.find((s) => s.tag === w.value.interestTag)?.count ?? 0} members)` },
   ]);
@@ -74,7 +74,7 @@ export async function afterUserMessage(chatId: string, _userId: string, body: st
   if (!ctx) return;
   const recent = await prisma.chatMessage.findMany({ where: { chatId }, orderBy: { createdAt: "desc" }, take: 6, include: { sender: { select: { name: true } } } });
   const reply = await generateReply(ctx, recent.reverse().map((m) => ({ from: m.kind === "host" ? "host" : (m.sender?.name.split(" ")[0] ?? "system"), text: m.body })));
-  await postMessage(chatId, null, reply, "host");
+  await postMessage(chatId, null, reply.reply, "host", reply.source);
 }
 
 /** Nudge stalled squad chats (template, no model call). Run from the ticker. */
@@ -87,6 +87,6 @@ export async function checkStalls(now = nowMs()) {
     const nudges = await prisma.chatMessage.count({ where: { chatId: c.id, kind: "host", body: { startsWith: "Quiet in here" } } });
     if (nudges >= MAX_NUDGES) continue;
     const ctx = await hostContext(c.id);
-    if (ctx) await postMessage(c.id, null, stallNudge(ctx, nudges), "host");
+    if (ctx) await postMessage(c.id, null, stallNudge(ctx, nudges), "host", "template");
   }
 }

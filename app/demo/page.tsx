@@ -1,5 +1,6 @@
 "use client";
 
+import { AiSourceBadge, AiStatusBadge } from "@/components/ai/AiBadges";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Bot, Database, FastForward, Play, QrCode, RotateCcw, Smartphone, UserX, Users, Wifi, WifiOff } from "lucide-react";
@@ -115,7 +116,7 @@ export default function DemoPage() {
       </section>
 
       <section className="mt-5">
-        <h2 className="flex items-center gap-1.5 text-sm font-bold"><Bot size={16} /> AI (Muse · {s?.model})</h2>
+        <h2 className="flex items-center gap-1.5 text-sm font-bold"><Bot size={16} /> AI (Muse · {s?.model}) <AiStatusBadge className="ml-auto" /></h2>
         <div className="mt-2 grid grid-cols-2 gap-1.5">
           <button type="button" data-testid="ai-cache" aria-pressed={s?.aiMode !== "live"} onClick={() => act("ai", "/api/demo/settings", { aiMode: "cache" })}
             className={`flex items-center justify-center gap-1 rounded-lg py-2 text-sm font-bold ${s?.aiMode !== "live" ? "bg-emerald-600" : "bg-white/10"}`}><WifiOff size={14} /> Run from cache</button>
@@ -125,7 +126,7 @@ export default function DemoPage() {
         <p className="mt-1 text-xs text-[#c7d2fe]">{s?.hasModelKey ? "Cache misses call Muse (budget-capped) and are saved for offline replays." : "No MODEL_API_KEY set: cached + deterministic fallbacks only."}</p>
         {s && s.aiLog.length > 0 && (
           <ul className="mt-2 space-y-0.5 font-mono text-[10px] text-[#c7d2fe]" data-testid="ai-log">
-            {s.aiLog.slice().reverse().map((l, i) => <li key={i}>{l.task} · {l.source} · {l.ms}ms{l.error ? ` · ${l.error}` : ""}</li>)}
+            {s.aiLog.slice().reverse().map((l, i) => <li key={i} className="flex items-center gap-1"><AiSourceBadge source={l.source} dark /> {l.task} · {l.ms}ms{l.error ? ` · ${l.error}` : ""}</li>)}
           </ul>
         )}
       </section>

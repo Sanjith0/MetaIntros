@@ -9,9 +9,10 @@ import { SquadHeader, type SquadHeaderData } from "./SquadHeader";
 import { ArchivedPrompt } from "./ArchivedPrompt";
 import { FastForwardButton } from "./FastForwardButton";
 import { FindYourParty } from "./FindYourParty";
+import { AiSourceBadge } from "@/components/ai/AiBadges";
 
 interface U { id: string; name: string; avatarColor: string }
-export interface ThreadMessage { id: string; body: string; kind: string; createdAt: string; senderId: string | null; sender: U | null }
+export interface ThreadMessage { id: string; body: string; kind: string; createdAt: string; senderId: string | null; sender: U | null; aiSource?: string | null }
 export interface ThreadChat {
   id: string;
   type: string;
@@ -100,7 +101,7 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
               <li key={m.id} className="flex items-end gap-1.5" data-testid="msg-host">
                 <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1877f2] to-[#a855f7] text-white"><Bot size={15} /></span>
                 <span className="max-w-[80%] rounded-2xl border border-[#e9e3ff] bg-gradient-to-br from-[#f3f0ff] to-[#eef5ff] px-3 py-1.5">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-queue-glow">Queue Up Host · AI</span>
+                  <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-queue-glow">Queue Up Host · AI <AiSourceBadge source={m.aiSource} /></span>
                   {m.body}
                 </span>
               </li>

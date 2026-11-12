@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Brain, CheckCircle2, ChevronDown, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 import { useLiveEvents } from "@/components/useLiveEvents";
+import { AiSourceBadge, AiStatusBadge } from "@/components/ai/AiBadges";
+import { combineSources, describeSource, stepSource, type AgentSource } from "@/lib/ai/status";
 
 interface Step {
   id: string;
@@ -11,6 +13,7 @@ interface Step {
   toolName: string | null;
   summary: string;
   stepIndex: number;
+  output?: unknown;
 }
 
 const AGENT_LABEL: Record<string, string> = {
@@ -58,6 +61,11 @@ export function MatchTracePanel({ partyId, dark = false, defaultOpen = true }: {
     return () => clearTimeout(t);
   }, [open, shown, steps.length]);
 
+  const modelSources = steps.map(stepSource).filter((x): x is string => !!x && x !== "code");
+  const museSteps = modelSources.filter((x) => describeSource(x)?.muse).length;
+  const overall = modelSources.length ? combineSources(modelSources as AgentSource[]) : null;
+  const agents = new Set(steps.map((s) => s.agent)).size;
+
   const tone = dark
     ? { box: "bg-black/25 border-white/15 text-white", sub: "text-[#c4b5fd]", item: "bg-white/5" }
     : { box: "bg-white border-[#e4e6eb] text-fb-text", sub: "text-fb-muted", item: "bg-fb-bg" };
@@ -67,8 +75,17 @@ export function MatchTracePanel({ partyId, dark = false, defaultOpen = true }: {
       <button type="button" onClick={() => setOpen((o) => !o)} data-testid="trace-toggle" aria-expanded={open}
         className="flex w-full items-center justify-between px-4 py-3 font-bold">
         <span className="flex items-center gap-2"><Sparkles size={18} className="text-[#a855f7]" /> How we matched you</span>
-        <ChevronDown size={18} className={`transition ${open ? "rotate-180" : ""}`} />
+        <span className="flex items-center gap-2">
+          <AiStatusBadge />
+          <ChevronDown size={18} className={`transition ${open ? "rotate-180" : ""}`} />
+        </span>
       </button>
+      {steps.length > 0 && (
+        <p className={`-mt-1 flex flex-wrap items-center gap-1.5 px-4 pb-2 text-xs ${tone.sub}`} data-testid="trace-ai-summary">
+          {agents} agent{agents === 1 ? "" : "s"} · {museSteps ? `${museSteps} Muse decision${museSteps === 1 ? "" : "s"}` : "no Muse output this run"}, every pick re-checked by safety rules in code
+          {overall && <AiSourceBadge source={overall} dark={dark} />}
+        </p>
+      )}
       {open && (
         <ol className="space-y-1.5 px-3 pb-3" data-testid="trace-steps">
           {steps.slice(0, shown).map((s) => {
@@ -77,9 +94,10 @@ export function MatchTracePanel({ partyId, dark = false, defaultOpen = true }: {
               <li key={s.id} data-testid="trace-step" data-kind={s.kind} className={`flex gap-2 rounded-xl p-2 text-sm animate-[qu-pop_.35s_ease-out] ${tone.item}`}>
                 <Icon size={16} className={`mt-0.5 shrink-0 ${s.kind === "safety_check" ? "text-emerald-400" : s.kind === "decision" ? "text-[#60a5fa]" : "text-[#a855f7]"}`} />
                 <span className="min-w-0">
-                  <span className={`block text-[10px] font-semibold uppercase tracking-wider ${tone.sub}`}>
+                  <span className={`flex flex-wrap items-center gap-1 text-[10px] font-semibold uppercase tracking-wider ${tone.sub}`}>
                     {AGENT_LABEL[s.agent] ?? s.agent}
-                    {s.toolName && <span className="ml-1 font-mono normal-case">· {s.toolName}()</span>}
+                    {s.toolName && <span className="font-mono normal-case">· {s.toolName}()</span>}
+                    <AiSourceBadge source={stepSource(s)} dark={dark} />
                   </span>
                   <span className="block leading-snug">{s.summary}</span>
                 </span>

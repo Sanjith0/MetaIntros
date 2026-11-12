@@ -7,6 +7,8 @@ import { Avatar } from "@/components/Avatar";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { fmtDuration, fmtEventWhen } from "@/lib/format";
 import { MatchTracePanel } from "@/components/trace/MatchTracePanel";
+import { AiStatusBadge } from "@/components/ai/AiBadges";
+import { MuseWeighing } from "@/components/ai/MuseWeighing";
 
 interface Status {
   state: "idle" | "waiting" | "matched";
@@ -104,6 +106,11 @@ export function QueueScreen() {
         </div>
       </div>
 
+      <div className="mt-2 flex flex-col items-center gap-1.5" data-testid="queue-ai">
+        <AiStatusBadge />
+        <MuseWeighing dark />
+      </div>
+
       {status.problem && <QueueProblemBanner status={status} />}
 
       <p className="mt-6 text-center text-lg font-extrabold" data-testid="players-found">
@@ -170,6 +177,7 @@ function PartyFound({ party }: { party: Party }) {
         ))}
       </div>
       <p className="text-center text-xs font-semibold uppercase tracking-[0.3em] text-[#c4b5fd]">Match complete</p>
+      <div className="mt-1 flex justify-center"><AiStatusBadge /></div>
       <h1 className="mt-1 animate-[qu-pop_.5s_ease-out] text-center text-4xl font-black drop-shadow-[0_0_20px_rgba(168,85,247,.9)]">Party found!</h1>
       <ul className="mt-6 flex flex-wrap justify-center gap-3" data-testid="party-members">
         {party.members.map((m) => (
