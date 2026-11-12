@@ -158,6 +158,8 @@ export const QueueEntry = z.object({
   consentBridges: z.boolean(),
   /** A friend this person is queuing with. Both join, and both land in the same party. */
   duoWith: Id.nullable().default(null),
+  /** "event": near this event's landmark. "night": anywhere that night, any of the evening's events. */
+  scope: z.enum(["event", "night"]).default("event"),
   joinedAt: IsoTime,
   status: z.enum(["waiting", "forming", "matched", "left"]),
 });

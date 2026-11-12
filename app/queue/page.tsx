@@ -5,7 +5,7 @@ import { IconSparkle } from "@/components/icons";
 import { QueueSheet } from "@/components/queue/QueueSheet";
 import { DEMO_PARTY } from "@/fixtures";
 import { eventWhen } from "@/lib/format";
-import { queueStatus } from "@/lib/server/queue";
+import { candidatePlans, nightPlans, queueStatus } from "@/lib/server/queue";
 import { friendsOf } from "@/lib/graph";
 import { flag } from "@/lib/flags";
 import { store } from "@/lib/server/store";
@@ -70,8 +70,11 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
             friends={friends}
             invitedBy={inviter}
             duoEnabled={duoOn}
+            night={flag("NIGHT_QUEUE") ? { nearCount: candidatePlans(e.landmark, e.date).length, tonightCount: nightPlans(e.date).length } : null}
             initialStatus={
-              active ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark, duo: active.duo } : null
+              active
+                ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark, duo: active.duo, scope: active.entry.scope }
+                : null
             }
           />
         </div>

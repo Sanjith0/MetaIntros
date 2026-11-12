@@ -9,6 +9,7 @@ const Body = z.object({
   consentBridges: z.boolean(),
   approvedLineIds: z.array(z.string()).optional(),
   duoWith: z.string().nullable().optional(),
+  scope: z.enum(["event", "night"]).optional(),
   settings: z.object({ womenOnly: z.boolean(), notOnlyWoman: z.boolean() }).optional(),
 });
 

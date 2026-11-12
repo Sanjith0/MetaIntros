@@ -20,6 +20,7 @@ interface Status {
   partyId: string | null;
   landmark: string;
   duo?: { with: string; confirmed: boolean } | null;
+  scope?: "event" | "night";
 }
 
 export interface Friend {
@@ -64,6 +65,7 @@ export function QueueSheet({
   friends = [],
   invitedBy = null,
   duoEnabled = true,
+  night = null,
 }: {
   eventId: string;
   landmark: string;
@@ -74,6 +76,8 @@ export function QueueSheet({
   friends?: Friend[];
   invitedBy?: Friend | null;
   duoEnabled?: boolean;
+  /** Whole-night option: how many events there are near here, and tonight anywhere. */
+  night?: { nearCount: number; tonightCount: number } | null;
 }) {
   const [sentence, setSentence] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -81,6 +85,7 @@ export function QueueSheet({
   const [consent, setConsent] = useState(true);
   const [settings, setSettings] = useState(initialSettings);
   const [duoWith, setDuoWith] = useState<string>(invitedBy?.id ?? "");
+  const [scope, setScope] = useState<"event" | "night">("event");
   const [status, setStatus] = useState<Status | null>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
@@ -122,6 +127,7 @@ export function QueueSheet({
         consentBridges: consent,
         approvedLineIds: Object.keys(approved).filter((k) => approved[k]),
         duoWith: duoWith || null,
+        scope,
         ...(isWoman ? { settings } : {}),
       }),
     });
@@ -132,10 +138,18 @@ export function QueueSheet({
       return;
     }
     const st = (await (await fetch("/api/queue/status")).json()) as {
-      status: { entry: { joinedAt: string; landmark: string }; inBucket: number; needed: number; partyId: string | null; duo: Status["duo"] } | null;
+      status: { entry: { joinedAt: string; landmark: string; scope?: "event" | "night" }; inBucket: number; needed: number; partyId: string | null; duo: Status["duo"] } | null;
     };
     if (st.status)
-      setStatus({ joinedAt: st.status.entry.joinedAt, inBucket: st.status.inBucket, needed: st.status.needed, partyId: st.status.partyId, landmark: st.status.entry.landmark, duo: st.status.duo });
+      setStatus({
+        joinedAt: st.status.entry.joinedAt,
+        inBucket: st.status.inBucket,
+        needed: st.status.needed,
+        partyId: st.status.partyId,
+        landmark: st.status.entry.landmark,
+        duo: st.status.duo,
+        scope: st.status.entry.scope,
+      });
     if (body.partyId) setForming(body.partyId);
   };
 
@@ -164,7 +178,9 @@ export function QueueSheet({
           </div>
         ) : (
           <div className="text-center">
-            <div className="text-[13px] font-semibold uppercase tracking-wide text-[var(--color-ink-2)]">In the queue near {status!.landmark}</div>
+            <div className="text-[13px] font-semibold uppercase tracking-wide text-[var(--color-ink-2)]" data-testid="queue-scope">
+              {status!.scope === "night" ? "In the queue for tonight, anywhere" : `In the queue near ${status!.landmark}`}
+            </div>
             <div className="my-2 font-mono text-[44px] font-bold tabular-nums" data-testid="queue-timer">
               {mmss(waited)}
             </div>
@@ -269,6 +285,33 @@ export function QueueSheet({
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+      )}
+
+      {night && (
+        <div className="mt-3" role="radiogroup" aria-label="Where" data-testid="scope-choice">
+          <div className="text-[13px] font-semibold text-[var(--color-ink-3)]">Where</div>
+          <div className="mt-1 grid grid-cols-2 gap-2">
+            {(
+              [
+                ["event", `Near ${landmark}`, `${night.nearCount} events`],
+                ["night", "Anywhere tonight", `${night.tonightCount} events`],
+              ] as const
+            ).map(([id, title, sub]) => (
+              <button
+                key={id}
+                type="button"
+                role="radio"
+                aria-checked={scope === id}
+                data-testid={`scope-${id}`}
+                onClick={() => setScope(id)}
+                className={`rounded-[8px] border-2 px-3 py-2 text-left ${scope === id ? "border-[var(--color-pq)] bg-[var(--color-pq-soft)]" : "border-[var(--color-divider)] bg-white"}`}
+              >
+                <div className="text-[14px] font-semibold">{title}</div>
+                <div className="text-[12px] text-[var(--color-ink-2)]">{sub}</div>
+              </button>
+            ))}
           </div>
         </div>
       )}

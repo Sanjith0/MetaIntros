@@ -2,7 +2,8 @@ import type { CandidatePlan, Party, QueueEntry } from "@/contracts";
 import { EVENT_TAGS } from "@/fixtures";
 import { buildBrief } from "@/lib/agents/brief";
 import { runParty } from "@/lib/agents/orchestrator";
-import { eligibleToQueue, formParty, bucketKey, PARTY_SIZE, type Candidate } from "@/lib/queue/formation";
+import { eligibleToQueue, formParty, bucketKey, nightOf, PARTY_SIZE, type Candidate } from "@/lib/queue/formation";
+import { flag } from "@/lib/flags";
 import { areFriends } from "@/lib/graph";
 import { publish } from "./bus";
 import { nextId, nowIso, profile, store } from "./store";
@@ -16,6 +17,8 @@ export interface JoinInput {
   approvedLineIds?: string[];
   /** Queue together with this friend (duo queue). */
   duoWith?: string | null;
+  /** "night": anywhere tonight, any of the evening's events (F14). Default: near this event. */
+  scope?: "event" | "night";
   /** Saved to the profile: only all-women parties; never the only woman. */
   settings?: { womenOnly: boolean; notOnlyWoman: boolean };
   /** Start the agents' table talk when a party forms (off in some tests). */
@@ -65,10 +68,11 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
     userId: input.userId,
     eventId: event.id,
     landmark: event.landmark,
-    window: windowFor(event.date, event.start),
+    window: input.scope === "night" && flag("NIGHT_QUEUE") ? nightWindow(event.date) : windowFor(event.date, event.start),
     briefId: built.brief.id,
     consentBridges: input.consentBridges,
     duoWith: input.duoWith ?? null,
+    scope: input.scope === "night" && flag("NIGHT_QUEUE") ? "night" : "event",
     joinedAt: nowIso(),
     status: "waiting",
   };
@@ -93,7 +97,7 @@ export function queueStatus(userId: string) {
   const s = store();
   const entry = [...s.queue].reverse().find((e) => e.userId === userId && e.status !== "left");
   if (!entry) return null;
-  const inBucket = s.queue.filter((e) => e.status === "waiting" && bucketKey(e) === bucketKey(entry)).length;
+  const inBucket = s.queue.filter((e) => e.status === "waiting" && sameBucket(e, entry)).length;
   const party = [...s.parties.values()].reverse().find((p) => p.memberIds.includes(userId));
   const partner = entry.duoWith ? s.queue.find((q) => q.userId === entry.duoWith && q.status !== "left") : undefined;
   return {
@@ -120,8 +124,11 @@ async function tryForm(mustInclude: string | undefined, startTalk: boolean): Pro
   if (!formed) return null;
 
   const joiner = formed.members.find((m) => m.profile.id === mustInclude) ?? formed.members[0]!;
-  const event = s.events.get(joiner.entry.eventId ?? "")!;
-  const plans = candidatePlans(event.landmark, event.date);
+  // Anyone tied to one place sets the landmark; a party of whole-night people can go anywhere.
+  const anchor = formed.members.find((m) => m.entry.scope !== "night") ?? joiner;
+  const event = s.events.get(anchor.entry.eventId ?? "")!;
+  const wholeNight = formed.members.every((m) => m.entry.scope === "night");
+  const plans = wholeNight ? nightPlans(event.date) : candidatePlans(event.landmark, event.date);
   plans.forEach((pl) => s.plans.set(pl.id, pl));
 
   const party: Party = {
@@ -162,6 +169,23 @@ async function tryForm(mustInclude: string | undefined, startTalk: boolean): Pro
 }
 
 /** Party-eligible events at the same landmark on the same day. */
+/** Every party-eligible event that evening, anywhere (for a whole-night party). */
+export function nightPlans(date: string): CandidatePlan[] {
+  const landmarks = [...new Set([...store().events.values()].filter((e) => e.partyEligible && e.date === date && Number(e.start.slice(0, 2)) >= 16).map((e) => e.landmark))];
+  return landmarks.flatMap((l) => candidatePlans(l, date)).filter((p) => Number(p.start.slice(0, 2)) >= 16);
+}
+
+/** The evening window for a whole-night entry. */
+export function nightWindow(date: string) {
+  return { start: `${date}T16:00:00-08:00`, end: `${date}T23:59:00-08:00` };
+}
+
+/** Could these two entries end up in one party? Same night, and same landmark unless either is whole-night. */
+export function sameBucket(a: QueueEntry, b: QueueEntry): boolean {
+  if (nightOf(a) !== nightOf(b)) return false;
+  return a.scope === "night" || b.scope === "night" || bucketKey(a) === bucketKey(b);
+}
+
 export function candidatePlans(landmark: string, date: string): CandidatePlan[] {
   return [...store().events.values()]
     .filter((e) => e.partyEligible && e.landmark === landmark && e.date === date)
@@ -191,7 +215,7 @@ function ensureTicker() {
   g.__pqTicker = setInterval(() => {
     const s = store();
     for (const e of s.queue.filter((x) => x.status === "waiting")) {
-      const inBucket = s.queue.filter((x) => x.status === "waiting" && bucketKey(x) === bucketKey(e)).length;
+      const inBucket = s.queue.filter((x) => x.status === "waiting" && sameBucket(x, e)).length;
       publish(
         "queue.tick",
         { userId: e.userId, waitingSeconds: Math.round((Date.now() - Date.parse(e.joinedAt)) / 1000), inBucket, needed: Math.max(0, PARTY_SIZE - inBucket) },

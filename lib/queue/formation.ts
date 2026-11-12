@@ -32,6 +32,9 @@ export interface Candidate {
 }
 
 export const bucketKey = (e: QueueEntry) => e.landmark.trim().toLowerCase();
+/** The night an entry is for (the date of its window). */
+export const nightOf = (e: QueueEntry) => e.window.start.slice(0, 10);
+const isNight = (e: QueueEntry) => e.scope === "night";
 
 export function overlapMinutes(entries: QueueEntry[]): number {
   if (entries.length === 0) return 0;
@@ -78,8 +81,10 @@ export function checkParty(cands: Candidate[], nameOf: (id: string) => string = 
 
   if (cands.length !== PARTY_SIZE) v.push({ rule: "size", userIds: ids, detail: `A party is exactly ${PARTY_SIZE} people, not ${cands.length}.` });
 
-  const buckets = new Set(cands.map((c) => bucketKey(c.entry)));
+  // People who queued for the whole night fit any landmark; the rest must share one.
+  const buckets = new Set(cands.filter((c) => !isNight(c.entry)).map((c) => bucketKey(c.entry)));
   if (buckets.size > 1) v.push({ rule: "bucket", userIds: ids, detail: `Members are in ${buckets.size} different landmark buckets.` });
+  // Different nights are caught by the shared-window rule below.
 
   const overlap = overlapMinutes(cands.map((c) => c.entry));
   if (overlap < MIN_OVERLAP_MIN) v.push({ rule: "window", userIds: ids, detail: `Shared time window is ${overlap} min; at least ${MIN_OVERLAP_MIN} needed.` });
@@ -139,11 +144,17 @@ export function formParty(cands: Candidate[], opts: { mustInclude?: string; name
     .filter((c, _i, all) => !c.entry.duoWith || confirmedDuo(all, c))
     .sort((a, b) => a.entry.joinedAt.localeCompare(b.entry.joinedAt));
   const byBucket = new Map<string, Candidate[]>();
-  for (const c of waiting) {
-    const k = bucketKey(c.entry);
+  const add = (k: string, c: Candidate) => {
     if (!byBucket.has(k)) byBucket.set(k, []);
     byBucket.get(k)!.push(c);
+  };
+  for (const c of waiting) if (!isNight(c.entry)) add(`${nightOf(c.entry)}|${bucketKey(c.entry)}`, c);
+  // A whole-night entry joins every landmark bucket that night, and a bucket of its own.
+  for (const c of waiting.filter((x) => isNight(x.entry))) {
+    for (const k of [...byBucket.keys()]) if (k.startsWith(`${nightOf(c.entry)}|`) && !k.endsWith("|*")) add(k, c);
+    add(`${nightOf(c.entry)}|*`, c);
   }
+  for (const list of byBucket.values()) list.sort((a, b) => a.entry.joinedAt.localeCompare(b.entry.joinedAt));
   for (const bucket of byBucket.values()) {
     if (bucket.length < PARTY_SIZE) continue;
     if (opts.mustInclude && !bucket.some((c) => c.profile.id === opts.mustInclude)) continue;

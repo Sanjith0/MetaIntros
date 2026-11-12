@@ -23,6 +23,7 @@ export function entryFor(userId: string, i: number, over: Partial<QueueEntry> = 
     briefId: `brief-${userId}`,
     consentBridges: true,
     duoWith: null,
+    scope: "event",
     joinedAt: new Date(Date.UTC(2026, 10, 14, 1, i)).toISOString(),
     status: "waiting",
     ...over,

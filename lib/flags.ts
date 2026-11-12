@@ -31,6 +31,8 @@ const DEFAULTS = {
   EVALS_PAGE: true,
   /** F13: a "why this plan" card on /party built only from code checks. */
   WHY_PLAN: true,
+  /** F14: queue for a whole night: join any landmark's queue that evening; a whole-night party picks from every event that night. */
+  NIGHT_QUEUE: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;
