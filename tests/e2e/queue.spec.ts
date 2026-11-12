@@ -30,6 +30,21 @@ test("join from an event page (GPS) → queue fills → party found → squad ba
   await page.getByTestId("trace-toggle").click();
   await expect(page.getByTestId("trace-steps")).toHaveCount(0);
 
+  // squad chat lands in the inbox with a badge
+  await expect(page.getByTestId("badge-chats")).toBeVisible();
+  await page.getByTestId("tab-chats").click();
+  const top = page.locator('[data-testid^="inbox-row-"]').first();
+  await expect(top).toHaveAttribute("data-type", "squad");
+  await expect(top.getByTestId("squad-badge")).toBeVisible();
+  await expect(top.getByTestId("squad-event")).toContainText("Indie Night");
+  await expect(top.getByTestId("squad-expiry")).toContainText("Expires in");
+  await top.click();
+  await expect(page.getByTestId("squad-header-event")).toContainText("Indie Night");
+  await expect(page.getByTestId("squad-header-spot")).toContainText("The Guild Theatre");
+  await expect(page.getByTestId("squad-header-time")).toBeVisible();
+  await expect(page.getByTestId("squad-header-members").locator("li")).toHaveCount(5);
+  await page.goBack();
+  await page.goBack();
   await page.getByTestId("view-event").click();
   await expect(page.getByTestId("squad-banner")).toBeVisible();
   await expect(page.getByTestId("squad-banner")).toContainText("Your squad is going");

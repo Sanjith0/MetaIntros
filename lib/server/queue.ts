@@ -8,6 +8,7 @@ import { loadPeople, type Person } from "@/lib/profile/load";
 import { publish } from "./bus";
 import { getFillMode, getSetting } from "./settings";
 import { formParty, chooseCandidate } from "./pipeline";
+import "./hooks";
 
 // ───────────────────────── join / leave ─────────────────────────
 
