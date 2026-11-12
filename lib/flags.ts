@@ -54,6 +54,8 @@ const DEFAULTS = {
   WHY_LINE: true,
   /** F24: "Forget my night" on /safety: delete your private data from a party, then a scan of the whole server store proves it's gone. */
   FORGET_ME: true,
+  /** F25: preflight on /demo: rehearse the whole demo party in a sandbox and check everything the presenter needs. */
+  PREFLIGHT: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

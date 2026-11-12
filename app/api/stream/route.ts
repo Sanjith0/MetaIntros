@@ -1,6 +1,6 @@
 import { subscribe, visibleTo } from "@/lib/server/bus";
 import { onTrace } from "@/lib/server/trace";
-import { connect } from "@/lib/server/phones";
+import { connect, connectScreen } from "@/lib/server/phones";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 import type { PQEvent } from "@/contracts";
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
       };
       // The hello carries the server clock so phones can report lag in server time.
       ctrl.enqueue(enc.encode(`retry: 1000\nevent: hello\ndata: ${JSON.stringify({ seq: store().seq, userId: userId ?? null, now: Date.now() })}\n\n`));
-      const disconnect = userId ? connect(userId) : () => {};
+      const disconnect = userId ? connect(userId) : stage ? connectScreen("stage") : () => {};
       if (Number.isFinite(since)) store().events_log.filter((e) => e.seq > since).forEach(send);
       const off = subscribe(send);
       // Only the projector hears traces, including the private lane.

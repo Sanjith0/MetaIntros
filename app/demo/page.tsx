@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DemoPanel } from "@/components/demo/DemoPanel";
+import { Preflight } from "@/components/demo/Preflight";
 import { DEMO_IDS } from "@/fixtures";
 import { flag } from "@/lib/flags";
 import { profile } from "@/lib/server/store";
@@ -21,6 +22,7 @@ export default function DemoPage() {
         <h1 className="text-[24px] font-bold">Run the five-minute demo</h1>
         <p className="text-[15px] text-[var(--color-ink-2)]">For whoever is presenting. Seeded, fictional people only.</p>
       </div>
+      {flag("PREFLIGHT") && <Preflight />}
       <DemoPanel people={people} />
     </main>
   );

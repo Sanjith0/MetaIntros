@@ -33,7 +33,8 @@ real table talk; `npm run record` saves a run for the recorded replay.
 
 ## The five-minute demo
 
-Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/demo`:
+Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/demo`, run
+**Preflight** first: it rehearses the whole party in a sandbox and says what to fix. Then:
 **Reset everything**, then **Pre-queue Dev, Ana, Kai, Zoe**. Pick a pace (Stage is good).
 
 1. **One sentence (Maya's phone).** Events → *Rooftop Sunset Session* → **Find my party**.
@@ -106,6 +107,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `WHAT_IF` | **What if…** on `/stage` after the lock: take rules away and re-run the same five in a sandbox (mock model, nothing live touched) |
 | `WHY_LINE` | **Why this?** under every opener on `/party` and on the door card: the approved facts each line came from, in plain words (no ids, no unnamed third person) |
 | `FORGET_ME` | **Forget my night** on `/safety` after the plan is set: deletes your sentence, rules, private reasons, prompts, checks and receipt, then scans every value on the server for your words |
+| `PREFLIGHT` | **Preflight** on `/demo`: rehearses the demo party in a sandbox and checks layers, model and call budget, pace, privacy, live state, screens and fallbacks |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -151,7 +153,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 170 unit tests (vitest)
+npm test                       # 174 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

@@ -24,6 +24,20 @@ export function connect(userId: string): () => void {
   };
 }
 
+/** Operator screens (the projector) are counted apart from phones. */
+const gs = globalThis as unknown as { __pqScreens?: Map<string, number> };
+const screens = () => (gs.__pqScreens ??= new Map());
+export function connectScreen(kind: "stage"): () => void {
+  screens().set(kind, (screens().get(kind) ?? 0) + 1);
+  let open = true;
+  return () => {
+    if (!open) return;
+    open = false;
+    screens().set(kind, Math.max(0, (screens().get(kind) ?? 1) - 1));
+  };
+}
+export const screensConnected = (kind: "stage") => screens().get(kind) ?? 0;
+
 export function connected(userId: string): boolean {
   return (presence().get(userId) ?? 0) > 0;
 }
