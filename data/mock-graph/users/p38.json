@@ -1,0 +1,211 @@
+{
+  "id": "p38",
+  "name": "Nadia Adeyemi",
+  "first_name": "Nadia",
+  "last_name": "Adeyemi",
+  "birthday": "06/04/2004",
+  "gender": "female",
+  "location": {
+    "name": "Menlo Park, California",
+    "latitude": 37.44103,
+    "longitude": -122.17786
+  },
+  "picture": {
+    "data": {
+      "color": "#1877f2"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_1257276648",
+        "name": "Hoka",
+        "category": "Sports & Recreation",
+        "created_time": "2022-06-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_662559005",
+        "name": "Runner's World",
+        "category": "Sports & Recreation",
+        "created_time": "2023-09-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_3381304047",
+        "name": "Stanford Oval Run Club",
+        "category": "Sports & Recreation",
+        "created_time": "2021-05-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_3561804415",
+        "name": "November Project SF",
+        "category": "Sports & Recreation",
+        "created_time": "2023-08-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_71207391",
+        "name": "California International Marathon",
+        "category": "Sports & Recreation",
+        "created_time": "2019-03-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_355211039",
+        "name": "Rapha",
+        "category": "Sports & Recreation",
+        "created_time": "2022-08-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_900676073",
+        "name": "Dogspotting",
+        "category": "Pet",
+        "created_time": "2019-05-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_3787187186",
+        "name": "Peninsula Humane Society",
+        "category": "Pet",
+        "created_time": "2023-06-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_2250220382",
+        "name": "Huberman Lab",
+        "category": "Media",
+        "created_time": "2025-06-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_3761657856",
+        "name": "Hard Fork",
+        "category": "Media",
+        "created_time": "2020-06-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_1313959704",
+        "name": "CUESA",
+        "category": "Farmers Market",
+        "created_time": "2023-02-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1669152886",
+        "name": "Peninsula Boulders",
+        "category": "Sports & Recreation",
+        "created_time": "2025-05-11T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_324363977",
+        "name": "Stanford Climbing Club Alumni",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1989342600",
+        "name": "Saturday Morning Run Crew",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_925424808",
+        "name": "Palo Alto Dog Park Friends",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_1958632383",
+        "name": "Japanese Breakfast",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1890828790",
+        "name": "Mitski",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_2851437574",
+        "name": "Phoebe Bridgers",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_2581632150",
+        "name": "SF Marathon",
+        "start_time": "2026-01-24T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1900390231",
+        "name": "Ferry Building Market Morning",
+        "start_time": "2025-07-19T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_194893160",
+        "name": "Saturday 5K Social Run",
+        "start_time": "2026-03-17T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p32",
+        "name": "Noor Johnson"
+      },
+      {
+        "id": "p33",
+        "name": "Caleb Wong"
+      },
+      {
+        "id": "p40",
+        "name": "Owen Sato"
+      },
+      {
+        "id": "p45",
+        "name": "Ari Moreau"
+      }
+    ],
+    "summary": {
+      "total_count": 4
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_857284444",
+        "name": "Rose & Crown Pub",
+        "category": "Bar",
+        "created_time": "2023-02-11T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "06:00",
+        "end": "13:00"
+      },
+      {
+        "day": "sun",
+        "start": "06:00",
+        "end": "12:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "run-coffee"
+}

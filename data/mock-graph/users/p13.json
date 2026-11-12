@@ -1,0 +1,196 @@
+{
+  "id": "p13",
+  "name": "Leo Adeyemi",
+  "first_name": "Leo",
+  "last_name": "Adeyemi",
+  "birthday": "06/10/2004",
+  "gender": "male",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.44774,
+    "longitude": -122.16554
+  },
+  "picture": {
+    "data": {
+      "color": "#ff6f00"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_3663269463",
+        "name": "V-Scale Memes",
+        "category": "Sports & Recreation",
+        "created_time": "2025-08-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3542300262",
+        "name": "Rasputin Music",
+        "category": "Shopping & Retail",
+        "created_time": "2019-07-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_2775067037",
+        "name": "KEXP",
+        "category": "Musician/Band",
+        "created_time": "2025-07-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_4214058980",
+        "name": "Climbing Magazine",
+        "category": "Sports & Recreation",
+        "created_time": "2025-04-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_1452298579",
+        "name": "Bay Area Hiker",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2024-08-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_1399278490",
+        "name": "Letterboxd",
+        "category": "Movie",
+        "created_time": "2021-02-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2025-08-10T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_2023845857",
+        "name": "Bay Area Indie Shows",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3522069602",
+        "name": "Peninsula Film Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2238783715",
+        "name": "Bay Area Campers",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_654056503",
+        "name": "Wet Leg",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1890828790",
+        "name": "Mitski",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_2851437574",
+        "name": "Phoebe Bridgers",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_2353355191",
+        "name": "Big Sur Camping Trip",
+        "start_time": "2026-08-18T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3954455477",
+        "name": "Record Store Day Palo Alto",
+        "start_time": "2025-08-11T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p02",
+        "name": "Freya Rossi"
+      },
+      {
+        "id": "p04",
+        "name": "Reza Ali"
+      },
+      {
+        "id": "p05",
+        "name": "Yuki Dubois"
+      },
+      {
+        "id": "p12",
+        "name": "Gabe Chen"
+      },
+      {
+        "id": "p15",
+        "name": "Ravi Mensah"
+      },
+      {
+        "id": "p37",
+        "name": "Oscar Novak"
+      },
+      {
+        "id": "p46",
+        "name": "Noor Martinez"
+      },
+      {
+        "id": "p47",
+        "name": "Mira Dubois"
+      }
+    ],
+    "summary": {
+      "total_count": 8
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_2497901386",
+        "name": "5AM Club",
+        "category": "Lifestyle",
+        "created_time": "2019-04-13T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "10:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sun",
+        "start": "11:00",
+        "end": "20:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "indie-climb"
+}

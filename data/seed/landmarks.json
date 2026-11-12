@@ -1,0 +1,10 @@
+[
+  { "id": "lm-stanford-oval", "name": "Stanford Oval", "city": "Stanford", "lat": 37.4294, "lng": -122.1697, "description": "The big lawn in front of the Main Quad" },
+  { "id": "lm-downtown-pa", "name": "Downtown Palo Alto", "city": "Palo Alto", "lat": 37.4443, "lng": -122.1611, "description": "University Ave & Lytton Plaza" },
+  { "id": "lm-meta-campus", "name": "Meta campus", "city": "Menlo Park", "lat": 37.4848, "lng": -122.1484, "description": "1 Hacker Way" },
+  { "id": "lm-rwc-courthouse", "name": "Courthouse Square", "city": "Redwood City", "lat": 37.4863, "lng": -122.2286, "description": "Downtown Redwood City plaza" },
+  { "id": "lm-menlo-caltrain", "name": "Menlo Park Caltrain", "city": "Menlo Park", "lat": 37.4545, "lng": -122.1823, "description": "Santa Cruz Ave & Merrill St" },
+  { "id": "lm-stanford-shopping", "name": "Stanford Shopping Center", "city": "Palo Alto", "lat": 37.4430, "lng": -122.1716, "description": "Open-air mall off El Camino" },
+  { "id": "lm-cal-ave", "name": "California Ave", "city": "Palo Alto", "lat": 37.4268, "lng": -122.1435, "description": "Cal Ave plaza & farmers market" },
+  { "id": "lm-shoreline", "name": "Shoreline Park", "city": "Mountain View", "lat": 37.4300, "lng": -122.0838, "description": "Shoreline Lake & trails" }
+]

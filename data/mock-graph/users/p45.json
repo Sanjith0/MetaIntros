@@ -1,0 +1,236 @@
+{
+  "id": "p45",
+  "name": "Ari Moreau",
+  "first_name": "Ari",
+  "last_name": "Moreau",
+  "birthday": "06/28/2002",
+  "gender": "custom",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.44673,
+    "longitude": -122.14992
+  },
+  "picture": {
+    "data": {
+      "color": "#1877f2"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_1657085092",
+        "name": "35mm Film Photography",
+        "category": "Arts & Entertainment",
+        "created_time": "2020-08-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_603487733",
+        "name": "Audubon Society",
+        "category": "Nonprofit Organization",
+        "created_time": "2022-03-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_990265982",
+        "name": "Merlin Bird ID",
+        "category": "Nonprofit Organization",
+        "created_time": "2023-01-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_2295242715",
+        "name": "REI",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2021-06-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1452298579",
+        "name": "Bay Area Hiker",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2023-06-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2025-04-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1719253395",
+        "name": "Big Basin Redwoods",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2020-09-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_3993053882",
+        "name": "Midpeninsula Open Space",
+        "category": "Nonprofit Organization",
+        "created_time": "2023-07-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_900676073",
+        "name": "Dogspotting",
+        "category": "Pet",
+        "created_time": "2019-03-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_142780729",
+        "name": "Cantor Arts Center",
+        "category": "Museum",
+        "created_time": "2020-06-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_3736514318",
+        "name": "SFMOMA",
+        "category": "Museum",
+        "created_time": "2019-09-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_355211039",
+        "name": "Rapha",
+        "category": "Sports & Recreation",
+        "created_time": "2020-04-10T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_2950239180",
+        "name": "Peninsula Sketch Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_152838782",
+        "name": "Bay Area Photo Walks",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2787739642",
+        "name": "Peninsula Weekend Riders",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_772350187",
+        "name": "Alvvays",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_654056503",
+        "name": "Wet Leg",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_1990815733",
+        "name": "Baylands Cleanup Day",
+        "start_time": "2026-08-20T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1369160417",
+        "name": "Cantor Arts Center Late Night",
+        "start_time": "2025-07-13T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2353355191",
+        "name": "Big Sur Camping Trip",
+        "start_time": "2026-03-26T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p01",
+        "name": "Jordan Lee"
+      },
+      {
+        "id": "p36",
+        "name": "Ben Müller"
+      },
+      {
+        "id": "p38",
+        "name": "Nadia Adeyemi"
+      },
+      {
+        "id": "p44",
+        "name": "Kai Cohen"
+      },
+      {
+        "id": "p47",
+        "name": "Mira Dubois"
+      },
+      {
+        "id": "p49",
+        "name": "Valeria Kim"
+      },
+      {
+        "id": "p50",
+        "name": "Oscar Park"
+      },
+      {
+        "id": "p54",
+        "name": "Owen Lindqvist"
+      },
+      {
+        "id": "p67",
+        "name": "Rosa Ferreira"
+      },
+      {
+        "id": "p68",
+        "name": "Tomás Ali"
+      }
+    ],
+    "summary": {
+      "total_count": 10
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_857284444",
+        "name": "Rose & Crown Pub",
+        "category": "Bar",
+        "created_time": "2021-02-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_455822419",
+        "name": "Concert Subwoofer Fans",
+        "category": "Nightlife",
+        "created_time": "2022-06-11T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "08:00",
+        "end": "18:00"
+      },
+      {
+        "day": "sun",
+        "start": "06:00",
+        "end": "18:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "hike-photo"
+}

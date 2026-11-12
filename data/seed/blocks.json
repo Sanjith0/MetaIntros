@@ -1,0 +1,14 @@
+[
+  {
+    "blockerId": "p01",
+    "blockedId": "p09"
+  },
+  {
+    "blockerId": "p17",
+    "blockedId": "p19"
+  },
+  {
+    "blockerId": "p40",
+    "blockedId": "p44"
+  }
+]

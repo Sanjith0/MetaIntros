@@ -1,0 +1,223 @@
+{
+  "id": "p60",
+  "name": "Aisha Müller",
+  "first_name": "Aisha",
+  "last_name": "Müller",
+  "birthday": "06/08/2003",
+  "gender": "female",
+  "location": {
+    "name": "Stanford, California",
+    "latitude": 37.42449,
+    "longitude": -122.16636
+  },
+  "picture": {
+    "data": {
+      "color": "#f02849"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_361244158",
+        "name": "Hacker News",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2024-07-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_2859346858",
+        "name": "Lenny's Newsletter",
+        "category": "Business",
+        "created_time": "2025-04-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_2961785669",
+        "name": "Hugging Face",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2023-06-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_1387132218",
+        "name": "Two Minute Papers",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2024-09-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_485296470",
+        "name": "Devpost",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2019-04-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_57494581",
+        "name": "Blue Bottle Coffee",
+        "category": "Coffee Shop",
+        "created_time": "2021-03-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_1868140960",
+        "name": "Verve Coffee Roasters",
+        "category": "Coffee Shop",
+        "created_time": "2024-04-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_2250220382",
+        "name": "Huberman Lab",
+        "category": "Media",
+        "created_time": "2025-01-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_671257111",
+        "name": "USA Pickleball",
+        "category": "Sports & Recreation",
+        "created_time": "2025-03-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3125224978",
+        "name": "Pickleball Kitchen",
+        "category": "Sports & Recreation",
+        "created_time": "2022-05-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_3968373210",
+        "name": "VIZ Media",
+        "category": "Book",
+        "created_time": "2019-06-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_1580973503",
+        "name": "Chainsaw Man",
+        "category": "Book",
+        "created_time": "2023-03-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_4190636008",
+        "name": "Peninsula Pride Network",
+        "category": "Community Organization",
+        "created_time": "2025-02-10T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_1847025959",
+        "name": "Bay Area Hackers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_727090536",
+        "name": "Palo Alto Pickleball",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_365051473",
+        "name": "Manga Swap Peninsula",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_2851437574",
+        "name": "Phoebe Bridgers",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1958632383",
+        "name": "Japanese Breakfast",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_3297501053",
+        "name": "Snail Mail",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_297575928",
+        "name": "AI Tinkerers Meetup",
+        "start_time": "2026-04-10T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2341282221",
+        "name": "Founder Friday Palo Alto",
+        "start_time": "2025-03-26T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2297260657",
+        "name": "TreeHacks",
+        "start_time": "2026-04-14T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1981751529",
+        "name": "Stanford HAI Public Lecture",
+        "start_time": "2025-04-19T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p33",
+        "name": "Caleb Wong"
+      },
+      {
+        "id": "p40",
+        "name": "Owen Sato"
+      },
+      {
+        "id": "p51",
+        "name": "Ethan Novak"
+      },
+      {
+        "id": "p54",
+        "name": "Owen Lindqvist"
+      }
+    ],
+    "summary": {
+      "total_count": 4
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_1800926923",
+        "name": "Blumhouse",
+        "category": "Movie",
+        "created_time": "2023-04-18T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "16:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sat",
+        "start": "09:00",
+        "end": "14:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "builders"
+}

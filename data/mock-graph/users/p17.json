@@ -1,0 +1,218 @@
+{
+  "id": "p17",
+  "name": "Nate Chen",
+  "first_name": "Nate",
+  "last_name": "Chen",
+  "birthday": "06/24/2006",
+  "gender": "male",
+  "location": {
+    "name": "Redwood City, California",
+    "latitude": 37.48907,
+    "longitude": -122.24389
+  },
+  "picture": {
+    "data": {
+      "color": "#45bd62"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_2511985466",
+        "name": "Valorant",
+        "category": "Games/Toys",
+        "created_time": "2019-09-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_902123100",
+        "name": "Crunchyroll",
+        "category": "TV Show",
+        "created_time": "2021-07-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_3299841632",
+        "name": "Frieren",
+        "category": "TV Show",
+        "created_time": "2022-02-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_353896392",
+        "name": "Critical Role",
+        "category": "Games/Toys",
+        "created_time": "2021-05-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_1349993811",
+        "name": "Sing Sing Karaoke",
+        "category": "Arts & Entertainment",
+        "created_time": "2021-08-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1344609176",
+        "name": "Geeks Who Drink",
+        "category": "Games/Toys",
+        "created_time": "2023-01-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_2184656895",
+        "name": "GothamChess",
+        "category": "Games/Toys",
+        "created_time": "2021-08-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_2398338752",
+        "name": "Chess.com",
+        "category": "Games/Toys",
+        "created_time": "2021-02-14T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_1240877100",
+        "name": "Peninsula D&D Players",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1542195441",
+        "name": "Peninsula Trivia Teams",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2434687349",
+        "name": "Bay Area Gamers",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_2361962968",
+        "name": "Illenium",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_13189584",
+        "name": "Zedd",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1814415648",
+        "name": "Fred again..",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_2969438527",
+        "name": "Karaoke Night Mountain View",
+        "start_time": "2026-03-27T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2528322140",
+        "name": "Ghibli Fest Screening",
+        "start_time": "2025-08-17T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3546048115",
+        "name": "Trivia Night at Cal Ave",
+        "start_time": "2026-06-19T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1346986683",
+        "name": "Smash Bros Local Tournament",
+        "start_time": "2025-02-26T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p14",
+        "name": "Ben Patel"
+      },
+      {
+        "id": "p18",
+        "name": "Jin Shah"
+      },
+      {
+        "id": "p22",
+        "name": "Kai Rossi"
+      },
+      {
+        "id": "p23",
+        "name": "Marcus Kim"
+      },
+      {
+        "id": "p54",
+        "name": "Owen Lindqvist"
+      },
+      {
+        "id": "p56",
+        "name": "Noor Adeyemi"
+      },
+      {
+        "id": "p62",
+        "name": "Reza Ibrahim"
+      },
+      {
+        "id": "p70",
+        "name": "Dev Johnson"
+      },
+      {
+        "id": "p79",
+        "name": "Leila Johnson"
+      }
+    ],
+    "summary": {
+      "total_count": 9
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_455822419",
+        "name": "Concert Subwoofer Fans",
+        "category": "Nightlife",
+        "created_time": "2022-04-10T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "13:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sun",
+        "start": "13:00",
+        "end": "22:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "games-anime"
+}

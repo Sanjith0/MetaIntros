@@ -1,0 +1,245 @@
+{
+  "id": "p03",
+  "name": "Zoe Kim",
+  "first_name": "Zoe",
+  "last_name": "Kim",
+  "birthday": "06/10/2004",
+  "gender": "female",
+  "location": {
+    "name": "Redwood City, California",
+    "latitude": 37.49144,
+    "longitude": -122.24442
+  },
+  "picture": {
+    "data": {
+      "color": "#d946ef"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_2195994927",
+        "name": "Bouldering Daily",
+        "category": "Sports & Recreation",
+        "created_time": "2020-06-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_3663269463",
+        "name": "V-Scale Memes",
+        "category": "Sports & Recreation",
+        "created_time": "2019-06-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_3542300262",
+        "name": "Rasputin Music",
+        "category": "Shopping & Retail",
+        "created_time": "2025-08-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_2432891253",
+        "name": "Vinyl Me, Please",
+        "category": "Shopping & Retail",
+        "created_time": "2022-08-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_1636414625",
+        "name": "SF Live Music Guide",
+        "category": "Arts & Entertainment",
+        "created_time": "2025-04-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_1788322323",
+        "name": "Bay Area Concerts",
+        "category": "Arts & Entertainment",
+        "created_time": "2020-01-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_1657085092",
+        "name": "35mm Film Photography",
+        "category": "Arts & Entertainment",
+        "created_time": "2020-01-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_2576936919",
+        "name": "Fujifilm X",
+        "category": "Arts & Entertainment",
+        "created_time": "2021-06-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_3533273514",
+        "name": "A24",
+        "category": "Movie",
+        "created_time": "2024-02-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_902123100",
+        "name": "Crunchyroll",
+        "category": "TV Show",
+        "created_time": "2024-09-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_112120066",
+        "name": "Jujutsu Kaisen",
+        "category": "TV Show",
+        "created_time": "2022-09-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_3797941484",
+        "name": "Peninsula Young Republicans",
+        "category": "Political Organization",
+        "created_time": "2024-02-12T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_296257480",
+        "name": "Peninsula Vinyl Collectors",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3522069602",
+        "name": "Peninsula Film Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_4235132143",
+        "name": "Bay Area Anime Watch Party",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3910991210",
+        "name": "Palo Alto Policy Debate Circle",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_2851437574",
+        "name": "Phoebe Bridgers",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1958632383",
+        "name": "Japanese Breakfast",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_654056503",
+        "name": "Wet Leg",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_231309798",
+        "name": "Anime Expo Watch Party",
+        "start_time": "2026-03-25T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2624804488",
+        "name": "Golden Gate Photo Walk",
+        "start_time": "2025-09-21T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3954455477",
+        "name": "Record Store Day Palo Alto",
+        "start_time": "2026-06-16T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_630026664",
+        "name": "Peninsula Bouldering League",
+        "start_time": "2025-06-27T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p02",
+        "name": "Freya Rossi"
+      },
+      {
+        "id": "p04",
+        "name": "Reza Ali"
+      },
+      {
+        "id": "p05",
+        "name": "Yuki Dubois"
+      },
+      {
+        "id": "p11",
+        "name": "Rosa Cohen"
+      },
+      {
+        "id": "p39",
+        "name": "Noah Ferreira"
+      },
+      {
+        "id": "p66",
+        "name": "Julia Chen"
+      },
+      {
+        "id": "p78",
+        "name": "Zoe Park"
+      }
+    ],
+    "summary": {
+      "total_count": 7
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_3069779066",
+        "name": "Audio SF",
+        "category": "Nightlife",
+        "created_time": "2021-03-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3293670811",
+        "name": "Insomniac Events",
+        "category": "Musician/Band",
+        "created_time": "2022-03-11T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "19:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "11:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sun",
+        "start": "12:00",
+        "end": "20:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "indie-climb"
+}

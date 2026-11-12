@@ -1,0 +1,186 @@
+{
+  "id": "p70",
+  "name": "Dev Johnson",
+  "first_name": "Dev",
+  "last_name": "Johnson",
+  "birthday": "06/03/1999",
+  "gender": "male",
+  "location": {
+    "name": "Menlo Park, California",
+    "latitude": 37.45665,
+    "longitude": -122.17035
+  },
+  "picture": {
+    "data": {
+      "color": "#1877f2"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_1953414866",
+        "name": "Tartine Bakery",
+        "category": "Food & Beverage",
+        "created_time": "2021-03-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3762006251",
+        "name": "Bon Appétit",
+        "category": "Restaurant",
+        "created_time": "2020-06-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_3025447798",
+        "name": "Joshua Weissman",
+        "category": "Food & Beverage",
+        "created_time": "2023-01-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_1720116024",
+        "name": "NYT Cooking",
+        "category": "Food & Beverage",
+        "created_time": "2022-05-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3668808447",
+        "name": "Thrift Flip Club",
+        "category": "Shopping & Retail",
+        "created_time": "2022-07-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_353896392",
+        "name": "Critical Role",
+        "category": "Games/Toys",
+        "created_time": "2023-08-10T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_3208882795",
+        "name": "Bay Area Thrift Finds",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_544762384",
+        "name": "Home Cooks of the Peninsula",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1240877100",
+        "name": "Peninsula D&D Players",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_3297501053",
+        "name": "Snail Mail",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1890828790",
+        "name": "Mitski",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_772350187",
+        "name": "Alvvays",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3628388981",
+        "name": "D&D Adventurers League Night",
+        "start_time": "2026-06-11T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1377370723",
+        "name": "Off the Grid Food Trucks",
+        "start_time": "2025-09-13T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p06",
+        "name": "Simon Hughes"
+      },
+      {
+        "id": "p07",
+        "name": "Daniel Singh"
+      },
+      {
+        "id": "p17",
+        "name": "Nate Chen"
+      },
+      {
+        "id": "p46",
+        "name": "Noor Martinez"
+      },
+      {
+        "id": "p51",
+        "name": "Ethan Novak"
+      },
+      {
+        "id": "p61",
+        "name": "Milo Chen"
+      },
+      {
+        "id": "p75",
+        "name": "Ivy Costa"
+      }
+    ],
+    "summary": {
+      "total_count": 7
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_1373745456",
+        "name": "Nintendo",
+        "category": "Games/Toys",
+        "created_time": "2019-02-12T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "09:00",
+        "end": "16:00"
+      },
+      {
+        "day": "sun",
+        "start": "11:00",
+        "end": "16:00"
+      },
+      {
+        "day": "thu",
+        "start": "17:00",
+        "end": "22:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "food"
+}

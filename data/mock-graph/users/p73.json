@@ -1,0 +1,166 @@
+{
+  "id": "p73",
+  "name": "Sage Bauer",
+  "first_name": "Sage",
+  "last_name": "Bauer",
+  "birthday": "06/16/2002",
+  "gender": "custom",
+  "location": {
+    "name": "Menlo Park, California",
+    "latitude": 37.46376,
+    "longitude": -122.17154
+  },
+  "picture": {
+    "data": {
+      "color": "#0ea5e9"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_3293670811",
+        "name": "Insomniac Events",
+        "category": "Musician/Band",
+        "created_time": "2021-07-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_3613979346",
+        "name": "Electric Daisy Carnival",
+        "category": "Musician/Band",
+        "created_time": "2019-07-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_4124523974",
+        "name": "Temple Nightclub",
+        "category": "Nightlife",
+        "created_time": "2022-02-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_3201520727",
+        "name": "Late Night Eats SF",
+        "category": "Nightlife",
+        "created_time": "2021-04-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_2496810232",
+        "name": "NBA",
+        "category": "Sports Team",
+        "created_time": "2021-07-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_857284444",
+        "name": "Rose & Crown Pub",
+        "category": "Bar",
+        "created_time": "2019-03-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_1006901491",
+        "name": "Nola Palo Alto",
+        "category": "Bar",
+        "created_time": "2021-04-14T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_1856907645",
+        "name": "Warriors Fans Bay Area",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_2361962968",
+        "name": "Illenium",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_3190415608",
+        "name": "Disclosure",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3038156069",
+        "name": "Warriors Watch Party",
+        "start_time": "2026-05-27T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2907137101",
+        "name": "Warehouse Rave SF",
+        "start_time": "2025-01-27T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3737833199",
+        "name": "EDC Las Vegas",
+        "start_time": "2026-01-14T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p24",
+        "name": "Ivan Mensah"
+      }
+    ],
+    "summary": {
+      "total_count": 1
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_4200118029",
+        "name": "Pitchfork",
+        "category": "Musician/Band",
+        "created_time": "2022-03-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1669152886",
+        "name": "Peninsula Boulders",
+        "category": "Sports & Recreation",
+        "created_time": "2019-07-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_2497901386",
+        "name": "5AM Club",
+        "category": "Lifestyle",
+        "created_time": "2019-07-15T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "20:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "20:00",
+        "end": "24:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "outlier-nightlife"
+}

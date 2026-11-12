@@ -1,0 +1,190 @@
+{
+  "id": "p09",
+  "name": "Kiara Costa",
+  "first_name": "Kiara",
+  "last_name": "Costa",
+  "birthday": "06/06/2004",
+  "gender": "female",
+  "location": {
+    "name": "Stanford, California",
+    "latitude": 37.4281,
+    "longitude": -122.16821
+  },
+  "picture": {
+    "data": {
+      "color": "#8b5cf6"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_3542300262",
+        "name": "Rasputin Music",
+        "category": "Shopping & Retail",
+        "created_time": "2022-01-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_1788322323",
+        "name": "Bay Area Concerts",
+        "category": "Arts & Entertainment",
+        "created_time": "2022-02-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_1636414625",
+        "name": "SF Live Music Guide",
+        "category": "Arts & Entertainment",
+        "created_time": "2021-02-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_2195994927",
+        "name": "Bouldering Daily",
+        "category": "Sports & Recreation",
+        "created_time": "2023-02-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_4200118029",
+        "name": "Pitchfork",
+        "category": "Musician/Band",
+        "created_time": "2024-08-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_2214456572",
+        "name": "Criterion Collection",
+        "category": "Movie",
+        "created_time": "2019-02-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_3533273514",
+        "name": "A24",
+        "category": "Movie",
+        "created_time": "2021-04-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_2472071921",
+        "name": "AllTrails",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2021-02-18T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_296257480",
+        "name": "Peninsula Vinyl Collectors",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2023845857",
+        "name": "Bay Area Indie Shows",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3522069602",
+        "name": "Peninsula Film Club",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_383266400",
+        "name": "boygenius",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1958632383",
+        "name": "Japanese Breakfast",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_630026664",
+        "name": "Peninsula Bouldering League",
+        "start_time": "2026-03-25T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3093592894",
+        "name": "Outside Lands",
+        "start_time": "2025-02-18T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3522809679",
+        "name": "Indie Night at The Guild",
+        "start_time": "2026-02-18T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p04",
+        "name": "Reza Ali"
+      },
+      {
+        "id": "p05",
+        "name": "Yuki Dubois"
+      },
+      {
+        "id": "p12",
+        "name": "Gabe Chen"
+      },
+      {
+        "id": "p14",
+        "name": "Ben Patel"
+      },
+      {
+        "id": "p15",
+        "name": "Ravi Mensah"
+      },
+      {
+        "id": "p31",
+        "name": "Isaac Moreau"
+      }
+    ],
+    "summary": {
+      "total_count": 6
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_857284444",
+        "name": "Rose & Crown Pub",
+        "category": "Bar",
+        "created_time": "2020-04-14T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "17:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "10:00",
+        "end": "23:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "indie-climb"
+}

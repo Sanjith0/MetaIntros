@@ -1,0 +1,202 @@
+{
+  "id": "p19",
+  "name": "Aisha Brooks",
+  "first_name": "Aisha",
+  "last_name": "Brooks",
+  "birthday": "06/10/2000",
+  "gender": "female",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.44784,
+    "longitude": -122.15236
+  },
+  "picture": {
+    "data": {
+      "color": "#e41e3f"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_3504473405",
+        "name": "One Piece",
+        "category": "Book",
+        "created_time": "2021-03-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_353896392",
+        "name": "Critical Role",
+        "category": "Games/Toys",
+        "created_time": "2019-07-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_1912237152",
+        "name": "Dungeons & Dragons",
+        "category": "Games/Toys",
+        "created_time": "2020-03-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_105552468",
+        "name": "Catan",
+        "category": "Games/Toys",
+        "created_time": "2025-07-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_2179806558",
+        "name": "Studio Ghibli",
+        "category": "TV Show",
+        "created_time": "2019-07-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3299841632",
+        "name": "Frieren",
+        "category": "TV Show",
+        "created_time": "2019-03-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_2511985466",
+        "name": "Valorant",
+        "category": "Games/Toys",
+        "created_time": "2021-03-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_291742637",
+        "name": "Ramen Nagi",
+        "category": "Restaurant",
+        "created_time": "2023-07-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_932462314",
+        "name": "Ramen Hunter",
+        "category": "Restaurant",
+        "created_time": "2020-09-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_2677106354",
+        "name": "Jeopardy!",
+        "category": "Games/Toys",
+        "created_time": "2024-05-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_71207391",
+        "name": "California International Marathon",
+        "category": "Sports & Recreation",
+        "created_time": "2022-09-15T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_1542195441",
+        "name": "Peninsula Trivia Teams",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_365051473",
+        "name": "Manga Swap Peninsula",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1240877100",
+        "name": "Peninsula D&D Players",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_3190415608",
+        "name": "Disclosure",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1814415648",
+        "name": "Fred again..",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_13189584",
+        "name": "Zedd",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3941049801",
+        "name": "Wingspan Tournament",
+        "start_time": "2026-03-18T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2581632150",
+        "name": "SF Marathon",
+        "start_time": "2025-09-20T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3990011887",
+        "name": "Ramen Crawl San Mateo",
+        "start_time": "2026-03-13T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p23",
+        "name": "Marcus Kim"
+      },
+      {
+        "id": "p27",
+        "name": "Leo Andersen"
+      }
+    ],
+    "summary": {
+      "total_count": 2
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_857284444",
+        "name": "Rose & Crown Pub",
+        "category": "Bar",
+        "created_time": "2021-06-12T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "13:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sun",
+        "start": "12:00",
+        "end": "22:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "games-anime"
+}

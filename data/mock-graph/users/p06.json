@@ -1,0 +1,210 @@
+{
+  "id": "p06",
+  "name": "Simon Hughes",
+  "first_name": "Simon",
+  "last_name": "Hughes",
+  "birthday": "06/08/2002",
+  "gender": "male",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.43469,
+    "longitude": -122.16207
+  },
+  "picture": {
+    "data": {
+      "color": "#e41e3f"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_1669152886",
+        "name": "Peninsula Boulders",
+        "category": "Sports & Recreation",
+        "created_time": "2022-05-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_4214058980",
+        "name": "Climbing Magazine",
+        "category": "Sports & Recreation",
+        "created_time": "2023-08-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_4200118029",
+        "name": "Pitchfork",
+        "category": "Musician/Band",
+        "created_time": "2021-07-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_2432891253",
+        "name": "Vinyl Me, Please",
+        "category": "Shopping & Retail",
+        "created_time": "2024-02-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_1452298579",
+        "name": "Bay Area Hiker",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2020-04-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_2472071921",
+        "name": "AllTrails",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2020-01-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1399278490",
+        "name": "Letterboxd",
+        "category": "Movie",
+        "created_time": "2022-04-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_1953414866",
+        "name": "Tartine Bakery",
+        "category": "Food & Beverage",
+        "created_time": "2022-04-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3851753345",
+        "name": "Hillel at Stanford",
+        "category": "Religious Organization",
+        "created_time": "2019-04-10T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_296257480",
+        "name": "Peninsula Vinyl Collectors",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2808529448",
+        "name": "Peninsula Hikers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2023845857",
+        "name": "Bay Area Indie Shows",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_1890828790",
+        "name": "Mitski",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_2851437574",
+        "name": "Phoebe Bridgers",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_231712045",
+        "name": "Phoebe Bridgers @ Greek Theatre",
+        "start_time": "2026-06-11T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_4234289730",
+        "name": "Mission Peak Sunrise Hike",
+        "start_time": "2025-09-13T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1390372120",
+        "name": "Bouldering Night at Peninsula Boulders",
+        "start_time": "2026-04-27T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3954455477",
+        "name": "Record Store Day Palo Alto",
+        "start_time": "2025-04-16T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p04",
+        "name": "Reza Ali"
+      },
+      {
+        "id": "p12",
+        "name": "Gabe Chen"
+      },
+      {
+        "id": "p15",
+        "name": "Ravi Mensah"
+      },
+      {
+        "id": "p36",
+        "name": "Ben Müller"
+      },
+      {
+        "id": "p37",
+        "name": "Oscar Novak"
+      },
+      {
+        "id": "p70",
+        "name": "Dev Johnson"
+      },
+      {
+        "id": "p72",
+        "name": "Anika Patel"
+      },
+      {
+        "id": "p77",
+        "name": "Aisha Andersen"
+      }
+    ],
+    "summary": {
+      "total_count": 8
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_857284444",
+        "name": "Rose & Crown Pub",
+        "category": "Bar",
+        "created_time": "2025-05-18T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "19:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "10:00",
+        "end": "24:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "indie-climb"
+}

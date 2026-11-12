@@ -1,0 +1,196 @@
+{
+  "id": "p25",
+  "name": "Ivan Castillo",
+  "first_name": "Ivan",
+  "last_name": "Castillo",
+  "birthday": "06/21/2007",
+  "gender": "male",
+  "location": {
+    "name": "Stanford, California",
+    "latitude": 37.42735,
+    "longitude": -122.168
+  },
+  "picture": {
+    "data": {
+      "color": "#2abba7"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_2511985466",
+        "name": "Valorant",
+        "category": "Games/Toys",
+        "created_time": "2021-06-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_4123061395",
+        "name": "Dimension 20",
+        "category": "Games/Toys",
+        "created_time": "2024-06-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_3216128065",
+        "name": "Board Game Geek",
+        "category": "Games/Toys",
+        "created_time": "2023-07-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_1399278490",
+        "name": "Letterboxd",
+        "category": "Movie",
+        "created_time": "2019-09-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_4190636008",
+        "name": "Peninsula Pride Network",
+        "category": "Community Organization",
+        "created_time": "2024-02-17T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_3522069602",
+        "name": "Peninsula Film Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1240877100",
+        "name": "Peninsula D&D Players",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_376236942",
+        "name": "Palo Alto Board Gamers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3928699871",
+        "name": "LGBTQ+ Book Club Palo Alto",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_1814415648",
+        "name": "Fred again..",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_2361962968",
+        "name": "Illenium",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3628388981",
+        "name": "D&D Adventurers League Night",
+        "start_time": "2026-06-23T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3964379026",
+        "name": "Stanford Theatre Classic Double Feature",
+        "start_time": "2025-04-26T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_968479970",
+        "name": "Board Game Night at Meeple House",
+        "start_time": "2026-03-13T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1346986683",
+        "name": "Smash Bros Local Tournament",
+        "start_time": "2025-09-27T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p04",
+        "name": "Reza Ali"
+      },
+      {
+        "id": "p07",
+        "name": "Daniel Singh"
+      },
+      {
+        "id": "p16",
+        "name": "Elena Shah"
+      },
+      {
+        "id": "p26",
+        "name": "Chloe Reyes"
+      },
+      {
+        "id": "p29",
+        "name": "Ava Sato"
+      },
+      {
+        "id": "p33",
+        "name": "Caleb Wong"
+      },
+      {
+        "id": "p46",
+        "name": "Noor Martinez"
+      },
+      {
+        "id": "p78",
+        "name": "Zoe Park"
+      }
+    ],
+    "summary": {
+      "total_count": 8
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_455822419",
+        "name": "Concert Subwoofer Fans",
+        "category": "Nightlife",
+        "created_time": "2025-08-17T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sat",
+        "start": "14:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sun",
+        "start": "13:00",
+        "end": "22:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "games-anime"
+}

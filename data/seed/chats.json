@@ -1,0 +1,462 @@
+[
+  {
+    "id": "chat-dm-p02",
+    "type": "direct",
+    "title": null,
+    "memberIds": [
+      "p01",
+      "p02"
+    ],
+    "messages": [
+      {
+        "senderId": "p02",
+        "body": "wait really?",
+        "minutesAgo": 115
+      },
+      {
+        "senderId": "p01",
+        "body": "send me the pics!",
+        "minutesAgo": 82
+      },
+      {
+        "senderId": "p02",
+        "body": "brb",
+        "minutesAgo": 67
+      },
+      {
+        "senderId": "p01",
+        "body": "I'm so tired today",
+        "minutesAgo": 47
+      },
+      {
+        "senderId": "p01",
+        "body": "lol yes",
+        "minutesAgo": 24
+      },
+      {
+        "senderId": "p02",
+        "body": "we should get dinner soon",
+        "minutesAgo": 13
+      }
+    ],
+    "meReadMinutesAgo": 14
+  },
+  {
+    "id": "chat-dm-p04",
+    "type": "direct",
+    "title": null,
+    "memberIds": [
+      "p01",
+      "p04"
+    ],
+    "messages": [
+      {
+        "senderId": "p04",
+        "body": "ok sounds good",
+        "minutesAgo": 388
+      },
+      {
+        "senderId": "p04",
+        "body": "that was so fun",
+        "minutesAgo": 308
+      },
+      {
+        "senderId": "p01",
+        "body": "that's hilarious",
+        "minutesAgo": 305
+      },
+      {
+        "senderId": "p01",
+        "body": "ok sounds good",
+        "minutesAgo": 291
+      },
+      {
+        "senderId": "p01",
+        "body": "we should get dinner soon",
+        "minutesAgo": 265
+      },
+      {
+        "senderId": "p04",
+        "body": "omw",
+        "minutesAgo": 242
+      },
+      {
+        "senderId": "p04",
+        "body": "I'm so tired today",
+        "minutesAgo": 237
+      }
+    ],
+    "meReadMinutesAgo": 237
+  },
+  {
+    "id": "chat-dm-p20",
+    "type": "direct",
+    "title": null,
+    "memberIds": [
+      "p01",
+      "p20"
+    ],
+    "messages": [
+      {
+        "senderId": "p01",
+        "body": "thanks again for last night",
+        "minutesAgo": 678
+      },
+      {
+        "senderId": "p20",
+        "body": "lmk when you're free",
+        "minutesAgo": 642
+      },
+      {
+        "senderId": "p20",
+        "body": "wait really?",
+        "minutesAgo": 638
+      },
+      {
+        "senderId": "p01",
+        "body": "I'm so tired today",
+        "minutesAgo": 628
+      },
+      {
+        "senderId": "p20",
+        "body": "we should get dinner soon",
+        "minutesAgo": 620
+      }
+    ],
+    "meReadMinutesAgo": 620
+  },
+  {
+    "id": "chat-dm-p30",
+    "type": "direct",
+    "title": null,
+    "memberIds": [
+      "p01",
+      "p30"
+    ],
+    "messages": [
+      {
+        "senderId": "p01",
+        "body": "haha classic",
+        "minutesAgo": 835
+      },
+      {
+        "senderId": "p30",
+        "body": "I'm so tired today",
+        "minutesAgo": 830
+      },
+      {
+        "senderId": "p01",
+        "body": "haha classic",
+        "minutesAgo": 800
+      },
+      {
+        "senderId": "p30",
+        "body": "I'm so tired today",
+        "minutesAgo": 776
+      },
+      {
+        "senderId": "p30",
+        "body": "are you going this weekend?",
+        "minutesAgo": 742
+      },
+      {
+        "senderId": "p01",
+        "body": "are you going this weekend?",
+        "minutesAgo": 724
+      }
+    ],
+    "meReadMinutesAgo": 725
+  },
+  {
+    "id": "chat-dm-p45",
+    "type": "direct",
+    "title": null,
+    "memberIds": [
+      "p01",
+      "p45"
+    ],
+    "messages": [
+      {
+        "senderId": "p01",
+        "body": "haha classic",
+        "minutesAgo": 936
+      },
+      {
+        "senderId": "p45",
+        "body": "happy birthday!!",
+        "minutesAgo": 896
+      },
+      {
+        "senderId": "p45",
+        "body": "omw",
+        "minutesAgo": 895
+      }
+    ],
+    "meReadMinutesAgo": 895
+  },
+  {
+    "id": "chat-dm-p50",
+    "type": "direct",
+    "title": null,
+    "memberIds": [
+      "p01",
+      "p50"
+    ],
+    "messages": [
+      {
+        "senderId": "p01",
+        "body": "who's driving?",
+        "minutesAgo": 1049
+      },
+      {
+        "senderId": "p50",
+        "body": "running 5 late sorry",
+        "minutesAgo": 1047
+      },
+      {
+        "senderId": "p50",
+        "body": "did you see that new place on University?",
+        "minutesAgo": 1033
+      },
+      {
+        "senderId": "p01",
+        "body": "I'm so tired today",
+        "minutesAgo": 990
+      }
+    ],
+    "meReadMinutesAgo": 990
+  },
+  {
+    "id": "chat-dm-p66",
+    "type": "direct",
+    "title": null,
+    "memberIds": [
+      "p01",
+      "p66"
+    ],
+    "messages": [
+      {
+        "senderId": "p01",
+        "body": "running 5 late sorry",
+        "minutesAgo": 1232
+      },
+      {
+        "senderId": "p66",
+        "body": "are you going this weekend?",
+        "minutesAgo": 1219
+      },
+      {
+        "senderId": "p66",
+        "body": "lol yes",
+        "minutesAgo": 1213
+      }
+    ],
+    "meReadMinutesAgo": 1214
+  },
+  {
+    "id": "chat-dm-p75",
+    "type": "direct",
+    "title": null,
+    "memberIds": [
+      "p01",
+      "p75"
+    ],
+    "messages": [
+      {
+        "senderId": "p75",
+        "body": "that was so fun",
+        "minutesAgo": 1450
+      },
+      {
+        "senderId": "p01",
+        "body": "can you send me that link",
+        "minutesAgo": 1427
+      },
+      {
+        "senderId": "p01",
+        "body": "are you going this weekend?",
+        "minutesAgo": 1381
+      },
+      {
+        "senderId": "p01",
+        "body": "running 5 late sorry",
+        "minutesAgo": 1347
+      },
+      {
+        "senderId": "p75",
+        "body": "can you send me that link",
+        "minutesAgo": 1346
+      },
+      {
+        "senderId": "p75",
+        "body": "that was so fun",
+        "minutesAgo": 1319
+      },
+      {
+        "senderId": "p75",
+        "body": "who's driving?",
+        "minutesAgo": 1312
+      }
+    ],
+    "meReadMinutesAgo": 1312
+  },
+  {
+    "id": "chat-group-1",
+    "type": "group",
+    "title": "Roommates 🏠",
+    "memberIds": [
+      "p01",
+      "p02",
+      "p04",
+      "p20"
+    ],
+    "messages": [
+      {
+        "senderId": "p02",
+        "body": "we should get dinner soon",
+        "minutesAgo": 310
+      },
+      {
+        "senderId": "p01",
+        "body": "haha classic",
+        "minutesAgo": 214
+      },
+      {
+        "senderId": "p04",
+        "body": "that's hilarious",
+        "minutesAgo": 210
+      },
+      {
+        "senderId": "p01",
+        "body": "can you send me that link",
+        "minutesAgo": 178
+      },
+      {
+        "senderId": "p20",
+        "body": "lmk when you're free",
+        "minutesAgo": 130
+      },
+      {
+        "senderId": "p02",
+        "body": "that was so fun",
+        "minutesAgo": 111
+      },
+      {
+        "senderId": "p04",
+        "body": "haha classic",
+        "minutesAgo": 68
+      },
+      {
+        "senderId": "p20",
+        "body": "happy birthday!!",
+        "minutesAgo": 49
+      }
+    ],
+    "meReadMinutesAgo": 109
+  },
+  {
+    "id": "chat-group-2",
+    "type": "group",
+    "title": "Climbing crew",
+    "memberIds": [
+      "p01",
+      "p02",
+      "p04"
+    ],
+    "messages": [
+      {
+        "senderId": "p01",
+        "body": "haha classic",
+        "minutesAgo": 314
+      },
+      {
+        "senderId": "p02",
+        "body": "running 5 late sorry",
+        "minutesAgo": 267
+      },
+      {
+        "senderId": "p04",
+        "body": "lol yes",
+        "minutesAgo": 258
+      },
+      {
+        "senderId": "p01",
+        "body": "we should get dinner soon",
+        "minutesAgo": 225
+      }
+    ],
+    "meReadMinutesAgo": 225
+  },
+  {
+    "id": "chat-group-3",
+    "type": "group",
+    "title": "Fam",
+    "memberIds": [
+      "p01",
+      "p45",
+      "p50",
+      "p66"
+    ],
+    "messages": [
+      {
+        "senderId": "p01",
+        "body": "ok I'm in",
+        "minutesAgo": 526
+      },
+      {
+        "senderId": "p45",
+        "body": "running 5 late sorry",
+        "minutesAgo": 456
+      },
+      {
+        "senderId": "p50",
+        "body": "can you send me that link",
+        "minutesAgo": 422
+      },
+      {
+        "senderId": "p66",
+        "body": "ok I'm in",
+        "minutesAgo": 400
+      }
+    ],
+    "meReadMinutesAgo": 400
+  },
+  {
+    "id": "chat-group-4",
+    "type": "group",
+    "title": "Hackathon team",
+    "memberIds": [
+      "p01",
+      "p30",
+      "p50"
+    ],
+    "messages": [
+      {
+        "senderId": "p30",
+        "body": "ok sounds good",
+        "minutesAgo": 706
+      },
+      {
+        "senderId": "p01",
+        "body": "lmk when you're free",
+        "minutesAgo": 685
+      },
+      {
+        "senderId": "p50",
+        "body": "that's hilarious",
+        "minutesAgo": 684
+      },
+      {
+        "senderId": "p01",
+        "body": "lol yes",
+        "minutesAgo": 610
+      },
+      {
+        "senderId": "p30",
+        "body": "haha classic",
+        "minutesAgo": 580
+      }
+    ],
+    "meReadMinutesAgo": 580
+  }
+]
