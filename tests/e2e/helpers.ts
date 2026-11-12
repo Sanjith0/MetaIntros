@@ -16,7 +16,8 @@ export function trackConsoleErrors(page: Page) {
 
 /** Navigate and wait until React has hydrated (clicks before hydration are silently lost). */
 export async function gotoReady(page: Page, url: string) {
-  const res = await page.goto(url);
+  let res = await page.goto(url);
+  if (res && res.status() >= 500) res = await page.goto(url); // one retry for transient dev-server errors
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "1");
   return res;
 }

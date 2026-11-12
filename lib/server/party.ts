@@ -11,5 +11,6 @@ export async function getPartyForUser(userId: string, partyId: string) {
     },
   });
   if (!p || !p.members.some((m) => m.userId === userId)) return null;
-  return p;
+  // photos are party-scoped: only returned to members, only if the owner opted in
+  return { ...p, members: p.members.map((m) => ({ ...m, photoUrl: m.photoOptIn ? m.photoUrl : null })) };
 }

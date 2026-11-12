@@ -8,6 +8,7 @@ import { useLiveEvents } from "@/components/useLiveEvents";
 import { SquadHeader, type SquadHeaderData } from "./SquadHeader";
 import { ArchivedPrompt } from "./ArchivedPrompt";
 import { FastForwardButton } from "./FastForwardButton";
+import { FindYourParty } from "./FindYourParty";
 
 interface U { id: string; name: string; avatarColor: string }
 export interface ThreadMessage { id: string; body: string; kind: string; createdAt: string; senderId: string | null; sender: U | null }
@@ -72,6 +73,7 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
       </div>
       {squad && (
         <SquadHeader squad={{ ...squad, archived }} meId={meId}>
+          {!archived && <FindYourParty partyId={squad.partyId} meId={meId} spot={squad.meetingSpot} lat={squad.event.lat} lng={squad.event.lng} />}
           {!archived && <FastForwardButton />}
         </SquadHeader>
       )}

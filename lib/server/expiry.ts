@@ -6,11 +6,6 @@ import { CHAT_TTL_AFTER_EVENT_MS } from "./squadChat";
 
 export const ARCHIVE_NOTICE = "This squad chat has ended. Want to stay in touch? Add your squad as friends.";
 
-type ArchiveHook = (partyId: string) => Promise<void>;
-const archiveHooks: ArchiveHook[] = [];
-export function onSquadArchived(fn: ArchiveHook) {
-  if (!archiveHooks.includes(fn)) archiveHooks.push(fn);
-}
 
 /** Archive every squad chat whose expiry (24h after the event) has passed. Idempotent. */
 export async function sweepExpiredChats(at?: Date): Promise<string[]> {
@@ -22,7 +17,8 @@ export async function sweepExpiredChats(at?: Date): Promise<string[]> {
     await postMessage(c.id, null, ARCHIVE_NOTICE, "system");
     if (c.partyId) {
       await prisma.party.update({ where: { id: c.partyId }, data: { status: "completed" } });
-      for (const h of archiveHooks) await h(c.partyId).catch((e) => console.error("[archive hook]", e));
+      // party-scoped photos don't outlive the squad
+      await prisma.partyMember.updateMany({ where: { partyId: c.partyId }, data: { photoUrl: null, photoOptIn: false } });
     }
     const members = await memberIds(c.id);
     publish("chat-archived", { chatId: c.id, partyId: c.partyId }, members);

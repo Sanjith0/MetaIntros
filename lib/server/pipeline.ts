@@ -14,6 +14,7 @@ import { weekendRange } from "./events";
 import { writeTrace, type TraceStep } from "./trace";
 import { partyFormationAgent, templateRationale } from "@/lib/agents/partyFormation";
 import { eventSelectionAgent } from "@/lib/agents/eventSelection";
+import { afterPartyConfirmed } from "./hooks";
 
 const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
 const candKey = (c: Candidate) => [...c.entryIds].sort().join(",");
@@ -76,12 +77,6 @@ export function setEventChooser(fn: EventChooser) {
   eventChooser = fn;
 }
 
-type Hook = (partyId: string) => Promise<void>;
-const hooks: Hook[] = [];
-/** Later parts register post-confirmation steps (squad chat, host, talk cards …). */
-export function onPartyConfirmed(fn: Hook) {
-  if (!hooks.includes(fn)) hooks.push(fn);
-}
 
 /** Commit a chosen candidate as a party. Returns null (no party) if anything fails validation. */
 export async function formParty(p: Proposal, c: Candidate, people: Map<string, Person>): Promise<string | null> {
@@ -123,13 +118,7 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
     return null;
   }
   await prisma.party.update({ where: { id: partyId }, data: { eventId: event.id, status: "confirmed" } });
-  for (const h of hooks) {
-    try {
-      await h(partyId);
-    } catch (e) {
-      console.error("[party hook]", e);
-    }
-  }
+  await afterPartyConfirmed(partyId);
   publish("party", { type: "formed", partyId, eventId: event.id }, c.userIds);
   publish("badges", {}, c.userIds);
   publish("demo", { type: "party", partyId });
