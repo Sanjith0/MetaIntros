@@ -1,6 +1,6 @@
 {
  "name": "demo-party",
- "recordedAt": "2026-11-12T10:23:04.844Z",
+ "recordedAt": "2026-11-12T10:45:34.260Z",
  "origin": "mock",
  "calls": {
   "brief:dev": {
@@ -17,7 +17,7 @@
      "new"
     ]
    },
-   "ms": 1,
+   "ms": 2,
    "source": "mock"
   },
   "brief:ana": {
@@ -34,7 +34,7 @@
      "outdoors"
     ]
    },
-   "ms": 1,
+   "ms": 0,
    "source": "mock"
   },
   "brief:kai": {
@@ -150,7 +150,7 @@
      ]
     }
    },
-   "ms": 1,
+   "ms": 0,
    "source": "mock"
   },
   "table.round1:ana": {
@@ -326,7 +326,7 @@
      ]
     }
    },
-   "ms": 0,
+   "ms": 1,
    "source": "mock"
   },
   "pair:dev|kai": {
@@ -339,7 +339,7 @@
      "dev-f2",
      "kai-f3"
     ],
-    "bridgeId": "br-dev-kai-f-theo",
+    "bridgeId": "br-dev-kai-f1kdqnj",
     "askForA": "kai-f3",
     "askForB": "dev-f2"
    },
@@ -373,7 +373,7 @@
      "dev-f4",
      "maya-f3"
     ],
-    "bridgeId": "br-dev-maya-f-priya",
+    "bridgeId": "br-dev-maya-f6wcoir",
     "askForA": "maya-f3",
     "askForB": "dev-f4"
    },
@@ -407,7 +407,7 @@
      "ana-f2",
      "zoe-f2"
     ],
-    "bridgeId": "br-ana-zoe-f-sam",
+    "bridgeId": "br-ana-zoe-fjgnhvo",
     "askForA": "zoe-f2",
     "askForB": "ana-f2"
    },
@@ -629,7 +629,7 @@
      ]
     }
    },
-   "ms": 0,
+   "ms": 1,
    "source": "mock"
   }
  }

@@ -17,6 +17,8 @@ const DEFAULTS = {
   DEMO_PANEL: true,
   /** F6: queue with a friend (duo), and women-only / not-the-only-woman settings in the queue sheet. */
   DUO_QUEUE: true,
+  /** F7: bridge lines say a tie exists without naming a third person who never opted in. */
+  BRIDGE_PRIVACY: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -4,7 +4,7 @@ import { publish } from "@/lib/server/bus";
 import { postMessage, setRsvp } from "@/lib/server/social";
 import { factById, nowIso, profile, store } from "@/lib/server/store";
 import { trace } from "@/lib/server/trace";
-import { bridgeText, consentedBridges, openerText, runPairTalk, type PairResult } from "./pair";
+import { bridgeLine, consentedBridges, openerText, runPairTalk, type PairResult } from "./pair";
 import { runTableTalk, type TableOptions, type TableResult } from "./table";
 import { pairKey } from "@/lib/graph";
 
@@ -56,16 +56,16 @@ export function finalize(partyId: string, table: TableResult, pairs: PairResult[
       [pr.b, pr.a],
     ] as const) {
       const opener = pr.openers[viewer]!;
-      const bridges = consentedBridges(party, viewer, subject);
+      const tie = bridgeLine(party, consentedBridges(party, viewer, subject));
       const card: Card = {
         partyId: party.id,
         viewerId: viewer,
         subjectId: subject,
         subjectName: profile(subject).firstName,
-        bridgeLine: bridges[0] ? bridgeText(bridges[0]) : null,
+        bridgeLine: tie?.text ?? null,
         sharedLine: pr.shared.text,
         opener: opener.text,
-        sourceIds: [...new Set([...pr.shared.sourceIds, ...opener.sourceIds, ...(bridges[0] ? [bridges[0].id] : [])])],
+        sourceIds: [...new Set([...pr.shared.sourceIds, ...opener.sourceIds, ...(tie?.sourceIds ?? [])])],
       };
       s.cards.push(card);
     }

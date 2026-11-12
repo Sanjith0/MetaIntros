@@ -1,6 +1,5 @@
 import type { Card, PairMessage, Receipt, TableMessage, Trace } from "@/contracts";
-import { consentedBridges } from "@/lib/agents/pair";
-import { bridgeText } from "@/lib/agents/pair";
+import { bridgeLine, consentedBridges } from "@/lib/agents/pair";
 import { person, partyForViewer, type Person } from "./social";
 import { store } from "./store";
 
@@ -32,8 +31,8 @@ export function memberPartyView(partyId: string, viewerId: string): MemberPartyV
     party: { id: party.id, status: party.status, planId: party.planId, lockedBy: party.lockedBy, lockedAt: party.lockedAt, chatId: party.chatId, eventId: party.eventId },
     viewerId,
     members: party.memberIds.map((id) => {
-      const br = id === viewerId ? [] : consentedBridges(party, viewerId, id);
-      return { ...person(id), bridge: br[0] ? bridgeText(br[0]) : null, arrived: arrived.has(id) };
+      const tie = id === viewerId ? null : bridgeLine(party, consentedBridges(party, viewerId, id));
+      return { ...person(id), bridge: tie?.text ?? null, arrived: arrived.has(id) };
     }),
     plans: party.candidatePlanIds.map((id) => {
       const p = s.plans.get(id)!;

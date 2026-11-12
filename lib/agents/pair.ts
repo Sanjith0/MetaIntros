@@ -100,9 +100,35 @@ function sanitize(out: PairOut, A: PairSide, B: PairSide, bridges: Bridge[], fal
 
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
-export function bridgeText(b: Bridge): string {
+/**
+ * May a bridge line name this third person? Only if they are in this same
+ * party and agreed to show connections. Everyone else stays unnamed: the
+ * line says a tie exists without saying who.
+ */
+export function nameable(party: Party | undefined, personId: string): boolean {
+  if (!flag("BRIDGE_PRIVACY")) return true;
+  if (!party || !party.memberIds.includes(personId)) return false;
+  return store().queue.some((q) => q.userId === personId && q.consentBridges && q.status !== "left");
+}
+
+export function bridgeText(b: Bridge, party?: Party): string {
   if (b.kind === "queued_together") return "You queued together.";
-  return b.kind === "mutual_friend" ? `You both know ${b.viaName}.` : `You're both in ${b.viaName}.`;
+  if (b.kind === "group") return `You're both in ${b.viaName}.`; // a Group, not a person, and both are in it
+  return nameable(party, b.viaId) ? `You both know ${b.viaName}.` : "You have a friend in common.";
+}
+
+/** The one line a card shows for how two people are tied, and the bridge ids behind it. */
+export function bridgeLine(party: Party, bridges: Bridge[]): { text: string; sourceIds: string[] } | null {
+  if (!bridges.length) return null;
+  const duo = bridges.find((b) => b.kind === "queued_together");
+  if (duo) return { text: bridgeText(duo, party), sourceIds: [duo.id] };
+  const named = bridges.find((b) => b.kind === "mutual_friend" && nameable(party, b.viaId));
+  if (named) return { text: bridgeText(named, party), sourceIds: [named.id] };
+  const group = bridges.find((b) => b.kind === "group");
+  if (group) return { text: bridgeText(group, party), sourceIds: [group.id] };
+  const friends = bridges.filter((b) => b.kind === "mutual_friend");
+  const text = friends.length === 1 ? "You have a friend in common." : `You have ${friends.length} friends in common.`;
+  return { text, sourceIds: friends.map((b) => b.id) };
 }
 
 export function openerText(target: { firstName: string }, fact: Fact): string {
@@ -123,7 +149,8 @@ async function onePair(party: Party, a: string, b: string, pace: () => number): 
     user: JSON.stringify({
       A: { name: A.firstName, lines: A.lines.map((l) => ({ id: l.id, text: l.text })), facts: A.facts.map((f) => ({ id: f.id, tag: f.tag, text: f.text })) },
       B: { name: B.firstName, lines: B.lines.map((l) => ({ id: l.id, text: l.text })), facts: B.facts.map((f) => ({ id: f.id, tag: f.tag, text: f.text })) },
-      bridges: bridges.map((br) => ({ id: br.id, kind: br.kind, via: br.viaName })),
+      // The model sees how they are tied, never the name of a third person who didn't opt in.
+      bridges: bridges.map((br) => ({ id: br.id, kind: br.kind, line: bridgeText(br, party) })),
     }),
     schema: PairOut,
     mock: () => fallback,
@@ -155,7 +182,7 @@ async function onePair(party: Party, a: string, b: string, pace: () => number): 
     const tag = factById(out.sharedFactIds[0]!)!.tag;
     shared = post({ fromId: null, toId: null, kind: "shared", text: `You both listed ${tag}.`, sourceIds: out.sharedFactIds });
   } else if (bridge) {
-    shared = post({ fromId: null, toId: null, kind: "shared", text: bridgeText(bridge), sourceIds: [bridge.id] });
+    shared = post({ fromId: null, toId: null, kind: "shared", text: bridgeText(bridge, party), sourceIds: [bridge.id] });
   } else {
     shared = post({ fromId: null, toId: null, kind: "shared", text: "You both joined this party.", sourceIds: [party.id] });
   }

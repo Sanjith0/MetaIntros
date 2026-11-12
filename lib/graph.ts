@@ -32,7 +32,8 @@ export function bridgesBetween(a: Profile, b: Profile, nameOf: (id: string) => s
   const [x, y] = a.id < b.id ? [a, b] : [b, a];
   const out: Bridge[] = [];
   for (const m of mutualFriends(x.id, y.id)) {
-    out.push({ id: `br-${x.id}-${y.id}-f-${m}`, a: x.id, b: y.id, kind: "mutual_friend", viaId: m, viaName: nameOf(m) });
+    // The id must not carry the friend's id: it is shown as a source id on cards.
+    out.push({ id: `br-${x.id}-${y.id}-f${tieHash(`${x.id}|${y.id}|${m}`)}`, a: x.id, b: y.id, kind: "mutual_friend", viaId: m, viaName: nameOf(m) });
   }
   for (const g of sharedSmallGroups(x, y)) {
     out.push({ id: `br-${x.id}-${y.id}-g-${g.id}`, a: x.id, b: y.id, kind: "group", viaId: g.id, viaName: g.name, groupSize: g.size });
@@ -41,3 +42,10 @@ export function bridgesBetween(a: Profile, b: Profile, nameOf: (id: string) => s
 }
 
 export const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+
+/** A short stable hash, so a tie can be cited without naming who it runs through. */
+export function tieHash(s: string): string {
+  let h = 2166136261;
+  for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+  return h.toString(36).slice(0, 6);
+}
