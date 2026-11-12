@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Trace } from "@/contracts";
 import { Avatar } from "@/components/Avatar";
+import { LeakTest } from "@/components/stage/LeakTest";
 import { boardAt, replayDelay } from "@/lib/stage/board";
 import type { StageView } from "@/lib/server/views";
 
@@ -91,7 +92,7 @@ function Body({ text }: { text: string }) {
  * The projector, with a scrubber. Every position on the scrubber rebuilds
  * the board (plans, signatures, the lock) from the trace up to that point.
  */
-export function StageReplay({ initial }: { initial: StageView }) {
+export function StageReplay({ initial, leakTest = false }: { initial: StageView; leakTest?: boolean }) {
   const [prompt, setPrompt] = useState<PromptView | null>(null);
   const openPrompt = async (t: Trace) => {
     if (!t.actorId || !t.meta?.round) return;
@@ -255,6 +256,7 @@ export function StageReplay({ initial }: { initial: StageView }) {
           <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-600 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-500">
             Start demo party
           </button>
+          {leakTest && <LeakTest partyId={view.partyId} members={view.members} />}
           <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
         </div>
       </header>

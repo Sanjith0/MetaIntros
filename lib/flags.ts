@@ -44,6 +44,8 @@ const DEFAULTS = {
   HOW_PAGE: true,
   /** F19: every agent prompt is audited by code for other members' private words; the stage shows it per turn. */
   CONTEXT_AUDIT: true,
+  /** F20: "Try to leak it" on the stage: type a line as any agent and watch the verifier stop it. */
+  LEAK_TEST: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -44,6 +44,8 @@ Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/
    late synth show and the $45 supper go **unavailable**: red on the private column, with no
    reason and no name on the shared one. Kai holds a round, then concedes. Five signatures
    land; the Dolores Night Market locks. Scrub back to show any moment.
+   Tap any agent's **own brief only ✓** chip to show the exact prompt it got. Then **Try to
+   leak it**: type Maya's limits as Dev's agent and watch the verifier block it, live.
 3. **MATCH FOUND** on all five phones at once, with a chime (use `/phones` and real phones:
    each scans a QR code; the board shows each phone's lag in ms).
 4. **Maya's secret.** On her `/party`: her rules in her own words, and "What the party knows":
@@ -89,6 +91,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `UX_STATES` | skip link, MATCH FOUND focus and Escape, chat send retry |
 | `HOW_PAGE` | `/how`: the architecture diagram and what code guarantees |
 | `CONTEXT_AUDIT` | every agent prompt checked by code for other members' private words; per-turn chip and the exact prompt on `/stage` |
+| `LEAK_TEST` | **Try to leak it** on `/stage`: type a line as any agent; the verifier blocks it live, and nothing reaches a phone |
 
 ## Routes
 
@@ -133,7 +136,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 143 unit tests (vitest)
+npm test                       # 148 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests
