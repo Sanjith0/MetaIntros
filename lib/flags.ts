@@ -64,6 +64,8 @@ const DEFAULTS = {
   STAGE_PARTIES: true,
   /** F29: /how as a proof hub: every guarantee links to where it can be seen working, and names its test. */
   PROOF_HUB: true,
+  /** F30: /evals runs a whole fair (100 fictional guests) through the real loop in a sandbox and reports timing, validity and leaks. */
+  SCALE_TEST: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -56,7 +56,7 @@ column is computed by scanning everything the other four can load, and it stays 
 - A code judge, a verifier for public lines, and pair talk where the model only picks fact ids.
 - A projector view with a scrubber that rebuilds the board (plans, signatures, the lock) at
   any moment of the replay.
-- Vitest (187 unit tests), Playwright (35+ end-to-end specs on a production build, including
+- Vitest (190 unit tests), Playwright (35+ end-to-end specs on a production build, including
   five phones at once, 390-pixel layouts and axe accessibility checks), and an eval harness.
 
 ## The leak test
@@ -86,6 +86,8 @@ real model run.
 ## Accomplishments
 
 - Zero private words in anything another member can load, across every generated party.
+- A whole fair in a sandbox: 100 fictional guests, 20 parties, all locked with every plan
+  valid and nothing leaked, in tens of milliseconds on the mock model (`/evals`, At fair scale).
 - One sentence to MATCH FOUND on five phones, about 5 ms after the lock.
 - Every feature is a layer behind a flag, switchable live from `/demo`.
 

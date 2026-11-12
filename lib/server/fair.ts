@@ -49,7 +49,7 @@ const SENTENCES = [
 const TAGS = Object.keys(TOPICS);
 
 /** Fictional guests "scan the QR" and join, so the host screen has something to count. */
-export async function simulateGuests(n: number): Promise<number> {
+export async function simulateGuests(n: number, startTalk = true): Promise<number> {
   const s = store();
   const start = [...s.profiles.keys()].filter((k) => k.startsWith("fair-")).length;
   for (let i = 0; i < n; i++) {
@@ -67,7 +67,7 @@ export async function simulateGuests(n: number): Promise<number> {
       ],
       consent: true,
     });
-    await joinQueue({ userId: p.id, eventId: FAIR_EVENT_ID, sentence: SENTENCES[k % SENTENCES.length]!, consentBridges: true });
+    await joinQueue({ userId: p.id, eventId: FAIR_EVENT_ID, sentence: SENTENCES[k % SENTENCES.length]!, consentBridges: true, startTalk });
   }
   return n;
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EvalsBoard } from "@/components/evals/EvalsBoard";
+import { ScaleBoard } from "@/components/evals/ScaleBoard";
 import { flag } from "@/lib/flags";
 
 export const metadata: Metadata = { title: "Evals" };
@@ -20,6 +21,7 @@ export default function EvalsPage() {
         </p>
       </div>
       <EvalsBoard />
+      {flag("SCALE_TEST") && <ScaleBoard />}
       <div className="mt-4 rounded-[12px] bg-white p-4 text-[13px] text-[var(--color-ink-2)] shadow-[var(--shadow-card)]">
         <div className="font-semibold text-[var(--color-ink)]">How to read this</div>
         <ul className="mt-1 list-disc space-y-1 pl-5">
