@@ -84,7 +84,11 @@ export function PostComposer({
             <AiSourceLabel source={ai.source} />
             {edited && <span data-testid="composer-edited">· Edited by you</span>}
           </p>
-          <p className="mt-1 text-meta text-muted">The AI host saw who took each photo and when, never the photos themselves. Nothing is posted until you tap Share.</p>
+          <p className="mt-1 text-meta text-muted">
+            {ai.source === "fallback"
+              ? "AI wasn't available, so this is a simple template. Nothing is posted until you tap Share."
+              : "The AI host saw who took each photo and when, never the photos themselves. Nothing is posted until you tap Share."}
+          </p>
         </div>
       )}
 
@@ -173,17 +177,13 @@ export function PostComposer({
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <ChipRow label="Share as" className="mx-0 px-0">
-          <Chip on={kind === "post"} onClick={() => setKind("post")} data-testid="composer-kind-post">Post</Chip>
-          <Chip on={kind === "story"} onClick={() => setKind("story")} data-testid="composer-kind-story">Story</Chip>
-        </ChipRow>
+      <div role="group" aria-label="Share as" className="flex flex-wrap items-center gap-2">
+        <Chip on={kind === "post"} onClick={() => setKind("post")} data-testid="composer-kind-post">Post</Chip>
+        <Chip on={kind === "story"} onClick={() => setKind("story")} data-testid="composer-kind-story">Story</Chip>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <ChipRow label="Audience" className="mx-0 px-0">
-          <Chip on={audience === "friends"} onClick={() => setAudience("friends")} data-testid="composer-audience-friends"><Users size={16} aria-hidden /> Friends</Chip>
-          <Chip on={audience === "only_me"} onClick={() => setAudience("only_me")} data-testid="composer-audience-only-me"><Lock size={16} aria-hidden /> Only me</Chip>
-        </ChipRow>
+      <div role="group" aria-label="Audience" className="flex flex-wrap items-center gap-2">
+        <Chip on={audience === "friends"} onClick={() => setAudience("friends")} data-testid="composer-audience-friends"><Users size={16} aria-hidden /> Friends</Chip>
+        <Chip on={audience === "only_me"} onClick={() => setAudience("only_me")} data-testid="composer-audience-only-me"><Lock size={16} aria-hidden /> Only me</Chip>
       </div>
       <p className="-mt-1 text-meta text-muted">{kind === "story" ? "Stories disappear after 24 hours." : "You can delete your post later."} {audience === "friends" ? "Your friends can see it." : "Only you can see it."}</p>
 
