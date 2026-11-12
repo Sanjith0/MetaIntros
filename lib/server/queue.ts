@@ -9,6 +9,7 @@ import { publish } from "./bus";
 import { getFillMode, getSetting } from "./settings";
 import { formParty, chooseCandidate } from "./pipeline";
 import "./hooks";
+import { checkStalls } from "./host";
 
 // ───────────────────────── join / leave ─────────────────────────
 
@@ -167,6 +168,7 @@ export function ensureTicker() {
   if (process.env.NODE_ENV === "test" || g.__quTicker) return;
   g.__quTicker = setInterval(() => {
     tick().catch((e) => console.error("[queue tick]", e));
+    checkStalls().catch((e) => console.error("[stalls]", e));
   }, Number(process.env.QUEUE_TICK_MS ?? 2000));
 }
 

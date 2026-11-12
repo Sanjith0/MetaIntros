@@ -26,9 +26,10 @@ describe("agent trace", () => {
       const t = await getTrace(p.id);
       expect(t.map((s) => s.stepIndex)).toEqual(t.map((_, i) => i));
       const agents = [...new Set(t.map((s) => s.agent))];
-      expect(agents).toEqual(["party_formation", "event_selection"]);
+      expect(agents.slice(0, 2)).toEqual(["party_formation", "event_selection"]);
+      expect(agents).toContain("host");
       expect(t.some((s) => s.kind === "safety_check" && s.agent === "party_formation")).toBe(true);
-      expect(t.filter((s) => s.kind === "decision")).toHaveLength(2);
+      expect(t.filter((s) => s.kind === "decision" && s.agent !== "host")).toHaveLength(2);
       expect(t.every((s) => s.summary.length > 0)).toBe(true);
     }
   });
