@@ -60,6 +60,8 @@ const DEFAULTS = {
   STANDING_QUEUE: true,
   /** F27: a "rogue model" switch on /demo: every agent accepts everything and tries to say its person's rules; code still holds. */
   ROGUE_MODE: true,
+  /** F28: the projector lists every party (place, night, status) and can pin one; by default it follows new parties. */
+  STAGE_PARTIES: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

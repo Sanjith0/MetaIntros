@@ -10,5 +10,5 @@ export const dynamic = "force-dynamic";
 export default async function StagePage({ searchParams }: { searchParams: Promise<{ party?: string }> }) {
   const { party } = await searchParams;
   const view = stageView(party);
-  return flag("STAGE_SCRUBBER") ? <StageReplay initial={view} leakTest={flag("LEAK_TEST")} whatIf={flag("WHAT_IF")} /> : <StageBoard initial={view} />;
+  return flag("STAGE_SCRUBBER") ? <StageReplay initial={view} leakTest={flag("LEAK_TEST")} whatIf={flag("WHAT_IF")} pinned={party && flag("STAGE_PARTIES") ? party : null} /> : <StageBoard initial={view} />;
 }

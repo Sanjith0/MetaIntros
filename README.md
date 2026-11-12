@@ -117,6 +117,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `PREFLIGHT` | **Preflight** on `/demo`: rehearses the demo party in a sandbox and checks layers, model and call budget, pace, privacy, live state, screens and fallbacks |
 | `STANDING_QUEUE` | a standing party (3+ who all picked each other) queues together again from `/runitback`: one invite each, they wait for each other, land in one party with new people, and each types their own sentence |
 | `ROGUE_MODE` | **Rogue model** switch on `/demo` (off by default): every agent says yes to everything and tries to tell the table its person's rules; the stage shows code overriding each bad yes and the verifier blocking each line |
+| `STAGE_PARTIES` | a party switcher on `/stage` once there's more than one: "Sun · Ferry Building · talking"; pin one (kept in the URL) or follow new parties |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -162,7 +163,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 183 unit tests (vitest)
+npm test                       # 186 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

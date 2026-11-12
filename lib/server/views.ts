@@ -2,6 +2,8 @@ import type { Card, PairMessage, Receipt, TableMessage, Trace } from "@/contract
 import { bridgeLine, consentedBridges } from "@/lib/agents/pair";
 import { person, partyForViewer, type Person } from "./social";
 import { store } from "./store";
+import { flag } from "@/lib/flags";
+import { dayLabel } from "@/lib/format";
 
 /**
  * What a party member may see. Built only from public table lines, the
@@ -56,13 +58,34 @@ export interface StageView {
   members: Person[];
   plans: { id: string; title: string }[];
   traces: Trace[];
+  /** F28: every party, newest first, for the projector's switcher. */
+  parties?: StageParty[];
+}
+
+export interface StageParty {
+  id: string;
+  label: string;
+  status: string;
+}
+
+/** Every party so far, newest first: "Sun · Ferry Building · talking". For the projector only. */
+export function stageParties(): StageParty[] {
+  const s = store();
+  const word: Record<string, string> = { forming: "forming", talking: "talking", locked: "locked", failed: "no match" };
+  return [...s.parties.values()].reverse().map((p) => {
+    const ev = p.eventId ? s.events.get(p.eventId) : undefined;
+    const day = ev ? dayLabel(ev.date).split(",")[0] : "";
+    return { id: p.id, label: `${day} · ${ev?.landmark ?? "?"} · ${word[p.status] ?? p.status}`, status: p.status };
+  });
 }
 
 export function stageView(partyId?: string): StageView {
   const s = store();
   const party = partyId ? s.parties.get(partyId) : [...s.parties.values()].at(-1);
-  if (!party) return { partyId: null, members: [], plans: [], traces: [] };
+  const parties = flag("STAGE_PARTIES") ? stageParties() : undefined;
+  if (!party) return { partyId: null, members: [], plans: [], traces: [], parties };
   return {
+    parties,
     partyId: party.id,
     members: party.memberIds.map(person),
     plans: party.candidatePlanIds.map((id) => ({ id, title: s.plans.get(id)?.title ?? id })),

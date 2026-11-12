@@ -93,7 +93,7 @@ function Body({ text }: { text: string }) {
  * The projector, with a scrubber. Every position on the scrubber rebuilds
  * the board (plans, signatures, the lock) from the trace up to that point.
  */
-export function StageReplay({ initial, leakTest = false, whatIf = false }: { initial: StageView; leakTest?: boolean; whatIf?: boolean }) {
+export function StageReplay({ initial, leakTest = false, whatIf = false, pinned: pinnedAtLoad = null }: { initial: StageView; leakTest?: boolean; whatIf?: boolean; pinned?: string | null }) {
   const [prompt, setPrompt] = useState<PromptView | null>(null);
   const openPrompt = async (t: Trace) => {
     if (!t.actorId || !t.meta?.round) return;
@@ -114,6 +114,31 @@ export function StageReplay({ initial, leakTest = false, whatIf = false }: { ini
   const [live, setLive] = useState(initial.traces.length === 0);
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(2);
   const partyRef = useRef(initial.partyId);
+  // F28: null follows new parties; an id keeps the projector on that party.
+  const [pinned, setPinned] = useState<string | null>(pinnedAtLoad);
+  const pinnedRef = useRef<string | null>(pinnedAtLoad);
+  const [parties, setParties] = useState(initial.parties ?? []);
+  const loadParty = async (id: string | null) => {
+    const fresh = (await (await fetch(id ? `/api/stage?party=${id}` : "/api/stage", { cache: "no-store" })).json()) as StageView;
+    fresh.plans ??= [];
+    partyRef.current = fresh.partyId;
+    setView(fresh);
+    if (fresh.parties) setParties(fresh.parties);
+    const done = fresh.traces.some((t) => t.meta?.kind === "locked" || t.meta?.kind === "nomatch");
+    setLive(!done);
+    setPlaying(false);
+    setPos(fresh.traces.length);
+  };
+  const choose = (id: string) => {
+    const next = id || null;
+    pinnedRef.current = next;
+    setPinned(next);
+    const url = new URL(window.location.href);
+    if (next) url.searchParams.set("party", next);
+    else url.searchParams.delete("party");
+    window.history.replaceState(null, "", url);
+    void loadParty(next);
+  };
   const privRef = useRef<HTMLUListElement>(null);
   const sharedRef = useRef<HTMLUListElement>(null);
   const total = view.traces.length;
@@ -134,12 +159,22 @@ export function StageReplay({ initial, leakTest = false, whatIf = false }: { ini
     const es = new EventSource("/api/stream?stage=1");
     es.addEventListener("trace", async (msg) => {
       const t = JSON.parse((msg as MessageEvent).data) as Trace;
+      // Pinned to another party: keep the list fresh, but stay put.
+      if (pinnedRef.current && t.partyId !== pinnedRef.current) {
+        if (t.meta?.kind === "formed" || t.meta?.kind === "locked" || t.meta?.kind === "nomatch") {
+          void fetch("/api/stage?party=" + pinnedRef.current, { cache: "no-store" })
+            .then((r) => r.json())
+            .then((v: StageView) => v.parties && setParties(v.parties));
+        }
+        return;
+      }
       // A new party (or the same id after a demo reset) starts a fresh board.
       if (t.partyId !== partyRef.current || t.meta?.kind === "formed") {
         partyRef.current = t.partyId;
         const fresh = (await (await fetch(`/api/stage?party=${t.partyId}`)).json()) as StageView;
         fresh.plans ??= [];
         setView(fresh);
+        if (fresh.parties) setParties(fresh.parties);
         setLive(true);
         setPlaying(false);
         setPos(fresh.traces.length);
@@ -264,6 +299,27 @@ export function StageReplay({ initial, leakTest = false, whatIf = false }: { ini
           <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-600 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-500">
             Start demo party
           </button>
+          {parties.length > 1 && (
+            <label className="flex items-center gap-1.5 text-[12px] font-semibold text-white/70">
+              <span className="sr-only sm:not-sr-only">Party</span>
+              <select
+                value={pinned ?? ""}
+                onChange={(e) => choose(e.target.value)}
+                data-testid="stage-party"
+                aria-label="Which party the projector shows"
+                className="h-[30px] max-w-[240px] rounded-[6px] bg-white/10 px-2 text-[13px] font-semibold text-white ring-1 ring-white/20"
+              >
+                <option value="" className="bg-[#14151c]">
+                  Follow new parties
+                </option>
+                {parties.map((p) => (
+                  <option key={p.id} value={p.id} className="bg-[#14151c]">
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           {leakTest && <LeakTest partyId={view.partyId} members={view.members} />}
           {whatIf && <WhatIf partyId={view.partyId} locked={view.traces.some((t) => t.meta?.kind === "locked")} />}
           <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
