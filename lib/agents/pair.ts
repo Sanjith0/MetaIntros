@@ -6,6 +6,7 @@ import { publish } from "@/lib/server/bus";
 import { factById, nextId, nowIso, profile, store } from "@/lib/server/store";
 import { trace } from "@/lib/server/trace";
 import { briefFor, paceFromEnv } from "./table";
+import { flag } from "@/lib/flags";
 
 /**
  * Pair talk. For each pair, the two agents trade approved lines and look
@@ -116,6 +117,7 @@ async function onePair(party: Party, a: string, b: string, pace: number): Promis
   const r = await callModel({
     role: "spark",
     task: "pair",
+    agent: key,
     system: SYSTEM,
     user: JSON.stringify({
       A: { name: A.firstName, lines: A.lines.map((l) => ({ id: l.id, text: l.text })), facts: A.facts.map((f) => ({ id: f.id, tag: f.tag, text: f.text })) },
@@ -165,7 +167,7 @@ async function onePair(party: Party, a: string, b: string, pace: number): Promis
     [a]: post({ fromId: a, toId: b, kind: "opener", text: openerText(B, fa), sourceIds: [fa.id] }),
     [b]: post({ fromId: b, toId: a, kind: "opener", text: openerText(A, fb), sourceIds: [fb.id] }),
   };
-  trace(party.id, "private", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · openers · ${r.source} ${r.ms}ms`, `${A.firstName} → ${openers[a]!.text}\n${B.firstName} → ${openers[b]!.text}`, { meta: { kind: "pair", source: r.source } });
+  trace(party.id, "private", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · openers${flag("MODEL_READINESS") ? "" : ` · ${r.source} ${r.ms}ms`}`, `${A.firstName} → ${openers[a]!.text}\n${B.firstName} → ${openers[b]!.text}`, { meta: { kind: "pair", source: r.source, ms: r.ms, note: r.note } });
   return { key, a, b, shared, openers, bridge, source: r.source };
 }
 

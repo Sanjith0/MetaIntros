@@ -5,6 +5,8 @@ import { trace } from "@/lib/server/trace";
 import { laterTurn, round1Turn, type LaterOut, type PublicTableRow, type Round1Out, type TurnContext } from "./agent";
 import { feasibleFor, ownerChecks, partyChecks, rankPlans } from "./judge";
 import { verifyPublicLine, type NeutralId, type PublicLine } from "./verifier";
+import { flag } from "@/lib/flags";
+import type { ModelSource } from "@/model/client";
 
 export const MAX_ROUNDS = 3;
 
@@ -23,6 +25,40 @@ export interface TableResult {
 }
 
 export const paceFromEnv = () => Number(process.env.PQ_PACE_MS ?? 600);
+
+/**
+ * Start every agent's call at once. With MODEL_READINESS on, handle each
+ * result the moment it returns (streamed), one at a time so table state stays
+ * consistent; with it off, handle them in member order after all return.
+ */
+async function streamed<T>(briefs: Brief[], start: (b: Brief) => Promise<T>, handle: (b: Brief, r: T) => Promise<void>) {
+  if (!flag("MODEL_READINESS")) {
+    const all = await Promise.all(briefs.map(start));
+    for (let i = 0; i < briefs.length; i++) await handle(briefs[i]!, all[i]!);
+    return;
+  }
+  let chain: Promise<void> = Promise.resolve();
+  await Promise.all(
+    briefs.map((b) =>
+      start(b).then((r) => {
+        chain = chain.then(() => handle(b, r));
+        return chain;
+      }),
+    ),
+  );
+  await chain;
+}
+
+function logCall(partyId: string, ownerId: string, round: number, turn: { source: ModelSource; ms: number; note?: string }) {
+  store().agentCalls.push({ partyId, ownerId, round, source: turn.source, ms: turn.ms, note: turn.note ?? null });
+}
+
+const turnLabel = (turn: { source: ModelSource; ms: number; note?: string }) =>
+  turn.source === "fallback" ? `fallback (${turn.note ?? "model unavailable"})` : `${turn.source} ${turn.ms}ms`;
+
+/** With MODEL_READINESS on, the stage shows source and latency as chips from meta. */
+const agentTitle = (ownerId: string, round: number, turn: { source: ModelSource; ms: number; note?: string }) =>
+  `${profile(ownerId).firstName}'s agent · round ${round}${flag("MODEL_READINESS") ? "" : ` · ${turnLabel(turn)}`}`;
 const sleep = (ms: number) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve());
 
 export function briefFor(userId: string): Brief {
@@ -93,12 +129,9 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
     ownPrefs,
   });
 
-  const r1 = await Promise.all(briefs.map((b) => round1Turn(ctxFor(b, 1, null))));
   const prefs = new Map<string, Record<string, number>>();
-
-  for (let i = 0; i < briefs.length; i++) {
-    const b = briefs[i]!;
-    const turn = r1[i]!;
+  await streamed(briefs, (b) => round1Turn(ctxFor(b, 1, null)), async (b, turn) => {
+    logCall(partyId, b.ownerId, 1, turn);
     const out = (opts.override?.(b.ownerId, 1, turn.out) as Round1Out | undefined) ?? turn.out;
     const own: Record<string, number> = {};
     const lines: string[] = [];
@@ -129,13 +162,13 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
     }
     prefs.set(b.ownerId, own);
     const anyReject = s.verdicts.some((v) => v.partyId === partyId && v.ownerId === b.ownerId && v.round === 1 && v.decision === "reject");
-    trace(partyId, "private", "table", b.ownerId, `${profile(b.ownerId).firstName}'s agent · round 1 · ${turn.source} ${turn.ms}ms`, lines.join("\n"), {
+    trace(partyId, "private", "table", b.ownerId, agentTitle(b.ownerId, 1, turn), lines.join("\n"), {
       tone: anyReject ? "reject" : "accept",
-      meta: { kind: "verdicts", round: 1, source: turn.source, ms: turn.ms },
+      meta: { kind: "verdicts", round: 1, source: turn.source, ms: turn.ms, note: turn.note },
     });
     speak(party, b, 1, out.publicLine, "neutral-hello");
     await sleep(pace);
-  }
+  });
 
   // The table learns only that a plan is unavailable. Never why, never who.
   for (const p of plans.filter((x) => unavailable.has(x.id))) {
@@ -173,11 +206,10 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   for (let round = 2; round <= MAX_ROUNDS; round++) {
     postTable(party, { round, authorId: null, kind: "leading", text: `Leading: ${leading.title}`, sourceIds: [leading.id], planId: leading.id });
     await sleep(pace);
-    const turns = await Promise.all(briefs.map((b) => laterTurn(ctxFor(b, round, leading.id, prefs.get(b.ownerId)))));
     signatures = [];
-    for (let i = 0; i < briefs.length; i++) {
-      const b = briefs[i]!;
-      const turn = turns[i]!;
+    const lead = leading;
+    await streamed(briefs, (b) => laterTurn(ctxFor(b, round, lead.id, prefs.get(b.ownerId))), async (b, turn) => {
+      logCall(partyId, b.ownerId, round, turn);
       const raw = (opts.override?.(b.ownerId, round, turn.out) as LaterOut | undefined) ?? turn.out;
       let decision = raw.decision;
       let planId = raw.planId;
@@ -199,13 +231,13 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
       s.verdicts.push(verdict);
       publish("agent.verdict", verdict, [b.ownerId], { stage: true });
       if (decision !== "hold") signatures.push(b.ownerId);
-      trace(partyId, "private", "table", b.ownerId, `${profile(b.ownerId).firstName}'s agent · round ${round} · ${turn.source} ${turn.ms}ms`, `${decision.toUpperCase()} ${plans.find((p) => p.id === planId)?.title ?? planId}: ${verdict.privateReason}`, {
+      trace(partyId, "private", "table", b.ownerId, agentTitle(b.ownerId, round, turn), `${decision.toUpperCase()} ${plans.find((p) => p.id === planId)?.title ?? planId}: ${verdict.privateReason}`, {
         tone: decision === "hold" ? "hold" : "sign",
-        meta: { kind: "verdicts", round, decision, planId, source: turn.source, ms: turn.ms },
+        meta: { kind: "verdicts", round, decision, planId, source: turn.source, ms: turn.ms, note: turn.note },
       });
       speak(party, b, round, raw.publicLine, decision === "hold" ? "neutral-thinking" : "neutral-in");
       await sleep(pace);
-    }
+    });
     postTable(
       party,
       { round, authorId: null, kind: "system", text: `${signatures.length} of 5 signed ${leading.title}.`, sourceIds: [leading.id] },

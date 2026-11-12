@@ -15,7 +15,8 @@
     "test:e2e": "playwright test --grep-invert \"record the 60-second\"",
     "eval": "tsx evals/run.ts",
     "talk:real": "tsx scripts/real-table-talk.ts",
-    "video": "playwright test tests/demo-video.spec.ts"
+    "video": "playwright test tests/demo-video.spec.ts",
+    "record": "tsx scripts/record.ts"
   },
   "dependencies": {
     "next": "^16.4.6",

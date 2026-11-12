@@ -1,0 +1,636 @@
+{
+ "name": "demo-party",
+ "recordedAt": "2026-11-12T10:23:04.844Z",
+ "origin": "mock",
+ "calls": {
+  "brief:dev": {
+   "value": {
+    "hardRules": [
+     {
+      "kind": "max_price",
+      "value": 40,
+      "sourceText": "spending up to 40"
+     }
+    ],
+    "preferenceTags": [
+     "music",
+     "new"
+    ]
+   },
+   "ms": 1,
+   "source": "mock"
+  },
+  "brief:ana": {
+   "value": {
+    "hardRules": [
+     {
+      "kind": "end_by",
+      "value": "00:00",
+      "sourceText": "home by midnight"
+     }
+    ],
+    "preferenceTags": [
+     "chill",
+     "outdoors"
+    ]
+   },
+   "ms": 1,
+   "source": "mock"
+  },
+  "brief:kai": {
+   "value": {
+    "hardRules": [],
+    "preferenceTags": [
+     "quiet",
+     "games",
+     "hands-on"
+    ]
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "brief:zoe": {
+   "value": {
+    "hardRules": [
+     {
+      "kind": "max_price",
+      "value": 25,
+      "sourceText": "budget around 25"
+     }
+    ],
+    "preferenceTags": [
+     "social",
+     "open"
+    ]
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "brief:maya": {
+   "value": {
+    "hardRules": [
+     {
+      "kind": "end_by",
+      "value": "23:00",
+      "sourceText": "out by eleven"
+     },
+     {
+      "kind": "max_price",
+      "value": 20,
+      "sourceText": "under twenty bucks"
+     },
+     {
+      "kind": "no_drink_minimum",
+      "value": true,
+      "sourceText": "nowhere I have to drink"
+     }
+    ],
+    "preferenceTags": [
+     "chill"
+    ]
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:ana|dev": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-dev-f4",
+     "sl-ana-f3"
+    ],
+    "sharedFactIds": [
+     "dev-f4",
+     "ana-f3"
+    ],
+    "bridgeId": null,
+    "askForA": "ana-f3",
+    "askForB": "dev-f4"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round1:dev": {
+   "value": {
+    "verdicts": [
+     {
+      "planId": "plan-evt-rooftop",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: music.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-night-market",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: music.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-clay",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: new.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-synth",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: music, new.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-supper",
+      "decision": "reject",
+      "privateReason": "Costs $45; limit is $40. You said \"spending up to 40\".",
+      "preference": 1
+     }
+    ],
+    "publicLine": {
+     "text": "Would love some live music.",
+     "sourceIds": [
+      "sl-dev-music"
+     ]
+    }
+   },
+   "ms": 1,
+   "source": "mock"
+  },
+  "table.round1:ana": {
+   "value": {
+    "verdicts": [
+     {
+      "planId": "plan-evt-rooftop",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 3
+     },
+     {
+      "planId": "plan-evt-night-market",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: chill, outdoors.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-clay",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 3
+     },
+     {
+      "planId": "plan-evt-synth",
+      "decision": "reject",
+      "privateReason": "Ends 1 AM; must end by 12 AM. You said \"home by midnight\".",
+      "preference": 1
+     },
+     {
+      "planId": "plan-evt-supper",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 3
+     }
+    ],
+    "publicLine": {
+     "text": "Up for something low-key.",
+     "sourceIds": [
+      "sl-ana-chill"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round1:kai": {
+   "value": {
+    "verdicts": [
+     {
+      "planId": "plan-evt-rooftop",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 3
+     },
+     {
+      "planId": "plan-evt-night-market",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 3
+     },
+     {
+      "planId": "plan-evt-clay",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: quiet, hands-on.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-synth",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 1
+     },
+     {
+      "planId": "plan-evt-supper",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 3
+     }
+    ],
+    "publicLine": {
+     "text": "Somewhere we can actually talk would be great.",
+     "sourceIds": [
+      "sl-kai-quiet"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round1:zoe": {
+   "value": {
+    "verdicts": [
+     {
+      "planId": "plan-evt-rooftop",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: social.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-night-market",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: social.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-clay",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 4
+     },
+     {
+      "planId": "plan-evt-synth",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 4
+     },
+     {
+      "planId": "plan-evt-supper",
+      "decision": "reject",
+      "privateReason": "Costs $45; limit is $25. You said \"budget around 25\".",
+      "preference": 1
+     }
+    ],
+    "publicLine": {
+     "text": "Mostly here to meet people.",
+     "sourceIds": [
+      "sl-zoe-social"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round1:maya": {
+   "value": {
+    "verdicts": [
+     {
+      "planId": "plan-evt-rooftop",
+      "decision": "reject",
+      "privateReason": "Has a drink minimum. You said \"nowhere I have to drink\".",
+      "preference": 1
+     },
+     {
+      "planId": "plan-evt-night-market",
+      "decision": "accept",
+      "privateReason": "Fits your rules and matches: chill.",
+      "preference": 5
+     },
+     {
+      "planId": "plan-evt-clay",
+      "decision": "accept",
+      "privateReason": "Fits your rules.",
+      "preference": 3
+     },
+     {
+      "planId": "plan-evt-synth",
+      "decision": "reject",
+      "privateReason": "Ends 1 AM; must end by 11 PM. You said \"out by eleven\".",
+      "preference": 1
+     },
+     {
+      "planId": "plan-evt-supper",
+      "decision": "reject",
+      "privateReason": "Costs $45; limit is $20. You said \"under twenty bucks\".",
+      "preference": 1
+     }
+    ],
+    "publicLine": {
+     "text": "Up for something low-key.",
+     "sourceIds": [
+      "sl-maya-chill"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:dev|kai": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-dev-f2",
+     "sl-kai-f3"
+    ],
+    "sharedFactIds": [
+     "dev-f2",
+     "kai-f3"
+    ],
+    "bridgeId": "br-dev-kai-f-theo",
+    "askForA": "kai-f3",
+    "askForB": "dev-f2"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:dev|zoe": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-dev-f1",
+     "sl-zoe-f4"
+    ],
+    "sharedFactIds": [
+     "dev-f1",
+     "zoe-f4"
+    ],
+    "bridgeId": null,
+    "askForA": "zoe-f4",
+    "askForB": "dev-f1"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:dev|maya": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-dev-f4",
+     "sl-maya-f3"
+    ],
+    "sharedFactIds": [
+     "dev-f4",
+     "maya-f3"
+    ],
+    "bridgeId": "br-dev-maya-f-priya",
+    "askForA": "maya-f3",
+    "askForB": "dev-f4"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:ana|kai": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-ana-f1",
+     "sl-kai-f1"
+    ],
+    "sharedFactIds": [
+     "ana-f1",
+     "kai-f1"
+    ],
+    "bridgeId": "br-ana-kai-g-grp-bouldering",
+    "askForA": "kai-f1",
+    "askForB": "ana-f1"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:ana|zoe": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-ana-f2",
+     "sl-zoe-f2"
+    ],
+    "sharedFactIds": [
+     "ana-f2",
+     "zoe-f2"
+    ],
+    "bridgeId": "br-ana-zoe-f-sam",
+    "askForA": "zoe-f2",
+    "askForB": "ana-f2"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:ana|maya": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-ana-f1",
+     "sl-maya-f2"
+    ],
+    "sharedFactIds": [
+     "ana-f1",
+     "maya-f2"
+    ],
+    "bridgeId": null,
+    "askForA": "maya-f2",
+    "askForB": "ana-f1"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:kai|zoe": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-kai-f4",
+     "sl-zoe-f3"
+    ],
+    "sharedFactIds": [
+     "kai-f4",
+     "zoe-f3"
+    ],
+    "bridgeId": null,
+    "askForA": "zoe-f3",
+    "askForB": "kai-f4"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:kai|maya": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-kai-f1",
+     "sl-maya-f2"
+    ],
+    "sharedFactIds": [
+     "kai-f1",
+     "maya-f2"
+    ],
+    "bridgeId": null,
+    "askForA": "maya-f2",
+    "askForB": "kai-f1"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "pair:maya|zoe": {
+   "value": {
+    "exchangeLineIds": [
+     "sl-zoe-f4",
+     "sl-maya-f1"
+    ],
+    "sharedFactIds": [
+     "zoe-f4",
+     "maya-f1"
+    ],
+    "bridgeId": "br-maya-zoe-g-grp-portuguese",
+    "askForA": "maya-f1",
+    "askForB": "zoe-f4"
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round2:dev": {
+   "value": {
+    "decision": "sign",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market fits your rules and you rated it 5/5.",
+    "publicLine": {
+     "text": "I'm in.",
+     "sourceIds": [
+      "neutral-in"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round2:ana": {
+   "value": {
+    "decision": "sign",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market fits your rules and you rated it 5/5.",
+    "publicLine": {
+     "text": "I'm in.",
+     "sourceIds": [
+      "neutral-in"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round2:kai": {
+   "value": {
+    "decision": "hold",
+    "planId": "plan-evt-clay",
+    "privateReason": "You'd rather do Open Studio: Clay and Tea (5/5) than Dolores Night Market (3/5). Holding one round.",
+    "publicLine": {
+     "text": "Still thinking, give me a round.",
+     "sourceIds": [
+      "neutral-thinking"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round2:zoe": {
+   "value": {
+    "decision": "sign",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market fits your rules and you rated it 5/5.",
+    "publicLine": {
+     "text": "I'm in.",
+     "sourceIds": [
+      "neutral-in"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round2:maya": {
+   "value": {
+    "decision": "sign",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market fits your rules and you rated it 5/5.",
+    "publicLine": {
+     "text": "I'm in.",
+     "sourceIds": [
+      "neutral-in"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round3:dev": {
+   "value": {
+    "decision": "sign",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market fits your rules and you rated it 5/5.",
+    "publicLine": {
+     "text": "I'm in.",
+     "sourceIds": [
+      "neutral-in"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round3:ana": {
+   "value": {
+    "decision": "sign",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market fits your rules and you rated it 5/5.",
+    "publicLine": {
+     "text": "I'm in.",
+     "sourceIds": [
+      "neutral-in"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round3:kai": {
+   "value": {
+    "decision": "concede",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market isn't your first pick, but it fits all your rules and the group wants it.",
+    "publicLine": {
+     "text": "Happy to go with the group.",
+     "sourceIds": [
+      "neutral-group"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round3:zoe": {
+   "value": {
+    "decision": "sign",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market fits your rules and you rated it 5/5.",
+    "publicLine": {
+     "text": "I'm in.",
+     "sourceIds": [
+      "neutral-in"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  },
+  "table.round3:maya": {
+   "value": {
+    "decision": "sign",
+    "planId": "plan-evt-night-market",
+    "privateReason": "Dolores Night Market fits your rules and you rated it 5/5.",
+    "publicLine": {
+     "text": "I'm in.",
+     "sourceIds": [
+      "neutral-in"
+     ]
+    }
+   },
+   "ms": 0,
+   "source": "mock"
+  }
+ }
+}

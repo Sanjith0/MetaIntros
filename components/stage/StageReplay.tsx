@@ -23,6 +23,26 @@ const TONE: Record<string, string> = {
 
 const SPEEDS = [1, 2, 4] as const;
 
+const fmtMs = (ms: number) => (ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ms}ms`);
+
+/** Where an agent's answer came from, and how long it took. */
+function SourceChip({ meta }: { meta: Trace["meta"] }) {
+  if (!meta?.source) return null;
+  const ms = typeof meta.ms === "number" ? fmtMs(meta.ms) : "";
+  const look: Record<string, string> = {
+    model: "bg-emerald-400/20 text-emerald-200",
+    mock: "bg-white/10 text-white/60",
+    fallback: "bg-amber-400 text-black",
+    recorded: "bg-sky-400/25 text-sky-200",
+  };
+  const label = meta.source === "fallback" ? `Fallback · ${meta.note ?? "model unavailable"}` : meta.source === "recorded" ? `Recorded · ${ms}` : `${meta.source} · ${ms}`;
+  return (
+    <span data-testid="source-chip" data-source={meta.source} className={`rounded px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${look[meta.source] ?? ""}`} title={meta.note}>
+      {label}
+    </span>
+  );
+}
+
 /** Colour each body line: rejections red, accepts green. */
 function Body({ text }: { text: string }) {
   return (
@@ -71,7 +91,8 @@ export function StageReplay({ initial }: { initial: StageView }) {
     const es = new EventSource("/api/stream?stage=1");
     es.addEventListener("trace", async (msg) => {
       const t = JSON.parse((msg as MessageEvent).data) as Trace;
-      if (t.partyId !== partyRef.current) {
+      // A new party (or the same id after a demo reset) starts a fresh board.
+      if (t.partyId !== partyRef.current || t.meta?.kind === "formed") {
         partyRef.current = t.partyId;
         const fresh = (await (await fetch(`/api/stage?party=${t.partyId}`)).json()) as StageView;
         fresh.plans ??= [];
@@ -108,6 +129,17 @@ export function StageReplay({ initial }: { initial: StageView }) {
     await fetch("/api/demo/start", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ mode: "all" }) });
   }, []);
 
+  // Per-agent latency, from the agents' own turns so far.
+  const latency = useMemo(() => {
+    const m: Record<string, { round: number; ms: number; source: string; note?: string }[]> = {};
+    for (const t of visible) {
+      if (t.meta?.kind !== "verdicts" || !t.actorId || typeof t.meta.ms !== "number") continue;
+      (m[t.actorId] ??= []).push({ round: t.meta.round ?? 0, ms: t.meta.ms, source: t.meta.source ?? "mock", note: t.meta.note });
+    }
+    return m;
+  }, [visible]);
+  const recorded = view.traces.find((t) => t.meta?.source === "recorded" && t.meta.note) ?? view.traces.find((t) => t.meta?.source === "recorded");
+
   const status = board.locked ? "Locked" : board.round >= 1 ? `Round ${board.round}` : total ? "Forming" : "Waiting";
   const planTitle = (id: string | null) => view.plans.find((p) => p.id === id)?.title ?? "";
 
@@ -122,6 +154,7 @@ export function StageReplay({ initial }: { initial: StageView }) {
             <span className={`rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${tone}`}>{label}</span>
             {(t.tone === "reject" || t.tone === "block") && <span className="rounded bg-red-500/80 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">{t.tone === "block" ? "Blocked" : "Rejected"}</span>}
             <span className="text-[15px] font-semibold text-white">{t.title}</span>
+            <SourceChip meta={t.meta} />
           </div>
           <Body text={t.body} />
         </div>
@@ -136,6 +169,11 @@ export function StageReplay({ initial }: { initial: StageView }) {
           <div className="text-[12px] font-semibold uppercase tracking-[0.18em] text-violet-300">Party Queue · Stage</div>
           <div className="text-[19px] font-bold sm:text-[22px]">Five agents settle one night out</div>
         </div>
+        {recorded && (
+          <span data-testid="recorded-banner" className="rounded-full bg-sky-400/20 px-3 py-1 text-[12px] font-bold uppercase tracking-wide text-sky-200" title={recorded.meta?.note}>
+            Recorded replay · {recorded.meta?.note ?? "from a saved run"}
+          </span>
+        )}
         <span data-testid="stage-status" className={`rounded-full px-3 py-1 text-[13px] font-semibold ${board.locked ? "bg-emerald-400/20 text-emerald-300" : "bg-white/10 text-white/80"}`}>
           {status}
         </span>
@@ -237,6 +275,26 @@ export function StageReplay({ initial }: { initial: StageView }) {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {Object.keys(latency).length > 0 && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-2 sm:px-6" data-testid="latency-strip">
+          <span className="text-[12px] font-semibold uppercase tracking-wide text-white/50">Agent latency</span>
+          {view.members.map((m) => (
+            <span key={m.id} className="flex items-center gap-1.5 text-[12px]" data-testid={`latency-${m.id}`}>
+              <span className="font-semibold text-white/80">{m.firstName}</span>
+              {(latency[m.id] ?? []).map((c) => (
+                <span
+                  key={c.round}
+                  title={c.note}
+                  className={`rounded px-1 font-mono tabular-nums ${c.source === "fallback" ? "bg-amber-400 font-bold text-black" : c.source === "recorded" ? "bg-sky-400/20 text-sky-200" : c.source === "model" ? "bg-emerald-400/20 text-emerald-200" : "bg-white/10 text-white/60"}`}
+                >
+                  r{c.round} {c.source === "fallback" ? "timeout" : fmtMs(c.ms)}
+                </span>
+              ))}
+            </span>
+          ))}
         </div>
       )}
 

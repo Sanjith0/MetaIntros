@@ -195,6 +195,11 @@ export default async function PartyPage() {
                     ))}
                   </ul>
                   {v.receipt.blockedLines > 0 && <div className="mt-2 text-[12px] text-[var(--color-ink-2)]">The verifier replaced {v.receipt.blockedLines} line with a neutral phrase.</div>}
+                  {(v.receipt.fallbackRounds ?? []).length > 0 && (
+                    <div className="mt-2 rounded-[6px] bg-[#fff4e0] px-2 py-1.5 text-[12px] text-[#7a4b00]" data-testid="receipt-fallback">
+                      In round {v.receipt.fallbackRounds.join(" and ")} your agent didn't answer in time, so the rule-based fallback answered for it, using the same rules.
+                    </div>
+                  )}
                 </>
               )}
             </>

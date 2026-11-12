@@ -76,7 +76,7 @@ describe("model client", () => {
     realMode();
     reply = () => {}; // never answers
     const r = await callModel({ ...base, timeoutMs: 150 });
-    expect(r).toMatchObject({ value: { answer: 2 }, source: "fallback", note: "timeout" });
+    expect(r).toMatchObject({ value: { answer: 2 }, source: "fallback", note: "timeout after 150 ms" });
   });
 
   it("falls back on HTTP errors", async () => {

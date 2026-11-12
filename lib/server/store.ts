@@ -52,6 +52,8 @@ export interface Store {
   mutuals: MutualPair[];
   /** When each phone showed MATCH FOUND (server clock). */
   acks: { userId: string; partyId: string; shownAt: number; lagMs: number; sound: string; vibrate: string }[];
+  /** Every agent turn's source and latency (for receipts and the stage). */
+  agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
   seq: number;
   idSeq: number;
@@ -85,6 +87,7 @@ function fresh(): Store {
     picks: [],
     mutuals: [],
     acks: [],
+    agentCalls: [],
     events_log: [],
     seq: 0,
     idSeq: 0,

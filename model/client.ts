@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { z } from "zod";
+import { callKey, capture, loadRecording } from "./recording";
+import { modelSettings, simulatedDelay } from "./settings";
 
 /**
  * One client for the Meta Model API (OpenAI-compatible chat completions).
@@ -14,7 +16,7 @@ import type { z } from "zod";
  */
 
 export type ModelRole = "spark" | "ember";
-export type ModelSource = "model" | "mock" | "fallback";
+export type ModelSource = "model" | "mock" | "fallback" | "recorded";
 
 export interface ModelResult<T> {
   value: T;
@@ -35,6 +37,8 @@ export interface CallOptions<T> {
   /** Used when the real call fails, times out, is over the cap, or returns invalid JSON. */
   fallback: () => T;
   timeoutMs?: number;
+  /** Which agent (owner id, or a pair key) is calling. Keys recordings, timeouts and latency labels. */
+  agent?: string;
 }
 
 export function modelConfig() {
@@ -122,28 +126,61 @@ async function postChat(cfg: ReturnType<typeof modelConfig>, model: string, syst
 
 /* -------------------------------- call -------------------------------- */
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export async function callModel<T>(opts: CallOptions<T>): Promise<ModelResult<T>> {
+  const result = await callModelInner(opts);
+  if (modelSettings().record && result.source !== "recorded") {
+    capture(callKey(opts.task, opts.agent), { value: result.value, ms: result.ms, source: result.source });
+  }
+  return result;
+}
+
+async function callModelInner<T>(opts: CallOptions<T>): Promise<ModelResult<T>> {
   const t0 = Date.now();
   const cfg = modelConfig();
+  const st = modelSettings();
+  const key = callKey(opts.task, opts.agent);
+  const timeoutMs = opts.timeoutMs ?? (opts.agent ? st.agentTimeoutMs : 15_000);
 
   const safe = (fn: () => T, source: ModelSource, note?: string): ModelResult<T> => {
     const value = opts.schema.parse(fn());
     return { value, source, ms: Date.now() - t0, note };
   };
 
-  if (cfg.mock) return safe(opts.mock, "mock");
+  // A recorded run replays exactly, labelled as recorded.
+  if (st.source === "recorded") {
+    const rec = loadRecording();
+    const hit = rec?.calls[key];
+    const parsed = hit ? opts.schema.safeParse(hit.value) : null;
+    if (rec && hit && parsed?.success) {
+      if (st.simulateLatency) await sleep(Math.min(hit.ms, 2000));
+      return { value: parsed.data, source: "recorded", ms: hit.ms, note: `recorded from the ${rec.origin} model, ${rec.recordedAt.slice(0, 16).replace("T", " ")} UTC` };
+    }
+  }
+
+  if (cfg.mock) {
+    // Optional: behave like a network call, including one agent that times out.
+    const forced = !!opts.agent && st.timeoutAgent === opts.agent;
+    if (st.simulateLatency || forced) {
+      const delay = forced ? timeoutMs + 1 : Math.round(simulatedDelay(key) * st.latencyScale);
+      await sleep(Math.min(delay, timeoutMs));
+      if (delay > timeoutMs) return safe(opts.fallback, "fallback", `timeout after ${timeoutMs} ms`);
+    }
+    return safe(opts.mock, "mock");
+  }
   if (!cfg.hasKey) return safe(opts.fallback, "fallback", "no key");
   if (readCount() >= cfg.cap) return safe(opts.fallback, "fallback", "call cap reached");
 
   const model = opts.role === "spark" ? cfg.spark : cfg.ember;
   try {
     bumpCount();
-    const content = await postChat(cfg, model, opts.system, opts.user, opts.timeoutMs ?? 15_000);
+    const content = await postChat(cfg, model, opts.system, opts.user, timeoutMs);
     const parsed = opts.schema.safeParse(extractJson(content));
     if (!parsed.success) return safe(opts.fallback, "fallback", `invalid JSON for ${opts.task}`);
     return { value: parsed.data, source: "model", ms: Date.now() - t0 };
   } catch (err) {
-    const note = err instanceof Error && err.name === "AbortError" ? "timeout" : `error: ${(err as Error).message}`;
+    const note = err instanceof Error && err.name === "AbortError" ? `timeout after ${timeoutMs} ms` : `error: ${(err as Error).message}`;
     return safe(opts.fallback, "fallback", note);
   }
 }

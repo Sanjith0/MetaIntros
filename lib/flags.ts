@@ -11,6 +11,8 @@ const DEFAULTS = {
   SECRET_PANEL: true,
   /** F3: real phones on the local network: QR join links, presence, server-clock acks, vibration. */
   REAL_PHONES: true,
+  /** F4: verdicts streamed as each agent returns, per-agent latency, labelled fallbacks and recorded replays. */
+  MODEL_READINESS: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

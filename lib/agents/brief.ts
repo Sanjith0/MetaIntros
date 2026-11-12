@@ -219,6 +219,7 @@ export async function buildBrief(
   const res = await callModel<ModelBrief>({
     role: "ember",
     task: "brief",
+    agent: ownerId,
     system: SYSTEM,
     user: sentence,
     schema: ModelBrief,

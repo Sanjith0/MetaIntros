@@ -274,6 +274,8 @@ export const Receipt = z.object({
   rejected: z.array(z.object({ planId: Id, title: z.string(), reason: z.string(), byCode: z.boolean() })),
   toldParty: z.array(z.object({ round: z.number().int(), text: z.string(), sourceIds: z.array(Id) })),
   blockedLines: z.number().int().min(0),
+  /** Rounds where this owner's agent did not answer in time and the rule-based fallback answered. */
+  fallbackRounds: z.array(z.number().int()).default([]),
   sharedFactIds: z.array(Id),
   finalPlanId: Id.nullable(),
 });
@@ -360,8 +362,10 @@ export const Trace = z.object({
       planId: z.string().optional(),
       decision: z.enum(["accept", "reject", "concede", "hold", "sign"]).optional(),
       kind: z.enum(["open", "verdicts", "unavailable", "leading", "tally", "locked", "line", "pair", "formed"]).optional(),
-      source: z.enum(["model", "mock", "fallback"]).optional(),
+      source: z.enum(["model", "mock", "fallback", "recorded"]).optional(),
       ms: z.number().optional(),
+      /** Why a fallback answered (for example "timeout after 2500 ms"), or where a replay came from. */
+      note: z.string().optional(),
     })
     .optional(),
 });

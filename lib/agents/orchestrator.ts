@@ -134,6 +134,7 @@ export function receiptFor(party: Party, ownerId: string, pairs: PairResult[]): 
     rejected: r1.filter((v) => v.decision === "reject").map((v) => ({ planId: v.planId, title: title(v.planId), reason: v.privateReason, byCode: v.overriddenByCode })),
     toldParty: told.map((t) => ({ round: t.round, text: t.text, sourceIds: t.sourceIds })),
     blockedLines: s.blockedLines.filter((b) => b.partyId === party.id && b.ownerId === ownerId).length,
+    fallbackRounds: [...new Set(s.agentCalls.filter((c) => c.partyId === party.id && c.ownerId === ownerId && c.source === "fallback").map((c) => c.round))],
     sharedFactIds: [...new Set(shared)],
     finalPlanId: party.planId,
   };

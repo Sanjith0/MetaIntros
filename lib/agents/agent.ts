@@ -193,6 +193,7 @@ export async function round1Turn(ctx: TurnContext): Promise<TurnResult<Round1Out
   const r = await callModel({
     role: "spark",
     task: "table.round1",
+    agent: ctx.brief.ownerId,
     system: SYSTEM,
     user: promptFor(ctx),
     schema: Round1Out,
@@ -209,6 +210,7 @@ export async function laterTurn(ctx: TurnContext): Promise<TurnResult<LaterOut>>
   const r = await callModel({
     role: "spark",
     task: `table.round${ctx.round}`,
+    agent: ctx.brief.ownerId,
     system: SYSTEM,
     user: promptFor(ctx),
     schema: LaterOut,
