@@ -1,3 +1,5 @@
+import { flag } from "@/lib/flags";
+import { LABEL } from "./memory";
 import { store } from "./store";
 
 /**
@@ -29,6 +31,11 @@ export function agentStory(partyId: string, ownerId: string): StoryStep[] | null
     parts.push(turned ? `Turned down ${turned} that ${turned === 1 ? "breaks" : "break"} your rules.` : "None broke your rules.");
     if (liked) parts.push(`Liked ${title(liked.planId)} most (${liked.preference}/5).`);
     steps.push({ round: 1, text: parts.join(" "), tone: "agent" });
+    // F56: when it used what it remembers (F39), say so.
+    const remembered = flag("STORY_MEMORY") ? (s.briefs.get(`brief-${ownerId}`)?.preferences ?? []).filter((p) => p.sourceText.startsWith("remembered from")) : [];
+    if (remembered.length) {
+      steps.push({ round: 1, text: `It used what it remembers about you: ${remembered.map((p) => LABEL[p.tag] ?? p.tag).join(", ")} (${remembered[0]!.sourceText}).`, tone: "agent" });
+    }
     const over = r1.filter((v) => v.overriddenByCode).length;
     if (over) steps.push({ round: 1, text: `Code overrode your agent ${over === 1 ? "once" : `${over} times`}: it said yes to ${over === 1 ? "a plan" : "plans"} that ${over === 1 ? "breaks" : "break"} your rules.`, tone: "code" });
   }

@@ -116,6 +116,8 @@ const DEFAULTS = {
   PLAN_B_SWITCH: true,
   /** F55: on an Event page, how many Party Queue parties are coming and how many people are already there. Whole parties only. */
   EVENT_IMPACT: true,
+  /** F56: your agent's story says when it used what it remembers about you. */
+  STORY_MEMORY: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -64,3 +64,24 @@ describe("how your agent did it (F31)", () => {
     expect(texts(failed, "maya").at(-1)).toBe("L|No plan fit all five. Nobody was told why.");
   });
 });
+
+describe("the story says when your agent used what it remembers (F56)", () => {
+  it("is on by default, and after a night remembered as too loud, the next story says it used 'prefers quiet'", async () => {
+    const { flag: f } = await import("@/lib/flags");
+    const { remember } = await import("@/lib/server/memory");
+    expect(f("STORY_MEMORY")).toBe(true);
+    process.env.PQ_PACE_MS = "0";
+    const first = await locked();
+    remember(first, "maya", "loud", ["quiet"]);
+    const memory = store().memory.get("maya")!;
+    resetStore();
+    store().memory.set("maya", memory); // the next night (locked() would reset the store)
+    for (const id of FIVE) await joinQueue({ userId: id, eventId: D.entryEventId, sentence: D.sentences[id]!, consentBridges: true, startTalk: false });
+    const pid = [...store().parties.keys()][0]!;
+    await runParty(pid, { paceMs: 0 });
+    const story = agentStory(pid, "maya")!.map((x) => x.text);
+    expect(story).toContain("It used what it remembers about you: prefers quiet (remembered from Dolores Night Market).");
+    // Nobody else's story mentions it.
+    for (const id of ["dev", "ana", "kai", "zoe"]) expect(JSON.stringify(agentStory(pid, id))).not.toContain("remembers");
+  });
+});

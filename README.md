@@ -164,6 +164,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `PLAN_B` | plan B: at the lock, code also names the next-best plan that fits everyone and nobody turned down, on the party card and pinned in the chat |
 | `PLAN_B_SWITCH` | **Switch to plan B** on the party card: when three of the five ask, code moves the plan, the RSVPs, the chat's pin and title; the chat shows only how many asked |
 | `EVENT_IMPACT` | on the Event page a party picked: "Party Queue: 1 party of five is coming tonight · 1 already here", whole parties only |
+| `STORY_MEMORY` | your agent's story says when it used what it remembers ("It used what it remembers about you: prefers quiet (remembered from Dolores Night Market).") |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -210,7 +211,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 263 unit tests (vitest)
+npm test                       # 264 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests
