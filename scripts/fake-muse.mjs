@@ -21,6 +21,18 @@ http
       });
     } else if (u.includes("timeWindow")) {
       out = "```json\n" + JSON.stringify({ venueId: "v-bluebonnet", time: "18:30", reasons: ["Quiet tables for six", "Everyone's budget", "6 min walk"] }) + "\n```";
+    } else if (u.includes("predicted conversational chemistry")) {
+      const { a, b } = JSON.parse(u);
+      out = JSON.stringify({
+        turns: [
+          { speaker: "a", text: `${a.name} loves ${a.likes[0]}.` },
+          { speaker: "b", text: `${b.name} too, and ${b.likes[1]}.` },
+          { speaker: "a", text: "Sounds like a match." },
+        ],
+        summary: `Ask ${b.name} about ${b.likes[0]}.`,
+        topics: [b.likes[0], "Underwater basket weaving"],
+        spark: 4,
+      });
     } else if (u.includes("allowedEvidence")) {
       const ev = JSON.parse(u).allowedEvidence;
       out = JSON.stringify({ hooks: [...ev.slice(0, 2).map((e) => ({ text: `AI hook about ${e}`, evidence: e })), { text: "made up", evidence: "likes:Nonexistent" }], opener: "AI opener!" });

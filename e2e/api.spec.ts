@@ -140,3 +140,18 @@ test.describe("API flows (mock AI)", () => {
     expect((await request.get("/api/crew/nope")).status()).toBe(404);
   });
 });
+
+test("agent pre-chat: one grounded transcript per crewmate", async ({ request }) => {
+  const { crew } = await formCrew(request, filters());
+  const chats = (await (await request.get(`/api/crew/${crew!.id}/prechat?userId=${ME}`)).json()) as {
+    bId: string; turns: { speaker: string }[]; topics: string[]; spark: number; summary: string;
+  }[];
+  expect(chats).toHaveLength(5);
+  for (const c of chats) {
+    expect(c.turns.length).toBeGreaterThanOrEqual(3);
+    expect(c.turns[0].speaker).toBe("a");
+    expect(c.spark).toBeGreaterThanOrEqual(1);
+    expect(c.spark).toBeLessThanOrEqual(5);
+    expect(c.summary.length).toBeGreaterThan(5);
+  }
+});

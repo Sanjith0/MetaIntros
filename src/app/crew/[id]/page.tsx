@@ -8,6 +8,7 @@ import { useCrew } from "@/lib/useCrew";
 import type { CrewView } from "@/lib/types";
 import { Avatar, Button, Card, MuseMark, TopBar } from "@/components/ui";
 import { MiniMap } from "@/components/MiniMap";
+import { PreChatCard } from "@/components/PreChatCard";
 
 export default function CrewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -61,6 +62,8 @@ export default function CrewPage({ params }: { params: Promise<{ id: string }> }
             })}
           </ul>
         </Card>
+
+        <PreChatCard crewId={crew.id} reveal={reveal} />
 
         <Card>
           <div className="flex items-center gap-1.5 text-[13px] font-semibold text-muse"><MuseMark /> Meetup picked for all {crew.memberIds.length}</div>

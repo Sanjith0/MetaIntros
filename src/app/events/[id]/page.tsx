@@ -23,9 +23,9 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         <h1 className="font-bold text-2xl leading-tight mt-1">{e.title}</h1>
         <div className="text-sub mt-1">{e.venueName}</div>
         <div className="flex gap-2 mt-3">
-          <button className="flex-1 h-9 rounded-md bg-fb text-white font-semibold flex items-center justify-center gap-1.5"><Star size={17} fill="#fff" /> Interested</button>
-          <button className="flex-1 h-9 rounded-md bg-[#e4e6eb] font-semibold flex items-center justify-center gap-1.5"><CircleCheck size={17} /> Going</button>
-          <button className="flex-1 h-9 rounded-md bg-[#e4e6eb] font-semibold flex items-center justify-center gap-1.5"><Mail size={17} /> Invite</button>
+          <button className="flex-[1.3] h-9 rounded-md bg-fb text-white font-semibold text-[14px] flex items-center justify-center gap-1"><Star size={16} fill="#fff" /> Interested</button>
+          <button className="flex-1 h-9 rounded-md bg-[#e4e6eb] font-semibold text-[14px] flex items-center justify-center gap-1"><CircleCheck size={16} /> Going</button>
+          <button className="flex-1 h-9 rounded-md bg-[#e4e6eb] font-semibold text-[14px] flex items-center justify-center gap-1"><Mail size={16} /> Invite</button>
           <button className="w-11 h-9 rounded-md bg-[#e4e6eb] grid place-items-center" aria-label="More"><MoreHorizontal size={18} /></button>
         </div>
       </div>

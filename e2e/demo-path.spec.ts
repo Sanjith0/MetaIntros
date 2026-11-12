@@ -30,6 +30,8 @@ test("Maya goes from an event page to meeting her crew", async ({ page, request 
   await page.getByTestId("accept-crew").click();
   await expect(page.getByTestId("revealed")).toBeVisible();
   await expect(page.getByTestId("accept-count")).toHaveText("6/6 in");
+  await page.getByTestId("prechat-priya").click();
+  await expect(page.getByTestId("prechat-transcript")).toContainText("Maya's agent");
 
   // 5. Crew chat opens with the assistant's plan
   await page.getByTestId("open-chat").click();

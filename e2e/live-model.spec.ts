@@ -34,3 +34,13 @@ test.describe("model path (fake Muse)", () => {
     await expect(page.getByTestId("ai-mode")).toHaveText("Muse live");
   });
 });
+
+test("pre-chat keeps grounded topics and drops invented ones", async ({ request }) => {
+  const { crew } = await formCrew(request, filters({ womenOnly: true }));
+  const chats = (await (await request.get(`/api/crew/${crew!.id}/prechat?userId=${ME}`)).json()) as { ai: boolean; topics: string[]; spark: number }[];
+  for (const c of chats) {
+    expect(c.ai).toBe(true);
+    expect(c.topics).not.toContain("Underwater basket weaving");
+    expect(c.spark).toBe(4);
+  }
+});
