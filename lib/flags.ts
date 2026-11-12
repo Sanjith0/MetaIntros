@@ -70,6 +70,8 @@ const DEFAULTS = {
   AGENT_STORY: true,
   /** F32: "Why this?" in the group chat too, under each suggested opener and the pinned plan. */
   CHAT_WHY: true,
+  /** F33: a big caption on /stage saying what just happened, in plain words, for the back of the room. */
+  STAGE_CAPTIONS: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -122,6 +122,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `SCALE_TEST` | **At fair scale** on `/evals`: 50, 100 or 200 fictional guests through the real loop in a sandbox; parties, timing, lock-to-MATCH FOUND, invalid plans, leaks, real calls |
 | `AGENT_STORY` | "How your agent did it" in your receipt: your own agent's moves round by round (turned down, held out, agreed, signed) and where code stepped in |
 | `CHAT_WHY` | **Why this?** in the group chat too: under the pinned plan and each suggested opener |
+| `STAGE_CAPTIONS` | a big caption on `/stage` saying what just happened in plain words ("Kai's agent is holding out for Open Studio: Clay and Tea."); follows the scrubber; never quotes anyone's private words |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -167,7 +168,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 196 unit tests (vitest)
+npm test                       # 200 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

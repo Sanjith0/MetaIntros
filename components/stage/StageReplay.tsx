@@ -6,6 +6,7 @@ import { Avatar } from "@/components/Avatar";
 import { LeakTest } from "@/components/stage/LeakTest";
 import { WhatIf } from "@/components/stage/WhatIf";
 import { boardAt, replayDelay } from "@/lib/stage/board";
+import { captionAt } from "@/lib/stage/captions";
 import type { StageView } from "@/lib/server/views";
 
 const CONVO: Record<Trace["conversation"], [string, string]> = {
@@ -93,7 +94,19 @@ function Body({ text }: { text: string }) {
  * The projector, with a scrubber. Every position on the scrubber rebuilds
  * the board (plans, signatures, the lock) from the trace up to that point.
  */
-export function StageReplay({ initial, leakTest = false, whatIf = false, pinned: pinnedAtLoad = null }: { initial: StageView; leakTest?: boolean; whatIf?: boolean; pinned?: string | null }) {
+export function StageReplay({
+  initial,
+  leakTest = false,
+  whatIf = false,
+  pinned: pinnedAtLoad = null,
+  captions = false,
+}: {
+  initial: StageView;
+  leakTest?: boolean;
+  whatIf?: boolean;
+  pinned?: string | null;
+  captions?: boolean;
+}) {
   const [prompt, setPrompt] = useState<PromptView | null>(null);
   const openPrompt = async (t: Trace) => {
     if (!t.actorId || !t.meta?.round) return;
@@ -219,6 +232,7 @@ export function StageReplay({ initial, leakTest = false, whatIf = false, pinned:
   const recorded = view.traces.find((t) => t.meta?.source === "recorded" && t.meta.note) ?? view.traces.find((t) => t.meta?.source === "recorded");
 
   const noMatch = visible.some((t) => t.meta?.kind === "nomatch");
+  const caption = captions ? captionAt(view.traces, pos, (id) => members[id]?.firstName ?? id, (id) => view.plans.find((p) => p.id === id)?.title) : null;
   const rogue = view.traces.some((t) => t.meta?.kind === "rogue");
   const status = board.locked ? "Locked" : noMatch ? "No match" : board.round >= 1 ? `Round ${board.round}` : total ? "Forming" : "Waiting";
   const planTitle = (id: string | null) => view.plans.find((p) => p.id === id)?.title ?? "";
@@ -325,6 +339,16 @@ export function StageReplay({ initial, leakTest = false, whatIf = false, pinned:
           <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
         </div>
       </header>
+      {captions && (
+        <div
+          aria-live="polite"
+          data-testid="stage-caption"
+          data-tone={caption?.tone ?? "none"}
+          className={`border-b border-white/10 px-4 py-2.5 text-[18px] font-semibold leading-snug sm:px-6 sm:text-[22px] ${caption?.tone === "alert" ? "bg-red-500/15 text-red-100" : caption?.tone === "code" ? "bg-sky-400/10 text-sky-100" : "bg-violet-500/10 text-violet-100"}`}
+        >
+          {caption?.text ?? "Waiting for the first move."}
+        </div>
+      )}
 
       {/* Scrubber */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-white/10 px-4 py-2.5 sm:flex-nowrap sm:px-6" data-testid="scrubber-bar">
