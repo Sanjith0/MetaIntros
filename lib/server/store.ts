@@ -66,6 +66,8 @@ export interface Store {
   nothingFits: Map<string, string[]>;
   /** People who asked to forget their private data from a party: `${partyId}:${userId}`. */
   forgotten: Set<string>;
+  /** F37: per party, who said they're running late (minutes) and where to meet. */
+  door: Map<string, { late: Record<string, number>; meet: { text: string; by: string } | null }>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -112,6 +114,7 @@ function fresh(): Store {
     avoidSets: new Set(),
     nothingFits: new Map(),
     forgotten: new Set(),
+    door: new Map(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

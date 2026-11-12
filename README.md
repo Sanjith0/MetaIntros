@@ -127,6 +127,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `EDIT_SENTENCE` | change your sentence while you wait in the queue: a new private preview, the brief rebuilt, and you keep your place in line |
 | `RUN_OF_SHOW` | **Run of show** on `/demo`: nine timed beats to 5:00, the line to say, where to show it, one-click setup; a clock highlights the current beat and says when you're over |
 | `TELL_A_FRIEND` | "Tell a friend where you'll be" on `/party`: a message for someone outside the app with the place, the time and when you'll check in; names nobody; copy or share, nothing is sent |
+| `FIND_EACH_OTHER` | "Find each other" on `/door`: running late (10, 20 or 30 min) and where we meet, live on everyone's door screen and in the chat; arriving clears "late" |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -172,7 +173,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 210 unit tests (vitest)
+npm test                       # 213 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

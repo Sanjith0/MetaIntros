@@ -4,6 +4,7 @@ import { publish } from "./bus";
 import { nextId, nowIso, profile, store } from "./store";
 import { postMessage } from "./social";
 import { flag } from "@/lib/flags";
+import { clearLate } from "./meet";
 
 function lockedParty(partyId: string, viewerId: string) {
   const party = store().parties.get(partyId);
@@ -18,6 +19,7 @@ export function arrive(partyId: string, userId: string) {
   const s = store();
   if (!s.arrivals.has(partyId)) s.arrivals.set(partyId, new Set());
   s.arrivals.get(partyId)!.add(userId);
+  clearLate(partyId, userId);
   publish("member.arrived", { partyId, userId, at: nowIso() }, party.memberIds, { stage: true });
   // An "I'm here" ping in the party chat: a fact this person just created by tapping.
   if (flag("CHAT_LIFECYCLE") && party.chatId && s.chats.has(party.chatId)) {

@@ -55,6 +55,7 @@ export const SAMPLE_PAYLOADS: { [T in EventType]: PayloadOf<T> } = {
   },
   "chat.message": { id: "m-1", chatId: "chat-p-1", senderId: "maya", kind: "user", text: "See you all there", sourceIds: [], at },
   "member.arrived": { partyId: "p-1", userId: "maya", at },
+  "door.update": { partyId: "p-1", userId: "dev", lateMinutes: 10, meetSpot: null },
   "member.spotted": { frameId: "frame-0001", viewerId: "maya", partyId: "p-1", subjectId: "dev", method: "stub", at },
   "runitback.mutual": { partyId: "p-1", a: "dev", b: "maya", revealedAt: at },
 };

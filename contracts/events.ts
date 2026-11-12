@@ -31,6 +31,7 @@ export const EVENT_TYPES = [
   "match.found",
   "chat.message",
   "member.arrived",
+  "door.update",
   "member.spotted",
   "runitback.mutual",
 ] as const;
@@ -89,6 +90,16 @@ export const PartyNoMatchPayload = z
   })
   .strict();
 
+/** F37: finding each other at the venue. Only what this person chose to share: how late, or where to meet. */
+export const DoorUpdatePayload = z
+  .object({
+    partyId: Id,
+    userId: Id,
+    lateMinutes: z.number().int().min(0).max(120).nullable(),
+    meetSpot: z.string().max(80).nullable(),
+  })
+  .strict();
+
 export const PlanLockedPayload = z.object({
   partyId: Id,
   planId: Id,
@@ -128,6 +139,7 @@ export const PAYLOADS = {
   "match.found": MatchFoundPayload,
   "chat.message": ChatMessage,
   "member.arrived": MemberArrivedPayload,
+  "door.update": DoorUpdatePayload,
   "member.spotted": Spotted,
   "runitback.mutual": MutualPair,
 } as const satisfies Record<EventType, z.ZodType>;
@@ -167,6 +179,7 @@ export const PQEvent = z.discriminatedUnion("type", [
   envelope("match.found"),
   envelope("chat.message"),
   envelope("member.arrived"),
+  envelope("door.update"),
   envelope("member.spotted"),
   envelope("runitback.mutual"),
 ]);

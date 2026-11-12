@@ -78,6 +78,8 @@ const DEFAULTS = {
   RUN_OF_SHOW: true,
   /** F36: "Tell a friend where you'll be": a message for someone outside the app with the plan and when you'll check in. Never names the others. */
   TELL_A_FRIEND: true,
+  /** F37: find each other at the venue: "running late" and "where we meet", on everyone's door screen and in the chat. */
+  FIND_EACH_OTHER: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

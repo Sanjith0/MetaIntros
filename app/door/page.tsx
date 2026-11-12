@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DoorClient } from "@/components/door/DoorClient";
 import { explainSources } from "@/lib/server/provenance";
+import { doorState } from "@/lib/server/meet";
 import { FRAME_SOURCES, frameSource } from "@/lib/door/source";
 import { flag } from "@/lib/flags";
 import { clock12 } from "@/lib/format";
@@ -56,6 +57,7 @@ export default async function DoorPage() {
         initialMethod={initialMethod}
         cameraOn={frameSource() !== "tap-only"}
         sourceLabel={FRAME_SOURCES.find((f) => f.id === frameSource())!.label}
+        initialDoor={flag("FIND_EACH_OTHER") ? doorState(v.party.id) : null}
       />
     </main>
   );
