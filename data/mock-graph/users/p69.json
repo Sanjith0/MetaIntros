@@ -1,0 +1,204 @@
+{
+  "id": "p69",
+  "name": "Ivan Hughes",
+  "first_name": "Ivan",
+  "last_name": "Hughes",
+  "birthday": "06/06/2000",
+  "gender": "male",
+  "location": {
+    "name": "Redwood City, California",
+    "latitude": 37.48972,
+    "longitude": -122.24459
+  },
+  "picture": {
+    "data": {
+      "color": "#f7b928"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_3025447798",
+        "name": "Joshua Weissman",
+        "category": "Food & Beverage",
+        "created_time": "2021-02-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_2151991632",
+        "name": "Serious Eats",
+        "category": "Food & Beverage",
+        "created_time": "2022-02-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_2713373491",
+        "name": "Palo Alto Farmers Market",
+        "category": "Farmers Market",
+        "created_time": "2025-07-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_1313959704",
+        "name": "CUESA",
+        "category": "Farmers Market",
+        "created_time": "2025-09-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1953414866",
+        "name": "Tartine Bakery",
+        "category": "Food & Beverage",
+        "created_time": "2023-05-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_932462314",
+        "name": "Ramen Hunter",
+        "category": "Restaurant",
+        "created_time": "2024-03-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_142780729",
+        "name": "Cantor Arts Center",
+        "category": "Museum",
+        "created_time": "2021-03-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_1349993811",
+        "name": "Sing Sing Karaoke",
+        "category": "Arts & Entertainment",
+        "created_time": "2020-02-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_4016451035",
+        "name": "Smule",
+        "category": "Arts & Entertainment",
+        "created_time": "2021-02-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_2214456572",
+        "name": "Criterion Collection",
+        "category": "Movie",
+        "created_time": "2021-05-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3533273514",
+        "name": "A24",
+        "category": "Movie",
+        "created_time": "2021-03-15T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_3996367429",
+        "name": "Bay Area Ramen Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2950239180",
+        "name": "Peninsula Sketch Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_544762384",
+        "name": "Home Cooks of the Peninsula",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_938984710",
+        "name": "Norah Jones",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_4192778843",
+        "name": "Kamasi Washington",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_3744864387",
+        "name": "Robert Glasper",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_1900390231",
+        "name": "Ferry Building Market Morning",
+        "start_time": "2026-03-28T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2758647726",
+        "name": "Pasta-Making Class",
+        "start_time": "2025-02-16T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p54",
+        "name": "Owen Lindqvist"
+      },
+      {
+        "id": "p58",
+        "name": "Kai Patel"
+      },
+      {
+        "id": "p65",
+        "name": "Emerson Shah"
+      },
+      {
+        "id": "p71",
+        "name": "Freya Sato"
+      }
+    ],
+    "summary": {
+      "total_count": 4
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2023-02-16T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "09:00",
+        "end": "16:00"
+      },
+      {
+        "day": "sun",
+        "start": "10:00",
+        "end": "15:00"
+      },
+      {
+        "day": "thu",
+        "start": "18:00",
+        "end": "22:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "food"
+}

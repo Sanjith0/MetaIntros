@@ -1,0 +1,211 @@
+{
+  "id": "p34",
+  "name": "Jade Sato",
+  "first_name": "Jade",
+  "last_name": "Sato",
+  "birthday": "06/09/1997",
+  "gender": "female",
+  "location": {
+    "name": "Stanford, California",
+    "latitude": 37.42551,
+    "longitude": -122.15898
+  },
+  "picture": {
+    "data": {
+      "color": "#1877f2"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_1257276648",
+        "name": "Hoka",
+        "category": "Sports & Recreation",
+        "created_time": "2025-02-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_3561804415",
+        "name": "November Project SF",
+        "category": "Sports & Recreation",
+        "created_time": "2019-08-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_71207391",
+        "name": "California International Marathon",
+        "category": "Sports & Recreation",
+        "created_time": "2020-07-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_2618154910",
+        "name": "Boston Marathon",
+        "category": "Sports & Recreation",
+        "created_time": "2023-06-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_355211039",
+        "name": "Rapha",
+        "category": "Sports & Recreation",
+        "created_time": "2022-01-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3761657856",
+        "name": "Hard Fork",
+        "category": "Media",
+        "created_time": "2022-03-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_900676073",
+        "name": "Dogspotting",
+        "category": "Pet",
+        "created_time": "2021-07-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3787187186",
+        "name": "Peninsula Humane Society",
+        "category": "Pet",
+        "created_time": "2020-09-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_1313959704",
+        "name": "CUESA",
+        "category": "Farmers Market",
+        "created_time": "2020-09-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_2713373491",
+        "name": "Palo Alto Farmers Market",
+        "category": "Farmers Market",
+        "created_time": "2021-03-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2025-01-13T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_2238783715",
+        "name": "Bay Area Campers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2787739642",
+        "name": "Peninsula Weekend Riders",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_925424808",
+        "name": "Palo Alto Dog Park Friends",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_772350187",
+        "name": "Alvvays",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_2851437574",
+        "name": "Phoebe Bridgers",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_1900390231",
+        "name": "Ferry Building Market Morning",
+        "start_time": "2026-03-20T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3603959155",
+        "name": "Old La Honda Hill Climb",
+        "start_time": "2025-07-12T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2581632150",
+        "name": "SF Marathon",
+        "start_time": "2026-01-21T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p20",
+        "name": "Rowan Müller"
+      },
+      {
+        "id": "p46",
+        "name": "Noor Martinez"
+      },
+      {
+        "id": "p49",
+        "name": "Valeria Kim"
+      },
+      {
+        "id": "p53",
+        "name": "Nate Kim"
+      }
+    ],
+    "summary": {
+      "total_count": 4
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_1373745456",
+        "name": "Nintendo",
+        "category": "Games/Toys",
+        "created_time": "2024-06-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_1800926923",
+        "name": "Blumhouse",
+        "category": "Movie",
+        "created_time": "2021-08-12T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "07:00",
+        "end": "14:00"
+      },
+      {
+        "day": "sun",
+        "start": "08:00",
+        "end": "13:00"
+      },
+      {
+        "day": "tue",
+        "start": "17:00",
+        "end": "21:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "run-coffee"
+}

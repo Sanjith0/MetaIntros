@@ -1,0 +1,209 @@
+{
+  "id": "p67",
+  "name": "Rosa Ferreira",
+  "first_name": "Rosa",
+  "last_name": "Ferreira",
+  "birthday": "06/12/1996",
+  "gender": "female",
+  "location": {
+    "name": "Stanford, California",
+    "latitude": 37.42141,
+    "longitude": -122.17803
+  },
+  "picture": {
+    "data": {
+      "color": "#7c3aed"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_932462314",
+        "name": "Ramen Hunter",
+        "category": "Restaurant",
+        "created_time": "2022-03-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_1850643646",
+        "name": "The Infatuation",
+        "category": "Restaurant",
+        "created_time": "2022-09-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_1953414866",
+        "name": "Tartine Bakery",
+        "category": "Food & Beverage",
+        "created_time": "2020-04-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_1837147022",
+        "name": "Philz Coffee",
+        "category": "Coffee Shop",
+        "created_time": "2019-09-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_607045084",
+        "name": "Goodwill Silicon Valley",
+        "category": "Shopping & Retail",
+        "created_time": "2020-02-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_1349993811",
+        "name": "Sing Sing Karaoke",
+        "category": "Arts & Entertainment",
+        "created_time": "2021-06-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_4016451035",
+        "name": "Smule",
+        "category": "Arts & Entertainment",
+        "created_time": "2020-04-13T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_3208882795",
+        "name": "Bay Area Thrift Finds",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3996367429",
+        "name": "Bay Area Ramen Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3562679192",
+        "name": "Peninsula Coffee Nerds",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_3744864387",
+        "name": "Robert Glasper",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_4192778843",
+        "name": "Kamasi Washington",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3990011887",
+        "name": "Ramen Crawl San Mateo",
+        "start_time": "2026-07-10T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_404678636",
+        "name": "Latte Art Throwdown",
+        "start_time": "2025-08-15T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2969438527",
+        "name": "Karaoke Night Mountain View",
+        "start_time": "2026-08-16T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1377370723",
+        "name": "Off the Grid Food Trucks",
+        "start_time": "2025-01-15T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p11",
+        "name": "Rosa Cohen"
+      },
+      {
+        "id": "p32",
+        "name": "Noor Johnson"
+      },
+      {
+        "id": "p45",
+        "name": "Ari Moreau"
+      },
+      {
+        "id": "p62",
+        "name": "Reza Ibrahim"
+      },
+      {
+        "id": "p63",
+        "name": "Rowan Brooks"
+      },
+      {
+        "id": "p66",
+        "name": "Julia Chen"
+      },
+      {
+        "id": "p71",
+        "name": "Freya Sato"
+      },
+      {
+        "id": "p72",
+        "name": "Anika Patel"
+      }
+    ],
+    "summary": {
+      "total_count": 8
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2021-09-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1373745456",
+        "name": "Nintendo",
+        "category": "Games/Toys",
+        "created_time": "2025-06-18T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "09:00",
+        "end": "16:00"
+      },
+      {
+        "day": "sun",
+        "start": "11:00",
+        "end": "16:00"
+      },
+      {
+        "day": "thu",
+        "start": "18:00",
+        "end": "22:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "food"
+}

@@ -1,0 +1,188 @@
+{
+  "id": "p75",
+  "name": "Ivy Costa",
+  "first_name": "Ivy",
+  "last_name": "Costa",
+  "birthday": "06/05/2000",
+  "gender": "female",
+  "location": {
+    "name": "Stanford, California",
+    "latitude": 37.42982,
+    "longitude": -122.1772
+  },
+  "picture": {
+    "data": {
+      "color": "#ff6f00"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_3289184843",
+        "name": "Figma",
+        "category": "Design",
+        "created_time": "2024-05-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_1641249763",
+        "name": "Dribbble",
+        "category": "Design",
+        "created_time": "2023-04-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_485296470",
+        "name": "Devpost",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2020-07-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_584975486",
+        "name": "Stardew Valley",
+        "category": "Games/Toys",
+        "created_time": "2019-03-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_2511985466",
+        "name": "Valorant",
+        "category": "Games/Toys",
+        "created_time": "2024-03-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1912237152",
+        "name": "Dungeons & Dragons",
+        "category": "Games/Toys",
+        "created_time": "2023-01-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_2631278412",
+        "name": "Golden State Warriors",
+        "category": "Sports Team",
+        "created_time": "2021-05-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_2496810232",
+        "name": "NBA",
+        "category": "Sports Team",
+        "created_time": "2024-01-14T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_1240877100",
+        "name": "Peninsula D&D Players",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1847025959",
+        "name": "Bay Area Hackers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1856907645",
+        "name": "Warriors Fans Bay Area",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_4192778843",
+        "name": "Kamasi Washington",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_938984710",
+        "name": "Norah Jones",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_1346986683",
+        "name": "Smash Bros Local Tournament",
+        "start_time": "2026-09-15T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3628388981",
+        "name": "D&D Adventurers League Night",
+        "start_time": "2025-01-18T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2573184051",
+        "name": "CalHacks",
+        "start_time": "2026-05-25T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1575973015",
+        "name": "Design Crit Night",
+        "start_time": "2025-05-15T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p01",
+        "name": "Jordan Lee"
+      },
+      {
+        "id": "p70",
+        "name": "Dev Johnson"
+      },
+      {
+        "id": "p77",
+        "name": "Aisha Andersen"
+      },
+      {
+        "id": "p79",
+        "name": "Leila Johnson"
+      }
+    ],
+    "summary": {
+      "total_count": 4
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_1800926923",
+        "name": "Blumhouse",
+        "category": "Movie",
+        "created_time": "2025-07-12T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "17:00",
+        "end": "23:00"
+      },
+      {
+        "day": "fri",
+        "start": "17:00",
+        "end": "24:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "bridge"
+}

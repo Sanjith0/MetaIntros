@@ -1,0 +1,177 @@
+{
+  "id": "p79",
+  "name": "Leila Johnson",
+  "first_name": "Leila",
+  "last_name": "Johnson",
+  "birthday": "06/23/2007",
+  "gender": "female",
+  "location": {
+    "name": "Menlo Park, California",
+    "latitude": 37.45176,
+    "longitude": -122.18516
+  },
+  "picture": {
+    "data": {
+      "color": "#ff6f00"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2020-07-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_3993053882",
+        "name": "Midpeninsula Open Space",
+        "category": "Nonprofit Organization",
+        "created_time": "2021-07-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_485296470",
+        "name": "Devpost",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2024-05-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_3699588068",
+        "name": "TechCrunch",
+        "category": "Business",
+        "created_time": "2024-08-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_963942509",
+        "name": "Blue Note Records",
+        "category": "Musician/Band",
+        "created_time": "2021-06-18T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_719538665",
+        "name": "Baylands Nature Lovers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2238783715",
+        "name": "Bay Area Campers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1847025959",
+        "name": "Bay Area Hackers",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_3744864387",
+        "name": "Robert Glasper",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_938984710",
+        "name": "Norah Jones",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_4192778843",
+        "name": "Kamasi Washington",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_2573184051",
+        "name": "CalHacks",
+        "start_time": "2026-09-11T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1990815733",
+        "name": "Baylands Cleanup Day",
+        "start_time": "2025-06-14T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_892093588",
+        "name": "Jazz on the Plaza",
+        "start_time": "2026-01-25T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p17",
+        "name": "Nate Chen"
+      },
+      {
+        "id": "p32",
+        "name": "Noor Johnson"
+      },
+      {
+        "id": "p54",
+        "name": "Owen Lindqvist"
+      },
+      {
+        "id": "p75",
+        "name": "Ivy Costa"
+      },
+      {
+        "id": "p78",
+        "name": "Zoe Park"
+      },
+      {
+        "id": "p80",
+        "name": "Mira Rahman"
+      }
+    ],
+    "summary": {
+      "total_count": 6
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_1800926923",
+        "name": "Blumhouse",
+        "category": "Movie",
+        "created_time": "2022-08-15T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "07:00",
+        "end": "18:00"
+      },
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "23:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "bridge"
+}

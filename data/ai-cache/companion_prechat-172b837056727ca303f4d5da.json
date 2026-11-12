@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Okay we both climb - are you more bouldering cave goblin or big wall, hike-for-days approach person?\"}, {\"speaker\": \"B\", \"text\": \"Bouldering goblin who pretends to love the hike for the views. You?\"}, {\"speaker\": \"A\", \"text\": \"Same! I actually run to the crag just to get extra hiking in. We should trade trail beta.\"}, {\"speaker\": \"B\", \"text\": \"Yes please. Also thank god we both put karaoke as a hard no, we can actually talk instead of singing.\"}, {\"speaker\": \"A\", \"text\": \"Deal. No mics, just mountains. And I heard you cook - you fueling our post-climb hang?\"}], \"sparks\": [\"Climbing \\u2014 bouldering styles and swapping local crag beta\", \"Hiking \\u2014 favorite trails and hike-to-climb days\", \"Mutual karaoke dislike \\u2014 instant alliance to skip the mic\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 212,
+    "completionTokens": 845
+  },
+  "savedAt": "2026-11-12T19:10:01.611Z"
+}

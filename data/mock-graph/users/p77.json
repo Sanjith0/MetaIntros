@@ -1,0 +1,178 @@
+{
+  "id": "p77",
+  "name": "Aisha Andersen",
+  "first_name": "Aisha",
+  "last_name": "Andersen",
+  "birthday": "06/25/2007",
+  "gender": "female",
+  "location": {
+    "name": "Redwood City, California",
+    "latitude": 37.49695,
+    "longitude": -122.23367
+  },
+  "picture": {
+    "data": {
+      "color": "#f02849"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_485296470",
+        "name": "Devpost",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2019-01-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_3289184843",
+        "name": "Figma",
+        "category": "Design",
+        "created_time": "2024-04-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_71207391",
+        "name": "California International Marathon",
+        "category": "Sports & Recreation",
+        "created_time": "2024-01-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_355211039",
+        "name": "Rapha",
+        "category": "Sports & Recreation",
+        "created_time": "2025-08-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_2496810232",
+        "name": "NBA",
+        "category": "Sports Team",
+        "created_time": "2020-05-15T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_688931905",
+        "name": "Bay Area Product Designers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2787739642",
+        "name": "Peninsula Weekend Riders",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1847025959",
+        "name": "Bay Area Hackers",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_3744864387",
+        "name": "Robert Glasper",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_938984710",
+        "name": "Norah Jones",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_2581632150",
+        "name": "SF Marathon",
+        "start_time": "2026-06-26T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1575973015",
+        "name": "Design Crit Night",
+        "start_time": "2025-06-21T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3603959155",
+        "name": "Old La Honda Hill Climb",
+        "start_time": "2026-04-15T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2297260657",
+        "name": "TreeHacks",
+        "start_time": "2025-02-15T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p06",
+        "name": "Simon Hughes"
+      },
+      {
+        "id": "p28",
+        "name": "Julia Mensah"
+      },
+      {
+        "id": "p75",
+        "name": "Ivy Costa"
+      },
+      {
+        "id": "p76",
+        "name": "Priya Bauer"
+      },
+      {
+        "id": "p78",
+        "name": "Zoe Park"
+      },
+      {
+        "id": "p80",
+        "name": "Mira Rahman"
+      }
+    ],
+    "summary": {
+      "total_count": 6
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_2497901386",
+        "name": "5AM Club",
+        "category": "Lifestyle",
+        "created_time": "2021-06-16T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "16:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sat",
+        "start": "07:00",
+        "end": "13:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "bridge"
+}

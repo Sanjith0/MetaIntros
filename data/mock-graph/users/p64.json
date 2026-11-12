@@ -1,0 +1,188 @@
+{
+  "id": "p64",
+  "name": "Zoe Chen",
+  "first_name": "Zoe",
+  "last_name": "Chen",
+  "birthday": "06/15/1999",
+  "gender": "female",
+  "location": {
+    "name": "Redwood City, California",
+    "latitude": 37.476,
+    "longitude": -122.22446
+  },
+  "picture": {
+    "data": {
+      "color": "#e41e3f"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_2713373491",
+        "name": "Palo Alto Farmers Market",
+        "category": "Farmers Market",
+        "created_time": "2022-05-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_932462314",
+        "name": "Ramen Hunter",
+        "category": "Restaurant",
+        "created_time": "2023-08-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_2151991632",
+        "name": "Serious Eats",
+        "category": "Food & Beverage",
+        "created_time": "2020-01-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_3668808447",
+        "name": "Thrift Flip Club",
+        "category": "Shopping & Retail",
+        "created_time": "2022-08-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_2214456572",
+        "name": "Criterion Collection",
+        "category": "Movie",
+        "created_time": "2019-07-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_1399278490",
+        "name": "Letterboxd",
+        "category": "Movie",
+        "created_time": "2025-05-12T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_3996367429",
+        "name": "Bay Area Ramen Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_591200941",
+        "name": "Peninsula Market Mornings",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3208882795",
+        "name": "Bay Area Thrift Finds",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_938984710",
+        "name": "Norah Jones",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_4192778843",
+        "name": "Kamasi Washington",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_3744864387",
+        "name": "Robert Glasper",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_1900390231",
+        "name": "Ferry Building Market Morning",
+        "start_time": "2026-05-16T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2758647726",
+        "name": "Pasta-Making Class",
+        "start_time": "2025-01-13T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p04",
+        "name": "Reza Ali"
+      },
+      {
+        "id": "p58",
+        "name": "Kai Patel"
+      },
+      {
+        "id": "p62",
+        "name": "Reza Ibrahim"
+      },
+      {
+        "id": "p66",
+        "name": "Julia Chen"
+      },
+      {
+        "id": "p68",
+        "name": "Tomás Ali"
+      },
+      {
+        "id": "p71",
+        "name": "Freya Sato"
+      }
+    ],
+    "summary": {
+      "total_count": 6
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_455822419",
+        "name": "Concert Subwoofer Fans",
+        "category": "Nightlife",
+        "created_time": "2025-02-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_2497901386",
+        "name": "5AM Club",
+        "category": "Lifestyle",
+        "created_time": "2025-06-18T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "09:00",
+        "end": "16:00"
+      },
+      {
+        "day": "sun",
+        "start": "09:00",
+        "end": "16:00"
+      },
+      {
+        "day": "thu",
+        "start": "19:00",
+        "end": "22:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "food"
+}

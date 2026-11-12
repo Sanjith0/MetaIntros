@@ -1,0 +1,203 @@
+{
+  "id": "p01",
+  "name": "Jordan Lee",
+  "first_name": "Jordan",
+  "last_name": "Lee",
+  "birthday": "06/07/2003",
+  "gender": "custom",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.44467,
+    "longitude": -122.16605
+  },
+  "picture": {
+    "data": {
+      "color": "#1877f2"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_4214058980",
+        "name": "Climbing Magazine",
+        "category": "Sports & Recreation",
+        "created_time": "2024-06-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_2195994927",
+        "name": "Bouldering Daily",
+        "category": "Sports & Recreation",
+        "created_time": "2021-06-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_3989394457",
+        "name": "Indie Shuffle",
+        "category": "Musician/Band",
+        "created_time": "2019-03-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_1788322323",
+        "name": "Bay Area Concerts",
+        "category": "Arts & Entertainment",
+        "created_time": "2023-05-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_3542300262",
+        "name": "Rasputin Music",
+        "category": "Shopping & Retail",
+        "created_time": "2024-01-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_2432891253",
+        "name": "Vinyl Me, Please",
+        "category": "Shopping & Retail",
+        "created_time": "2019-09-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_2576936919",
+        "name": "Fujifilm X",
+        "category": "Arts & Entertainment",
+        "created_time": "2020-06-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_1837147022",
+        "name": "Philz Coffee",
+        "category": "Coffee Shop",
+        "created_time": "2019-04-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_2295242715",
+        "name": "REI",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2020-07-13T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_152838782",
+        "name": "Bay Area Photo Walks",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1548739667",
+        "name": "Bay Area Climbers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3562679192",
+        "name": "Peninsula Coffee Nerds",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_1958632383",
+        "name": "Japanese Breakfast",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_772350187",
+        "name": "Alvvays",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3954455477",
+        "name": "Record Store Day Palo Alto",
+        "start_time": "2026-03-18T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_630026664",
+        "name": "Peninsula Bouldering League",
+        "start_time": "2025-08-19T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p02",
+        "name": "Freya Rossi"
+      },
+      {
+        "id": "p04",
+        "name": "Reza Ali"
+      },
+      {
+        "id": "p20",
+        "name": "Rowan Müller"
+      },
+      {
+        "id": "p30",
+        "name": "Diego Cohen"
+      },
+      {
+        "id": "p45",
+        "name": "Ari Moreau"
+      },
+      {
+        "id": "p50",
+        "name": "Oscar Park"
+      },
+      {
+        "id": "p66",
+        "name": "Julia Chen"
+      },
+      {
+        "id": "p75",
+        "name": "Ivy Costa"
+      }
+    ],
+    "summary": {
+      "total_count": 8
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_2631278412",
+        "name": "Golden State Warriors",
+        "category": "Sports Team",
+        "created_time": "2024-04-11T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "10:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sun",
+        "start": "12:00",
+        "end": "20:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "indie-climb"
+}

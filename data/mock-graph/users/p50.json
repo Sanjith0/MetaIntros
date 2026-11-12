@@ -1,0 +1,175 @@
+{
+  "id": "p50",
+  "name": "Oscar Park",
+  "first_name": "Oscar",
+  "last_name": "Park",
+  "birthday": "06/22/2002",
+  "gender": "male",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.45232,
+    "longitude": -122.15272
+  },
+  "picture": {
+    "data": {
+      "color": "#d946ef"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_2472071921",
+        "name": "AllTrails",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2023-01-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_2295242715",
+        "name": "REI",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2024-05-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_603487733",
+        "name": "Audubon Society",
+        "category": "Nonprofit Organization",
+        "created_time": "2025-07-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2022-03-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_1719253395",
+        "name": "Big Basin Redwoods",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2019-06-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_900676073",
+        "name": "Dogspotting",
+        "category": "Pet",
+        "created_time": "2022-08-14T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_2808529448",
+        "name": "Peninsula Hikers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_925424808",
+        "name": "Palo Alto Dog Park Friends",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1150949717",
+        "name": "Santa Clara Valley Birders",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_3744864387",
+        "name": "Robert Glasper",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_938984710",
+        "name": "Norah Jones",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_4192778843",
+        "name": "Kamasi Washington",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_4234289730",
+        "name": "Mission Peak Sunrise Hike",
+        "start_time": "2026-05-28T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2353355191",
+        "name": "Big Sur Camping Trip",
+        "start_time": "2025-07-14T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p01",
+        "name": "Jordan Lee"
+      },
+      {
+        "id": "p31",
+        "name": "Isaac Moreau"
+      },
+      {
+        "id": "p45",
+        "name": "Ari Moreau"
+      },
+      {
+        "id": "p48",
+        "name": "Hugo Andersen"
+      }
+    ],
+    "summary": {
+      "total_count": 4
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_3201520727",
+        "name": "Late Night Eats SF",
+        "category": "Nightlife",
+        "created_time": "2025-06-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_455822419",
+        "name": "Concert Subwoofer Fans",
+        "category": "Nightlife",
+        "created_time": "2020-09-14T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "07:00",
+        "end": "17:00"
+      },
+      {
+        "day": "sun",
+        "start": "07:00",
+        "end": "17:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "hike-photo"
+}

@@ -1,0 +1,164 @@
+{
+  "id": "p57",
+  "name": "Aaron Castillo",
+  "first_name": "Aaron",
+  "last_name": "Castillo",
+  "birthday": "06/12/2001",
+  "gender": "male",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.43883,
+    "longitude": -122.16604
+  },
+  "picture": {
+    "data": {
+      "color": "#45bd62"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_1387132218",
+        "name": "Two Minute Papers",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2022-09-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_22281416",
+        "name": "Major League Hacking",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2022-05-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_1641249763",
+        "name": "Dribbble",
+        "category": "Design",
+        "created_time": "2022-05-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_3761657856",
+        "name": "Hard Fork",
+        "category": "Media",
+        "created_time": "2019-05-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2020-01-10T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_688931905",
+        "name": "Bay Area Product Designers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1847025959",
+        "name": "Bay Area Hackers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1377567062",
+        "name": "Peninsula AI Builders",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_3297501053",
+        "name": "Snail Mail",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_2851437574",
+        "name": "Phoebe Bridgers",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_297575928",
+        "name": "AI Tinkerers Meetup",
+        "start_time": "2026-03-25T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2573184051",
+        "name": "CalHacks",
+        "start_time": "2025-05-20T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p52",
+        "name": "Jonah Nguyen"
+      },
+      {
+        "id": "p54",
+        "name": "Owen Lindqvist"
+      },
+      {
+        "id": "p61",
+        "name": "Milo Chen"
+      },
+      {
+        "id": "p71",
+        "name": "Freya Sato"
+      }
+    ],
+    "summary": {
+      "total_count": 4
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_1800926923",
+        "name": "Blumhouse",
+        "category": "Movie",
+        "created_time": "2022-05-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_3069779066",
+        "name": "Audio SF",
+        "category": "Nightlife",
+        "created_time": "2023-02-16T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sat",
+        "start": "09:00",
+        "end": "13:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "builders"
+}

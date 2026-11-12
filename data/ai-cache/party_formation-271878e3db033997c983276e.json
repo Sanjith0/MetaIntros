@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all have climbing and hiking in common, so you'll have plenty to talk about on the way! Adi and Swarit can also bond over startups and coffee while you plan your next climb.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 298,
+    "completionTokens": 275
+  },
+  "savedAt": "2026-11-12T19:11:40.599Z"
+}

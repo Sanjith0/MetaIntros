@@ -1,0 +1,227 @@
+{
+  "id": "p12",
+  "name": "Gabe Chen",
+  "first_name": "Gabe",
+  "last_name": "Chen",
+  "birthday": "06/03/2003",
+  "gender": "male",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.45136,
+    "longitude": -122.17175
+  },
+  "picture": {
+    "data": {
+      "color": "#8b5cf6"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_4214058980",
+        "name": "Climbing Magazine",
+        "category": "Sports & Recreation",
+        "created_time": "2021-04-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_1636414625",
+        "name": "SF Live Music Guide",
+        "category": "Arts & Entertainment",
+        "created_time": "2023-03-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_2195994927",
+        "name": "Bouldering Daily",
+        "category": "Sports & Recreation",
+        "created_time": "2025-03-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_3663269463",
+        "name": "V-Scale Memes",
+        "category": "Sports & Recreation",
+        "created_time": "2021-09-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_3542300262",
+        "name": "Rasputin Music",
+        "category": "Shopping & Retail",
+        "created_time": "2023-07-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_2432891253",
+        "name": "Vinyl Me, Please",
+        "category": "Shopping & Retail",
+        "created_time": "2023-08-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3989394457",
+        "name": "Indie Shuffle",
+        "category": "Musician/Band",
+        "created_time": "2020-07-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_4200118029",
+        "name": "Pitchfork",
+        "category": "Musician/Band",
+        "created_time": "2021-01-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_3533273514",
+        "name": "A24",
+        "category": "Movie",
+        "created_time": "2021-03-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_3668808447",
+        "name": "Thrift Flip Club",
+        "category": "Shopping & Retail",
+        "created_time": "2023-04-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_1331360593",
+        "name": "Unsplash",
+        "category": "Arts & Entertainment",
+        "created_time": "2025-01-13T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_3522069602",
+        "name": "Peninsula Film Club",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_296257480",
+        "name": "Peninsula Vinyl Collectors",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1548739667",
+        "name": "Bay Area Climbers",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_772350187",
+        "name": "Alvvays",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1890828790",
+        "name": "Mitski",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3522809679",
+        "name": "Indie Night at The Guild",
+        "start_time": "2026-03-26T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_630026664",
+        "name": "Peninsula Bouldering League",
+        "start_time": "2025-05-12T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1390372120",
+        "name": "Bouldering Night at Peninsula Boulders",
+        "start_time": "2026-09-24T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2624804488",
+        "name": "Golden Gate Photo Walk",
+        "start_time": "2025-08-15T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p02",
+        "name": "Freya Rossi"
+      },
+      {
+        "id": "p05",
+        "name": "Yuki Dubois"
+      },
+      {
+        "id": "p06",
+        "name": "Simon Hughes"
+      },
+      {
+        "id": "p09",
+        "name": "Kiara Costa"
+      },
+      {
+        "id": "p11",
+        "name": "Rosa Cohen"
+      },
+      {
+        "id": "p13",
+        "name": "Leo Adeyemi"
+      },
+      {
+        "id": "p14",
+        "name": "Ben Patel"
+      },
+      {
+        "id": "p15",
+        "name": "Ravi Mensah"
+      }
+    ],
+    "summary": {
+      "total_count": 8
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_3069779066",
+        "name": "Audio SF",
+        "category": "Nightlife",
+        "created_time": "2019-05-11T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sat",
+        "start": "11:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sun",
+        "start": "11:00",
+        "end": "19:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "indie-climb"
+}

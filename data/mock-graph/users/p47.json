@@ -1,0 +1,196 @@
+{
+  "id": "p47",
+  "name": "Mira Dubois",
+  "first_name": "Mira",
+  "last_name": "Dubois",
+  "birthday": "06/15/2002",
+  "gender": "female",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.44086,
+    "longitude": -122.15143
+  },
+  "picture": {
+    "data": {
+      "color": "#d946ef"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_356115159",
+        "name": "Recreation.gov",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2021-06-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_1719253395",
+        "name": "Big Basin Redwoods",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2019-06-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_1331360593",
+        "name": "Unsplash",
+        "category": "Arts & Entertainment",
+        "created_time": "2019-04-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_1657085092",
+        "name": "35mm Film Photography",
+        "category": "Arts & Entertainment",
+        "created_time": "2021-08-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_3945656910",
+        "name": "National Park Service",
+        "category": "Nonprofit Organization",
+        "created_time": "2019-02-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_1452298579",
+        "name": "Bay Area Hiker",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2023-06-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_2472071921",
+        "name": "AllTrails",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2023-01-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_900676073",
+        "name": "Dogspotting",
+        "category": "Pet",
+        "created_time": "2021-01-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_858280010",
+        "name": "Wingspan",
+        "category": "Games/Toys",
+        "created_time": "2023-02-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_3216128065",
+        "name": "Board Game Geek",
+        "category": "Games/Toys",
+        "created_time": "2025-06-13T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_925424808",
+        "name": "Palo Alto Dog Park Friends",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1624968456",
+        "name": "Bay Area Hiking Buddies",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_719538665",
+        "name": "Baylands Nature Lovers",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_1890828790",
+        "name": "Mitski",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_2851437574",
+        "name": "Phoebe Bridgers",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_2353355191",
+        "name": "Big Sur Camping Trip",
+        "start_time": "2026-04-24T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3941049801",
+        "name": "Wingspan Tournament",
+        "start_time": "2025-06-10T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2624804488",
+        "name": "Golden Gate Photo Walk",
+        "start_time": "2026-08-16T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p13",
+        "name": "Leo Adeyemi"
+      },
+      {
+        "id": "p45",
+        "name": "Ari Moreau"
+      },
+      {
+        "id": "p46",
+        "name": "Noor Martinez"
+      }
+    ],
+    "summary": {
+      "total_count": 3
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_3201520727",
+        "name": "Late Night Eats SF",
+        "category": "Nightlife",
+        "created_time": "2023-07-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_857284444",
+        "name": "Rose & Crown Pub",
+        "category": "Bar",
+        "created_time": "2024-02-13T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "07:00",
+        "end": "18:00"
+      },
+      {
+        "day": "sun",
+        "start": "07:00",
+        "end": "18:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": true
+  },
+  "x_cluster": "hike-photo"
+}

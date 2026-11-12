@@ -1,0 +1,202 @@
+{
+  "id": "p23",
+  "name": "Marcus Kim",
+  "first_name": "Marcus",
+  "last_name": "Kim",
+  "birthday": "06/09/2001",
+  "gender": "male",
+  "location": {
+    "name": "Redwood City, California",
+    "latitude": 37.47358,
+    "longitude": -122.24725
+  },
+  "picture": {
+    "data": {
+      "color": "#7c3aed"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_105552468",
+        "name": "Catan",
+        "category": "Games/Toys",
+        "created_time": "2023-09-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3216128065",
+        "name": "Board Game Geek",
+        "category": "Games/Toys",
+        "created_time": "2025-08-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_4123061395",
+        "name": "Dimension 20",
+        "category": "Games/Toys",
+        "created_time": "2023-04-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_3504473405",
+        "name": "One Piece",
+        "category": "Book",
+        "created_time": "2025-09-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_3968373210",
+        "name": "VIZ Media",
+        "category": "Book",
+        "created_time": "2022-09-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_2179806558",
+        "name": "Studio Ghibli",
+        "category": "TV Show",
+        "created_time": "2024-01-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_1399278490",
+        "name": "Letterboxd",
+        "category": "Movie",
+        "created_time": "2023-06-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_4016451035",
+        "name": "Smule",
+        "category": "Arts & Entertainment",
+        "created_time": "2021-01-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_2959502175",
+        "name": "Eater SF",
+        "category": "Restaurant",
+        "created_time": "2019-03-17T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_1492546811",
+        "name": "Peninsula Foodies",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_365051473",
+        "name": "Manga Swap Peninsula",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_4235132143",
+        "name": "Bay Area Anime Watch Party",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_1814415648",
+        "name": "Fred again..",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_2361962968",
+        "name": "Illenium",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3628388981",
+        "name": "D&D Adventurers League Night",
+        "start_time": "2026-05-24T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2969438527",
+        "name": "Karaoke Night Mountain View",
+        "start_time": "2025-06-17T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_1377370723",
+        "name": "Off the Grid Food Trucks",
+        "start_time": "2026-03-26T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p17",
+        "name": "Nate Chen"
+      },
+      {
+        "id": "p19",
+        "name": "Aisha Brooks"
+      },
+      {
+        "id": "p21",
+        "name": "Omar Nguyen"
+      },
+      {
+        "id": "p24",
+        "name": "Ivan Mensah"
+      },
+      {
+        "id": "p41",
+        "name": "Rafael Nguyen"
+      },
+      {
+        "id": "p63",
+        "name": "Rowan Brooks"
+      }
+    ],
+    "summary": {
+      "total_count": 6
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_455822419",
+        "name": "Concert Subwoofer Fans",
+        "category": "Nightlife",
+        "created_time": "2025-04-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_2472071921",
+        "name": "AllTrails",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2020-09-14T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "18:00",
+        "end": "24:00"
+      },
+      {
+        "day": "sat",
+        "start": "12:00",
+        "end": "24:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "games-anime"
+}

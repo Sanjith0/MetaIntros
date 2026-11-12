@@ -1,0 +1,221 @@
+{
+  "id": "p61",
+  "name": "Milo Chen",
+  "first_name": "Milo",
+  "last_name": "Chen",
+  "birthday": "06/11/2000",
+  "gender": "male",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.43746,
+    "longitude": -122.14941
+  },
+  "picture": {
+    "data": {
+      "color": "#2abba7"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_3699588068",
+        "name": "TechCrunch",
+        "category": "Business",
+        "created_time": "2021-03-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_22281416",
+        "name": "Major League Hacking",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2024-04-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_1155029887",
+        "name": "Stanford Online",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2021-08-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_361244158",
+        "name": "Hacker News",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2023-04-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_1387132218",
+        "name": "Two Minute Papers",
+        "category": "Science, Technology & Engineering",
+        "created_time": "2019-07-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_57494581",
+        "name": "Blue Bottle Coffee",
+        "category": "Coffee Shop",
+        "created_time": "2019-01-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_1837147022",
+        "name": "Philz Coffee",
+        "category": "Coffee Shop",
+        "created_time": "2020-09-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_876403757",
+        "name": "Goodreads",
+        "category": "Book",
+        "created_time": "2024-01-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_1176846366",
+        "name": "Kepler's Books",
+        "category": "Book",
+        "created_time": "2019-02-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_671257111",
+        "name": "USA Pickleball",
+        "category": "Sports & Recreation",
+        "created_time": "2019-01-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_3125224978",
+        "name": "Pickleball Kitchen",
+        "category": "Sports & Recreation",
+        "created_time": "2021-06-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_3504473405",
+        "name": "One Piece",
+        "category": "Book",
+        "created_time": "2023-01-14T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_365051473",
+        "name": "Manga Swap Peninsula",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1377567062",
+        "name": "Peninsula AI Builders",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1847025959",
+        "name": "Bay Area Hackers",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_772350187",
+        "name": "Alvvays",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_1958632383",
+        "name": "Japanese Breakfast",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_297575928",
+        "name": "AI Tinkerers Meetup",
+        "start_time": "2026-09-20T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2573184051",
+        "name": "CalHacks",
+        "start_time": "2025-09-20T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_4131268999",
+        "name": "Kepler's Author Talk",
+        "start_time": "2026-08-28T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p32",
+        "name": "Noor Johnson"
+      },
+      {
+        "id": "p52",
+        "name": "Jonah Nguyen"
+      },
+      {
+        "id": "p54",
+        "name": "Owen Lindqvist"
+      },
+      {
+        "id": "p57",
+        "name": "Aaron Castillo"
+      },
+      {
+        "id": "p70",
+        "name": "Dev Johnson"
+      }
+    ],
+    "summary": {
+      "total_count": 5
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_3069779066",
+        "name": "Audio SF",
+        "category": "Nightlife",
+        "created_time": "2019-02-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_1800926923",
+        "name": "Blumhouse",
+        "category": "Movie",
+        "created_time": "2024-08-17T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "fri",
+        "start": "17:00",
+        "end": "23:00"
+      },
+      {
+        "day": "sat",
+        "start": "09:00",
+        "end": "14:00"
+      },
+      {
+        "day": "sun",
+        "start": "14:00",
+        "end": "20:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "builders"
+}

@@ -1,0 +1,176 @@
+{
+  "id": "p76",
+  "name": "Priya Bauer",
+  "first_name": "Priya",
+  "last_name": "Bauer",
+  "birthday": "06/28/2004",
+  "gender": "female",
+  "location": {
+    "name": "Menlo Park, California",
+    "latitude": 37.44333,
+    "longitude": -122.17641
+  },
+  "picture": {
+    "data": {
+      "color": "#2abba7"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_1837147022",
+        "name": "Philz Coffee",
+        "category": "Coffee Shop",
+        "created_time": "2023-09-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_1921984697",
+        "name": "Bay Area Bicycle Coalition",
+        "category": "Sports & Recreation",
+        "created_time": "2022-03-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_990265982",
+        "name": "Merlin Bird ID",
+        "category": "Nonprofit Organization",
+        "created_time": "2022-03-13T12:00:00+0000"
+      },
+      {
+        "id": "pg_1331360593",
+        "name": "Unsplash",
+        "category": "Arts & Entertainment",
+        "created_time": "2023-02-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_1657085092",
+        "name": "35mm Film Photography",
+        "category": "Arts & Entertainment",
+        "created_time": "2025-01-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_3244948457",
+        "name": "SFJAZZ",
+        "category": "Musician/Band",
+        "created_time": "2023-05-19T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_152838782",
+        "name": "Bay Area Photo Walks",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2787739642",
+        "name": "Peninsula Weekend Riders",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3562679192",
+        "name": "Peninsula Coffee Nerds",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_3744864387",
+        "name": "Robert Glasper",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_4192778843",
+        "name": "Kamasi Washington",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_892093588",
+        "name": "Jazz on the Plaza",
+        "start_time": "2026-06-11T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_2624804488",
+        "name": "Golden Gate Photo Walk",
+        "start_time": "2025-07-10T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_404678636",
+        "name": "Latte Art Throwdown",
+        "start_time": "2026-02-20T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3603959155",
+        "name": "Old La Honda Hill Climb",
+        "start_time": "2025-04-26T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p22",
+        "name": "Kai Rossi"
+      },
+      {
+        "id": "p26",
+        "name": "Chloe Reyes"
+      },
+      {
+        "id": "p51",
+        "name": "Ethan Novak"
+      },
+      {
+        "id": "p77",
+        "name": "Aisha Andersen"
+      }
+    ],
+    "summary": {
+      "total_count": 4
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_455822419",
+        "name": "Concert Subwoofer Fans",
+        "category": "Nightlife",
+        "created_time": "2019-09-19T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "07:00",
+        "end": "13:00"
+      },
+      {
+        "day": "sat",
+        "start": "08:00",
+        "end": "18:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "bridge"
+}

@@ -1,0 +1,191 @@
+{
+  "id": "p78",
+  "name": "Zoe Park",
+  "first_name": "Zoe",
+  "last_name": "Park",
+  "birthday": "06/10/2001",
+  "gender": "female",
+  "location": {
+    "name": "Palo Alto, California",
+    "latitude": 37.43445,
+    "longitude": -122.16764
+  },
+  "picture": {
+    "data": {
+      "color": "#8b5cf6"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_355211039",
+        "name": "Rapha",
+        "category": "Sports & Recreation",
+        "created_time": "2021-03-14T12:00:00+0000"
+      },
+      {
+        "id": "pg_1868140960",
+        "name": "Verve Coffee Roasters",
+        "category": "Coffee Shop",
+        "created_time": "2022-07-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_1636414625",
+        "name": "SF Live Music Guide",
+        "category": "Arts & Entertainment",
+        "created_time": "2025-06-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_1788322323",
+        "name": "Bay Area Concerts",
+        "category": "Arts & Entertainment",
+        "created_time": "2020-02-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_3542300262",
+        "name": "Rasputin Music",
+        "category": "Shopping & Retail",
+        "created_time": "2023-05-15T12:00:00+0000"
+      },
+      {
+        "id": "pg_900676073",
+        "name": "Dogspotting",
+        "category": "Pet",
+        "created_time": "2023-08-19T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_839702041",
+        "name": "Peninsula Gig Buddies",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_3562679192",
+        "name": "Peninsula Coffee Nerds",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_925424808",
+        "name": "Palo Alto Dog Park Friends",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_938984710",
+        "name": "Norah Jones",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_3744864387",
+        "name": "Robert Glasper",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_4192778843",
+        "name": "Kamasi Washington",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_3603959155",
+        "name": "Old La Honda Hill Climb",
+        "start_time": "2026-07-27T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_404678636",
+        "name": "Latte Art Throwdown",
+        "start_time": "2025-02-19T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_3954455477",
+        "name": "Record Store Day Palo Alto",
+        "start_time": "2026-02-21T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p03",
+        "name": "Zoe Kim"
+      },
+      {
+        "id": "p05",
+        "name": "Yuki Dubois"
+      },
+      {
+        "id": "p22",
+        "name": "Kai Rossi"
+      },
+      {
+        "id": "p25",
+        "name": "Ivan Castillo"
+      },
+      {
+        "id": "p58",
+        "name": "Kai Patel"
+      },
+      {
+        "id": "p77",
+        "name": "Aisha Andersen"
+      },
+      {
+        "id": "p79",
+        "name": "Leila Johnson"
+      },
+      {
+        "id": "p80",
+        "name": "Mira Rahman"
+      }
+    ],
+    "summary": {
+      "total_count": 8
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_2497901386",
+        "name": "5AM Club",
+        "category": "Lifestyle",
+        "created_time": "2025-06-18T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "07:00",
+        "end": "14:00"
+      },
+      {
+        "day": "fri",
+        "start": "17:00",
+        "end": "24:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "bridge"
+}

@@ -1,0 +1,201 @@
+{
+  "id": "p43",
+  "name": "Emma Patel",
+  "first_name": "Emma",
+  "last_name": "Patel",
+  "birthday": "06/24/1998",
+  "gender": "female",
+  "location": {
+    "name": "Redwood City, California",
+    "latitude": 37.48196,
+    "longitude": -122.23157
+  },
+  "picture": {
+    "data": {
+      "color": "#f7b928"
+    }
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "pg_1331360593",
+        "name": "Unsplash",
+        "category": "Arts & Entertainment",
+        "created_time": "2020-03-11T12:00:00+0000"
+      },
+      {
+        "id": "pg_603487733",
+        "name": "Audubon Society",
+        "category": "Nonprofit Organization",
+        "created_time": "2022-07-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_3945656910",
+        "name": "National Park Service",
+        "category": "Nonprofit Organization",
+        "created_time": "2022-02-19T12:00:00+0000"
+      },
+      {
+        "id": "pg_3993053882",
+        "name": "Midpeninsula Open Space",
+        "category": "Nonprofit Organization",
+        "created_time": "2019-09-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_1719253395",
+        "name": "Big Basin Redwoods",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2019-07-18T12:00:00+0000"
+      },
+      {
+        "id": "pg_2295242715",
+        "name": "REI",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2020-09-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_1452298579",
+        "name": "Bay Area Hiker",
+        "category": "Outdoor & Sporting Goods",
+        "created_time": "2021-04-10T12:00:00+0000"
+      },
+      {
+        "id": "pg_355211039",
+        "name": "Rapha",
+        "category": "Sports & Recreation",
+        "created_time": "2023-09-17T12:00:00+0000"
+      },
+      {
+        "id": "pg_142780729",
+        "name": "Cantor Arts Center",
+        "category": "Museum",
+        "created_time": "2020-07-16T12:00:00+0000"
+      },
+      {
+        "id": "pg_2432891253",
+        "name": "Vinyl Me, Please",
+        "category": "Shopping & Retail",
+        "created_time": "2025-07-12T12:00:00+0000"
+      },
+      {
+        "id": "pg_3542300262",
+        "name": "Rasputin Music",
+        "category": "Shopping & Retail",
+        "created_time": "2019-09-11T12:00:00+0000"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVFIUjA",
+        "after": "QVFIUjE"
+      }
+    }
+  },
+  "groups": {
+    "data": [
+      {
+        "id": "gr_2787739642",
+        "name": "Peninsula Weekend Riders",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_2238783715",
+        "name": "Bay Area Campers",
+        "privacy": "OPEN"
+      },
+      {
+        "id": "gr_1150949717",
+        "name": "Santa Clara Valley Birders",
+        "privacy": "OPEN"
+      }
+    ]
+  },
+  "music": {
+    "data": [
+      {
+        "id": "pg_383266400",
+        "name": "boygenius",
+        "category": "Musician/Band"
+      },
+      {
+        "id": "pg_772350187",
+        "name": "Alvvays",
+        "category": "Musician/Band"
+      }
+    ]
+  },
+  "events": {
+    "data": [
+      {
+        "id": "ev_2353355191",
+        "name": "Big Sur Camping Trip",
+        "start_time": "2026-07-22T19:00:00-0700",
+        "rsvp_status": "attending"
+      },
+      {
+        "id": "ev_378048372",
+        "name": "Windy Hill Sunset Hike",
+        "start_time": "2025-07-24T19:00:00-0700",
+        "rsvp_status": "attending"
+      }
+    ]
+  },
+  "friends": {
+    "data": [
+      {
+        "id": "p28",
+        "name": "Julia Mensah"
+      },
+      {
+        "id": "p35",
+        "name": "Malik Moreau"
+      },
+      {
+        "id": "p39",
+        "name": "Noah Ferreira"
+      },
+      {
+        "id": "p42",
+        "name": "Felix Brooks"
+      },
+      {
+        "id": "p48",
+        "name": "Hugo Andersen"
+      },
+      {
+        "id": "p49",
+        "name": "Valeria Kim"
+      },
+      {
+        "id": "p52",
+        "name": "Jonah Nguyen"
+      }
+    ],
+    "summary": {
+      "total_count": 7
+    }
+  },
+  "x_not_interested": {
+    "data": [
+      {
+        "id": "pg_857284444",
+        "name": "Rose & Crown Pub",
+        "category": "Bar",
+        "created_time": "2023-01-18T12:00:00+0000"
+      }
+    ]
+  },
+  "x_availability": {
+    "data": [
+      {
+        "day": "sat",
+        "start": "07:00",
+        "end": "18:00"
+      }
+    ]
+  },
+  "x_preferences": {
+    "women_only_party": false
+  },
+  "x_cluster": "hike-photo"
+}
