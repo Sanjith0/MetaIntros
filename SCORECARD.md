@@ -46,6 +46,15 @@ after F5 (10:36 UTC):
 | Demo video | `npm run video` | `saved shots/demo.webm (5407687 bytes, about 60 s)`; timeline 0.1s events, 4.3s event, 11.4s sentence and private preview, 16.4s party forming, 18.0s the table live, 30.5s MATCH FOUND, 35.5s group chat, 40.6s party card, 43.1s Maya's secret, 46.7s event RSVP, 50.8s door card, 57.5s run it back |
 | CI | `gh run list --branch swarit-features` | `success` since the lockfile fix |
 
+Checkpoint after F10 (11:02 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npx playwright test` (production build, cold) | 25 specs, `25 passed (3.2m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Unit | `npm test` | `Tests  106 passed (106)` |
+| Demo video | `npm run video` | `saved shots/demo.webm (5535680 bytes, about 60 s)`; same timeline as the F5 checkpoint (MATCH FOUND at 30.3s, Maya's secret at 42.9s) |
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 

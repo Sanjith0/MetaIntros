@@ -59,8 +59,9 @@ recorded or live answers, a forced agent timeout, and the door's frame source.
    frame `fixtures/frames/dev-at-door.json` with `curl -X POST localhost:3000/api/demo/frame`). Dev's card appears: how you're
    connected, what you have in common, and what to say. (`POST /api/frames` takes any Frame
    directly.)
-7. Open `/runitback`, pick people privately, and see only the mutual pairs. `/fair` shows the
-   QR join with a typed profile and a consent box.
+7. Open `/runitback`, pick people privately, and see only the mutual pairs, each with a private
+   chat. Three who all picked each other become a standing party; everyone without a match sees
+   the same "Queue again" card. `/fair` shows the QR join with a typed profile and a consent box.
 
 **Automated:** `npm run test:demo` runs the same path with five browser contexts and checks
 that all five show MATCH FOUND within 2 seconds of `plan.locked`, with sound. A 60-second
@@ -77,6 +78,11 @@ recording is at `shots/demo.webm` (`npm run video` re-records it).
 | `REAL_PHONES` | `/phones` QR join on the local network, presence, server-clock acks, sound unlock, vibration |
 | `MODEL_READINESS` | streamed verdicts, per-agent latency, labelled fallbacks on timeout, recorded replays |
 | `DEMO_PANEL` | `/demo` presenter controls |
+| `DUO_QUEUE` | bring a friend (both land in one party); women-only and not-the-only-woman in the queue sheet |
+| `BRIDGE_PRIVACY` | ties are shown without naming a third person who never opted in |
+| `CHAT_LIFECYCLE` | I'm here pings, leaving before the lock without attribution, chats that close after the event |
+| `GLASSES_VIEW` | `/door/glasses` heads-up view, and a recorded-clip frame source labelled as recorded |
+| `RUN_IT_BACK_PLUS` | a private chat per mutual pair, one identical queue-again card, standing parties |
 
 Turn one off with `PQ_FLAG_<NAME>=0`. `FEATURES.md` lists every feature with its proof.
 
@@ -138,7 +144,7 @@ Turn one off with `PQ_FLAG_<NAME>=0`. `FEATURES.md` lists every feature with its
 
 ```bash
 npm run typecheck
-npm test                     # 77 unit tests (vitest)
+npm test                     # 106 unit tests (vitest)
 npm test -- queue            # one failing fixture per formation rule
 npm test -- agents           # the four required agent cases and more
 npm run contract:check       # fixtures and events against the Zod contracts
@@ -163,8 +169,8 @@ lib/agents/  brief, agent turns, table talk, judge, verifier, pair talk, orchest
 lib/queue/   party formation rules
 lib/server/  in-memory store, event bus, queue, views, door, after
 lib/door/    the recognition interface and stub
-app/         routes: /events /event/[id] /queue /party /chat/[id] /stage /door /runitback /fair
-             /phones /join/[id] /demo
+app/         routes: /events /event/[id] /queue /party /chat/[id] /stage /door /door/glasses
+             /runitback /fair /phones /join/[id] /demo
 evals/       eval harness, cases and PLAN.md
 reference/   the Facebook reference written from REA
 tests/       unit (vitest) and Playwright specs
