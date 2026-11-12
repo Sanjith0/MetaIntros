@@ -126,9 +126,10 @@ npm run test:e2e             # all Playwright specs (screenshots in shots/)
 npm run test:demo            # five-context demo path
 ```
 
-Playwright reuses a dev server already running on port 3000 (Next 16 allows one dev server per
-project folder), or starts one. CI (`.github/workflows/ci.yml`) runs typecheck, unit tests and
-the contract check on every push.
+Playwright runs against a production build: it runs `next build`, starts `next start` on port
+3210, and stops it afterwards, so every run starts cold and never depends on a warm dev server.
+`PQ_REUSE=1` reuses a server already on that port; `PQ_DEV=1` runs against `next dev` instead.
+CI (`.github/workflows/ci.yml`) runs typecheck, unit tests and the contract check on every push.
 
 ## Layout
 

@@ -58,7 +58,7 @@ const counterFile = () =>
 
 function readCount(): number {
   try {
-    return Number(JSON.parse(fs.readFileSync(counterFile(), "utf8")).count) || 0;
+    return Number(JSON.parse(fs.readFileSync(/*turbopackIgnore: true*/ counterFile(), "utf8")).count) || 0;
   } catch {
     return 0;
   }
@@ -67,8 +67,8 @@ function readCount(): number {
 function bumpCount(): number {
   const next = readCount() + 1;
   try {
-    fs.mkdirSync(path.dirname(counterFile()), { recursive: true });
-    fs.writeFileSync(counterFile(), JSON.stringify({ count: next, updatedAt: new Date().toISOString() }));
+    fs.mkdirSync(/*turbopackIgnore: true*/ path.dirname(counterFile()), { recursive: true });
+    fs.writeFileSync(/*turbopackIgnore: true*/ counterFile(), JSON.stringify({ count: next, updatedAt: new Date().toISOString() }));
   } catch {
     /* counting is best effort; the in-memory guard below still applies */
   }
