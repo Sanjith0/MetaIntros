@@ -6,6 +6,7 @@ import { playersFound, runTickAsync, type Candidate, type Proposal, type QueueIt
 import { pairAllowed } from "@/lib/match/safety";
 import { loadPeople, type Person } from "@/lib/profile/load";
 import { publish } from "./bus";
+import { setAiMode } from "@/lib/ai";
 import { getFillMode, getSetting } from "./settings";
 import { formParty, chooseCandidate } from "./pipeline";
 import { checkStalls } from "./host";
@@ -134,6 +135,8 @@ export async function tick(): Promise<number> {
   if (ticking) return 0;
   ticking = true;
   try {
+    const aiMode = await getSetting("aiMode", "");
+    if (process.env.NODE_ENV !== "test" && (aiMode === "cache" || aiMode === "live")) setAiMode(aiMode);
     const waiting = await waitingItems();
     if (waiting.length < 2) return 0;
     const people = await loadPeople(prisma, waiting.map((w) => w.userId));

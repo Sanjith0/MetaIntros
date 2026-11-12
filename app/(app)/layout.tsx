@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { TabBar } from "@/components/TabBar";
+import { LiveRefresher } from "@/components/LiveRefresher";
 import { getBadges } from "@/lib/server/badges";
 import { getCurrentUser } from "@/lib/server/session";
 
@@ -13,6 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <Header me={me} />
       <main>{children}</main>
       <TabBar initial={badges} />
+      <LiveRefresher />
     </div>
   );
 }
