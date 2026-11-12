@@ -104,6 +104,7 @@ export function StageReplay({
   publicAtLoad = false,
   locked = false,
   follow = null,
+  keys = false,
 }: {
   initial: StageView;
   leakTest?: boolean;
@@ -117,7 +118,11 @@ export function StageReplay({
   locked?: boolean;
   /** F46: a QR to the room's view, shown on the public screen. */
   follow?: { url: string; svg: string } | null;
+  /** F47: presenter keyboard shortcuts. */
+  keys?: boolean;
 }) {
+  const [showCaptions, setShowCaptions] = useState(true);
+  const [help, setHelp] = useState(false);
   const [pub, setPub] = useState(locked || (publicScreen && publicAtLoad));
   const q = locked ? "&public=1" : "";
   const togglePublic = () => {
@@ -222,6 +227,73 @@ export function StageReplay({
   useEffect(() => {
     if (live) setPos(total);
   }, [live, total]);
+
+  // F47: presenter keys. Ignored while typing, inside a dialog, or on a focused button (Space stays the button's).
+  const keyState = useRef({ pos, total, live, playing });
+  keyState.current = { pos, total, live, playing };
+  const toggleRef = useRef(togglePublic);
+  toggleRef.current = togglePublic;
+  useEffect(() => {
+    if (!keys) return;
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (el && (["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) || el.isContentEditable || el.closest("[role=dialog]"))) return;
+      if (el?.tagName === "BUTTON" && (e.key === " " || e.key === "Enter")) return;
+      const k = keyState.current;
+      const step = (d: number) => {
+        setLive(false);
+        setPlaying(false);
+        setPos(Math.max(0, Math.min(k.total, k.pos + d)));
+      };
+      switch (e.key) {
+        case " ":
+          e.preventDefault();
+          setLive(false);
+          if (k.pos >= k.total) setPos(0);
+          setPlaying(!(k.playing && !k.live));
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          step(e.shiftKey ? -10 : -1);
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          step(e.shiftKey ? 10 : 1);
+          break;
+        case "Home":
+          step(-k.total);
+          break;
+        case "End":
+        case "l":
+        case "L":
+          setPlaying(false);
+          setLive(true);
+          break;
+        case "p":
+        case "P":
+          if (publicScreen && !locked) toggleRef.current();
+          break;
+        case "c":
+        case "C":
+          setShowCaptions((x) => !x);
+          break;
+        case "1":
+        case "2":
+        case "4":
+          setSpeed(Number(e.key) as (typeof SPEEDS)[number]);
+          break;
+        case "?":
+          setHelp((x) => !x);
+          break;
+        case "Escape":
+          setHelp(false);
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [keys, publicScreen, locked]);
 
   const visible = view.traces.slice(0, pos);
   const board = useMemo(() => boardAt(view.traces, pos), [view.traces, pos]);
@@ -375,7 +447,29 @@ export function StageReplay({
           <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
         </div>
       </header>
-      {captions && (
+      {keys && help && (
+        <div className="fixed bottom-4 right-4 z-[55] w-[300px] rounded-[12px] bg-[#14151c] p-4 text-[14px] text-white/85 shadow-2xl ring-1 ring-white/15" role="note" aria-label="Keyboard shortcuts" data-testid="keys-help">
+          <div className="mb-2 text-[15px] font-bold text-white">Presenter keys</div>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+            {[
+              ["Space", "play or pause the replay"],
+              ["← →", "step back or forward (Shift: 10)"],
+              ["Home", "back to the start"],
+              ["L or End", "live"],
+              ["P", "public screen on or off"],
+              ["C", "captions on or off"],
+              ["1 2 4", "replay speed"],
+              ["?", "this list"],
+            ].map(([k, d]) => (
+              <div key={k} className="contents">
+                <dt className="font-mono font-semibold text-white">{k}</dt>
+                <dd>{d}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
+      {captions && showCaptions && (
         <div
           aria-live="polite"
           data-testid="stage-caption"

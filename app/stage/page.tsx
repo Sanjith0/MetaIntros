@@ -37,6 +37,7 @@ export default async function StagePage({ searchParams }: { searchParams: Promis
       publicAtLoad={screen === "public"}
       locked={room}
       follow={await followQr()}
+      keys={flag("STAGE_KEYS") && !room}
     />
   );
 }

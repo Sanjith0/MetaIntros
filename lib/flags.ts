@@ -98,6 +98,8 @@ const DEFAULTS = {
   CLOSEST_FIT: true,
   /** F46: follow along: /stage?screen=public is enforced on the server (anonymous seats, no words) and the projector shows a QR to it. */
   FOLLOW_ALONG: true,
+  /** F47: presenter keys on /stage: Space play/pause, arrows step, L live, P public screen, C captions, 1/2/4 speed, ? help. */
+  STAGE_KEYS: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

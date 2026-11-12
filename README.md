@@ -35,7 +35,8 @@ real table talk; `npm run record` saves a run for the recorded replay.
 
 Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/demo`, run
 **Preflight** first: it rehearses the whole party in a sandbox and says what to fix. The
-**Run of show** below it has the same script as nine timed beats with one-click setup. Then:
+**Run of show** below it has the same script as nine timed beats with one-click setup. On the
+projector, press **?** for the presenter keys. Then:
 **Reset everything**, then **Pre-queue Dev, Ana, Kai, Zoe**. Pick a pace (Stage is good).
 
 1. **One sentence (Maya's phone).** Events → *Rooftop Sunset Session* → **Find my party**.
@@ -137,6 +138,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `FRIEND_GROUP` | bring up to three friends from the queue sheet: one invite each, the group waits for everyone, lands in one party with new people, and each types their own sentence |
 | `CLOSEST_FIT` | when nothing there fits your own rules, your phone (only yours) names the closest plan and the change that would open it ("stay until 9:30 PM") |
 | `FOLLOW_ALONG` | **Follow along**: the public projector shows a QR to `/stage?screen=room`, the room's view on any phone, enforced on the server: anonymous seats, code's rows, no bus events, no names, no words, no operator controls |
+| `STAGE_KEYS` | presenter keys on `/stage`: Space play/pause, ← → step (Shift: 10), Home start, L live, P public screen, C captions, 1/2/4 speed, ? the list |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
