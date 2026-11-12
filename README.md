@@ -14,7 +14,7 @@ npm run dev                  # http://localhost:3000 (open in a phone-sized wind
 
 Without a key everything works on a deterministic fallback, and the header shows a **Mock AI** badge. With a key the badge reads **Muse live**.
 
-Smoke-test your key and model IDs: `node --env-file=.env.local scripts/smoke-muse.mjs`. To exercise the live-model code path with no key, run `node scripts/fake-muse.mjs` and start the app with `META_API_BASE_URL=http://localhost:4010 META_API_KEY=x`.
+Live Muse runs on the Meta Model API at `https://api.meta.ai/v1` (not api.llama.com), with `muse-spark-1.3` for crew formation and venue picks and `muse-ember-1.0` for icebreakers and chat. Both models reason before answering, so `src/lib/muse.ts` adds `MUSE_REASONING_HEADROOM` (default 3000) tokens on top of each call's answer budget and sends `reasoning_effort: low` (`MUSE_REASONING_EFFORT`). Smoke-test your key and model IDs: `node --env-file=.env.local scripts/smoke-muse.mjs`. To exercise the live-model code path with no key, run `node scripts/fake-muse.mjs` and start the app with `META_API_BASE_URL=http://localhost:4010 META_API_KEY=x`.
 
 ## Demo path
 

@@ -5,7 +5,7 @@ if (!base || !key) {
   console.error("Set META_API_BASE_URL and META_API_KEY (see .env.example)");
   process.exit(1);
 }
-const models = [process.env.MUSE_SPARK_MODEL || "muse-spark-1.3", process.env.MUSE_EMBER_MODEL || "muse-ember"];
+const models = [process.env.MUSE_SPARK_MODEL || "muse-spark-1.3", process.env.MUSE_EMBER_MODEL || "muse-ember-1.0"];
 try {
   const r = await fetch(`${base}/models`, { headers: { Authorization: `Bearer ${key}` } });
   console.log("GET /models", r.status, (await r.text()).slice(0, 800));
@@ -20,7 +20,8 @@ for (const model of models) {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify({
         model,
-        max_tokens: 60,
+        max_tokens: 2000,
+        reasoning_effort: process.env.MUSE_REASONING_EFFORT ?? "low",
         ...(json ? { response_format: { type: "json_object" } } : {}),
         messages: [{ role: "user", content: 'Reply with JSON {"ok": true, "model": "<your name>"}' }],
       }),
