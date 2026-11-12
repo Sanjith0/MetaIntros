@@ -70,6 +70,8 @@ export interface Store {
   door: Map<string, { late: Record<string, number>; meet: { text: string; by: string } | null }>;
   /** F39: what each person's agent remembers about plans they liked, with their OK. Never about people. */
   memory: Map<string, { tag: string; weight: number; from: string }[]>;
+  /** F42: people who can't make a locked plan and weren't replaced: `${partyId}:${userId}`. */
+  dropped: Set<string>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -118,6 +120,7 @@ function fresh(): Store {
     forgotten: new Set(),
     door: new Map(),
     memory: new Map(),
+    dropped: new Set(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

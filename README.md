@@ -132,6 +132,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `AGENT_MEMORY` | your agent remembers, with your OK: after the night, "Loved it" or "Too loud" becomes preferences you tick ("prefers quiet"); next time they're in your private preview, preferences only, never rules; you can leave them out or make it forget |
 | `MY_DATA` | `/me`, "Your data": everything Party Queue holds about you (profile facts, sentence and brief, queue, parties, memory, picks, blocks and reports, messages), where to change each, and a JSON download |
 | `PUBLIC_SCREEN` | **Public screen** on `/stage` (`?screen=public`): for a screen the whole room can see; plans, a signature count, code's rows and captions only: no names, no reasons, no one's words |
+| `SEAT_REFILL` | **Can't make it?** on `/party` after the lock: the plan stands; someone waiting nearby whose own rules pass it, and who fits the party, takes the seat (their agent meets the other four); the others are told one person couldn't make it, never who |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -178,7 +179,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 227 unit tests (vitest)
+npm test                       # 231 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

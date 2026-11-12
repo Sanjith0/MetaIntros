@@ -57,26 +57,7 @@ export function finalize(partyId: string, table: TableResult, pairs: PairResult[
 
   // Cards: for each viewer and each other member, what's in common and what to say.
   s.cards = s.cards.filter((c) => c.partyId !== party.id);
-  for (const pr of pairs) {
-    for (const [viewer, subject] of [
-      [pr.a, pr.b],
-      [pr.b, pr.a],
-    ] as const) {
-      const opener = pr.openers[viewer]!;
-      const tie = bridgeLine(party, consentedBridges(party, viewer, subject));
-      const card: Card = {
-        partyId: party.id,
-        viewerId: viewer,
-        subjectId: subject,
-        subjectName: profile(subject).firstName,
-        bridgeLine: tie?.text ?? null,
-        sharedLine: pr.shared.text,
-        opener: opener.text,
-        sourceIds: [...new Set([...pr.shared.sourceIds, ...opener.sourceIds, ...(tie?.sourceIds ?? [])])],
-      };
-      s.cards.push(card);
-    }
-  }
+  for (const pr of pairs) s.cards.push(...cardsForPair(party, pr));
 
   // Receipts: per owner, what their agent considered, rejected and said.
   for (const owner of party.memberIds) s.receipts.set(`${party.id}:${owner}`, receiptFor(party, owner, pairs));
@@ -132,6 +113,27 @@ export function finalize(partyId: string, table: TableResult, pairs: PairResult[
     party.memberIds,
     { stage: true },
   );
+}
+
+/** Both directions of one pair's cards: how they're tied, what they share, what to say. */
+export function cardsForPair(party: Party, pr: PairResult): Card[] {
+  return ([
+    [pr.a, pr.b],
+    [pr.b, pr.a],
+  ] as const).map(([viewer, subject]) => {
+    const opener = pr.openers[viewer]!;
+    const tie = bridgeLine(party, consentedBridges(party, viewer, subject));
+    return {
+      partyId: party.id,
+      viewerId: viewer,
+      subjectId: subject,
+      subjectName: profile(subject).firstName,
+      bridgeLine: tie?.text ?? null,
+      sharedLine: pr.shared.text,
+      opener: opener.text,
+      sourceIds: [...new Set([...pr.shared.sourceIds, ...opener.sourceIds, ...(tie?.sourceIds ?? [])])],
+    };
+  });
 }
 
 export function receiptFor(party: Party, ownerId: string, pairs: PairResult[]): Receipt {

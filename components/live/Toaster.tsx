@@ -73,6 +73,16 @@ export function Toaster({ people, keyboard = true }: { people: Directory; keyboa
         push({ id: e.id, title: "Party Queue", body: "Your party changed before the plan was set. Nobody was named. You're back at the front of the queue.", href: "/queue", layer: true });
         router.refresh();
         break;
+      case "party.seat":
+        push({
+          id: e.id,
+          title: "Party Queue",
+          body: e.payload.refilled ? "One person couldn't make it. Someone new is taking the seat." : "One person can't make it. The plan stands.",
+          href: "/party",
+          layer: true,
+        });
+        router.refresh();
+        break;
       case "party.nomatch":
         push({ id: e.id, title: "Party Queue", body: "No plan fit all five of you. Nobody was told why. Open your party for what's next.", href: "/party", layer: true });
         router.refresh();

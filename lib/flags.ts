@@ -88,6 +88,8 @@ const DEFAULTS = {
   MY_DATA: true,
   /** F41: public screen mode for /stage: what the room may see (plans, a signature count, code events, captions without names). No reasons, no names, no lines. */
   PUBLIC_SCREEN: true,
+  /** F42: "Can't make it" after the lock: the seat is refilled from the queue by someone whose own rules pass the plan; nobody is told who left. */
+  SEAT_REFILL: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -135,7 +135,8 @@ export function openerText(target: { firstName: string }, fact: Fact): string {
   return `${target.firstName}, ${lowerFirst(fact.ask)}`;
 }
 
-async function onePair(party: Party, a: string, b: string, pace: () => number): Promise<PairResult> {
+/** One pair's talk. Exported for a seat refilled after the lock (F42). */
+export async function onePair(party: Party, a: string, b: string, pace: () => number): Promise<PairResult> {
   const A = sideFor(a);
   const B = sideFor(b);
   const bridges = consentedBridges(party, a, b);

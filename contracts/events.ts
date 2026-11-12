@@ -23,6 +23,7 @@ export const EVENT_TYPES = [
   "party.forming",
   "party.dissolved",
   "party.nomatch",
+  "party.seat",
   "agent.verdict",
   "table.message",
   "pair.message",
@@ -83,6 +84,14 @@ export const PartyDissolvedPayload = z
   })
   .strict();
 
+/** F42: after the lock, one person couldn't make it (and maybe someone new joined). No name, no reason. */
+export const PartySeatPayload = z
+  .object({
+    partyId: Id,
+    refilled: z.boolean(),
+  })
+  .strict();
+
 /** No plan fit all five. Like party.dissolved, it can't carry a reason or a name. */
 export const PartyNoMatchPayload = z
   .object({
@@ -131,6 +140,7 @@ export const PAYLOADS = {
   "party.forming": PartyFormingPayload,
   "party.dissolved": PartyDissolvedPayload,
   "party.nomatch": PartyNoMatchPayload,
+  "party.seat": PartySeatPayload,
   "agent.verdict": Verdict,
   "table.message": TableMessage,
   "pair.message": PairMessage,
@@ -171,6 +181,7 @@ export const PQEvent = z.discriminatedUnion("type", [
   envelope("party.forming"),
   envelope("party.dissolved"),
   envelope("party.nomatch"),
+  envelope("party.seat"),
   envelope("agent.verdict"),
   envelope("table.message"),
   envelope("pair.message"),

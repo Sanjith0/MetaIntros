@@ -22,12 +22,14 @@ import { isForgotten } from "@/lib/server/forget";
 import { agentStory } from "@/lib/server/story";
 import { friendMessage } from "@/lib/server/tellfriend";
 import { TellFriend } from "@/components/party/TellFriend";
+import { CantMakeIt } from "@/components/party/CantMakeIt";
+import { hasDropped } from "@/lib/server/refill";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
 
-export default async function PartyPage({ searchParams }: { searchParams: Promise<{ left?: string }> }) {
-  const { left } = await searchParams;
+export default async function PartyPage({ searchParams }: { searchParams: Promise<{ left?: string; cantmake?: string }> }) {
+  const { left, cantmake } = await searchParams;
   const viewer = await currentViewerId();
   const v = memberPartyViewForViewer(viewer);
   const s = store();
@@ -40,9 +42,14 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
         <div className="rounded-[12px] bg-white p-6 text-center shadow-[var(--shadow-card)]" data-testid="no-party">
           <IconSparkle size={28} className="mx-auto text-[var(--color-pq)]" />
           <h1 className="mt-2 text-[20px] font-bold" data-testid="no-party-title">
-            {left ? "You left the party" : q?.entry.status === "waiting" ? "You're in the queue" : "No party yet"}
+            {left ? "You left the party" : cantmake ? "Your seat went to someone new" : q?.entry.status === "waiting" ? "You're in the queue" : "No party yet"}
           </h1>
           {left && <p className="mt-1 text-[15px] text-[var(--color-ink-2)]">The other four are back at the front of the queue. They weren't told who left.</p>}
+          {cantmake && (
+            <p className="mt-1 text-[15px] text-[var(--color-ink-2)]" data-testid="cantmake-done">
+              Someone waiting nearby took your seat. The others were told one person couldn&apos;t make it, not who.
+            </p>
+          )}
           <p className="mt-1 text-[15px] text-[var(--color-ink-2)]">
             {q?.entry.status === "waiting" ? `${q.inBucket} of 5 near ${q.entry.landmark}. We'll notify you when your party is set.` : "Open any event and tap Find my party."}
           </p>
@@ -111,6 +118,18 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
                     </a>
                   )}
                 </div>
+                {flag("SEAT_REFILL") &&
+                  (hasDropped(v.party.id, viewer) ? (
+                    <p className="mt-3 text-[13px] text-[var(--color-ink-2)]" data-testid="cantmake-dropped">
+                      You said you can&apos;t make it. The plan stands for the other four.
+                    </p>
+                  ) : (
+                    !s.arrivals.get(v.party.id)?.has(viewer) && (
+                      <div className="mt-3">
+                        <CantMakeIt partyId={v.party.id} />
+                      </div>
+                    )
+                  ))}
               </>
             ) : (
               <>

@@ -10,6 +10,7 @@ export const SAMPLE_PAYLOADS: { [T in EventType]: PayloadOf<T> } = {
   "party.forming": { partyId: "p-1", memberIds: ["maya", "dev", "ana", "kai", "zoe"], landmark: "Dolores Park" },
   "party.dissolved": { partyId: "p-1" },
   "party.nomatch": { partyId: "p-1" },
+  "party.seat": { partyId: "p-1", refilled: true },
   "agent.verdict": {
     partyId: "p-1",
     ownerId: "maya",
