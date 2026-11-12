@@ -6,6 +6,8 @@ import { partyForViewer, person } from "@/lib/server/social";
 import { store } from "@/lib/server/store";
 import { flag } from "@/lib/flags";
 import { dayLabel } from "@/lib/format";
+import { MemoryCard } from "@/components/after/MemoryCard";
+import { LABEL, memoryOf, suggestions } from "@/lib/server/memory";
 import { currentViewerId } from "@/lib/server/viewer";
 
 export const metadata: Metadata = { title: "Run it back" };
@@ -46,6 +48,15 @@ export default async function RunItBackPage() {
         <h1 className="text-[24px] font-bold leading-tight">How was {plan?.title ?? "your night"}?</h1>
       </div>
       <RunItBack key={viewer} partyId={party.id} viewerId={viewer} members={party.memberIds.map(person)} initial={view} nextEvents={nextEvents} />
+      {flag("AGENT_MEMORY") && plan && (
+        <MemoryCard
+          partyId={party.id}
+          planTitle={plan.title}
+          offers={{ loved: suggestions(party.id, viewer, "loved"), loud: suggestions(party.id, viewer, "loud"), meh: [] }}
+          labels={LABEL}
+          initial={memoryOf(viewer)}
+        />
+      )}
     </main>
   );
 }

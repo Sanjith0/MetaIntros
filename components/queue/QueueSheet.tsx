@@ -79,6 +79,7 @@ export function QueueSheet({
   voice = false,
   standing = null,
   editable = false,
+  memory = [],
 }: {
   eventId: string;
   landmark: string;
@@ -96,7 +97,10 @@ export function QueueSheet({
   standing?: Standing | null;
   /** F34: offer "Change it" while waiting. */
   editable?: boolean;
+  /** F39: what your agent remembers from last time (yours only). */
+  memory?: { tag: string; label: string; from: string }[];
 }) {
+  const [useMemory, setUseMemory] = useState(true);
   const [sentence, setSentence] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
   const [approved, setApproved] = useState<Record<string, boolean>>({});
@@ -165,6 +169,7 @@ export function QueueSheet({
         approvedLineIds: Object.keys(approved).filter((k) => approved[k]),
         duoWith: standing ? null : duoWith || null,
         groupOf: standing?.partyId ?? null,
+        useMemory,
         scope,
         ...(isWoman ? { settings } : {}),
       }),
@@ -380,6 +385,22 @@ export function QueueSheet({
                     </li>
                   ))}
                 </ul>
+              </div>
+            )}
+            {memory.length > 0 && (
+              <div data-testid="memory-preview">
+                <div className="text-[13px] font-semibold text-[var(--color-ink-3)]">From last time</div>
+                <ul className={`mt-1 flex flex-wrap gap-1.5 ${useMemory ? "" : "line-through"}`}>
+                  {memory.map((m) => (
+                    <li key={m.tag} className="rounded-full bg-[var(--color-pq-soft)] px-2.5 py-1 text-[13px] font-semibold text-[var(--color-pq-ink)]" title={`From ${m.from}`}>
+                      {m.label}
+                    </li>
+                  ))}
+                </ul>
+                <label className="mt-1 flex items-center gap-2 text-[13px]">
+                  <input type="checkbox" checked={useMemory} onChange={(e) => setUseMemory(e.target.checked)} data-testid="use-memory" />
+                  Let my agent use these tonight (preferences only, never rules)
+                </label>
               </div>
             )}
             <div>

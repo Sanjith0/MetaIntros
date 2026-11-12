@@ -129,6 +129,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `TELL_A_FRIEND` | "Tell a friend where you'll be" on `/party`: a message for someone outside the app with the place, the time and when you'll check in; names nobody; copy or share, nothing is sent |
 | `FIND_EACH_OTHER` | "Find each other" on `/door`: running late (10, 20 or 30 min) and where we meet, live on everyone's door screen and in the chat; arriving clears "late" |
 | `ADD_TO_CALENDAR` | **Add to calendar** on the party card: the locked plan as an `.ics` file (local times; after midnight ends the next day; names nobody) |
+| `AGENT_MEMORY` | your agent remembers, with your OK: after the night, "Loved it" or "Too loud" becomes preferences you tick ("prefers quiet"); next time they're in your private preview, preferences only, never rules; you can leave them out or make it forget |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -174,7 +175,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 216 unit tests (vitest)
+npm test                       # 220 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

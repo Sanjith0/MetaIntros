@@ -1,6 +1,7 @@
 import type { CandidatePlan, Party, QueueEntry } from "@/contracts";
 import { EVENT_TAGS } from "@/fixtures";
 import { buildBrief } from "@/lib/agents/brief";
+import { withMemory } from "./memory";
 import { runParty } from "@/lib/agents/orchestrator";
 import { eligibleToQueue, formParty, bucketKey, nightOf, PARTY_SIZE, type Candidate } from "@/lib/queue/formation";
 import { flag } from "@/lib/flags";
@@ -17,6 +18,8 @@ export interface JoinInput {
   approvedLineIds?: string[];
   /** Queue together with this friend (duo queue). */
   duoWith?: string | null;
+  /** F39: add what your agent remembers to your preferences (default yes, if there is anything). */
+  useMemory?: boolean;
   /** Queue together with your standing party (the party id it came from). Everyone in it lands in one party. */
   groupOf?: string | null;
   /** "night": anywhere tonight, any of the evening's events (F14). Default: near this event. */
@@ -69,6 +72,7 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
   for (const e of s.queue) if (e.userId === input.userId && e.status === "waiting") e.status = "left";
 
   const built = await buildBrief(input.userId, input.sentence.trim(), p.facts, input.approvedLineIds);
+  if (input.useMemory !== false) built.brief = withMemory(built.brief, input.userId);
   s.briefs.set(built.brief.id, built.brief);
   for (const f of built.facts) s.briefFacts.set(f.id, f);
 
@@ -122,6 +126,7 @@ export async function updateSentence(userId: string, sentence: string, approvedL
   const text = sentence.trim();
   if (text.length < 3) throw new Error("Type one sentence about your night.");
   const built = await buildBrief(userId, text, profile(userId).facts, approvedLineIds);
+  built.brief = withMemory(built.brief, userId);
   for (const [id, f] of s.briefFacts) if (f.ownerId === userId && f.source === "brief") s.briefFacts.delete(id);
   s.briefs.set(built.brief.id, built.brief);
   for (const f of built.facts) s.briefFacts.set(f.id, f);

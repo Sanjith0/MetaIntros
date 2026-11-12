@@ -10,6 +10,7 @@ const Body = z.object({
   approvedLineIds: z.array(z.string()).optional(),
   duoWith: z.string().nullable().optional(),
   groupOf: z.string().nullable().optional(),
+  useMemory: z.boolean().optional(),
   scope: z.enum(["event", "night"]).optional(),
   settings: z.object({ womenOnly: z.boolean(), notOnlyWoman: z.boolean() }).optional(),
 });

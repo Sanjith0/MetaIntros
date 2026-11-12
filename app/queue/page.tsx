@@ -8,6 +8,7 @@ import { eventWhen } from "@/lib/format";
 import { candidatePlans, nightPlans, queueStatus } from "@/lib/server/queue";
 import { friendsOf } from "@/lib/graph";
 import { flag } from "@/lib/flags";
+import { LABEL, memoryOf } from "@/lib/server/memory";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 
@@ -79,6 +80,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
             duoEnabled={duoOn}
             voice={flag("VOICE_SENTENCE")}
             editable={flag("EDIT_SENTENCE")}
+            memory={flag("AGENT_MEMORY") ? memoryOf(viewer).map((m) => ({ tag: m.tag, label: LABEL[m.tag] ?? m.tag, from: m.from })) : []}
             standing={standing ?? (active?.group ? { partyId: active.group.of, others: (s.standing.get(active.group.of)?.memberIds ?? []).filter((id) => id !== viewer).map((id) => ({ id, firstName: s.profiles.get(id)!.firstName })) } : null)}
             night={flag("NIGHT_QUEUE") ? { nearCount: candidatePlans(e.landmark, e.date).length, tonightCount: nightPlans(e.date).length } : null}
             initialStatus={

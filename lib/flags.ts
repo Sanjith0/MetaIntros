@@ -82,6 +82,8 @@ const DEFAULTS = {
   FIND_EACH_OTHER: true,
   /** F38: "Add to calendar" on /party: the locked plan as an .ics file, local times, names nobody. */
   ADD_TO_CALENDAR: true,
+  /** F39: your agent remembers, with your OK: after the night, how the plan was for you becomes a preference it suggests next time. About plans, never people. */
+  AGENT_MEMORY: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

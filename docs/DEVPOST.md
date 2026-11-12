@@ -56,7 +56,7 @@ column is computed by scanning everything the other four can load, and it stays 
 - A code judge, a verifier for public lines, and pair talk where the model only picks fact ids.
 - A projector view with a scrubber that rebuilds the board (plans, signatures, the lock) at
   any moment of the replay.
-- Vitest (216 unit tests), Playwright (35+ end-to-end specs on a production build, including
+- Vitest (220 unit tests), Playwright (35+ end-to-end specs on a production build, including
   five phones at once, 390-pixel layouts and axe accessibility checks), and an eval harness.
 
 ## The leak test
