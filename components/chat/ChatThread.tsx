@@ -7,6 +7,7 @@ import { Avatar } from "@/components/Avatar";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { SquadHeader, type SquadHeaderData } from "./SquadHeader";
 import { ArchivedPrompt } from "./ArchivedPrompt";
+import { FastForwardButton } from "./FastForwardButton";
 
 interface U { id: string; name: string; avatarColor: string }
 export interface ThreadMessage { id: string; body: string; kind: string; createdAt: string; senderId: string | null; sender: U | null }
@@ -32,6 +33,10 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
   useEffect(() => {
     bottom.current?.scrollIntoView({ block: "end" });
   }, [messages.length]);
+  useEffect(() => {
+    if (chat.archived) setArchived(true);
+    setMessages((ms) => (chat.messages.length > ms.length ? chat.messages : ms));
+  }, [chat.archived, chat.messages]);
 
   useLiveEvents(["chat", "chat-archived"], (topic, data) => {
     const d = data as { chatId: string; message?: ThreadMessage };
@@ -65,7 +70,11 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
         <span className="truncate font-semibold" data-testid="chat-title">{title}</span>
         {chat.type === "squad" && <span className="rounded bg-queue-glow px-1.5 py-px text-[10px] font-bold uppercase text-white">Squad</span>}
       </div>
-      {squad && <SquadHeader squad={squad} meId={meId} />}
+      {squad && (
+        <SquadHeader squad={{ ...squad, archived }} meId={meId}>
+          {!archived && <FastForwardButton />}
+        </SquadHeader>
+      )}
       <ul className="flex-1 space-y-1.5 p-3" data-testid="messages">
         {messages.map((m) => {
           if (m.kind === "system")

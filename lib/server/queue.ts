@@ -10,6 +10,7 @@ import { getFillMode, getSetting } from "./settings";
 import { formParty, chooseCandidate } from "./pipeline";
 import "./hooks";
 import { checkStalls } from "./host";
+import { sweepExpiredChats } from "./expiry";
 
 // ───────────────────────── join / leave ─────────────────────────
 
@@ -169,6 +170,7 @@ export function ensureTicker() {
   g.__quTicker = setInterval(() => {
     tick().catch((e) => console.error("[queue tick]", e));
     checkStalls().catch((e) => console.error("[stalls]", e));
+    sweepExpiredChats().catch((e) => console.error("[expiry]", e));
   }, Number(process.env.QUEUE_TICK_MS ?? 2000));
 }
 

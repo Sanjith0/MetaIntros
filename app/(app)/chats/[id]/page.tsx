@@ -4,10 +4,12 @@ import { getCurrentUserId } from "@/lib/server/session";
 import { ChatThread } from "@/components/chat/ChatThread";
 import { now } from "@/lib/server/clock";
 import { getSquadHeader } from "@/lib/server/squadChat";
+import { sweepExpiredChats } from "@/lib/server/expiry";
 
 export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const userId = await getCurrentUserId();
+  await sweepExpiredChats();
   const chat = await getChatForUser(userId, id);
   if (!chat) notFound();
   await markChatRead(userId, id, new Date(Math.max(Date.now(), (await now()).getTime())));

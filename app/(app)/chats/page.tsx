@@ -5,9 +5,11 @@ import { listInbox } from "@/lib/server/chats";
 import { getCurrentUserId } from "@/lib/server/session";
 import { fmtDuration, timeAgo } from "@/lib/format";
 import { now as clockNow } from "@/lib/server/clock";
+import { sweepExpiredChats } from "@/lib/server/expiry";
 
 export default async function ChatsPage() {
   const userId = await getCurrentUserId();
+  await sweepExpiredChats();
   const [rows, now] = await Promise.all([listInbox(userId), clockNow()]);
   return (
     <div data-testid="chats-page" className="bg-white">
