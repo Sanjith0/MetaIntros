@@ -46,6 +46,18 @@ re-runs the same five in a sandbox with rules taken away, to show which rules cl
 On your own phone, **Maya's secret** shows your rules next to "What the party knows". That
 column is computed by scanning everything the other four can load, and it stays empty.
 
+Around the loop: bring up to three friends, or queue again as the standing party who all
+picked each other; change your sentence while you wait, or widen to anywhere tonight, and
+keep your place; say it in Spanish; if someone can't make it after the lock, the seat goes to
+someone waiting nearby whose rules pass the plan, and nobody is told who left; tell a friend
+where you'll be; find each other at the door ("running late", "let's meet by the fountain").
+Your agent remembers what you liked, only with your OK, and your private data from the night
+is deleted when the chat closes unless you keep it. `/me` lists everything held about you.
+
+For the room: the projector has a **public screen** that shows only what code decided about
+plans, and a QR so anyone can follow along on their phone. That view is sanitized on the
+server, and a test records its live stream to prove it.
+
 ## How we built it
 
 - Next.js (App Router, TypeScript), Tailwind, Zod contracts for every entity and event,
@@ -56,8 +68,10 @@ column is computed by scanning everything the other four can load, and it stays 
 - A code judge, a verifier for public lines, and pair talk where the model only picks fact ids.
 - A projector view with a scrubber that rebuilds the board (plans, signatures, the lock) at
   any moment of the replay.
-- Vitest (252 unit tests), Playwright (35+ end-to-end specs on a production build, including
-  five phones at once, 390-pixel layouts and axe accessibility checks), and an eval harness.
+- Vitest (252 unit tests), Playwright (65+ end-to-end specs on a production build, including
+  five phones at once, every route at 390 pixels and axe accessibility checks), and an eval
+  harness. Fifty features, each a layer behind one flags file, each with its proof in
+  `FEATURES.md`.
 
 ## The leak test
 
@@ -82,6 +96,9 @@ real model run.
 - Not naming third people: "You both know Priya" names someone who never opted in. Our first
   fix still leaked her id through a bridge id shown as a source; we caught it in a screenshot.
 - Timing: all five phones within a second, measured in server time, because phone clocks drift.
+- Our own projector was a leak: showing every agent's reasons on a wall is fine for a demo with
+  fictional people and wrong at a real fair. The public screen fixes the display; the room's
+  phones get a view sanitized on the server.
 
 ## Accomplishments
 
@@ -96,14 +113,13 @@ real model run.
 The model is good at negotiating and bad at keeping secrets, so give it nothing to keep. The
 demo has a **Rogue model** switch to prove it: every agent says yes to everything and tries to
 tell the table its person's rules, and code still locks a plan that passes all five people's
-rules with nothing leaked.
-Each agent knows one person, and code holds the line.
+rules with nothing leaked. Each agent knows one person, and code holds the line.
 
 ## What's next
 
 - Run the full suite against the real model (`npm run talk:real`, `npm run eval`).
 - A real recognition module behind `matchFrame` (the interface and the rules are in place).
-- Group queue beyond duos; standing parties that queue together.
+- More languages for the one sentence (Spanish is in).
 
 ## Built with
 

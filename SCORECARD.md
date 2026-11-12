@@ -158,6 +158,23 @@ buttons whose contrast Tailwind 4 had lowered); the creator of a friend group sa
 for" line (F44). The network dropped twice during pushes; commits waited locally and went up on
 retry.
 
+Checkpoint after F50 (15:30 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npm run test:e2e` (production build, cold) | 68 specs, `68 passed (7.2m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` (brief 20/20 with Spanish on) |
+| Unit | `npm test` | `Tests  252 passed (252)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 337/337 checks passed` |
+| Demo video | `npm run video` | `saved shots/demo.webm (7635304 bytes, about 61 s)` |
+
+README: a "For judges: what to check, and where" table at the top (ten claims, each with where to
+see it working). Devpost draft: the loop around the core (friends, standing parties, Spanish,
+seat refill, tell a friend, find each other, memory with consent, forget by default) and the
+room's sanitized view. Found and fixed between F45 and F50: the "follow along" QR as first
+planned pointed at a view that was only hidden in the browser, and the room phone showed an
+operator button (F46); the lock splash first let the board bleed through (F48).
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 

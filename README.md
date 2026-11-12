@@ -17,6 +17,23 @@ How it works, and where privacy is enforced: [docs/ARCHITECTURE.md](docs/ARCHITE
 Devpost draft: [docs/DEVPOST.md](docs/DEVPOST.md). Every feature and its proof:
 [FEATURES.md](FEATURES.md). Milestones and checks: [SCORECARD.md](SCORECARD.md).
 
+## For judges: what to check, and where
+
+Each of these works in the app and has a test; `/how` links to all of them.
+
+| Claim | See it |
+|---|---|
+| Each agent knows only its own person | `/stage`: tap any turn's **own brief only ✓** for the exact prompt it got |
+| A broken rule reaches the others only as "unavailable" | `/stage` shared lane; Maya's `/party` → "What the party knows: Nothing", computed by scanning what the other four can load |
+| Safety doesn't depend on the model behaving | `/demo` → **Rogue model**: every agent says yes to everything and tries to leak; code still locks a valid plan |
+| You can try to break it | `/stage` → **Try to leak it**: type a leak as any agent and watch the verifier stop it |
+| Rules decide which plans are open | `/stage` → **What if…**: take rules away and re-run the same five in a sandbox |
+| Every machine-written line is grounded | **Why this?** under any card, door card or chat opener |
+| The room can watch without anything leaking | `/stage` → **Public screen**, then scan the QR: the room's view is sanitized on the server |
+| Nothing is kept longer than the night | `/safety` → **Forget my night**, or wait: it's deleted when the chat closes; `/me` lists everything held about you |
+| When things go wrong, nobody is blamed | `/demo` → **Show a no-match**; `/party` → **Can't make it?** (the seat is refilled) |
+| It scales | `/evals` → **At fair scale**: 100 guests, 20 parties, every plan valid, 0 leaks |
+
 ## Run it
 
 ```bash
