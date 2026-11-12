@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Ravi tends to keep things low-key and chill, preferring relaxed hangouts where conversation can wander. They enjoy swapping recommendations and geeking out quietly over shared interests rather than big, loud plans.\",\"depth\":{\"p15:likes[0]\":\"Follows Vinyl Me, Please and is in Peninsula Vinyl Collectors\",\"p15:likes[4]\":\"Uses Letterboxd and is in Peninsula Film Club, went to Stanford Theatre Classic Double Feature\",\"p15:likes[3]\":\"Bay Area Hiker who is in Peninsula Bouldering Crew and Peninsula Bouldering League\",\"p15:music[0]\":\"Listens to Mitski, Japanese Breakfast, and Alvvays\"},\"lightsUp\":[\"p15:likes[0]\",\"p15:likes[4]\",\"p15:groups[1]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 580,
+    "completionTokens": 755
+  },
+  "savedAt": "2026-11-12T20:24:37.269Z"
+}

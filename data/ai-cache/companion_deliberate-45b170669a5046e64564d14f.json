@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p03\", \"members\": [\"p01\", \"p02\", \"p03\", \"p04\", \"p05\", \"p14\"], \"line\": {\"say\": \"Zoe would love a chill corner crew to trade vinyl and photo chat between sets.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[6]\", \"p03:likes[0]\", \"p03:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2287,
+    "completionTokens": 516
+  },
+  "savedAt": "2026-11-12T20:25:42.465Z"
+}

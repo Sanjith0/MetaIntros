@@ -10,6 +10,7 @@ import type { z } from "zod";
 import { cacheGet, cacheKey, cachePut } from "./cache";
 import { MockProvider } from "./providers/mock";
 import { fallbackFromEnv, museFromEnv } from "./providers/openaiCompat";
+import { makeLimiter, withRateLimitRetry } from "./throttle";
 import type { AiMode, AiSource, ChatMessage, LlmProvider } from "./types";
 
 export type { AiMode, AiSource } from "./types";
@@ -38,7 +39,10 @@ export function setAiMode(mode: AiMode | undefined) {
   state.mode = mode;
 }
 
-export const MAX_LIVE_CALLS = Number(process.env.AI_MAX_CALLS ?? 150);
+export const MAX_LIVE_CALLS = Number(process.env.AI_MAX_CALLS ?? 400);
+/** The Companion engine fires a dozen calls per round; stay inside the provider's rate limit. */
+const limit = makeLimiter(Number(process.env.AI_CONCURRENCY) || 6);
+const RETRY_DELAYS_MS = (process.env.AI_RETRY_MS ?? "3000,8000,15000,30000,30000").split(",").map(Number).filter((n) => n >= 0);
 
 function extractJson(text: string): unknown {
   const t = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
@@ -89,7 +93,7 @@ export async function runAi<T>(c: AiCall<T>): Promise<AiResult<T>> {
   const mode = getAiMode();
   const done = (r: AiResult<T>) => {
     state.log.push({ task: c.task, source: r.source, ms: Date.now() - t0, error: r.error });
-    if (state.log.length > 200) state.log.shift();
+    if (state.log.length > 2000) state.log.shift(); // one Companion-engine room is ~100 calls
     return r;
   };
   const parse = (text: string): T => c.schema.parse(extractJson(text));
@@ -121,7 +125,7 @@ export async function runAi<T>(c: AiCall<T>): Promise<AiResult<T>> {
   for (const p of providers) {
     try {
       state.calls++;
-      const r = await callProvider(p, c.task, messages, c as AiCall<unknown>);
+      const r = await limit(() => withRateLimitRetry(() => callProvider(p, c.task, messages, c as AiCall<unknown>), RETRY_DELAYS_MS));
       const value = parse(r.text);
       cachePut(key, r.text, { task: c.task, model: r.model, provider: p.name, usage: r.usage });
       return done({ value, source: "live" });

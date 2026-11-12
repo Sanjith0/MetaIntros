@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Ben is in for a chill 6-person weekend hang. They'd love swapping notes on Climbing Magazine, Vinyl Me, Please digging, and Snail Mail with this crew who all like low-key, chill plans.\", \"cites\": [\"p14:likes[0]\", \"p14:likes[1]\", \"p14:music[0]\", \"p14:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1563,
+    "completionTokens": 322
+  },
+  "savedAt": "2026-11-12T20:28:35.142Z"
+}

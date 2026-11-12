@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Reza would love this chill crew for Rasputin digs, bouldering beta and Fujifilm photo walk.\", \"cites\": [\"p04:likes[0]\", \"p04:likes[3]\", \"p04:likes[9]\", \"p04:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2008,
+    "completionTokens": 546
+  },
+  "savedAt": "2026-11-12T20:29:53.886Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p04\", \"p05\", \"p06\", \"p11\", \"p14\"], \"why\": \"You all overlap on Rasputin Music crate-digging, Bouldering Daily and Peninsula Boulders sessions, plus Vinyl Me, Please swaps and Climbing Magazine chat. Perfect for a low-key day of bouldering, record hunting, and Bay Area Concerts and Indie Shuffle talk over coffee.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2497,
+    "completionTokens": 2629
+  },
+  "savedAt": "2026-11-12T20:28:30.839Z"
+}

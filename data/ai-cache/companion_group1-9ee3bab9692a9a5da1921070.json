@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan is hoping for a chill new hangout with a squad of 4. They'd bring easy low-key energy and love swapping notes on bouldering, vinyl digging, and photo walks. They like low-key, chill plans and would prefer to skip anything Warriors-centered tonight.\", \"cites\": [\"p01:socialStyle\", \"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2066,
+    "completionTokens": 512
+  },
+  "savedAt": "2026-11-12T20:30:03.914Z"
+}

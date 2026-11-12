@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Ben is hoping for a chill squad of 6 for something low-key this weekend. They'd bring easy wandering chat about Climbing Magazine, Vinyl Me, Please and Snail Mail, and loves relaxed hangs. They'd prefer plans that stay low-key and not super early morning or sports-centered, more like vinyl or indie night vibes.\", \"cites\": [\"p14:likes[0]\", \"p14:likes[1]\", \"p14:music[0]\", \"p14:socialStyle\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2917,
+    "completionTokens": 430
+  },
+  "savedAt": "2026-11-12T20:28:33.199Z"
+}

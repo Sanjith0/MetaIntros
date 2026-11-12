@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p02\", \"line\": {\"say\": \"Gabe is into low-key edge seats, swapping V-Scale Memes and A24 takes between sets.\", \"cites\": [\"p12:likes[3]\", \"p12:likes[8]\", \"p12:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2090,
+    "completionTokens": 830
+  },
+  "savedAt": "2026-11-12T20:27:02.559Z"
+}

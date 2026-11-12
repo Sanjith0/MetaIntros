@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Rosa is stoked — everyone wants low-key, chill hangs and shares vinyl collecting, climbing culture, and Phoebe Bridgers. Perfect for photo walks and coffee chats.\", \"cites\": [\"p11:socialStyle\", \"p11:groups[0]\", \"p11:likes[2]\", \"p11:music[0]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1549,
+    "completionTokens": 306
+  },
+  "savedAt": "2026-11-12T20:28:35.032Z"
+}

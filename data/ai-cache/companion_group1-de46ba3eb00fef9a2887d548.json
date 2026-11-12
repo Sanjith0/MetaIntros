@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan is hoping for a chill Indie Night with this squad of 5, just enjoying local bands together low-key. They'd bring easy chat about climbing, vinyl hunting, and photo walks, plus shared love for indie music. Jordan likes low-key, chill plans, so keeping it relaxed between sets would make it work best for them.\", \"cites\": [\"p01:socialStyle\", \"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:groups[0]\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2430,
+    "completionTokens": 501
+  },
+  "savedAt": "2026-11-12T20:27:12.142Z"
+}

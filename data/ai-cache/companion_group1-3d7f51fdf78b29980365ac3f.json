@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Freya is hoping for a chill squad for Indie Night to enjoy local bands together. They'd bring easygoing energy from Peninsula Bouldering Crew, love for A24 and Bay Area Concerts, plus swapping V-Scale memes, concert tips and photo walk stories. They like low-key, relaxed hangs and work best when plans stay mellow.\", \"cites\": [\"p02:likes[0]\", \"p02:likes[6]\", \"p02:likes[4]\", \"p02:socialStyle\", \"p02:groups[0]\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2740,
+    "completionTokens": 452
+  },
+  "savedAt": "2026-11-12T20:25:55.991Z"
+}

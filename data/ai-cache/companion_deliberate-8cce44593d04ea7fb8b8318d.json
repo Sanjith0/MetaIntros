@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p11\", \"members\": [\"p01\", \"p03\", \"p05\", \"p06\", \"p11\", \"p14\"], \"line\": {\"say\": \"Rosa is into low-key vinyl digs and Phoebe Bridgers hangs with fellow collectors.\", \"cites\": [\"p11:music[0]\", \"p11:groups[0]\", \"p11:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2249,
+    "completionTokens": 958
+  },
+  "savedAt": "2026-11-12T20:28:21.140Z"
+}

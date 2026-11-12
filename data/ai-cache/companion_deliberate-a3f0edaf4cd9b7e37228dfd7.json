@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p02\", \"line\": {\"say\": \"Low-key edge hang trading V-Scale Memes, A24 takes and Bay Area Concerts tips sounds perfect.\", \"cites\": [\"p02:likes[0]\", \"p02:likes[6]\", \"p02:likes[4]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1935,
+    "completionTokens": 726
+  },
+  "savedAt": "2026-11-12T20:26:59.606Z"
+}

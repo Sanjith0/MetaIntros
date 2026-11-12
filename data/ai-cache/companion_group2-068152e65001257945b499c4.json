@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan is stoked on this chill squad of 6. They see easy overlap with Reza, Yuki, Simon, Rosa and Ben around vinyl digging, bouldering and Fujifilm photo walks, all low-key.\", \"cites\": [\"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1423,
+    "completionTokens": 459
+  },
+  "savedAt": "2026-11-12T20:28:35.641Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Reza is chill and prefers low-key, laid-back plans. They tend to keep conversation easygoing and connect over shared interests like vinyl, bouldering, and outdoor hangs.\",\"depth\":{\"p04:likes[1]\":\"Follows Vinyl Me, Please for vinyl\",\"p04:likes[3]\":\"Into Peninsula Boulders for bouldering\",\"p04:likes[9]\":\"Shoots with Fujifilm X\",\"p04:groups[2]\":\"Member of Peninsula Vinyl Collectors\",\"p04:events[0]\":\"Attends Record Store Day Palo Alto\"},\"lightsUp\":[\"p04:groups[2]\",\"p04:likes[3]\",\"p04:music[0]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 687,
+    "completionTokens": 795
+  },
+  "savedAt": "2026-11-12T20:24:37.606Z"
+}

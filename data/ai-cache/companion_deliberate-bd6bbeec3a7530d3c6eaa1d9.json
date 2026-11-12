@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Ben's into that low-key vinyl dig and bouldering chat vibe.\", \"cites\": [\"p14:likes[1]\", \"p14:likes[0]\", \"p14:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2262,
+    "completionTokens": 632
+  },
+  "savedAt": "2026-11-12T20:28:20.767Z"
+}

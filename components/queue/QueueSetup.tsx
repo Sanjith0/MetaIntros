@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CalendarDays, Crosshair, Lock, MapPin, ShieldCheck, Sparkles, Swords, Users } from "lucide-react";
@@ -109,6 +111,10 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: P
               {loc.kind === "locating" ? <><Crosshair className="animate-spin" size={22} /> Finding your area…</> : <><Swords size={22} /> Find my squad</>}
             </button>
           )}
+          <p className="mt-4 text-center text-xs text-[#c7d2fe]" data-testid="companion-note">
+            Your Companion AI will speak for you to find people you&apos;d click with.{" "}
+            <Link href="/profile" className="underline" data-testid="review-brief">Review what it can share</Link>
+          </p>
           {loc.kind !== "manual" && (
             <button type="button" className="mt-3 w-full text-center text-sm text-[#c7d2fe] underline" data-testid="choose-area"
               onClick={() => setLoc({ kind: "manual", reason: "Choose your area:" })}>

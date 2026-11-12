@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Freya is excited for this chill Indie Night squad. They'd bring stories from Peninsula Bouldering Crew, love for A24 and Bay Area Concerts, and easy low-key vibes that match everyone wanting to keep it mellow and actually hear the bands.\", \"cites\": [\"p02:likes[0]\", \"p02:likes[6]\", \"p02:likes[4]\", \"p02:socialStyle\", \"p02:groups[0]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1445,
+    "completionTokens": 473
+  },
+  "savedAt": "2026-11-12T20:25:58.162Z"
+}

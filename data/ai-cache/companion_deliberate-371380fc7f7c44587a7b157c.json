@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p04\", \"line\": {\"say\": \"Ben would love a low-key edge crew trading vinyl and climbing chat between sets.\", \"cites\": [\"p14:likes[1]\", \"p14:likes[0]\", \"p14:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2240,
+    "completionTokens": 538
+  },
+  "savedAt": "2026-11-12T20:25:44.951Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Zoe tends to keep things low-key and chill, preferring relaxed hangouts over big crowds. They enjoy easygoing, low-pressure conversations around shared niche interests.\", \"depth\": {\"p03:likes[0]\": \"Follows Bouldering Daily and participates in Peninsula Bouldering League\", \"p03:likes[3]\": \"Into Vinyl Me, Please, member of Peninsula Vinyl Collectors, goes to Record Store Day Palo Alto\", \"p03:likes[6]\": \"Into 35mm Film Photography, follows Fujifilm X, joined Golden Gate Photo Walk\", \"p03:likes[8]\": \"Fan of A24 and member of Peninsula Film Club\", \"p03:likes[10]\": \"Watches Jujutsu Kaisen and Crunchyroll, part of Bay Area Anime Watch Party\"}, \"lightsUp\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 712,
+    "completionTokens": 776
+  },
+  "savedAt": "2026-11-12T20:24:39.879Z"
+}

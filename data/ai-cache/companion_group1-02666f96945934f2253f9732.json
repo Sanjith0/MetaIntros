@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan is hoping for a chill squad of 6 this weekend and loves low-key, relaxed hangs. They'd bring shared stoke for bouldering, vinyl digging, and shooting Fujifilm X on photo walks. Group should know they prefer low-key chill plans and would rather skip anything Warriors-related.\", \"cites\": [\"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:socialStyle\", \"p01:groups[0]\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2780,
+    "completionTokens": 478
+  },
+  "savedAt": "2026-11-12T20:28:32.674Z"
+}

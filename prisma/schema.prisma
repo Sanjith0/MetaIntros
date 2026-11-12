@@ -57,6 +57,7 @@ model User {
   talkCardsOwned   TalkCard[]      @relation("CardOwner")
   talkCardsAbout   TalkCard[]      @relation("CardSubject")
   sessions         DeviceSession[]
+  companionBrief   CompanionBrief?
 }
 
 model TasteProfile {
@@ -353,4 +354,34 @@ model DeviceSession {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   lastSeenAt DateTime @default(now())
+}
+
+/// What a user's Companion agent may say about them (share level per fact) plus the model-written parts of the brief.
+model CompanionBrief {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// { [factId]: "open" | "need_only" | "private" } — overrides of the defaults
+  shares    Json
+  /// { depth: { [factId]: string }, communication: string, lightsUp: string[] } written by the Profile Analyst
+  generated Json?
+  updatedAt DateTime @updatedAt
+}
+
+/// One run of the Companion engine over a set of waiting queue entries.
+model MatchRoom {
+  id           String   @id @default(cuid())
+  /// sorted queue-entry ids, comma-joined
+  signature    String
+  anchorUserId String
+  /// comma-joined user ids in the room (for stage lookups)
+  userIds      String
+  /// "briefing" | "circles" | "mingling" | "deep" | "deliberating" | "forming" | "group" | "done" | "waiting"
+  stage        String
+  note         String   @default("")
+  /// summary once finished (null while running)
+  result       Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([anchorUserId])
 }

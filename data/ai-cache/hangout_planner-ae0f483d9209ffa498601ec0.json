@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"sp-guild-vinyl\", \"title\": \"Vinyl Night at the Listening Bar\", \"plan\": \"Let's meet Fri 7pm to dig crates and share spins at the Menlo listening bar.\", \"reasons\": [\"Covers two unanimous interests: vinyl records and indie music\", \"Super close at 1.8km and great for easy conversation\"]}",
+  "task": "hangout_planner",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 467,
+    "completionTokens": 486
+  },
+  "savedAt": "2026-11-12T21:01:54.550Z"
+}

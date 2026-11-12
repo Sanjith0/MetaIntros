@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan is hoping for a chill Indie Night showcase with this squad of 6. They'd bring easy vinyl talk, photo walk stories, and bouldering banter, and loves low-key, relaxed hangs. They'd enjoy keeping it mellow so everyone can geek out over the bands.\", \"cites\": [\"p01:socialStyle\", \"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2752,
+    "completionTokens": 329
+  },
+  "savedAt": "2026-11-12T20:25:55.391Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki is hoping for a chill squad of 6 for Indie Night: Local Bands Showcase and to keep it low-key and relaxed. They would bring easy vinyl digging chat, bouldering crew stories, and love for indie shows like Wet Leg. They like low-key, chill plans and would prefer to avoid pub-style venues tonight.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:likes[2]\", \"p05:music[0]\", \"p05:socialStyle\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2797,
+    "completionTokens": 508
+  },
+  "savedAt": "2026-11-12T20:25:56.169Z"
+}

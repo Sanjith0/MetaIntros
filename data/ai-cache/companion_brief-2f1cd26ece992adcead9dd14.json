@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Freya is chill and prefers low-key, relaxed plans, tending to connect through small groups around bouldering, film, and live music. They enjoy easygoing chats swapping memes, concert tips, and photo walk stories.\",\"depth\":{\"p02:likes[0]\":\"Boulders daily and is in Peninsula Bouldering Crew\",\"p02:likes[6]\":\"Likes A24 and is in Peninsula Film Club\",\"p02:likes[4]\":\"Follows Bay Area Concerts and SF Live Music Guide and is in Peninsula Gig Buddies, plus likes Snail Mail and Mitski\",\"p02:events[0]\":\"Going to Golden Gate Photo Walk and likes Unsplash\",\"p02:likes[1]\":\"Likes V-Scale Memes alongside Bouldering Daily\"},\"lightsUp\":[\"p02:likes[0]\",\"p02:likes[6]\",\"p02:likes[4]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 558,
+    "completionTokens": 742
+  },
+  "savedAt": "2026-11-12T20:24:37.364Z"
+}

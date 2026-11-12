@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe thinks this squad of 4 clicks perfectly for a chill hangout. With Jordan, Freya, and Yuki they can swap bouldering beta, vinyl finds, and 35mm photo walk stories. Low-key energy all around is exactly what they were hoping for.\", \"cites\": [\"p03:likes[0]\", \"p03:likes[3]\", \"p03:likes[6]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1467,
+    "completionTokens": 375
+  },
+  "savedAt": "2026-11-12T20:30:05.741Z"
+}

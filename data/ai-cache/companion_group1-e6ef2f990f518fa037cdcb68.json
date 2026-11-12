@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki is hoping for a chill, low-key hangout with a squad of 4 and would prefer somewhere quieter. They'd bring easygoing vinyl chat from Peninsula Vinyl Collectors and Record Store Day, plus Bouldering Daily and Peninsula Bouldering Crew stories, and love swapping Bay Area indie show tips. They vibe best low-pressure.\", \"cites\": [\"p05:socialStyle\", \"p05:groups[1]\", \"p05:events[0]\", \"p05:likes[1]\", \"p05:groups[0]\", \"p05:likes[2]\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2111,
+    "completionTokens": 520
+  },
+  "savedAt": "2026-11-12T20:30:04.010Z"
+}

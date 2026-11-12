@@ -18,7 +18,21 @@ interface Status {
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
   partyId?: string | null;
+  stage?: string;
+  stageNote?: string;
 }
+
+/** What the Companion engine is doing, in the user's words. */
+const STAGE_LABEL: Record<string, string> = {
+  briefing: "Companions are reading profiles",
+  circles: "Finding your circle",
+  mingling: "Your Companion is meeting everyone",
+  deep: "Going deeper with a few people",
+  deliberating: "Companions are proposing squads",
+  forming: "Forming your squad",
+  group: "Your squad's Companions are talking it over",
+};
+const STAGES = Object.keys(STAGE_LABEL);
 
 interface Party {
   id: string;
@@ -105,6 +119,16 @@ export function QueueScreen() {
       <p className="mt-6 text-center text-lg font-extrabold" data-testid="players-found">
         Players found: <span className="text-[#67e8f9]">{found}</span>/{n}
       </p>
+      {status.stage && STAGE_LABEL[status.stage] && (
+        <div className="mx-auto mt-3 max-w-xs rounded-2xl bg-white/10 p-3 text-center backdrop-blur" data-testid="room-stage" data-stage={status.stage} aria-live="polite">
+          <p className="flex items-center justify-center gap-1.5 text-sm font-bold"><Sparkles size={15} className="text-[#c4b5fd]" /> {STAGE_LABEL[status.stage]}</p>
+          <div className="mt-2 flex justify-center gap-1" aria-hidden>
+            {STAGES.map((s, i) => (
+              <span key={s} className={`h-1.5 w-5 rounded-full ${i <= STAGES.indexOf(status.stage!) ? "bg-[#67e8f9]" : "bg-white/20"}`} />
+            ))}
+          </div>
+        </div>
+      )}
       <ul className="mx-auto mt-4 flex max-w-xs flex-wrap justify-center gap-3" data-testid="player-slots">
         {Array.from({ length: n }).map((_, i) => {
           const u = users[i];

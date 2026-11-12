@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p14\", \"line\": {\"say\": \"Simon is down for low-key bouldering and vinyl digs, Record Store Day and Bouldering Night sound perfect.\", \"cites\": [\"p06:likes[0]\", \"p06:events[3]\", \"p06:events[2]\", \"p06:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2203,
+    "completionTokens": 584
+  },
+  "savedAt": "2026-11-12T20:28:17.963Z"
+}

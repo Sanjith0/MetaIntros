@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Reza is hoping for a chill squad of 5 for Indie Night to vibe to local bands together. They'd bring easygoing chat as a member of Peninsula Vinyl Collectors [p04:groups[2]], love for Peninsula Boulders [p04:likes[3]] and Japanese Breakfast [p04:music[0]], plus a Fujifilm X eye. They like low-key, chill plans [p04:socialStyle] — keeping it relaxed helps them connect.\", \"cites\": [\"p04:groups[2]\", \"p04:likes[3]\", \"p04:music[0]\", \"p04:socialStyle\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2576,
+    "completionTokens": 502
+  },
+  "savedAt": "2026-11-12T20:27:11.495Z"
+}

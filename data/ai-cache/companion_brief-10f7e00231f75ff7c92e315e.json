@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Yuki is chill and prefers low-key, relaxed plans. They tend to socialize around shared interests like music and bouldering in an easygoing, low-pressure way.\",\"depth\":{\"p05:likes[0]\":\"Likes Rasputin Music and is in Peninsula Vinyl Collectors and went to Record Store Day Palo Alto\",\"p05:likes[1]\":\"Follows Bouldering Daily and is in Peninsula Bouldering Crew and Bay Area Climbers Coalition and went to Bouldering Night at Peninsula Boulders\",\"p05:likes[2]\":\"Likes Bay Area Concerts and is in Bay Area Indie Shows group\",\"p05:events[0]\":\"Record Store Day Palo Alto connects to liking Rasputin Music and being in Peninsula Vinyl Collectors\",\"p05:events[1]\":\"Bouldering Night at Peninsula Boulders connects to Peninsula Bouldering Crew and Bouldering Daily\"},\"lightsUp\":[\"p05:events[0]\",\"p05:events[1]\",\"p05:music[0]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 584,
+    "completionTokens": 965
+  },
+  "savedAt": "2026-11-12T20:24:40.391Z"
+}

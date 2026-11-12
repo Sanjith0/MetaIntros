@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p07\", \"line\": {\"say\": \"Reza is into low-key hangs and would love vinyl chat plus Japanese Breakfast vibes.\", \"cites\": [\"p04:socialStyle\", \"p04:groups[2]\", \"p04:music[0]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2219,
+    "completionTokens": 703
+  },
+  "savedAt": "2026-11-12T20:25:42.441Z"
+}

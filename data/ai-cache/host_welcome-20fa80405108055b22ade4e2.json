@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\":\"Hey Jordan, Freya, Zoe, Reza and Yuki! Welcome to your squad chat for Indie Night: Local Bands Showcase on Sat, Nov 14 · 7:30 PM. We'll meet up at the front entrance of The Guild Theatre before heading in together. So glad you're all here!\",\"icebreaker\":\"Since you all love vinyl, what's the last record you picked up or have had on repeat lately?\",\"interestTag\":\"vinyl\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 261,
+    "completionTokens": 422
+  },
+  "savedAt": "2026-11-12T20:27:18.439Z"
+}

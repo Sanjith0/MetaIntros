@@ -11,20 +11,19 @@ import { dislikeTags } from "@/lib/profile/builder";
 import { publish } from "./bus";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
-import { writeTrace, type TraceStep } from "./trace";
-import { partyFormationAgent, templateRationale } from "@/lib/agents/partyFormation";
+import { writeTrace } from "./trace";
+import { fmtWindow, label } from "@/lib/agents/describe";
 import { eventSelectionAgent } from "@/lib/agents/eventSelection";
 import { afterPartyConfirmed } from "./hooks";
 import { planHangout } from "./hangout";
+import { markFailed, takePending } from "./rooms";
+import { toJson } from "@/lib/json";
 
-const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
-const candKey = (c: Candidate) => [...c.entryIds].sort().join(",");
-
-/** Party Formation Agent picks among the engine's candidates (its trace is kept until the party exists). */
-export async function chooseCandidate(p: Proposal, people: Map<string, Person>): Promise<Candidate | null> {
-  const r = await partyFormationAgent(p, people);
-  pending.set(candKey(r.candidate), { steps: r.steps, rationale: r.rationale });
-  return r.candidate;
+/** Deterministic rationale, used when a squad was committed without a Companion-engine run. */
+export function templateRationale(c: Candidate) {
+  const tags = c.cohesion.sharedTags.slice(0, 3).map((t) => label(t.tag).toLowerCase());
+  const w = c.cohesion.bestWindow;
+  return `Everyone here shares ${tags.join(", ") || "overlapping interests"}${w ? ` and is free ${fmtWindow(w)}` : ""}. Nobody is a weak link: the lowest pairwise match is ${Math.round(c.cohesion.minPairwise * 100)}%.`;
 }
 
 export function groupContext(members: Person[], cand: Candidate, center: { lat: number; lng: number }): GroupContext {
@@ -82,7 +81,12 @@ export function setEventChooser(fn: EventChooser) {
 /** Commit a chosen candidate as a party. Returns null (no party) if anything fails validation. */
 export async function formParty(p: Proposal, c: Candidate, people: Map<string, Person>): Promise<string | null> {
   const members = c.userIds.map((u) => people.get(u)!);
-  if (!validateParty(members).ok) return null;
+  // What the Companion engine decided for this squad (rationale, trace, conversations), if it came from a room.
+  const room = takePending(c);
+  if (!validateParty(members).ok) {
+    markFailed(room);
+    return null;
+  }
 
   // Claim the entries atomically: if any is no longer waiting, abort.
   const partyId = await prisma.$transaction(async (tx) => {
@@ -102,11 +106,12 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
     await tx.queueEntry.updateMany({ where: { id: { in: c.entryIds } }, data: { partyId: party.id } });
     return party.id;
   }).catch(() => null);
-  if (!partyId) return null;
-  const agentOut = pending.get(candKey(c));
-  pending.delete(candKey(c));
-  await prisma.party.update({ where: { id: partyId }, data: { rationale: agentOut?.rationale ?? templateRationale(c) } });
-  if (agentOut) await writeTrace(partyId, agentOut.steps);
+  if (!partyId) {
+    markFailed(room);
+    return null;
+  }
+  await prisma.party.update({ where: { id: partyId }, data: { rationale: room?.party.why ?? templateRationale(c) } });
+  if (room) await writeTrace(partyId, room.party.steps);
 
   // Existing-events queue → pick a real event; hangout queue → plan a new one at common ground.
   const choice =
@@ -122,9 +127,16 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
       prisma.queueEntry.updateMany({ where: { id: { in: c.entryIds } }, data: { status: "waiting", partyId: null, matchedAt: null } }),
       prisma.party.update({ where: { id: partyId }, data: { status: "cancelled" } }),
     ]);
+    markFailed(room); // don't let the same room propose this exact group again
     return null;
   }
   await prisma.party.update({ where: { id: partyId }, data: { eventId: event.id, status: "confirmed" } });
+  // The Companions' conversations between squad members feed the talk cards and the cards screen.
+  if (room?.preChats.length) {
+    await prisma.preChat.createMany({
+      data: room.preChats.map((pc) => ({ partyId, userAId: pc.a, userBId: pc.b, transcript: toJson(pc.transcript), sparks: toJson(pc.sparks), simulated: true })),
+    });
+  }
   await afterPartyConfirmed(partyId);
   publish("party", { type: "formed", partyId, eventId: event.id }, c.userIds);
   publish("badges", {}, c.userIds);

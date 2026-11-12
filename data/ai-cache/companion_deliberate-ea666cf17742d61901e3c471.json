@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p06\", \"line\": {\"say\": \"Rosa would love this low-key crew to chat Pitchfork, vinyl and climbing between sets at Indie Night.\", \"cites\": [\"p11:likes[0]\", \"p11:likes[4]\", \"p11:likes[2]\", \"p11:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2227,
+    "completionTokens": 599
+  },
+  "savedAt": "2026-11-12T20:25:44.350Z"
+}

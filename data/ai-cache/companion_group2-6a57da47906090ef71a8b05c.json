@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Reza is stoked this squad is all about chill Indie Night vibes. They'd love swapping stories with Jordan, Freya, Zoe, Yuki and Gabe about vinyl digging, bouldering, and Japanese Breakfast.\", \"cites\": [\"p04:groups[2]\", \"p04:likes[3]\", \"p04:music[0]\", \"p04:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1559,
+    "completionTokens": 262
+  },
+  "savedAt": "2026-11-12T20:25:57.848Z"
+}

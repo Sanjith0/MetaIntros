@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Freya would love this chill squad of 5 for Indie Night. They'd connect with Jordan, Zoe, Reza and Yuki over Bouldering Daily, A24 films, and Bay Area gigs, swapping V-Scale memes and photo walk stories between sets.\", \"cites\": [\"p02:likes[0]\", \"p02:likes[6]\", \"p02:likes[4]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1403,
+    "completionTokens": 364
+  },
+  "savedAt": "2026-11-12T20:27:13.472Z"
+}

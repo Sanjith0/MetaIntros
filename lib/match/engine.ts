@@ -136,21 +136,23 @@ function growGroup(seed: QueueItem[], pool: QueueItem[], size: number, people: M
   return group;
 }
 
-/** Best safe candidate groups for one anchor at its current search level. */
-export function findProposal(
+/**
+ * Everyone in the queue who could be matched with this anchor at its current search level:
+ * same party size, compatible queue, within the radius, allowed by the safety rules, and
+ * respecting the fill mode. Excludes the anchor.
+ */
+export function eligiblePool(
   anchor: QueueItem,
   pool: QueueItem[],
   people: Map<string, Person>,
   landmarks: Map<string, { id: string; lat: number; lng: number }>,
   opts: EngineOptions,
-  score: Scorer,
-): Proposal | null {
+): { items: QueueItem[]; level: SearchLevel; index: number } | null {
   const { level, index } = levelFor(opts.now - anchor.joinedAt, opts);
   const anchorP = people.get(anchor.userId);
   if (!anchorP) return null;
   const mixedDelay = opts.mixedFillDelayMs ?? 12_000;
-
-  const eligible = pool.filter((c) => {
+  const items = pool.filter((c) => {
     if (c.entryId === anchor.entryId || c.userId === anchor.userId) return false;
     if (c.targetSize !== anchor.targetSize) return false; // party size is a hard "game mode"
     if (!queuesCompatible(anchor, c)) return false;
@@ -163,6 +165,22 @@ export function findProposal(
     }
     return true;
   });
+  return { items, level, index };
+}
+
+/** Best safe candidate groups for one anchor at its current search level. */
+export function findProposal(
+  anchor: QueueItem,
+  pool: QueueItem[],
+  people: Map<string, Person>,
+  landmarks: Map<string, { id: string; lat: number; lng: number }>,
+  opts: EngineOptions,
+  score: Scorer,
+): Proposal | null {
+  const found = eligiblePool(anchor, pool, people, landmarks, opts);
+  if (!found) return null;
+  const { level, index, items: eligible } = found;
+  const anchorP = people.get(anchor.userId)!;
   if (eligible.length < anchor.targetSize - 1) return null;
 
   // Seeds: anchor alone, plus anchor + each of its top-3 partners → diverse candidates for the agent.
@@ -289,6 +307,65 @@ export async function runTickAsync(
       chosen!.entryIds.forEach((id) => taken.add(id));
       formed++;
     }
+  }
+  return formed;
+}
+
+/** The most people one run of the Companion engine considers. */
+export const MAX_ROOM = 30;
+
+/**
+ * Companion-engine tick. For each anchor (same order and rules as runTickAsync) the "room" is the
+ * anchor plus everyone who could be matched with them; `match` (the Companion engine) returns the
+ * squads the Companions and the Orchestrator settled on. Code re-checks every squad before it is
+ * committed: exact size, entries still free, one event at most, and the hard safety rules.
+ */
+export async function runRoomsAsync(
+  waiting: QueueItem[],
+  people: Map<string, Person>,
+  landmarks: Map<string, { id: string; lat: number; lng: number }>,
+  opts: EngineOptions,
+  match: (anchor: QueueItem, room: QueueItem[], level: number) => Promise<Candidate[]>,
+  commit: (p: Proposal, c: Candidate) => Promise<boolean>,
+): Promise<number> {
+  const pool = [...waiting].sort((a, b) => a.joinedAt - b.joinedAt || Number(a.isSimulated) - Number(b.isSimulated) || a.entryId.localeCompare(b.entryId));
+  const taken = new Set<string>();
+  let formed = 0;
+  for (const anchor of pool) {
+    if (taken.has(anchor.entryId)) continue;
+    if (anchor.isSimulated && opts.fillMode !== "simulated") continue;
+    const found = eligiblePool(anchor, pool.filter((p) => !taken.has(p.entryId)), people, landmarks, opts);
+    if (!found) continue;
+    // Everyone in a room must be able to go to the same event: the first specific event wins.
+    let eventId = anchor.eventId;
+    const items: QueueItem[] = [];
+    for (const it of found.items) {
+      if (it.eventId && eventId && it.eventId !== eventId) continue;
+      eventId = eventId ?? it.eventId;
+      items.push(it);
+    }
+    if (items.length < anchor.targetSize - 1) continue;
+    const room = [anchor, ...items.slice(0, MAX_ROOM - 1)];
+    const inRoom = new Map(room.map((r) => [r.entryId, r]));
+    const candidates = await match(anchor, room, found.index).catch(() => [] as Candidate[]);
+    let any = false;
+    for (const c of candidates) {
+      const ok =
+        c.entryIds.length === anchor.targetSize &&
+        new Set(c.entryIds).size === c.entryIds.length &&
+        c.entryIds.every((id) => inRoom.has(id) && !taken.has(id)) &&
+        c.userIds.join() === c.entryIds.map((id) => inRoom.get(id)!.userId).join() &&
+        validateParty(c.userIds.map((u) => people.get(u)!)).ok;
+      if (!ok) continue;
+      const proposal: Proposal = { anchorEntryId: anchor.entryId, targetSize: anchor.targetSize, mode: modeOf(anchor), eventId, bucketId: anchor.bucketId, level: found.index, candidates: [c] };
+      if (await commit(proposal, { ...c, eventId })) {
+        c.entryIds.forEach((id) => taken.add(id));
+        formed++;
+        any = true;
+      }
+    }
+    // A room is used once per tick: leftover fillers must not form another squad before they are withdrawn.
+    if (any) room.forEach((r) => taken.add(r.entryId));
   }
   return formed;
 }

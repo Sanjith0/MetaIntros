@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Rosa is hoping for a chill squad of 6 this weekend and would love low-key hangs. They'd bring shared love for vinyl collecting, climbing culture, and Phoebe Bridgers, plus 35mm photo walks and coffee shop chats. They like low-key, chill plans and would prefer to skip anything Warriors-related and would prefer not to do Rose & Crown Pub.\", \"cites\": [\"p11:likes[2]\", \"p11:likes[4]\", \"p11:music[0]\", \"p11:likes[7]\", \"p11:socialStyle\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2930,
+    "completionTokens": 572
+  },
+  "savedAt": "2026-11-12T20:28:32.737Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\":\"Hey Jordan, Freya, Zoe and Yuki! Welcome to your squad for Vinyl Night at the Listening Bar on Fri, Nov 13 · 7 PM. Plan is to meet at the front entrance of Menlo record shop listening bar before we head in together. So glad you're all here!\",\"icebreaker\":\"Since you all share a love for vinyl, what's one record in your collection you could listen to on repeat all night?\",\"interestTag\":\"vinyl\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 271,
+    "completionTokens": 419
+  },
+  "savedAt": "2026-11-12T21:01:56.438Z"
+}

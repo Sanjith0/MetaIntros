@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan would love this chill squad of 5 for Indie Night. They share Bouldering Daily [p01:likes[1]], vinyl hunting via Vinyl Me, Please [p01:likes[5]], and Fujifilm X photo walks [p01:likes[6]] with everyone, and likes low-key, chill plans [p01:socialStyle] just like Freya, Zoe, Reza and Yuki.\", \"cites\": [\"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1399,
+    "completionTokens": 396
+  },
+  "savedAt": "2026-11-12T20:27:13.722Z"
+}

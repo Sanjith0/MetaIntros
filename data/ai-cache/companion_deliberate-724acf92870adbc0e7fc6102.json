@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p11\", \"line\": {\"say\": \"Zoe would love low-key edge hang trading vinyl finds, bouldering beta and photo tips between sets.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2117,
+    "completionTokens": 806
+  },
+  "savedAt": "2026-11-12T20:26:59.903Z"
+}

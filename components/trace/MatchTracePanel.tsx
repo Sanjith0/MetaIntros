@@ -14,12 +14,12 @@ interface Step {
 }
 
 const AGENT_LABEL: Record<string, string> = {
-  party_formation: "Party Formation Agent",
+  orchestrator: "Orchestrator",
   event_selection: "Event Selection Agent",
   hangout_planner: "Hangout Planner Agent",
   host: "AI Host",
   talk_cards: "Talk Cards Agent",
-  companion: "Companion Agents",
+  companion: "Companions",
 };
 
 const ICON = { tool_call: Wrench, reasoning: Brain, decision: CheckCircle2, safety_check: ShieldCheck };

@@ -2,11 +2,14 @@ import { Avatar } from "@/components/Avatar";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/server/session";
 import { VOCAB_BY_TAG } from "@/lib/graph/vocabulary";
+import { BriefCard } from "@/components/companion/BriefCard";
+import { getBriefFor } from "@/lib/server/briefs";
 
 export default async function ProfilePage() {
   const me = await getCurrentUser();
   const tp = await prisma.tasteProfile.findUnique({ where: { userId: me.id } });
   const tags = ((tp?.interestTags ?? []) as { tag: string }[]).slice(0, 10);
+  const brief = await getBriefFor(me.id, { mode: "events", eventTitle: null, targetSize: 6 }, false);
   return (
     <div data-testid="profile-page">
       <div className="h-28 bg-gradient-to-br from-fb-blue to-queue-glow" />
@@ -23,6 +26,7 @@ export default async function ProfilePage() {
           ))}
         </div>
       </section>
+      {brief && <BriefCard initial={brief.facts.map(({ id, kind, text, share }) => ({ id, kind, text, share }))} communication={brief.communication} />}
     </div>
   );
 }

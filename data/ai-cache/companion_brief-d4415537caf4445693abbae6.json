@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Jordan is chill and gravitates toward low-key, relaxed plans, tending to chat casually about shared interests like climbing, music, and photography.\",\"depth\":{\"p01:likes[1]\":\"Follows Bouldering Daily, is in Bay Area Climbers, and went to Peninsula Bouldering League.\",\"p01:likes[5]\":\"Into vinyl through Vinyl Me, Please, Rasputin Music, and Record Store Day Palo Alto.\",\"p01:likes[6]\":\"Shoots with Fujifilm X and is part of Bay Area Photo Walks.\"},\"lightsUp\":[\"p01:likes[1]\",\"p01:likes[5]\",\"p01:likes[6]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 581,
+    "completionTokens": 811
+  },
+  "savedAt": "2026-11-12T20:24:38.288Z"
+}

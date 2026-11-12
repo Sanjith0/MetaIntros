@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe is hoping for a chill new hangout with a squad of 4. They'd bring shared love of bouldering, vinyl collecting, and 35mm film photography, plus easygoing low-key vibes. They'd love swapping Record Store Day finds, photo walk stories, and bouldering beta. To make it work, they'd prefer something low-key and quieter over a loud club scene.\", \"cites\": [\"p03:likes[0]\", \"p03:likes[3]\", \"p03:likes[6]\", \"p03:socialStyle\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2242,
+    "completionTokens": 449
+  },
+  "savedAt": "2026-11-12T20:30:03.133Z"
+}

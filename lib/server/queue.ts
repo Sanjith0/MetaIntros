@@ -2,13 +2,14 @@ import { prisma } from "@/lib/db";
 import { PartySize } from "@/lib/domain/enums";
 import { assignBucket } from "@/lib/match/buckets";
 import { makePairScorer } from "@/lib/match/compat";
-import { playersFound, runTickAsync, type Candidate, type Proposal, type QueueItem, type QueueMode } from "@/lib/match/engine";
+import { playersFound, runRoomsAsync, type Candidate, type Proposal, type QueueItem, type QueueMode } from "@/lib/match/engine";
 import { pairAllowed } from "@/lib/match/safety";
 import { loadPeople, type Person } from "@/lib/profile/load";
 import { publish } from "./bus";
 import { setAiMode } from "@/lib/ai";
 import { getFillMode, getSetting } from "./settings";
-import { formParty, chooseCandidate } from "./pipeline";
+import { formParty } from "./pipeline";
+import { matchRoom, roomStageFor } from "./rooms";
 import { checkStalls } from "./host";
 import { sweepExpiredChats } from "./expiry";
 
@@ -90,6 +91,9 @@ export interface QueueStatus {
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
   partyId?: string | null;
+  /** what the Companion engine is doing for this user right now, if a room is running */
+  stage?: string;
+  stageNote?: string;
 }
 
 export async function getQueueStatus(userId: string): Promise<QueueStatus> {
@@ -103,8 +107,11 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
   const anchor = waiting.find((w) => w.entryId === entry.id);
   const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: Date.now(), fillMode: await getFillMode() }) : { found: 1, userIds: [userId] };
   const users = await prisma.user.findMany({ where: { id: { in: pf.userIds } }, select: { id: true, name: true, avatarColor: true } });
+  const room = await roomStageFor(userId);
   return {
     state: "waiting",
+    stage: room?.stage,
+    stageNote: room?.note,
     entryId: entry.id,
     targetSize: entry.targetPartySize,
     mode: entry.mode as QueueMode,
@@ -151,19 +158,18 @@ export async function tick(): Promise<number> {
     const landmarks = await landmarkMap();
     const fillMode = await getFillMode();
     const mixedFillDelayMs = Number(await getSetting("mixedFillDelayMs", "12000"));
-    const score = makePairScorer();
-    const formed = await runTickAsync(
+    const formed = await runRoomsAsync(
       waiting,
       people,
       landmarks,
       { now: Date.now(), fillMode, mixedFillDelayMs },
-      (p: Proposal) => chooseCandidate(p, people),
+      // The Companion engine decides who goes together. Wait until a real user's room has finished filling.
+      async (anchor: QueueItem, room: QueueItem[]) => (room.some((r) => fillPending(r.entryId)) ? [] : matchRoom(anchor, room, people)),
       async (p: Proposal, c: Candidate) => {
         const partyId = await formParty(p, c, people);
-        if (partyId) for (const id of c.entryIds) cleanupSimFor(id);
+        if (partyId) await Promise.all(c.entryIds.map((id) => cleanupSimFor(id)));
         return Boolean(partyId);
       },
-      score,
     );
     // push fresh "players found" counts to waiting real users
     for (const w of waiting.filter((x) => !x.isSimulated)) publish("queue", { type: "tick" }, [w.userId]);
@@ -173,7 +179,7 @@ export async function tick(): Promise<number> {
   }
 }
 
-const g = globalThis as unknown as { __quTicker?: NodeJS.Timeout; __quSim?: Map<string, { timers: NodeJS.Timeout[]; spawned: string[] }> };
+const g = globalThis as unknown as { __quTicker?: NodeJS.Timeout; __quSim?: Map<string, { timers: NodeJS.Timeout[]; spawned: string[]; readyAt: number }> };
 
 export function ensureTicker() {
   if (process.env.NODE_ENV === "test" || g.__quTicker) return;
@@ -192,6 +198,12 @@ export function stopTicker() {
 // ───────────────────────── simulated fill ─────────────────────────
 
 const sims = () => (g.__quSim ??= new Map());
+
+/** True while simulated fillers are still trickling into this real user's room. */
+function fillPending(entryId: string) {
+  const s = sims().get(entryId);
+  return Boolean(s && Date.now() < s.readyAt);
+}
 
 function cancelSim(entryId: string) {
   const s = sims().get(entryId);
@@ -223,7 +235,9 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
   const fillMs = Number(await getSetting("simFillMs", "18000"));
   const delay = mode === "mixed" ? Number(await getSetting("mixedFillDelayMs", "12000")) : 0;
   const entry = await prisma.queueEntry.findUniqueOrThrow({ where: { id: entryId } });
-  const rec = { timers: [] as NodeJS.Timeout[], spawned: [] as string[] };
+  // The Companion engine wants a whole room to choose from, not just enough people for one squad.
+  const roomFill = Number(await getSetting("roomFill", "12"));
+  const rec = { timers: [] as NodeJS.Timeout[], spawned: [] as string[], readyAt: Date.now() + (opts.immediate ? 0 : delay + fillMs) + 250 };
   sims().set(entryId, rec);
 
   const plan = async () => {
@@ -240,7 +254,7 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
     const pool = [...people.values()].filter((p) => p.isSimulated && !busy.has(p.id) && pairAllowed(me, p));
     // greedy: most compatible with the joiner *and* with already-picked fillers
     const picked: Person[] = [];
-    while (picked.length < need + 1 && pool.length) {
+    while (picked.length < Math.max(need + 1, roomFill - 1) && pool.length) {
       pool.sort((a, b) => fitScore(b) - fitScore(a) || a.id.localeCompare(b.id));
       const next = pool.shift()!;
       if (picked.every((p) => pairAllowed(p, next))) picked.push(next);

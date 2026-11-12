@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p02\", \"line\": {\"say\": \"Ravi would love this - V-Scale Memes, Philz chat and chill bouldering crew vibes.\", \"cites\": [\"p15:likes[1]\", \"p15:likes[5]\", \"p15:socialStyle\", \"p15:groups[1]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2138,
+    "completionTokens": 980
+  },
+  "savedAt": "2026-11-12T20:28:21.811Z"
+}

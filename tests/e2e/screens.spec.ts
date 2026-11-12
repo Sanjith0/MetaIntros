@@ -43,6 +43,11 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await page.getByTestId("open-talk-cards").click();
   await expect(page.locator('[data-testid^="talk-card-"]').first()).toBeVisible();
   await shot(page, "20-talk-cards");
+  const pre = page.locator('[data-testid^="talk-card-"]').first().getByTestId("prechat");
+  await pre.locator("summary").click();
+  await pre.scrollIntoViewIfNeeded();
+  await shot(page, "24-companion-conversation");
+  await pre.locator("summary").click();
   await page.goBack();
   await page.getByTestId("im-here").click();
   await shot(page, "21-find-your-party");
@@ -52,6 +57,10 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await page.getByTestId("stay-in-touch").click();
   await expect(page.getByTestId("squad-connect")).toBeVisible();
   await shot(page, "23-connect");
+
+  await gotoReady(page, "/profile");
+  await page.getByTestId("brief-card").scrollIntoViewIfNeeded();
+  await shot(page, "25-companion-brief");
 
   expect(errors.filter((e) => !e.includes("404"))).toEqual([]);
 });

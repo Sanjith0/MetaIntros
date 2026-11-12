@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Yuki would vibe with this chill crew for Indie Night, swapping vinyl and bouldering stories.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2158,
+    "completionTokens": 565
+  },
+  "savedAt": "2026-11-12T20:25:41.879Z"
+}

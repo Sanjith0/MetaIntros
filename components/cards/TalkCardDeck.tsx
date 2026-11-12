@@ -22,7 +22,7 @@ const KIND_ICON: Record<ClaimKind, typeof Heart> = { shared_interest: Heart, mut
 
 function humanSource(src: string, meId: string) {
   if (src === "mutualFriends") return "mutual friends";
-  if (src.startsWith("preChat:")) return "AI pre-chat (simulated)";
+  if (src.startsWith("preChat:")) return "Companion conversation (AI)";
   const [uid, field] = src.split(":");
   const f = field.replace(/\[\d+\]/, "");
   const name = { likes: "likes", groups: "groups", music: "music", events: "events", x_not_interested: "not-interested list", socialStyle: "activity pattern", availability: "availability" }[f] ?? f;
@@ -104,11 +104,12 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
                 {c.preChat && (
                   <details className="rounded-xl border border-dashed border-[#c4b5fd] bg-[#faf8ff] p-2" data-testid="prechat">
                     <summary className="flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-queue-glow">
-                      <Bot size={15} /> Companion pre-chat
+                      <Bot size={15} /> What your Companions talked about
+                      {c.preChat.transcript.length > 6 && <span className="rounded bg-[#ddd6fe] px-1.5 text-[10px] font-bold uppercase tracking-wide" data-testid="prechat-deep">went deeper</span>}
                       <span className="ml-auto rounded bg-[#ede9fe] px-1.5 text-[10px] font-bold uppercase tracking-wide" data-testid="prechat-label">AI simulation</span>
                     </summary>
-                    <p className="mt-1 text-[11px] text-fb-muted">Simulated by your companion AIs using only your two profiles — these are not real messages.</p>
-                    <ul className="mt-1.5 space-y-1">
+                    <p className="mt-1 text-[11px] text-fb-muted">Your Companion AI and theirs talked before you were matched. Each one knew only its own person, and only what they chose to share. These are not real messages.</p>
+                    <ul className="mt-1.5 max-h-64 space-y-1 overflow-y-auto pr-1" data-testid="prechat-thread">
                       {c.preChat.transcript.map((t, i) => {
                         const mine = (t.speaker === "A") === c.preChat!.meIsA;
                         return (

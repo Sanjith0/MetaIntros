@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Rosa is chill and prefers low-key, relaxed plans over big or loud hangouts. They tend to socialize in an easygoing way around shared interests like music, climbing, and vinyl.\", \"depth\": {\"p11:likes[4]\": \"Into vinyl collecting via Vinyl Me, Please\", \"p11:likes[2]\": \"Follows Bay Area Climbers Coalition and climbing culture\", \"p11:likes[7]\": \"Shoots 35mm film photography\", \"p11:groups[0]\": \"Member of Peninsula Vinyl Collectors\", \"p11:music[0]\": \"Fan of Phoebe Bridgers\"}, \"lightsUp\": [\"p11:music[0]\", \"p11:groups[0]\", \"p11:likes[2]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 691,
+    "completionTokens": 647
+  },
+  "savedAt": "2026-11-12T20:24:36.932Z"
+}

@@ -7,7 +7,7 @@ import { runAi } from "@/lib/ai";
 import type { Claim } from "@/lib/cards/claims";
 
 const Out = z.object({
-  pairs: z.array(z.object({ owner: z.string(), subject: z.string(), openers: z.array(z.string().min(5).max(200)).min(1).max(3) })),
+  pairs: z.array(z.object({ owner: z.string(), subject: z.string(), openers: z.array(z.string().min(5).max(320)).min(1).max(3) })),
 });
 
 export interface PairInput {
