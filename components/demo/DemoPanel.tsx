@@ -8,7 +8,7 @@ interface Status {
   waiting: { userId: string; landmark: string }[];
   party: { id: string; status: string; round: number; plan: string | null; lockedBy: string | null; forced: boolean } | null;
   phones: { id: string; connected: boolean }[];
-  settings: { simulateLatency: boolean; timeoutAgent: string | null; agentTimeoutMs: number; source: "live" | "recorded"; paceMs: number | null };
+  settings: { simulateLatency: boolean; timeoutAgent: string | null; agentTimeoutMs: number; source: "live" | "recorded"; paceMs: number | null; rogue?: boolean };
   mockModel: boolean;
   frameSource: "fixture" | "recorded-clip" | "tap-only";
 }
@@ -131,6 +131,9 @@ export function DemoPanel({ people }: { people: Person[] }) {
             </button>
             <button className={on(st?.settings.source === "recorded")} data-testid="demo-recorded" onClick={() => settings({ source: "recorded" }, "Recorded replay")}>
               Recorded replay
+            </button>
+            <button className={on(!!st?.settings.rogue)} data-testid="demo-rogue" onClick={() => settings({ rogue: !st?.settings.rogue }, st?.settings.rogue ? "Rogue model off" : "Rogue model on")}>
+              Rogue model {st?.settings.rogue ? "on" : "off"}
             </button>
             <button className={on(!!st?.settings.simulateLatency)} data-testid="demo-latency" onClick={() => settings({ simulateLatency: !st?.settings.simulateLatency }, "Network latency")}>
               Simulate network latency

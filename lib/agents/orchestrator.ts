@@ -22,7 +22,9 @@ export function runParty(partyId: string, opts: RunOptions = {}): Promise<void> 
   const existing = runs().get(key);
   if (existing) return existing;
   const p = (async () => {
+    const s0 = store();
     const [table, pairs] = await Promise.all([runTableTalk(partyId, opts), runPairTalk(partyId, { paceMs: opts.paceMs })]);
+    if (store() !== s0) return; // "Reset everything" happened mid-talk: this party no longer exists
     if (store().operator.cancelled.has(partyId)) return; // someone left before the lock
     if (!table) {
       // Imported here: the no-match handler re-forms through the queue, which imports this file.

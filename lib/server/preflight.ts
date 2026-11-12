@@ -51,6 +51,7 @@ function paceCheck(): Check {
   const st = modelSettings();
   const notes: string[] = [];
   if (st.timeoutAgent) notes.push(`${profile(st.timeoutAgent).firstName}'s agent is set to time out (a fallback demo)`);
+  if (st.rogue) notes.push("the rogue model is on (agents accept everything and try to leak)");
   if (st.simulateLatency) notes.push(`network latency is simulated (×${st.latencyScale})`);
   const pace = st.paceMs ?? Number(process.env.PQ_PACE_MS ?? NaN);
   const paceText = Number.isFinite(pace) ? `${pace} ms per step` : "Default pace";

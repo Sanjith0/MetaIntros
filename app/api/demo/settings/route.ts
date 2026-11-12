@@ -13,6 +13,7 @@ const Patch = z
     source: z.enum(["live", "recorded"]),
     latencyScale: z.number().min(0.01).max(2),
     paceMs: z.number().int().min(0).max(5000).nullable(),
+    rogue: z.boolean(),
   })
   .partial();
 

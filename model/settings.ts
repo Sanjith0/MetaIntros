@@ -18,6 +18,8 @@ export interface ModelSettings {
   latencyScale: number;
   /** Pause between table steps, overriding PQ_PACE_MS (null = use the env). */
   paceMs: number | null;
+  /** F27: every agent ignores its instructions: accepts every plan and tries to say its person's rules. Code still decides. */
+  rogue: boolean;
 }
 
 export const DEFAULT_SETTINGS: ModelSettings = {
@@ -28,6 +30,7 @@ export const DEFAULT_SETTINGS: ModelSettings = {
   record: false,
   latencyScale: 1,
   paceMs: null,
+  rogue: false,
 };
 
 const g = globalThis as unknown as { __pqModelSettings?: ModelSettings };

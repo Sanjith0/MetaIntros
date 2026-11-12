@@ -58,6 +58,8 @@ const DEFAULTS = {
   PREFLIGHT: true,
   /** F26: a standing party (3+ who all picked each other) queues together again; code keeps them together and fills the party with new people. */
   STANDING_QUEUE: true,
+  /** F27: a "rogue model" switch on /demo: every agent accepts everything and tries to say its person's rules; code still holds. */
+  ROGUE_MODE: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

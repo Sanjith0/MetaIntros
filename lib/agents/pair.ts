@@ -141,6 +141,12 @@ async function onePair(party: Party, a: string, b: string, pace: () => number): 
   const bridges = consentedBridges(party, a, b);
   const key = pairKey(a, b);
   const fallback = mockPair(A, B, bridges);
+  // If "Reset everything" replaces the store while this pair is mid-talk, post nothing into the new one.
+  const s0 = store();
+  const live = () => store() === s0;
+  const note = (...args: Parameters<typeof trace>) => {
+    if (live()) trace(...args);
+  };
   const r = await callModel({
     role: "spark",
     task: "pair",
@@ -158,10 +164,10 @@ async function onePair(party: Party, a: string, b: string, pace: () => number): 
   });
   const out = sanitize(r.value, A, B, bridges, fallback);
 
-  const s = store();
   const post = (m: Omit<PairMessage, "id" | "partyId" | "pairKey" | "at">) => {
-    const msg: PairMessage = { id: nextId("pm"), partyId: party.id, pairKey: key, at: nowIso(), ...m };
-    s.pairs.push(msg);
+    const msg: PairMessage = { id: live() ? nextId("pm") : "pm-stale", partyId: party.id, pairKey: key, at: nowIso(), ...m };
+    if (!live()) return msg;
+    s0.pairs.push(msg);
     publish("pair.message", msg, [a, b], { stage: true });
     return msg;
   };
@@ -171,7 +177,7 @@ async function onePair(party: Party, a: string, b: string, pace: () => number): 
     const line = [...A.lines, ...B.lines].find((l) => l.id === lineId)!;
     const from = line.ownerId;
     post({ fromId: from, toId: from === a ? b : a, kind: "exchange", text: line.text, sourceIds: line.factIds });
-    trace(party.id, "shared", "pair", from, `${profile(a).firstName} + ${profile(b).firstName}`, `${profile(from).firstName}'s agent: ${line.text}`, { meta: { kind: "pair" } });
+    note(party.id, "shared", "pair", from, `${profile(a).firstName} + ${profile(b).firstName}`, `${profile(from).firstName}'s agent: ${line.text}`, { meta: { kind: "pair" } });
     if (pace()) await pauseFor(pace() / 3, party.id);
   }
 
@@ -186,7 +192,7 @@ async function onePair(party: Party, a: string, b: string, pace: () => number): 
   } else {
     shared = post({ fromId: null, toId: null, kind: "shared", text: "You both joined this party.", sourceIds: [party.id] });
   }
-  trace(party.id, "shared", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · in common`, shared.text, { meta: { kind: "pair" } });
+  note(party.id, "shared", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · in common`, shared.text, { meta: { kind: "pair" } });
 
   // One opener in each direction, from the other person's approved fact.
   const fa = factById(out.askForA)!; // B's fact, for A to ask
@@ -195,13 +201,14 @@ async function onePair(party: Party, a: string, b: string, pace: () => number): 
     [a]: post({ fromId: a, toId: b, kind: "opener", text: openerText(B, fa), sourceIds: [fa.id] }),
     [b]: post({ fromId: b, toId: a, kind: "opener", text: openerText(A, fb), sourceIds: [fb.id] }),
   };
-  trace(party.id, "private", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · openers${flag("MODEL_READINESS") ? "" : ` · ${r.source} ${r.ms}ms`}`, `${A.firstName} → ${openers[a]!.text}\n${B.firstName} → ${openers[b]!.text}`, { meta: { kind: "pair", source: r.source, ms: r.ms, note: r.note } });
+  note(party.id, "private", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · openers${flag("MODEL_READINESS") ? "" : ` · ${r.source} ${r.ms}ms`}`, `${A.firstName} → ${openers[a]!.text}\n${B.firstName} → ${openers[b]!.text}`, { meta: { kind: "pair", source: r.source, ms: r.ms, note: r.note } });
   return { key, a, b, shared, openers, bridge, source: r.source };
 }
 
 export async function runPairTalk(partyId: string, opts: { paceMs?: number } = {}): Promise<PairResult[]> {
   const party = store().parties.get(partyId);
   if (!party) throw new Error("unknown party");
+  const s0 = store();
   const ff = () => store().operator.fastForward.has(partyId);
   const pace = () => (ff() ? 0 : (opts.paceMs ?? paceFromEnv()));
   const ids = party.memberIds;
@@ -209,7 +216,7 @@ export async function runPairTalk(partyId: string, opts: { paceMs?: number } = {
   for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) pairs.push([ids[i]!, ids[j]!]);
   const results: PairResult[] = [];
   for (let i = 0; i < pairs.length; i++) {
-    if (store().operator.cancelled.has(partyId)) break; // someone left before the lock
+    if (store().operator.cancelled.has(partyId) || store() !== s0) break; // someone left before the lock, or a reset
     // Fast-forward: run the remaining pairs at once.
     if (ff()) {
       results.push(...(await Promise.all(pairs.slice(i).map(([a, b]) => onePair(party, a, b, pace)))));

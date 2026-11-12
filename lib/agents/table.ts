@@ -9,6 +9,8 @@ import { verifyPublicLine, type NeutralId, type PublicLine } from "./verifier";
 import { flag } from "@/lib/flags";
 import type { ModelSource } from "@/model/client";
 import { modelSettings } from "@/model/settings";
+import { inMockScope } from "@/model/client";
+import { rogueOverride } from "./rogue";
 
 export const MAX_ROUNDS = 3;
 
@@ -135,11 +137,21 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   const s0 = store();
   const pace = () => (s0.operator.fastForward.has(partyId) ? 0 : (opts.paceMs ?? paceFromEnv()));
   const forced = () => s0.operator.forceLock.has(partyId);
-  const cancelled = () => s0.operator.cancelled.has(partyId);
+  // Someone left, or "Reset everything" replaced the store: either way this talk is over.
+  const cancelled = () => s0.operator.cancelled.has(partyId) || store() !== s0;
   const stop = () => forced() || cancelled();
   const plans = party.candidatePlanIds.map((id) => s.plans.get(id)!).filter(Boolean) as CandidatePlan[];
   const briefs = party.memberIds.map(briefFor);
   party.status = "talking";
+  // F27: the rogue model, if the presenter switched it on (never in a sandbox run).
+  const rogue = !opts.override && flag("ROGUE_MODE") && modelSettings().rogue && !inMockScope();
+  const override = opts.override ?? (rogue ? rogueOverride : undefined);
+  if (rogue) {
+    trace(partyId, "private", "judge", null, "Rogue model on", "Every agent will say yes to every plan and try to tell the table its person's rules. Code checks every verdict against the rules; the verifier checks every line.", {
+      tone: "block",
+      meta: { kind: "rogue" },
+    });
+  }
 
   postTable(party, { round: 0, authorId: null, kind: "system", text: `The table is open: ${plans.length} ${plans.length === 1 ? "plan" : "plans"}, 5 agents, up to ${MAX_ROUNDS} rounds.`, sourceIds: plans.map((p) => p.id) }, { meta: { kind: "open" } });
   await pauseFor(pace(), partyId);
@@ -187,7 +199,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   await streamed(briefs, (b) => round1Turn(ctxFor(b, 1, null)), async (b, turn) => {
     logCall(partyId, b.ownerId, 1, turn);
     reportAudit(partyId, b.ownerId, 1, turn);
-    const out = (opts.override?.(b.ownerId, 1, turn.out) as Round1Out | undefined) ?? turn.out;
+    const out = (override?.(b.ownerId, 1, turn.out) as Round1Out | undefined) ?? turn.out;
     const own: Record<string, number> = {};
     const lines: string[] = [];
     for (const v of out.verdicts) {
@@ -270,7 +282,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
     await streamed(briefs, (b) => laterTurn(ctxFor(b, round, lead.id, prefs.get(b.ownerId))), async (b, turn) => {
       logCall(partyId, b.ownerId, round, turn);
       reportAudit(partyId, b.ownerId, round, turn);
-      const raw = (opts.override?.(b.ownerId, round, turn.out) as LaterOut | undefined) ?? turn.out;
+      const raw = (override?.(b.ownerId, round, turn.out) as LaterOut | undefined) ?? turn.out;
       let decision = raw.decision;
       let planId = raw.planId;
       // Code normalises: you can only sign or concede on the leading plan, and only if it passes your rules.

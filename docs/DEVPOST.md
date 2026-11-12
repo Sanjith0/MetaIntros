@@ -56,7 +56,7 @@ column is computed by scanning everything the other four can load, and it stays 
 - A code judge, a verifier for public lines, and pair talk where the model only picks fact ids.
 - A projector view with a scrubber that rebuilds the board (plans, signatures, the lock) at
   any moment of the replay.
-- Vitest (178 unit tests), Playwright (35+ end-to-end specs on a production build, including
+- Vitest (183 unit tests), Playwright (35+ end-to-end specs on a production build, including
   five phones at once, 390-pixel layouts and axe accessibility checks), and an eval harness.
 
 ## The leak test
@@ -91,7 +91,10 @@ real model run.
 
 ## What we learned
 
-The model is good at negotiating and bad at keeping secrets, so give it nothing to keep.
+The model is good at negotiating and bad at keeping secrets, so give it nothing to keep. The
+demo has a **Rogue model** switch to prove it: every agent says yes to everything and tries to
+tell the table its person's rules, and code still locks a plan that passes all five people's
+rules with nothing leaked.
 Each agent knows one person, and code holds the line.
 
 ## What's next

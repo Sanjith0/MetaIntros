@@ -34,6 +34,7 @@ test("preflight: ready for the demo with the projector open; reports a party lef
   await expect(page.getByTestId("preflight-live")).toContainText("A party is talking right now");
   await expect(page.getByTestId("preflight-verdict")).toContainText("Ready, with");
   await request.delete("/api/demo/settings");
+  await request.post("/api/demo/reset"); // don't leave a party talking for the next spec
   await sctx.close();
   await ctx.close();
 });

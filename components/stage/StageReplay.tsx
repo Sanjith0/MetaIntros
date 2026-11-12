@@ -184,6 +184,7 @@ export function StageReplay({ initial, leakTest = false, whatIf = false }: { ini
   const recorded = view.traces.find((t) => t.meta?.source === "recorded" && t.meta.note) ?? view.traces.find((t) => t.meta?.source === "recorded");
 
   const noMatch = visible.some((t) => t.meta?.kind === "nomatch");
+  const rogue = view.traces.some((t) => t.meta?.kind === "rogue");
   const status = board.locked ? "Locked" : noMatch ? "No match" : board.round >= 1 ? `Round ${board.round}` : total ? "Forming" : "Waiting";
   const planTitle = (id: string | null) => view.plans.find((p) => p.id === id)?.title ?? "";
 
@@ -249,6 +250,11 @@ export function StageReplay({ initial, leakTest = false, whatIf = false }: { ini
         {recorded && (
           <span data-testid="recorded-banner" className="rounded-full bg-sky-400/20 px-3 py-1 text-[12px] font-bold uppercase tracking-wide text-sky-200" title={recorded.meta?.note}>
             Recorded replay · {recorded.meta?.note ?? "from a saved run"}
+          </span>
+        )}
+        {rogue && (
+          <span data-testid="rogue-banner" className="rounded-full bg-red-600 px-3 py-1 text-[12px] font-bold uppercase tracking-wide text-white" title="Every agent accepts everything and tries to leak; code still decides">
+            Rogue model · code still decides
           </span>
         )}
         <span data-testid="stage-status" className={`rounded-full px-3 py-1 text-[13px] font-semibold ${board.locked ? "bg-emerald-400/20 text-emerald-300" : "bg-white/10 text-white/80"}`}>
