@@ -25,6 +25,8 @@ const DEFAULTS = {
   GLASSES_VIEW: true,
   /** F10: run it back: a two-person chat per mutual pair, the same "queue again" card for everyone without a match, standing parties. */
   RUN_IT_BACK_PLUS: true,
+  /** F11: /fair/host dashboard with live counts (guests, queued, parties formed, locked, met). Counts only. */
+  FAIR_HOST: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;
