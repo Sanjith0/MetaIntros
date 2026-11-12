@@ -4,8 +4,10 @@
  * Afterwards the demo replays these responses with no network ("Run from cache").
  */
 import { execSync } from "node:child_process";
-import { rmSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 
+// tsx doesn't read .env (Next.js does that for the app), so load it here.
+if (existsSync(".env")) process.loadEnvFile(".env");
 process.env.DATABASE_URL = "file:./warm.db";
 process.env.AI_MODE = "live";
 
