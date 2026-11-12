@@ -9,8 +9,8 @@ export const DEMO_LANDMARK = "Dolores Park";
  *  candidate builder and the evals agree. */
 export const EVENT_TAGS: Record<string, string[]> = {
   "evt-rooftop": ["drinks", "views", "social", "music"],
-  "evt-night-market": ["outdoors", "food", "chill", "social"],
-  "evt-clay": ["hands-on", "quiet", "chill", "new"],
+  "evt-night-market": ["outdoors", "food", "chill", "social", "music"],
+  "evt-clay": ["hands-on", "quiet", "new"],
   "evt-synth": ["music", "loud", "late", "new"],
   "evt-supper": ["food", "new", "social"],
   "evt-ferry-jazz": ["music", "chill"],

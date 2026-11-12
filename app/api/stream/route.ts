@@ -1,4 +1,5 @@
 import { subscribe, visibleTo } from "@/lib/server/bus";
+import { onTrace } from "@/lib/server/trace";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 import type { PQEvent } from "@/contracts";
@@ -29,6 +30,16 @@ export async function GET(req: Request) {
       ctrl.enqueue(enc.encode(`retry: 1000\nevent: hello\ndata: ${JSON.stringify({ seq: store().seq, userId: userId ?? null })}\n\n`));
       if (Number.isFinite(since)) store().events_log.filter((e) => e.seq > since).forEach(send);
       const off = subscribe(send);
+      // Only the projector hears traces, including the private lane.
+      const offTrace = stage
+        ? onTrace((t) => {
+            try {
+              ctrl.enqueue(enc.encode(`event: trace\ndata: ${JSON.stringify(t)}\n\n`));
+            } catch {
+              cleanup();
+            }
+          })
+        : () => {};
       const ping = setInterval(() => {
         try {
           ctrl.enqueue(enc.encode(`: ping\n\n`));
@@ -38,6 +49,7 @@ export async function GET(req: Request) {
       }, 15_000);
       cleanup = () => {
         off();
+        offTrace();
         clearInterval(ping);
       };
       req.signal.addEventListener("abort", () => {

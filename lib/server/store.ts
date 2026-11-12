@@ -37,6 +37,8 @@ export interface Store {
   plans: Map<string, CandidatePlan>;
   verdicts: Verdict[];
   codeChecks: CodeCheck[];
+  /** Public lines the verifier blocked. Stage-only. */
+  blockedLines: { partyId: string; ownerId: string; round: number; text: string; reason: string }[];
   table: TableMessage[];
   pairs: PairMessage[];
   traces: Trace[];
@@ -68,6 +70,7 @@ function fresh(): Store {
     plans: new Map(),
     verdicts: [],
     codeChecks: [],
+    blockedLines: [],
     table: [],
     pairs: [],
     traces: [],

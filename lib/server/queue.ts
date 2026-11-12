@@ -1,6 +1,7 @@
 import type { CandidatePlan, Party, QueueEntry } from "@/contracts";
 import { EVENT_TAGS } from "@/fixtures";
 import { buildBrief } from "@/lib/agents/brief";
+import { runParty } from "@/lib/agents/orchestrator";
 import { eligibleToQueue, formParty, bucketKey, PARTY_SIZE, type Candidate } from "@/lib/queue/formation";
 import { publish } from "./bus";
 import { nextId, nowIso, profile, store } from "./store";
@@ -126,7 +127,6 @@ async function tryForm(mustInclude: string, startTalk: boolean): Promise<string 
   publish("party.forming", { partyId: party.id, memberIds: party.memberIds, landmark: event.landmark }, party.memberIds, { stage: true });
 
   if (startTalk) {
-    const { runParty } = await import("@/lib/agents/orchestrator");
     void runParty(party.id).catch((err) => {
       trace(party.id, "private", "judge", null, "Talk crashed", String(err));
     });

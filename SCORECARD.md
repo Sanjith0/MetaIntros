@@ -9,6 +9,7 @@ Branch: `swarit-baseline`. Everything runs locally with `npm install && npm run 
 | M0 Foundations | PASS | `npm run contract:check && npm test` | `contract:check PASS - 314/314 checks passed` · `Test Files  2 passed (2)` · `Tests  11 passed (11)` |
 | M1 The Facebook layer | PASS | `npx playwright test tests/shots.spec.ts` (`npm run shots`) | `✓ events tab` · `✓ event page with Interested, Going, guest list and Find my party` · `✓ messenger-style group chat` · `✓ notification toast arrives live` · `✓ demo user switcher` · `5 passed (2.3s)`; screenshots in `shots/m1-*.png` |
 | M2 Queue and party formation | PASS | `npm test -- queue` | one failing fixture per rule: `✓ size` `✓ bucket` `✓ window` `✓ age` `✓ blocks` `✓ women_only` `✓ not_only_woman` `✓ bridge` (no shared friend; and a shared 12,000-member Group) · `Test Files  1 passed (1)` · `Tests  19 passed (19)`. UI: `tests/queue.spec.ts` 1 passed; `shots/m2-queue-*.png` |
+| M3 Agent conversations | PASS (mock model) | `npm test -- agents` | `✓ Maya's drink rule rejects the rooftop plan` · `✓ the plan.unavailable payload has no reason field` · `✓ no other member's page contains her rule text` · `✓ the verifier blocks a planted leak` (+8 more: code override, signatures lock, round-3 fallback, approved-line table, pair talk sources, unapproved fact, receipts, chat) · `Test Files  1 passed (1)` · `Tests  12 passed (12)`. Real table talk: `npm run talk:real` → `real-table-talk: SKIPPED (no META_API_KEY in the environment or .env.local)`. Stage: `shots/m3-stage.png` |
 
 ## Facebook reference (Step 1)
 
@@ -21,8 +22,10 @@ Messenger state are **inferred**, because they need a login. See `reference/`.
 
 ## Real model run
 
-Not run: no `META_API_KEY` in the environment or `.env.local`. All agent calls ran on the
-deterministic mock (`MOCK_MODEL=1`). Real model calls used tonight: 0 of 300.
+Not run: no `META_API_KEY` in the environment or `.env.local`, so there is no wall-clock time
+for a real table talk. `npm run talk:real` is ready: with a key it runs one table talk with
+`MOCK_MODEL=0` and prints the wall-clock time and the calls used. All agent calls tonight
+ran on the deterministic mock (`MOCK_MODEL=1`). Real model calls used tonight: 0 of 300.
 
 ## Stubs and blockers
 

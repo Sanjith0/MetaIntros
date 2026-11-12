@@ -1,0 +1,213 @@
+import type { Brief, CandidatePlan, Party, TableMessage, Verdict } from "@/contracts";
+import { publish } from "@/lib/server/bus";
+import { nextId, nowIso, profile, store } from "@/lib/server/store";
+import { trace } from "@/lib/server/trace";
+import { laterTurn, round1Turn, type LaterOut, type PublicTableRow, type Round1Out, type TurnContext } from "./agent";
+import { feasibleFor, ownerChecks, partyChecks, rankPlans } from "./judge";
+import { verifyPublicLine, type NeutralId, type PublicLine } from "./verifier";
+
+export const MAX_ROUNDS = 3;
+
+export interface TableOptions {
+  paceMs?: number;
+  /** Test hook: rewrite one agent's raw output before code sees it (to plant a leak, say). */
+  override?: (ownerId: string, round: number, out: Round1Out | LaterOut) => Round1Out | LaterOut;
+}
+
+export interface TableResult {
+  planId: string;
+  lockedBy: "signatures" | "fallback";
+  signatures: string[];
+  rounds: number;
+  unavailable: string[];
+}
+
+export const paceFromEnv = () => Number(process.env.PQ_PACE_MS ?? 600);
+const sleep = (ms: number) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve());
+
+export function briefFor(userId: string): Brief {
+  const b = store().briefs.get(`brief-${userId}`);
+  if (!b) throw new Error(`no brief for ${userId}`);
+  return b;
+}
+
+function postTable(party: Party, msg: Omit<TableMessage, "id" | "partyId" | "at">): TableMessage {
+  const m: TableMessage = { id: nextId("t"), partyId: party.id, at: nowIso(), ...msg };
+  store().table.push(m);
+  publish("table.message", m, party.memberIds, { stage: true });
+  const who = m.authorId ? `${profile(m.authorId).firstName}'s agent` : "Table";
+  trace(party.id, "shared", "table", m.authorId, `${who} · round ${m.round}`, m.text);
+  return m;
+}
+
+function publicRows(partyId: string): PublicTableRow[] {
+  return store()
+    .table.filter((t) => t.partyId === partyId)
+    .map((t) => ({ round: t.round, from: t.authorId ? profile(t.authorId).firstName : "Table", text: t.text }));
+}
+
+/** Verify one public line, post what survives, and record any block privately. */
+function speak(party: Party, brief: Brief, round: number, line: PublicLine, fallback: NeutralId) {
+  const v = verifyPublicLine(line, brief, fallback);
+  if (!v.ok) {
+    trace(party.id, "private", "table", brief.ownerId, `Verifier blocked ${profile(brief.ownerId).firstName}'s line`, `Blocked "${line.text}" (${v.reason}). Posted a neutral phrase instead.`);
+    store().blockedLines.push({ partyId: party.id, ownerId: brief.ownerId, round, text: line.text, reason: v.reason });
+  }
+  postTable(party, { round, authorId: brief.ownerId, kind: "line", text: v.line.text, sourceIds: v.line.sourceIds });
+}
+
+export async function runTableTalk(partyId: string, opts: TableOptions = {}): Promise<TableResult | null> {
+  const s = store();
+  const party = s.parties.get(partyId);
+  if (!party) throw new Error("unknown party");
+  const pace = opts.paceMs ?? paceFromEnv();
+  const plans = party.candidatePlanIds.map((id) => s.plans.get(id)!).filter(Boolean) as CandidatePlan[];
+  const briefs = party.memberIds.map(briefFor);
+  party.status = "talking";
+
+  postTable(party, { round: 0, authorId: null, kind: "system", text: `The table is open: ${plans.length} plans, 5 agents, up to ${MAX_ROUNDS} rounds.`, sourceIds: plans.map((p) => p.id) });
+  await sleep(pace);
+
+  // Party-wide safety first: private venues never reach the agents as options.
+  const unavailable = new Set<string>();
+  for (const p of plans) {
+    const checks = partyChecks(partyId, p);
+    s.codeChecks.push(...checks);
+    if (checks.some((c) => !c.pass)) unavailable.add(p.id);
+  }
+
+  /* -------------------------------- round 1 -------------------------------- */
+  const ctxFor = (b: Brief, round: number, leadingPlanId: string | null, ownPrefs?: Record<string, number>): TurnContext => ({
+    partyId,
+    ownerName: profile(b.ownerId).firstName,
+    brief: b,
+    plans,
+    table: publicRows(partyId),
+    round,
+    unavailable: [...unavailable],
+    leadingPlanId,
+    ownPrefs,
+  });
+
+  const r1 = await Promise.all(briefs.map((b) => round1Turn(ctxFor(b, 1, null))));
+  const prefs = new Map<string, Record<string, number>>();
+
+  for (let i = 0; i < briefs.length; i++) {
+    const b = briefs[i]!;
+    const turn = r1[i]!;
+    const out = (opts.override?.(b.ownerId, 1, turn.out) as Round1Out | undefined) ?? turn.out;
+    const own: Record<string, number> = {};
+    const lines: string[] = [];
+    for (const v of out.verdicts) {
+      const plan = plans.find((p) => p.id === v.planId);
+      if (!plan) continue;
+      const checks = ownerChecks(partyId, plan, b);
+      s.codeChecks.push(...checks);
+      const failing = checks.filter((c) => !c.pass);
+      const overridden = v.decision === "accept" && failing.length > 0;
+      const decision = overridden ? "reject" : v.decision;
+      const reason = overridden ? `Code overrode the model: ${failing.map((c) => c.detail).join(" ")}` : v.privateReason;
+      const verdict: Verdict = {
+        partyId,
+        ownerId: b.ownerId,
+        round: 1,
+        planId: plan.id,
+        decision,
+        preference: decision === "reject" ? 1 : v.preference,
+        privateReason: reason.slice(0, 240),
+        overriddenByCode: overridden,
+      };
+      s.verdicts.push(verdict);
+      publish("agent.verdict", verdict, [b.ownerId], { stage: true });
+      own[plan.id] = verdict.preference;
+      if (decision === "reject") unavailable.add(plan.id);
+      lines.push(`${decision === "reject" ? "✗" : "✓"} ${plan.title} (${verdict.preference}/5): ${verdict.privateReason}`);
+    }
+    prefs.set(b.ownerId, own);
+    trace(partyId, "private", "table", b.ownerId, `${profile(b.ownerId).firstName}'s agent · round 1 · ${turn.source} ${turn.ms}ms`, lines.join("\n"));
+    speak(party, b, 1, out.publicLine, "neutral-hello");
+    await sleep(pace);
+  }
+
+  // The table learns only that a plan is unavailable. Never why, never who.
+  for (const p of plans.filter((x) => unavailable.has(x.id))) {
+    publish("plan.unavailable", { partyId, planId: p.id, round: 1 }, party.memberIds, { stage: true });
+    postTable(party, { round: 1, authorId: null, kind: "unavailable", text: `${p.title} · unavailable`, sourceIds: [p.id], planId: p.id });
+    await sleep(pace / 2);
+  }
+
+  const available = plans.filter((p) => !unavailable.has(p.id));
+  const totals = new Map<string, number>();
+  for (const p of plans) totals.set(p.id, [...prefs.values()].reduce((sum, own) => sum + (own[p.id] ?? 0), 0));
+  trace(partyId, "private", "judge", null, "Code totals preferences", rankPlans(plans, totals).map((p) => `${p.title}: ${totals.get(p.id)}${unavailable.has(p.id) ? " (unavailable)" : ""}`).join("\n"));
+
+  const finish = (planId: string, lockedBy: TableResult["lockedBy"], signatures: string[], rounds: number): TableResult => ({
+    planId,
+    lockedBy,
+    signatures,
+    rounds,
+    unavailable: [...unavailable],
+  });
+
+  if (available.length === 0) {
+    const feasible = rankPlans(plans.filter((p) => feasibleFor(partyId, p, briefs)), totals)[0];
+    if (!feasible) {
+      postTable(party, { round: 1, authorId: null, kind: "system", text: "No plan works for everyone tonight.", sourceIds: plans.map((p) => p.id) });
+      party.status = "failed";
+      return null;
+    }
+    return finish(feasible.id, "fallback", [], 1);
+  }
+
+  /* ------------------------------ rounds 2 and 3 ------------------------------ */
+  let leading = rankPlans(available, totals)[0]!;
+  let signatures: string[] = [];
+  for (let round = 2; round <= MAX_ROUNDS; round++) {
+    postTable(party, { round, authorId: null, kind: "leading", text: `Leading: ${leading.title}`, sourceIds: [leading.id], planId: leading.id });
+    await sleep(pace);
+    const turns = await Promise.all(briefs.map((b) => laterTurn(ctxFor(b, round, leading.id, prefs.get(b.ownerId)))));
+    signatures = [];
+    for (let i = 0; i < briefs.length; i++) {
+      const b = briefs[i]!;
+      const turn = turns[i]!;
+      const raw = (opts.override?.(b.ownerId, round, turn.out) as LaterOut | undefined) ?? turn.out;
+      let decision = raw.decision;
+      let planId = raw.planId;
+      // Code normalises: you can only sign or concede on the leading plan, and only if it passes your rules.
+      if ((decision === "sign" || decision === "concede") && planId !== leading.id) decision = "hold";
+      const failing = ownerChecks(partyId, leading, b).filter((c) => !c.pass);
+      if ((decision === "sign" || decision === "concede") && failing.length) decision = "hold";
+      if (!plans.some((p) => p.id === planId)) planId = leading.id;
+      const verdict: Verdict = {
+        partyId,
+        ownerId: b.ownerId,
+        round,
+        planId,
+        decision,
+        preference: prefs.get(b.ownerId)?.[planId] ?? 3,
+        privateReason: raw.privateReason.slice(0, 240),
+        overriddenByCode: decision !== raw.decision,
+      };
+      s.verdicts.push(verdict);
+      publish("agent.verdict", verdict, [b.ownerId], { stage: true });
+      if (decision !== "hold") signatures.push(b.ownerId);
+      trace(partyId, "private", "table", b.ownerId, `${profile(b.ownerId).firstName}'s agent · round ${round} · ${turn.source} ${turn.ms}ms`, `${decision.toUpperCase()} ${plans.find((p) => p.id === planId)?.title ?? planId}: ${verdict.privateReason}`);
+      speak(party, b, round, raw.publicLine, decision === "hold" ? "neutral-thinking" : "neutral-in");
+      await sleep(pace);
+    }
+    postTable(party, { round, authorId: null, kind: "system", text: `${signatures.length} of 5 signed ${leading.title}.`, sourceIds: [leading.id] });
+    await sleep(pace);
+    if (signatures.length === party.memberIds.length) return finish(leading.id, "signatures", signatures, round);
+    leading = rankPlans(available, totals)[0]!;
+  }
+
+  // Round 3 ended without five signatures: code picks the best feasible plan.
+  const fallback = rankPlans(plans.filter((p) => feasibleFor(partyId, p, briefs) && !unavailable.has(p.id)), totals)[0] ?? rankPlans(plans.filter((p) => feasibleFor(partyId, p, briefs)), totals)[0];
+  if (!fallback) {
+    party.status = "failed";
+    postTable(party, { round: MAX_ROUNDS, authorId: null, kind: "system", text: "No plan works for everyone tonight.", sourceIds: plans.map((p) => p.id) });
+    return null;
+  }
+  trace(partyId, "private", "judge", null, "Fallback", `No five signatures after round ${MAX_ROUNDS}. Code picked ${fallback.title}, the best feasible plan by total preference.`);
+  return finish(fallback.id, "fallback", signatures, MAX_ROUNDS);
+}
