@@ -23,6 +23,7 @@ import { agentStory } from "@/lib/server/story";
 import { friendMessage } from "@/lib/server/tellfriend";
 import { TellFriend } from "@/components/party/TellFriend";
 import { CantMakeIt } from "@/components/party/CantMakeIt";
+import { closestFit } from "@/lib/server/closest";
 import { hasDropped } from "@/lib/server/refill";
 import { autoForgetDue } from "@/lib/server/forget";
 
@@ -75,6 +76,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
   const noMatch = flag("NO_MATCH") ? noMatchView(v.party.id, viewer) : null;
   const story = flag("AGENT_STORY") ? agentStory(v.party.id, viewer) : null;
   const friend = flag("TELL_A_FRIEND") ? friendMessage(v.party.id, viewer) : null;
+  const closest = flag("CLOSEST_FIT") && noMatch && !noMatch.requeued ? closestFit(v.party.id, viewer) : null;
   const waiting = noMatch?.requeued ? queueStatus(viewer) : null;
 
   return (
@@ -161,6 +163,11 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
                         </li>
                       ))}
                     </ul>
+                    {closest && (
+                      <p className="mt-2 rounded-[8px] bg-[var(--color-pq-soft)] px-3 py-2 text-[15px]" data-testid="closest-fit">
+                        Closest: <b>{closest.planTitle}</b>. It would fit if you could {closest.changes.join(" and ")}.
+                      </p>
+                    )}
                     <p className="mt-2 text-[15px] text-[var(--color-ink-2)]">Try Anywhere tonight, or say it a little differently.</p>
                     <Link href={noMatch.eventId ? `/queue?event=${noMatch.eventId}` : "/queue"} className="press mt-3 inline-flex rounded-[6px] bg-[var(--color-pq)] px-4 py-2 text-[15px] font-semibold text-white">
                       Queue again

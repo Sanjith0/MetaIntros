@@ -94,6 +94,8 @@ const DEFAULTS = {
   AUTO_FORGET: true,
   /** F44: bring up to three friends: you all land in one party, with new people; each types their own sentence. */
   FRIEND_GROUP: true,
+  /** F45: when nothing there fits your own rules, the smallest change that would open a plan, told only to you. */
+  CLOSEST_FIT: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
