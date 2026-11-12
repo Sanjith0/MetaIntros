@@ -56,7 +56,7 @@ export function Toaster({ people }: { people: Directory }) {
       }
       case "member.spotted": {
         const s = e.payload;
-        if (!s.subjectId) return;
+        if (!s.subjectId || pathname === "/door") return; // the door card already shows it
         push({ id: e.id, title: "At the door", body: `${people[s.subjectId]?.firstName ?? "Someone"} from your party is here.`, href: "/door", layer: true, who: s.subjectId });
         break;
       }
