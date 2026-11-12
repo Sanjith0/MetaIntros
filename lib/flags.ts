@@ -118,6 +118,8 @@ const DEFAULTS = {
   EVENT_IMPACT: true,
   /** F56: your agent's story says when it used what it remembers about you. */
   STORY_MEMORY: true,
+  /** F57: take back what you shared: stop sharing a fact, and every card, opener and line built from it is rewritten. */
+  REVOKE_SHARING: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

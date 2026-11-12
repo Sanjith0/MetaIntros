@@ -5,6 +5,8 @@ import { flag } from "@/lib/flags";
 import { myData } from "@/lib/server/mydata";
 import { currentViewerId } from "@/lib/server/viewer";
 import { autoForgetDue } from "@/lib/server/forget";
+import { StopSharing } from "@/components/me/StopSharing";
+import { sharedFacts } from "@/lib/server/revoke";
 
 export const metadata: Metadata = { title: "Your data" };
 export const dynamic = "force-dynamic";
@@ -24,6 +26,19 @@ export default async function MyDataPage() {
           Download as JSON
         </a>
       </div>
+      {flag("REVOKE_SHARING") && (
+        <section className="rounded-[12px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="data-sharing">
+          <h2 className="text-[17px] font-bold">What you share, and taking it back</h2>
+          <p className="text-[13px] text-[var(--color-ink-2)]">
+            Stop sharing a fact and every card, opener and line built from it is rewritten, on everyone&apos;s phone. Agents can&apos;t use it again.
+          </p>
+          {sharedFacts(viewer).length ? (
+            <StopSharing facts={sharedFacts(viewer).map((f) => ({ id: f.id, tag: f.tag }))} />
+          ) : (
+            <p className="mt-1 text-[14px] text-[var(--color-ink-2)]">You aren&apos;t sharing any facts.</p>
+          )}
+        </section>
+      )}
       {d.sections.map((s) => (
         <section key={s.id} className="rounded-[12px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid={`data-${s.id}`}>
           <div className="flex items-baseline justify-between gap-3">

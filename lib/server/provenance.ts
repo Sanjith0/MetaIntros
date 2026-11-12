@@ -41,6 +41,11 @@ export function explainSources(sourceIds: string[], viewerId: string, partyId: s
       out.push({ kind: "plan", text: `Your party's plan: ${plan.title}.`, ok: true });
       continue;
     }
+    if (id.startsWith("removed-")) {
+      // F57: the line here used a fact its owner stopped sharing; the greeting in its place uses nothing about anyone.
+      out.push({ kind: "fact", text: "Its owner stopped sharing what this was built from; this greeting uses nothing about anyone.", ok: true });
+      continue;
+    }
     out.push({ kind: "unknown", text: "A source this app can't explain.", ok: false });
   }
   return out;
