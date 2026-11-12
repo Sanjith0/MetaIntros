@@ -27,6 +27,8 @@ const DEFAULTS = {
   RUN_IT_BACK_PLUS: true,
   /** F11: /fair/host dashboard with live counts (guests, queued, parties formed, locked, met). Counts only. */
   FAIR_HOST: true,
+  /** F12: /evals: the leak test four ways (one prompt, one prompt + verifier, five agents + verifier, solver). */
+  EVALS_PAGE: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

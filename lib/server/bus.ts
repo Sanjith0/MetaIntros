@@ -27,6 +27,7 @@ export function publish<T extends EventType>(
     payload,
   });
   s.events_log.push(event);
+  if ((globalThis as unknown as { __pqSilent?: boolean }).__pqSilent) return event; // an isolated eval run
   for (const l of listeners()) {
     try {
       l(event);

@@ -23,7 +23,7 @@ export function LiveProvider({ viewerId, stage = false, children }: { viewerId: 
   const offset = useRef(0);
   const pathname = usePathname() ?? "";
   // Operator screens (the projector and the phones board) watch without counting as a phone.
-  const observer = pathname.startsWith("/phones") || pathname.startsWith("/stage") || pathname.startsWith("/demo") || pathname.startsWith("/fair/host");
+  const observer = pathname.startsWith("/phones") || pathname.startsWith("/stage") || pathname.startsWith("/demo") || pathname.startsWith("/fair/host") || pathname.startsWith("/evals");
 
   // Phones only play sound after a tap; unlock audio on the first one.
   useEffect(() => {

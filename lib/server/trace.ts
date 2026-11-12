@@ -19,6 +19,7 @@ export function trace(
   const s = store();
   const t: Trace = { id: `tr-${s.version}-${s.traces.length + 1}`, partyId, seq: s.traces.length, lane, conversation, actorId, title, body, at: nowIso(), ...extra };
   s.traces.push(t);
+  if ((globalThis as unknown as { __pqSilent?: boolean }).__pqSilent) return t; // an isolated eval run
   for (const l of listeners()) {
     try {
       l(t);
