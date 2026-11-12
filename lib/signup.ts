@@ -27,8 +27,8 @@ export const SignupInput = z
     dislikes: z.array(z.enum(chipTags)).max(6).default([]),
     availability: z.array(z.enum(slotIds)).min(1),
   })
-  .refine((v) => !v.womenOnlyParty || v.gender === "woman" || v.gender === "nonbinary", {
-    message: "Women-only parties are available to women and non-binary users",
+  .refine((v) => !v.womenOnlyParty || v.gender === "woman", {
+    message: "Women-only squads are available to women",
     path: ["womenOnlyParty"],
   })
   .refine((v) => v.dislikes.every((d) => !v.interests.includes(d)), { message: "Interest and dislike overlap", path: ["dislikes"] });

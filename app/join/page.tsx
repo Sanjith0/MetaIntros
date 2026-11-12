@@ -39,7 +39,7 @@ export default function JoinPage() {
 
   const toggle = (xs: string[], set: (v: string[]) => void, x: string) => set(xs.includes(x) ? xs.filter((y) => y !== x) : [...xs, x]);
   const basicsOk = name.trim().length >= 2 && ageBand && gender !== undefined;
-  const canWomenOnly = gender === "woman" || gender === "nonbinary";
+  const canWomenOnly = gender === "woman";
 
   const submit = async (sample: boolean) => {
     setError(null);

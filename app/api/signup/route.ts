@@ -9,7 +9,7 @@ import { publish } from "@/lib/server/bus";
 
 const SampleInput = z
   .object({ sample: z.literal(true), name: z.string().trim().min(2).max(40), ageBand: AgeBand, gender: Gender.nullable(), womenOnlyParty: z.boolean().default(false) })
-  .refine((v) => !v.womenOnlyParty || v.gender === "woman" || v.gender === "nonbinary", { path: ["womenOnlyParty"], message: "Women-only parties are available to women and non-binary users" });
+  .refine((v) => !v.womenOnlyParty || v.gender === "woman", { path: ["womenOnlyParty"], message: "Women-only squads are available to women" });
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
