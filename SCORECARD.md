@@ -175,6 +175,20 @@ room's sanitized view. Found and fixed between F45 and F50: the "follow along" Q
 planned pointed at a view that was only hidden in the browser, and the room phone showed an
 operator button (F46); the lock splash first let the board bleed through (F48).
 
+Checkpoint after F55 (15:50 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npm run test:e2e` (production build, cold) | 73 specs, `73 passed (7.7m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Unit | `npm test` | `Tests  263 passed (263)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 339/339 checks passed` (adds `party.switched`) |
+| Demo video | `npm run video` | `saved shots/demo.webm (7572443 bytes, about 61 s)` |
+
+Found and fixed between F50 and F55: after switching to plan B the chat kept the old plan's
+title (F54); the Event page said "a party has formed here" twice once the impact line showed
+(F55).
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 
