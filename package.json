@@ -11,9 +11,10 @@
     "contract:check": "tsx scripts/contract-check.ts",
     "shots": "playwright test tests/shots.spec.ts",
     "test:demo": "playwright test tests/demo-path.spec.ts",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --grep-invert \"record the 60-second\"",
     "eval": "tsx evals/run.ts",
-    "talk:real": "tsx scripts/real-table-talk.ts"
+    "talk:real": "tsx scripts/real-table-talk.ts",
+    "video": "playwright test tests/demo-video.spec.ts"
   },
   "dependencies": {
     "next": "^16.4.6",

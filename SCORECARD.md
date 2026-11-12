@@ -14,6 +14,25 @@ Branch: `swarit-baseline`. Everything runs locally with `npm install && npm run 
 | M5 The door | PASS | `npx playwright test tests/door.spec.ts` (+ `npm test -- door`) | `POST /api/frames -> {"frameId":"frame-0001","viewerId":"maya","partyId":"party-6","subjectId":"dev","method":"stub",...}` · `✓ door: the fixture frame shows Dev's card on Maya's /door (13.9s)` · `1 passed (14.4s)`; unit: `Tests  5 passed` (stub never reads pixels, gallery-only ids, viewer-only event, I'm here, tap-a-face). `shots/m5-door.png` |
 | M6 After | PASS | `npx playwright test tests/after.spec.ts` and `npm run eval -- --mock` | Playwright: `✓ runitback: private picks, mutual pairs only, shown pair by pair (14.6s)` · `✓ fair: QR join with a typed profile and a consent box (514ms)` · `2 passed (15.6s)`. Eval: `PASS brief 20/20` · `PASS table 4/4` · `PASS privacy (25 generated parties) 1428/1428` · `PASS judge 25/25` · `PASS verifier 24/24` · `PASS grounding 71/71` · `PASS adversarial 3/3` · `eval: 7/7 suites passed`. Unit `npm test -- after`: 5 passed. `shots/m6-*.png`, `evals/PLAN.md` |
 
+## Final run (all checks together, after M6)
+
+| Check | Command | Last lines |
+|---|---|---|
+| Typecheck | `npm run typecheck` | clean, no errors |
+| Unit tests | `npm test` | `Test Files  6 passed (6)` · `Tests  52 passed (52)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 315/315 checks passed` |
+| Evals | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| All Playwright specs | `npm run test:e2e` | `MATCH FOUND lag after plan.locked (ms): maya=5 sound=played dev=4 sound=played ana=4 sound=played kai=4 sound=played zoe=4 sound=played` · `10 passed (50.4s)` |
+
+## Demo video
+
+`shots/demo.webm`: 60 seconds, 1280x720, recorded by `npm run video`
+(`tests/demo-video.spec.ts`) from Maya's screen: Events tab (0 s), the event (4 s), one
+sentence with the private preview (12 s), party forming (17 s), the table filling in live
+(18 s), MATCH FOUND (30 s), the group chat with the pinned plan and openers (35 s), the party
+card and her receipt (40 s), the RSVP on the Event page (46 s), Dev's card at the door (50 s),
+and a mutual run-it-back pick (57 s).
+
 ## Facebook reference (Step 1)
 
 FACEBOOK_LAYER: no REA reference for the logged-in states. REA (`rea-agents` 6.8.0,
@@ -32,9 +51,19 @@ ran on the deterministic mock (`MOCK_MODEL=1`). Real model calls used tonight: 0
 
 ## Stubs and blockers
 
-- Model: mock by default (no key available tonight).
+- Model: mock by default. Blocker: no `META_API_KEY` was available, so no agent turn tonight
+  used a real model, and the brief's "real table talk wall-clock" is not recorded.
 - Recognition: `matchFrame(frame, gallery)` in `lib/door/recognition.ts` runs a stub that maps a
   fixture key to a party member and never reads pixels. A real module plugs in with
   `setMatcher()`; whatever it returns, only a gallery member id (or null) gets through.
 - Door camera identity: `POST /api/frames` trusts the `viewerId` in the frame body (it stands in
   for a paired door device). A real build would authenticate the device.
+- Facebook reference: the logged-out page was gated by a login dialog; Interested, Going, the
+  guest list and Messenger are built from inferred layouts plus the seen tokens.
+- State is in memory only: a server restart or `POST /api/demo/reset` clears it.
+- Inert shell pieces: search, Invite, Share, the overflow menu, the Discussion tab and the map
+  are visual only.
+- Dev-server note: Next 16 allows one `next dev` per project folder, so Playwright reuses a
+  running server on port 3000 (or starts one). Once tonight the dev server's hot-reload state
+  wedged and every page reloaded in a loop; `rm -rf .next` and a restart fixed it (noted in the
+  README).
