@@ -101,6 +101,7 @@ function sanitize(out: PairOut, A: PairSide, B: PairSide, bridges: Bridge[], fal
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
 export function bridgeText(b: Bridge): string {
+  if (b.kind === "queued_together") return "You queued together.";
   return b.kind === "mutual_friend" ? `You both know ${b.viaName}.` : `You're both in ${b.viaName}.`;
 }
 

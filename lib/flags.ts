@@ -15,6 +15,8 @@ const DEFAULTS = {
   MODEL_READINESS: true,
   /** F5: /demo control panel: reset, pre-queue four, lock now, frame source, model behaviour, pace. */
   DEMO_PANEL: true,
+  /** F6: queue with a friend (duo), and women-only / not-the-only-woman settings in the queue sheet. */
+  DUO_QUEUE: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -66,7 +66,7 @@ export const Bridge = z.object({
   id: Id,
   a: Id,
   b: Id,
-  kind: z.enum(["mutual_friend", "group"]),
+  kind: z.enum(["mutual_friend", "group", "queued_together"]),
   viaId: Id,
   viaName: z.string().min(1),
   groupSize: z.number().int().optional(),
@@ -156,6 +156,8 @@ export const QueueEntry = z.object({
   window: TimeWindow,
   briefId: Id,
   consentBridges: z.boolean(),
+  /** A friend this person is queuing with. Both join, and both land in the same party. */
+  duoWith: Id.nullable().default(null),
   joinedAt: IsoTime,
   status: z.enum(["waiting", "forming", "matched", "left"]),
 });

@@ -6,14 +6,16 @@ import { QueueSheet } from "@/components/queue/QueueSheet";
 import { DEMO_PARTY } from "@/fixtures";
 import { eventWhen } from "@/lib/format";
 import { queueStatus } from "@/lib/server/queue";
+import { friendsOf } from "@/lib/graph";
+import { flag } from "@/lib/flags";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 
 export const metadata: Metadata = { title: "Find my party" };
 export const dynamic = "force-dynamic";
 
-export default async function QueuePage({ searchParams }: { searchParams: Promise<{ event?: string }> }) {
-  const { event: eventParam } = await searchParams;
+export default async function QueuePage({ searchParams }: { searchParams: Promise<{ event?: string; duo?: string }> }) {
+  const { event: eventParam, duo } = await searchParams;
   const viewer = await currentViewerId();
   const s = store();
   const st = queueStatus(viewer);
@@ -21,6 +23,15 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
   const e = s.events.get(eventId) ?? s.events.get(DEMO_PARTY.entryEventId)!;
   const active = st && (st.entry.status === "waiting" || st.partyId) ? st : null;
   const placeholder = DEMO_PARTY.sentences[viewer] ?? "e.g. low-key, home by eleven, under $20";
+  const me = s.profiles.get(viewer)!;
+  const duoOn = flag("DUO_QUEUE");
+  const friends = duoOn
+    ? [...friendsOf(viewer)]
+        .map((id) => s.profiles.get(id))
+        .filter((p): p is NonNullable<typeof p> => !!p && p.age >= 18 && !me.blocks.includes(p.id) && !p.blocks.includes(viewer))
+        .map((p) => ({ id: p.id, name: p.name }))
+    : [];
+  const inviter = duo ? friends.find((f) => f.id === duo) ?? null : null;
 
   return (
     <main className="relative min-h-[calc(100vh-56px)]">
@@ -54,7 +65,14 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
             eventId={e.id}
             landmark={e.landmark}
             placeholder={placeholder}
-            initialStatus={active ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark } : null}
+            isWoman={duoOn && me.gender === "woman"}
+            initialSettings={me.settings}
+            friends={friends}
+            invitedBy={inviter}
+            duoEnabled={duoOn}
+            initialStatus={
+              active ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark, duo: active.duo } : null
+            }
           />
         </div>
       </div>

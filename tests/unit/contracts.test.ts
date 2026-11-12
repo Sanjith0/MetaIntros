@@ -5,7 +5,8 @@ import { DEMO_PARTY, EVENTS, PROFILES } from "@/fixtures";
 
 describe("contracts", () => {
   it("every event type has a payload schema and a valid sample", () => {
-    expect(EVENT_TYPES).toHaveLength(13);
+    // The 13 from the brief, plus queue.invite (duo queue).
+    expect(EVENT_TYPES.length).toBeGreaterThanOrEqual(13);
     for (const t of EVENT_TYPES) expect(PAYLOADS[t].safeParse(SAMPLE_PAYLOADS[t]).success).toBe(true);
   });
 

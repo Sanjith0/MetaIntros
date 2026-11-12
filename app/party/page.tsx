@@ -105,7 +105,7 @@ export default async function PartyPage() {
                   <div className="min-w-0 flex-1">
                     <div className="text-[15px] font-semibold">{m.name}</div>
                     {m.bridge && <div className="text-[13px] text-[var(--color-ink-2)]">{m.bridge}</div>}
-                    {c?.sharedLine && <div className="mt-0.5 text-[13px] font-semibold text-[var(--color-pq-ink)]">{c.sharedLine}</div>}
+                    {c?.sharedLine && c.sharedLine !== m.bridge && <div className="mt-0.5 text-[13px] font-semibold text-[var(--color-pq-ink)]">{c.sharedLine}</div>}
                     {c && (
                       <div className="mt-1 rounded-[8px] bg-[var(--color-pq-soft)] px-2.5 py-1.5 text-[13px]">
                         <span className="font-semibold text-[var(--color-pq)]">Say: </span>

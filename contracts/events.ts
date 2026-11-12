@@ -18,6 +18,7 @@ import {
 
 export const EVENT_TYPES = [
   "queue.joined",
+  "queue.invite",
   "queue.tick",
   "party.forming",
   "agent.verdict",
@@ -38,6 +39,13 @@ export const QueueJoinedPayload = z.object({
   userId: Id,
   eventId: Id.nullable(),
   landmark: z.string(),
+});
+
+/** A friend asked you to queue together (duo queue). */
+export const QueueInvitePayload = z.object({
+  fromId: Id,
+  toId: Id,
+  eventId: Id,
 });
 
 export const QueueTickPayload = z.object({
@@ -89,6 +97,7 @@ export const MemberArrivedPayload = z.object({
 
 export const PAYLOADS = {
   "queue.joined": QueueJoinedPayload,
+  "queue.invite": QueueInvitePayload,
   "queue.tick": QueueTickPayload,
   "party.forming": PartyFormingPayload,
   "agent.verdict": Verdict,
@@ -125,6 +134,7 @@ const envelope = <T extends EventType>(type: T) =>
 
 export const PQEvent = z.discriminatedUnion("type", [
   envelope("queue.joined"),
+  envelope("queue.invite"),
   envelope("queue.tick"),
   envelope("party.forming"),
   envelope("agent.verdict"),

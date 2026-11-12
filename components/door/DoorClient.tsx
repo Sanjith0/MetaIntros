@@ -96,7 +96,7 @@ export function DoorClient({
             </div>
             <div className="space-y-3 p-5">
               {card.bridgeLine && <div className="text-[15px] text-[var(--color-ink-2)]">{card.bridgeLine}</div>}
-              {card.sharedLine && <div className="text-[17px] font-semibold text-[var(--color-pq-ink)]">{card.sharedLine}</div>}
+              {card.sharedLine && card.sharedLine !== card.bridgeLine && <div className="text-[17px] font-semibold text-[var(--color-pq-ink)]">{card.sharedLine}</div>}
               <div className="rounded-[10px] bg-[var(--color-pq-soft)] p-3">
                 <div className="flex items-center gap-1 text-[12px] font-semibold uppercase tracking-wide text-[var(--color-pq)]">
                   <IconSparkle size={14} /> Say

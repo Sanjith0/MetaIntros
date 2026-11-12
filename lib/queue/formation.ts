@@ -18,7 +18,7 @@ export const PARTY_SIZE = 5;
 export const MIN_OVERLAP_MIN = 90;
 export const MIN_AGE = 18;
 
-export type RuleId = "size" | "bucket" | "window" | "age" | "blocks" | "women_only" | "not_only_woman" | "bridge";
+export type RuleId = "size" | "bucket" | "window" | "age" | "blocks" | "women_only" | "not_only_woman" | "bridge" | "duo";
 
 export interface Violation {
   rule: RuleId;
@@ -45,10 +45,28 @@ export function eligibleToQueue(p: Profile): Violation | null {
   return p.age < MIN_AGE ? { rule: "age", userIds: [p.id], detail: "Party Queue is for people 18 and over." } : null;
 }
 
-export function partyBridges(members: Profile[], nameOf: (id: string) => string): Bridge[] {
+/** Two people who queued together and both confirmed it. */
+export function confirmedDuo(cands: Candidate[], c: Candidate): Candidate | null {
+  const partnerId = c.entry.duoWith;
+  if (!partnerId) return null;
+  const partner = cands.find((x) => x.profile.id === partnerId);
+  return partner && partner.entry.duoWith === c.profile.id ? partner : null;
+}
+
+export function partyBridges(members: Profile[], nameOf: (id: string) => string, entries: QueueEntry[] = []): Bridge[] {
   const out: Bridge[] = [];
   for (let i = 0; i < members.length; i++)
-    for (let j = i + 1; j < members.length; j++) out.push(...bridgesBetween(members[i]!, members[j]!, nameOf));
+    for (let j = i + 1; j < members.length; j++) {
+      const a = members[i]!;
+      const b = members[j]!;
+      const ea = entries.find((e) => e.userId === a.id);
+      const eb = entries.find((e) => e.userId === b.id);
+      if (ea?.duoWith === b.id && eb?.duoWith === a.id) {
+        const [x, y] = a.id < b.id ? [a.id, b.id] : [b.id, a.id];
+        out.push({ id: `br-${x}-${y}-duo`, a: x, b: y, kind: "queued_together", viaId: `${x}|${y}`, viaName: "queued together" });
+      }
+      out.push(...bridgesBetween(a, b, nameOf));
+    }
   return out;
 }
 
@@ -81,7 +99,13 @@ export function checkParty(cands: Candidate[], nameOf: (id: string) => string = 
       v.push({ rule: "not_only_woman", userIds: [p.id], detail: "This member is never the only woman in a party." });
   }
 
-  const bridges = partyBridges(people, nameOf);
+  // A duo comes as a pair: both members, or neither.
+  for (const c of cands) {
+    const partnerId = c.entry.duoWith;
+    if (partnerId && !ids.includes(partnerId)) v.push({ rule: "duo", userIds: [c.profile.id, partnerId], detail: "Queued with a friend who isn't in this party." });
+  }
+
+  const bridges = partyBridges(people, nameOf, cands.map((c) => c.entry));
   for (const p of people) {
     if (!bridges.some((b) => b.a === p.id || b.b === p.id))
       v.push({ rule: "bridge", userIds: [p.id], detail: "No mutual friend or small Group shared with anyone else in the party." });
@@ -111,6 +135,8 @@ export function formParty(cands: Candidate[], opts: { mustInclude?: string; name
   const nameOf = opts.nameOf ?? ((id: string) => id);
   const waiting = cands
     .filter((c) => c.entry.status === "waiting" && c.profile.age >= MIN_AGE)
+    // Someone who invited a friend waits until the friend has joined too.
+    .filter((c, _i, all) => !c.entry.duoWith || confirmedDuo(all, c))
     .sort((a, b) => a.entry.joinedAt.localeCompare(b.entry.joinedAt));
   const byBucket = new Map<string, Candidate[]>();
   for (const c of waiting) {
@@ -126,7 +152,7 @@ export function formParty(cands: Candidate[], opts: { mustInclude?: string; name
       if (++tried > 50_000) break; // hard ceiling; buckets are small in practice
       if (opts.mustInclude && !combo.some((c) => c.profile.id === opts.mustInclude)) continue;
       if (checkParty(combo, nameOf).length === 0) {
-        return { members: combo, bridges: partyBridges(combo.map((c) => c.profile), nameOf) };
+        return { members: combo, bridges: partyBridges(combo.map((c) => c.profile), nameOf, combo.map((c) => c.entry)) };
       }
     }
   }

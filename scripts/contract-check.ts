@@ -64,7 +64,8 @@ ok(
 );
 
 // Events
-ok(EVENT_TYPES.length === 13, "13 event types");
+const REQUIRED_EVENTS = ["queue.joined", "queue.tick", "party.forming", "agent.verdict", "table.message", "pair.message", "plan.unavailable", "plan.locked", "match.found", "chat.message", "member.arrived", "member.spotted", "runitback.mutual"];
+for (const e of REQUIRED_EVENTS) ok((EVENT_TYPES as readonly string[]).includes(e), `event ${e} exists`);
 for (const type of EVENT_TYPES) {
   parses(PAYLOADS[type], SAMPLE_PAYLOADS[type], `sample payload ${type}`);
   parses(

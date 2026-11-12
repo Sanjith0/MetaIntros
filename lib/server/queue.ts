@@ -3,6 +3,7 @@ import { EVENT_TAGS } from "@/fixtures";
 import { buildBrief } from "@/lib/agents/brief";
 import { runParty } from "@/lib/agents/orchestrator";
 import { eligibleToQueue, formParty, bucketKey, PARTY_SIZE, type Candidate } from "@/lib/queue/formation";
+import { areFriends } from "@/lib/graph";
 import { publish } from "./bus";
 import { nextId, nowIso, profile, store } from "./store";
 import { trace } from "./trace";
@@ -13,6 +14,10 @@ export interface JoinInput {
   sentence: string;
   consentBridges: boolean;
   approvedLineIds?: string[];
+  /** Queue together with this friend (duo queue). */
+  duoWith?: string | null;
+  /** Saved to the profile: only all-women parties; never the only woman. */
+  settings?: { womenOnly: boolean; notOnlyWoman: boolean };
   /** Start the agents' table talk when a party forms (off in some tests). */
   startTalk?: boolean;
 }
@@ -39,6 +44,15 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
   if (!event) throw new Error("unknown event");
   if (!event.partyEligible) throw new Error("this event is not open to Party Queue");
 
+  if (input.duoWith) {
+    if (input.duoWith === input.userId) throw new Error("You can't queue with yourself.");
+    const friend = s.profiles.get(input.duoWith);
+    if (!friend || !areFriends(input.userId, input.duoWith)) throw new Error("You can only queue with a friend.");
+    if (eligibleToQueue(friend)) throw new Error("Your friend can't join Party Queue.");
+    if (p.blocks.includes(friend.id) || friend.blocks.includes(p.id)) throw new Error("You can't queue with that person.");
+  }
+  if (input.settings) p.settings = { ...p.settings, ...input.settings };
+
   // One active entry per person.
   for (const e of s.queue) if (e.userId === input.userId && e.status === "waiting") e.status = "left";
 
@@ -54,11 +68,17 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
     window: windowFor(event.date, event.start),
     briefId: built.brief.id,
     consentBridges: input.consentBridges,
+    duoWith: input.duoWith ?? null,
     joinedAt: nowIso(),
     status: "waiting",
   };
   s.queue.push(entry);
   publish("queue.joined", { entryId: entry.id, userId: entry.userId, eventId: entry.eventId, landmark: entry.landmark }, [entry.userId]);
+  // Duo: if the friend hasn't joined with us yet, invite them.
+  if (entry.duoWith) {
+    const theirs = s.queue.find((q) => q.userId === entry.duoWith && q.status === "waiting" && q.duoWith === entry.userId);
+    if (!theirs) publish("queue.invite", { fromId: entry.userId, toId: entry.duoWith, eventId: event.id }, [entry.duoWith]);
+  }
   ensureTicker();
 
   const partyId = await tryForm(entry.userId, input.startTalk ?? true);
@@ -75,8 +95,10 @@ export function queueStatus(userId: string) {
   if (!entry) return null;
   const inBucket = s.queue.filter((e) => e.status === "waiting" && bucketKey(e) === bucketKey(entry)).length;
   const party = [...s.parties.values()].reverse().find((p) => p.memberIds.includes(userId));
+  const partner = entry.duoWith ? s.queue.find((q) => q.userId === entry.duoWith && q.status !== "left") : undefined;
   return {
     entry,
+    duo: entry.duoWith ? { with: entry.duoWith, confirmed: !!partner && partner.duoWith === userId } : null,
     inBucket,
     needed: Math.max(0, PARTY_SIZE - inBucket),
     waitingSeconds: Math.round((Date.now() - Date.parse(entry.joinedAt)) / 1000),

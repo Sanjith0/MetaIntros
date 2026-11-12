@@ -5,6 +5,7 @@ const at = "2026-11-14T19:00:00.000Z";
 /** One valid payload per event type. Used by contract:check and tests. */
 export const SAMPLE_PAYLOADS: { [T in EventType]: PayloadOf<T> } = {
   "queue.joined": { entryId: "q-1", userId: "maya", eventId: "evt-rooftop", landmark: "Dolores Park" },
+  "queue.invite": { fromId: "zoe", toId: "sam", eventId: "evt-rooftop" },
   "queue.tick": { userId: "maya", waitingSeconds: 12, inBucket: 3, needed: 2 },
   "party.forming": { partyId: "p-1", memberIds: ["maya", "dev", "ana", "kai", "zoe"], landmark: "Dolores Park" },
   "agent.verdict": {

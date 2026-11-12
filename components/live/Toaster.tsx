@@ -53,6 +53,18 @@ export function Toaster({ people }: { people: Directory }) {
         router.refresh();
         break;
       }
+      case "queue.invite": {
+        const from = people[e.payload.fromId];
+        push({
+          id: e.id,
+          title: "Party Queue",
+          body: `${from?.firstName ?? "A friend"} wants to queue with you. You'd be in the same party.`,
+          href: `/queue?event=${e.payload.eventId}&duo=${e.payload.fromId}`,
+          layer: true,
+          who: e.payload.fromId,
+        });
+        break;
+      }
       case "party.forming":
         push({ id: e.id, title: "Party Queue", body: "Your party of five is forming. Your agents are talking it over.", href: "/party", layer: true });
         break;

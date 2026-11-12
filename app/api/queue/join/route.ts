@@ -8,6 +8,8 @@ const Body = z.object({
   sentence: z.string().trim().min(3).max(280),
   consentBridges: z.boolean(),
   approvedLineIds: z.array(z.string()).optional(),
+  duoWith: z.string().nullable().optional(),
+  settings: z.object({ womenOnly: z.boolean(), notOnlyWoman: z.boolean() }).optional(),
 });
 
 export async function POST(req: Request) {

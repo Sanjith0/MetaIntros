@@ -19,6 +19,12 @@ interface Status {
   needed: number;
   partyId: string | null;
   landmark: string;
+  duo?: { with: string; confirmed: boolean } | null;
+}
+
+export interface Friend {
+  id: string;
+  name: string;
 }
 
 const ruleLabel = (r: HardRule) => {
@@ -48,11 +54,33 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
 
 /** The queue sheet: one sentence, a private preview, approvals, and then a
  *  live timer. You can leave the page; the notification will find you. */
-export function QueueSheet({ eventId, landmark, initialStatus, placeholder }: { eventId: string; landmark: string; initialStatus: Status | null; placeholder: string }) {
+export function QueueSheet({
+  eventId,
+  landmark,
+  initialStatus,
+  placeholder,
+  isWoman = false,
+  initialSettings = { womenOnly: false, notOnlyWoman: false },
+  friends = [],
+  invitedBy = null,
+  duoEnabled = true,
+}: {
+  eventId: string;
+  landmark: string;
+  initialStatus: Status | null;
+  placeholder: string;
+  isWoman?: boolean;
+  initialSettings?: { womenOnly: boolean; notOnlyWoman: boolean };
+  friends?: Friend[];
+  invitedBy?: Friend | null;
+  duoEnabled?: boolean;
+}) {
   const [sentence, setSentence] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
   const [approved, setApproved] = useState<Record<string, boolean>>({});
   const [consent, setConsent] = useState(true);
+  const [settings, setSettings] = useState(initialSettings);
+  const [duoWith, setDuoWith] = useState<string>(invitedBy?.id ?? "");
   const [status, setStatus] = useState<Status | null>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
@@ -88,7 +116,14 @@ export function QueueSheet({ eventId, landmark, initialStatus, placeholder }: { 
     const res = await fetch("/api/queue/join", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ eventId, sentence, consentBridges: consent, approvedLineIds: Object.keys(approved).filter((k) => approved[k]) }),
+      body: JSON.stringify({
+        eventId,
+        sentence,
+        consentBridges: consent,
+        approvedLineIds: Object.keys(approved).filter((k) => approved[k]),
+        duoWith: duoWith || null,
+        ...(isWoman ? { settings } : {}),
+      }),
     });
     const body = (await res.json()) as { error?: string; partyId?: string | null };
     setJoining(false);
@@ -96,8 +131,11 @@ export function QueueSheet({ eventId, landmark, initialStatus, placeholder }: { 
       setError(body.error ?? "Could not join the queue.");
       return;
     }
-    const st = (await (await fetch("/api/queue/status")).json()) as { status: { entry: { joinedAt: string; landmark: string }; inBucket: number; needed: number; partyId: string | null } | null };
-    if (st.status) setStatus({ joinedAt: st.status.entry.joinedAt, inBucket: st.status.inBucket, needed: st.status.needed, partyId: st.status.partyId, landmark: st.status.entry.landmark });
+    const st = (await (await fetch("/api/queue/status")).json()) as {
+      status: { entry: { joinedAt: string; landmark: string }; inBucket: number; needed: number; partyId: string | null; duo: Status["duo"] } | null;
+    };
+    if (st.status)
+      setStatus({ joinedAt: st.status.entry.joinedAt, inBucket: st.status.inBucket, needed: st.status.needed, partyId: st.status.partyId, landmark: st.status.entry.landmark, duo: st.status.duo });
     if (body.partyId) setForming(body.partyId);
   };
 
@@ -138,6 +176,13 @@ export function QueueSheet({ eventId, landmark, initialStatus, placeholder }: { 
             <p className="text-[15px] text-[var(--color-ink-2)]" data-testid="queue-count">
               {status!.inBucket} of 5 here · waiting for {status!.needed} more
             </p>
+            {status!.duo && (
+              <p className="mt-1 text-[13px] font-semibold text-[var(--color-pq-ink)]" data-testid="queue-duo">
+                {status!.duo.confirmed
+                  ? `You and ${friends.find((f) => f.id === status!.duo!.with)?.name.split(" ")[0] ?? "your friend"} are queued together`
+                  : `Waiting for ${friends.find((f) => f.id === status!.duo!.with)?.name.split(" ")[0] ?? "your friend"} to join you`}
+              </p>
+            )}
             <p className="mt-3 text-[13px] text-[var(--color-ink-2)]">You can leave this page. We'll notify you when your party is set.</p>
             <div className="mt-4 flex justify-center gap-2">
               <Link href="/events" className="press rounded-[6px] bg-[var(--color-btn-2)] px-4 py-2 text-[15px] font-semibold">
@@ -155,6 +200,11 @@ export function QueueSheet({ eventId, landmark, initialStatus, placeholder }: { 
 
   return (
     <div className="p-5">
+      {invitedBy && (
+        <div className="mb-3 rounded-[8px] bg-[var(--color-pq-soft)] px-3 py-2 text-[14px] font-semibold text-[var(--color-pq-ink)]" data-testid="duo-invite">
+          {invitedBy.name.split(" ")[0]} asked to queue with you. You'll be in the same party.
+        </div>
+      )}
       <label htmlFor="sentence" className="text-[17px] font-semibold">
         Describe your night in one sentence
       </label>
@@ -221,6 +271,41 @@ export function QueueSheet({ eventId, landmark, initialStatus, placeholder }: { 
             </div>
           </div>
         </div>
+      )}
+
+      {duoEnabled && friends.length > 0 && (
+        <label className="mt-3 block text-[13px] font-semibold text-[var(--color-ink-3)]">
+          Bring a friend (optional)
+          <select
+            data-testid="duo-select"
+            value={duoWith}
+            onChange={(e) => setDuoWith(e.target.value)}
+            className="mt-1 h-9 w-full rounded-[6px] border border-[var(--color-divider)] bg-white px-2 text-[15px] font-normal text-[var(--color-ink)]"
+          >
+            <option value="">Just me</option>
+            {friends.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+          <span className="mt-0.5 block text-[12px] font-normal text-[var(--color-ink-2)]">You'll both land in the same party of five. They type their own sentence.</span>
+        </label>
+      )}
+
+      {isWoman && (
+        <fieldset className="mt-3 space-y-1 rounded-[8px] border border-[var(--color-divider)] px-3 py-2" data-testid="women-settings">
+          <legend className="px-1 text-[13px] font-semibold text-[var(--color-ink-3)]">Who's in your party</legend>
+          <label className="flex cursor-pointer items-start gap-2 text-[14px]">
+            <input type="checkbox" data-testid="women-only" checked={settings.womenOnly} onChange={(e) => setSettings((x) => ({ ...x, womenOnly: e.target.checked }))} className="mt-1 accent-[var(--color-pq)]" />
+            Only join all-women parties
+          </label>
+          <label className="flex cursor-pointer items-start gap-2 text-[14px]">
+            <input type="checkbox" data-testid="not-only-woman" checked={settings.notOnlyWoman} onChange={(e) => setSettings((x) => ({ ...x, notOnlyWoman: e.target.checked }))} className="mt-1 accent-[var(--color-pq)]" />
+            Never be the only woman
+          </label>
+          <span className="block text-[12px] text-[var(--color-ink-2)]">Code checks these when it forms a party. Nobody else sees them.</span>
+        </fieldset>
       )}
 
       <label className="mt-3 flex cursor-pointer items-start gap-2 text-[13px] text-[var(--color-ink-2)]">
