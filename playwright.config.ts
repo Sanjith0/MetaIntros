@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = Number(process.env.PQ_PORT ?? 3217);
+const PORT = Number(process.env.PQ_PORT ?? 3000);
 
 export default defineConfig({
   testDir: "./tests",
@@ -13,6 +13,8 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
     launchOptions: { args: ["--autoplay-policy=no-user-gesture-required"] },
   },
+  // Next 16 allows one dev server per project folder, so a running `npm run dev`
+  // on the same port is reused. Without one, Playwright starts it.
   webServer: {
     command: `npx next dev -p ${PORT}`,
     url: `http://localhost:${PORT}/api/health`,

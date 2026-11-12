@@ -49,7 +49,7 @@ export function Toaster({ people }: { people: Directory }) {
       case "chat.message": {
         const m = e.payload;
         if (m.senderId === viewerId || pathname === `/chat/${m.chatId}`) return;
-        if (m.kind === "opener" || m.kind === "pinned") return; // seeded lines arrive with MATCH FOUND
+        if (m.kind !== "user") return; // seeded and system lines arrive with MATCH FOUND
         const who = m.senderId ? people[m.senderId] : undefined;
         push({ id: e.id, title: who?.name ?? "Chat", body: m.text, href: `/chat/${m.chatId}`, who: m.senderId ?? undefined });
         break;
