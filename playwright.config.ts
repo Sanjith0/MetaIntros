@@ -23,7 +23,7 @@ export default defineConfig({
     command: `pnpm e2e:server`,
     url: `http://localhost:${PORT}/api/health`,
     reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
+    timeout: 300_000,
     env: { DATABASE_URL: "file:./e2e.db", PORT: String(PORT), AI_MODE: "cache" },
   },
 });
