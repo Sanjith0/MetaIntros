@@ -1,0 +1,14 @@
+.overnight/
+.env*
+!.env.example
+node_modules/
+.next/
+out/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+evals/results/

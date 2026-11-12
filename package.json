@@ -1,0 +1,37 @@
+{
+  "name": "party-queue",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "contract:check": "tsx scripts/contract-check.ts",
+    "shots": "playwright test tests/shots.spec.ts",
+    "test:demo": "playwright test tests/demo-path.spec.ts",
+    "test:e2e": "playwright test",
+    "eval": "tsx evals/run.ts",
+    "talk:real": "tsx scripts/real-table-talk.ts"
+  },
+  "dependencies": {
+    "next": "^16.4.6",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^26.6.6",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.0"
+  }
+}

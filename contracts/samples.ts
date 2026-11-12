@@ -1,0 +1,57 @@
+import type { EventType, PayloadOf } from "./events";
+
+const at = "2026-11-14T19:00:00.000Z";
+
+/** One valid payload per event type. Used by contract:check and tests. */
+export const SAMPLE_PAYLOADS: { [T in EventType]: PayloadOf<T> } = {
+  "queue.joined": { entryId: "q-1", userId: "maya", eventId: "evt-rooftop", landmark: "Dolores Park" },
+  "queue.tick": { userId: "maya", waitingSeconds: 12, inBucket: 3, needed: 2 },
+  "party.forming": { partyId: "p-1", memberIds: ["maya", "dev", "ana", "kai", "zoe"], landmark: "Dolores Park" },
+  "agent.verdict": {
+    partyId: "p-1",
+    ownerId: "maya",
+    round: 1,
+    planId: "plan-evt-rooftop",
+    decision: "reject",
+    preference: 1,
+    privateReason: "private reason for the owner only",
+    overriddenByCode: false,
+  },
+  "table.message": {
+    id: "t-1",
+    partyId: "p-1",
+    round: 1,
+    authorId: "maya",
+    kind: "line",
+    text: "Up for something low-key.",
+    sourceIds: ["sl-maya-chill"],
+    at,
+  },
+  "pair.message": {
+    id: "pm-1",
+    partyId: "p-1",
+    pairKey: "dev|maya",
+    fromId: "maya",
+    toId: "dev",
+    kind: "opener",
+    text: "What's the last roll you developed?",
+    sourceIds: ["dev-f1"],
+    at,
+  },
+  "plan.unavailable": { partyId: "p-1", planId: "plan-evt-rooftop", round: 1 },
+  "plan.locked": { partyId: "p-1", planId: "plan-evt-night-market", lockedBy: "signatures", lockedAt: at },
+  "match.found": {
+    partyId: "p-1",
+    planId: "plan-evt-night-market",
+    eventId: "evt-night-market",
+    title: "Dolores Night Market",
+    venueName: "Dolores Park, upper lawn",
+    start: "18:00",
+    chatId: "chat-p-1",
+    lockedAt: at,
+  },
+  "chat.message": { id: "m-1", chatId: "chat-p-1", senderId: "maya", kind: "user", text: "See you all there", sourceIds: [], at },
+  "member.arrived": { partyId: "p-1", userId: "maya", at },
+  "member.spotted": { frameId: "frame-0001", viewerId: "maya", partyId: "p-1", subjectId: "dev", method: "stub", at },
+  "runitback.mutual": { partyId: "p-1", a: "dev", b: "maya", revealedAt: at },
+};
