@@ -81,6 +81,21 @@ Checkpoint after F20 (12:13 UTC):
 | Demo video | `npm run video` | `saved shots/demo.webm (7335438 bytes, about 62 s)`; Maya's phone as before (run it back at 52.4s), now ending on the projector: Try to leak it, Dev's agent types Maya's limits, blocked (57.2s), end 61.7s |
 | CI | `gh run list --branch swarit-features --limit 3` | `success` for F18, F19, F20 |
 
+Checkpoint after F25 (12:47 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npm run test:e2e` (production build, cold) | 44 specs, `44 passed (4.1m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` (privacy 1428/1428) |
+| Unit | `npm test` | `Tests  174 passed (174)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 333/333 checks passed` (the new `party.nomatch` event) |
+| Demo video | `npm run video` | `saved shots/demo.webm (7301232 bytes, about 61 s)`; MATCH FOUND 28.4s, Maya's secret 39.6s, door card 46.3s with "Why this?" opened, run it back 52.0s, Try to leak it blocked 56.7s |
+
+Found and fixed between checkpoints: a party with no common plan left all five queue entries
+stuck in "forming" while the stage said they stayed in the queue (F22 fixes it and adds a
+test), and the demo-path spec counted nested list items as party members once cards gained
+"Why this?" (it now counts direct members).
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 

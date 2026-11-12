@@ -81,7 +81,9 @@ test("record the 60-second demo path", async ({ browser, baseURL, request }) => 
   await request.post("/api/frames", { data: { ...frame, partyId: party.view.party.id } });
   await expect(page.getByTestId("door-card-name")).toHaveText("Dev");
   mark("door card");
-  await page.waitForTimeout(4000);
+  await page.waitForTimeout(1500);
+  await page.getByTestId("door-why").getByText("Why this?").click(); // the approved facts behind the card
+  await page.waitForTimeout(2500);
 
   // 8. Afterwards: private picks, mutual pairs only.
   await request.post("/api/runitback", { data: { partyId: party.view.party.id, pickedIds: ["maya"] }, headers: { cookie: "pq_viewer=dev" } });
