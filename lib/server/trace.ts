@@ -1,5 +1,5 @@
 import type { Trace } from "@/contracts";
-import { nowIso, store } from "./store";
+import { isIsolated, nowIso, store } from "./store";
 
 type Listener = (t: Trace) => void;
 const g = globalThis as unknown as { __pqTraceListeners?: Set<Listener> };
@@ -19,7 +19,7 @@ export function trace(
   const s = store();
   const t: Trace = { id: `tr-${s.version}-${s.traces.length + 1}`, partyId, seq: s.traces.length, lane, conversation, actorId, title, body, at: nowIso(), ...extra };
   s.traces.push(t);
-  if ((globalThis as unknown as { __pqSilent?: boolean }).__pqSilent) return t; // an isolated eval run
+  if (isIsolated()) return t; // an isolated eval run never reaches the stage
   for (const l of listeners()) {
     try {
       l(t);

@@ -55,6 +55,21 @@ Checkpoint after F10 (11:02 UTC):
 | Unit | `npm test` | `Tests  106 passed (106)` |
 | Demo video | `npm run video` | `saved shots/demo.webm (5535680 bytes, about 60 s)`; same timeline as the F5 checkpoint (MATCH FOUND at 30.3s, Maya's secret at 42.9s) |
 
+Checkpoint after F15 (11:31 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npx playwright test` (production build, cold) | 31 specs, `31 passed (3.6m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 331/331 checks passed` |
+| Demo video | `npm run video` | `saved shots/demo.webm (5686873 bytes, about 60 s)` |
+
+Found at this checkpoint and fixed: the first full run failed from the fair-host spec onward.
+F12's comparison isolated itself by swapping the global store during async work, so a live
+request arriving mid-run landed in the eval store and the restore then clobbered newer state.
+Isolation is now by async context (`AsyncLocalStorage`): concurrent requests always see the
+live store and nothing is restored. A regression test covers it.
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 

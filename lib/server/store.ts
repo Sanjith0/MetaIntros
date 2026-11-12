@@ -66,7 +66,11 @@ export interface Store {
   version: number;
 }
 
-const g = globalThis as unknown as { __pq?: Store };
+import { AsyncLocalStorage } from "node:async_hooks";
+
+const g = globalThis as unknown as { __pq?: Store; __pqAls?: AsyncLocalStorage<{ s: Store }>; __pqVersionSeq?: number };
+/** Isolated runs (the /evals comparison) get their own store through async context, never by swapping the global one. */
+const als = (g.__pqAls ??= new AsyncLocalStorage<{ s: Store }>());
 
 function fresh(): Store {
   const s: Store = {
@@ -100,20 +104,40 @@ function fresh(): Store {
     events_log: [],
     seq: 0,
     idSeq: 0,
-    version: (g.__pq?.version ?? 0) + 1,
+    // Unique across every store ever made (live or isolated), since runs are cached by version.
+    version: (g.__pqVersionSeq = (g.__pqVersionSeq ?? 0) + 1),
   };
   seedChats(s);
   return s;
 }
 
 export function store(): Store {
+  const iso = als.getStore();
+  if (iso) return iso.s;
   if (!g.__pq) g.__pq = fresh();
   return g.__pq;
 }
 
 export function resetStore(): Store {
+  const iso = als.getStore();
+  if (iso) {
+    iso.s = fresh();
+    return iso.s;
+  }
   g.__pq = fresh();
   return g.__pq;
+}
+
+/** Run work against its own throwaway store. Concurrent requests keep using the real one. */
+export function runIsolated<T>(fn: () => Promise<T>): Promise<T> {
+  return als.run({ s: fresh() }, fn);
+}
+
+export const isIsolated = () => !!als.getStore();
+
+/** Start something (a long-lived timer) outside any isolated run, so it never binds to one. */
+export function outsideIsolation<T>(fn: () => T): T {
+  return als.exit(fn);
 }
 
 export function nextId(prefix: string): string {

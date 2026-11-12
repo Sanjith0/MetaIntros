@@ -83,6 +83,11 @@ recording is at `shots/demo.webm` (`npm run video` re-records it).
 | `CHAT_LIFECYCLE` | I'm here pings, leaving before the lock without attribution, chats that close after the event |
 | `GLASSES_VIEW` | `/door/glasses` heads-up view, and a recorded-clip frame source labelled as recorded |
 | `RUN_IT_BACK_PLUS` | a private chat per mutual pair, one identical queue-again card, standing parties |
+| `FAIR_HOST` | `/fair/host` live counts (guests, queued, parties, locked, met), counts only |
+| `EVALS_PAGE` | `/evals` leak test four ways: one prompt, one prompt + verifier, five agents + verifier, solver |
+| `WHY_PLAN` | a "why this plan" card built only from code checks |
+| `NIGHT_QUEUE` | queue for the whole night: any landmark that evening, any of its events |
+| `SAFETY_PAGE` | `/safety`: what code enforces, block, leave, report (the reported person is never told) |
 
 Turn one off with `PQ_FLAG_<NAME>=0`. `FEATURES.md` lists every feature with its proof.
 
@@ -144,7 +149,7 @@ Turn one off with `PQ_FLAG_<NAME>=0`. `FEATURES.md` lists every feature with its
 
 ```bash
 npm run typecheck
-npm test                     # 106 unit tests (vitest)
+npm test                     # 129 unit tests (vitest)
 npm test -- queue            # one failing fixture per formation rule
 npm test -- agents           # the four required agent cases and more
 npm run contract:check       # fixtures and events against the Zod contracts
@@ -170,7 +175,7 @@ lib/queue/   party formation rules
 lib/server/  in-memory store, event bus, queue, views, door, after
 lib/door/    the recognition interface and stub
 app/         routes: /events /event/[id] /queue /party /chat/[id] /stage /door /door/glasses
-             /runitback /fair /phones /join/[id] /demo
+             /runitback /fair /fair/host /phones /join/[id] /demo /evals /safety
 evals/       eval harness, cases and PLAN.md
 reference/   the Facebook reference written from REA
 tests/       unit (vitest) and Playwright specs

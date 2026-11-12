@@ -40,4 +40,17 @@ describe("the leak test four ways (F12)", () => {
     expect(store().parties.size).toBe(0);
     expect(heard).toHaveLength(0);
   });
+
+  it("a live request during a comparison lands in the live store, and nothing is clobbered afterwards", async () => {
+    process.env.PQ_PACE_MS = "0";
+    resetStore();
+    const run = runComparison(6); // not awaited: a live request arrives meanwhile
+    await new Promise((r) => setTimeout(r, 5));
+    await joinQueue({ userId: "maya", eventId: D.entryEventId, sentence: D.sentences.maya!, consentBridges: true, startTalk: false });
+    const live = store();
+    expect(live.queue.map((q) => q.userId)).toEqual(["maya"]);
+    await run;
+    expect(store()).toBe(live);
+    expect(store().queue.map((q) => q.userId)).toEqual(["maya"]);
+  });
 });

@@ -6,7 +6,7 @@ import { eligibleToQueue, formParty, bucketKey, nightOf, PARTY_SIZE, type Candid
 import { flag } from "@/lib/flags";
 import { areFriends } from "@/lib/graph";
 import { publish } from "./bus";
-import { nextId, nowIso, profile, store } from "./store";
+import { isIsolated, nextId, nowIso, outsideIsolation, profile, store } from "./store";
 import { trace } from "./trace";
 
 export interface JoinInput {
@@ -211,8 +211,8 @@ export function candidatePlans(landmark: string, date: string): CandidatePlan[] 
 const g = globalThis as unknown as { __pqTicker?: ReturnType<typeof setInterval> };
 
 function ensureTicker() {
-  if (g.__pqTicker) return;
-  g.__pqTicker = setInterval(() => {
+  if (g.__pqTicker || isIsolated()) return;
+  g.__pqTicker = outsideIsolation(() => setInterval(() => {
     const s = store();
     for (const e of s.queue.filter((x) => x.status === "waiting")) {
       const inBucket = s.queue.filter((x) => x.status === "waiting" && sameBucket(x, e)).length;
@@ -222,6 +222,6 @@ function ensureTicker() {
         [e.userId],
       );
     }
-  }, 3000);
+  }, 3000));
   g.__pqTicker.unref?.();
 }

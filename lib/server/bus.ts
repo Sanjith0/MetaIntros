@@ -1,5 +1,5 @@
 import { PQEvent, type Audience, type EventType, type PayloadOf } from "@/contracts";
-import { nowIso, store } from "./store";
+import { isIsolated, nowIso, store } from "./store";
 
 type Listener = (e: PQEvent) => void;
 const g = globalThis as unknown as { __pqListeners?: Set<Listener> };
@@ -27,7 +27,7 @@ export function publish<T extends EventType>(
     payload,
   });
   s.events_log.push(event);
-  if ((globalThis as unknown as { __pqSilent?: boolean }).__pqSilent) return event; // an isolated eval run
+  if (isIsolated()) return event; // an isolated eval run never reaches a live browser
   for (const l of listeners()) {
     try {
       l(event);
