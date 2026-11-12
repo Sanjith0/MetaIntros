@@ -24,11 +24,11 @@ test("record the 60-second demo path", async ({ browser, baseURL, request }) => 
   await page.goto("/events");
   await expect(page.locator("[data-live=on]")).toHaveCount(1, { timeout: 30_000 });
   mark("events tab");
-  await page.waitForTimeout(4000);
+  await page.waitForTimeout(3000);
   await page.getByTestId(`event-card-${DEMO_PARTY.entryEventId}`).getByRole("link", { name: "Rooftop Sunset Session", exact: true }).click();
   await expect(page.getByTestId("find-my-party")).toBeVisible();
   mark("event page");
-  await page.waitForTimeout(4000);
+  await page.waitForTimeout(3000);
 
   // 2. Find my party: one sentence, a private preview, join.
   await page.getByTestId("find-my-party").click();
@@ -49,13 +49,13 @@ test("record the 60-second demo path", async ({ browser, baseURL, request }) => 
   await page.getByTestId("party-table").scrollIntoViewIfNeeded();
   await expect(page.getByTestId("match-found")).toBeVisible({ timeout: 90_000 });
   mark("MATCH FOUND");
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(4500);
 
   // 4. The group chat: plan pinned, one opener each.
   await page.getByRole("link", { name: "Open group chat" }).click();
   await expect(page.getByTestId("opener-message")).toHaveCount(5);
   mark("group chat");
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(4000);
 
   // 5. The party card, then Maya's secret: her rules on her phone, and what the party knows (nothing).
   await page.goto("/party");
@@ -70,7 +70,7 @@ test("record the 60-second demo path", async ({ browser, baseURL, request }) => 
   await page.goto(`/event/${DEMO_PARTY.expectedPlanEventId}`);
   await expect(page.getByTestId("party-rsvp-banner")).toBeVisible();
   mark("event RSVP");
-  await page.waitForTimeout(4000);
+  await page.waitForTimeout(3000);
 
   // 7. At the door: the camera stub spots Dev; his card says what to say.
   await page.goto("/door");
@@ -81,7 +81,7 @@ test("record the 60-second demo path", async ({ browser, baseURL, request }) => 
   await request.post("/api/frames", { data: { ...frame, partyId: party.view.party.id } });
   await expect(page.getByTestId("door-card-name")).toHaveText("Dev");
   mark("door card");
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(4000);
 
   // 8. Afterwards: private picks, mutual pairs only.
   await request.post("/api/runitback", { data: { partyId: party.view.party.id, pickedIds: ["maya"] }, headers: { cookie: "pq_viewer=dev" } });
@@ -92,6 +92,19 @@ test("record the 60-second demo path", async ({ browser, baseURL, request }) => 
   await page.getByTestId("save-picks").click();
   await expect(page.getByTestId("mutual-dev")).toBeVisible();
   mark("run it back");
+  await page.waitForTimeout(1500);
+
+  // 9. On the projector: try to leak Maya's limits as Dev's agent. The verifier blocks it.
+  await page.goto("/stage");
+  await page.getByTestId("go-live").click();
+  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 30_000 });
+  await page.waitForTimeout(1500);
+  await page.getByTestId("leak-open").click();
+  await page.waitForTimeout(1500);
+  await page.getByTestId("leak-run").click();
+  await expect(page.getByTestId("leak-result")).toHaveAttribute("data-ok", "false");
+  mark("try to leak it: blocked");
+  await page.waitForTimeout(4500);
 
   const left = TARGET_MS - (Date.now() - t0);
   if (left > 0) await page.waitForTimeout(left);

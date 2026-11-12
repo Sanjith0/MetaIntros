@@ -63,7 +63,8 @@ Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/
 
 If a live model is slow, **Lock now** on `/demo` makes code pick the best plan that passes
 everyone's rules. `npm run test:demo` runs the core path with five browser contexts; a
-60-second recording is at `shots/demo.webm` (`npm run video`).
+60-second recording is at `shots/demo.webm` (`npm run video`): Maya's phone from the Events
+tab to run it back, ending on the projector as Dev's agent tries to leak her limits.
 
 ## Layers (all in `lib/flags.ts`)
 
