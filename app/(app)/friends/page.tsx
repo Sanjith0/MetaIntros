@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { FriendRequestActions } from "@/components/FriendRequestActions";
-import { listFriends, listQueueUpFriends, listRequests } from "@/lib/server/friends";
+import { listFriends, listQueueUpFriends, listRequests, listSuggestions } from "@/lib/server/friends";
 import { getCurrentUserId } from "@/lib/server/session";
 
 const TABS = [
@@ -15,7 +15,7 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const tab = TABS.find((t) => t.id === sp.tab)?.id ?? "friends";
   const userId = await getCurrentUserId();
-  const [friends, requests, queueUp] = await Promise.all([listFriends(userId), listRequests(userId), listQueueUpFriends(userId)]);
+  const [friends, requests, queueUp, suggestions] = await Promise.all([listFriends(userId), listRequests(userId), listQueueUpFriends(userId), listSuggestions(userId)]);
   const counts = { friends: friends.length, requests: requests.incoming.length, queueup: queueUp.length };
 
   return (
@@ -30,6 +30,21 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
           </Link>
         ))}
       </div>
+
+      {tab === "friends" && suggestions.length > 0 && (
+        <section className="mt-3" data-testid="suggestions">
+          <h2 className="text-sm font-bold">People you may know</h2>
+          <ul className="mt-2 flex gap-2 overflow-x-auto pb-1">
+            {suggestions.map((s) => (
+              <li key={s.id} className="w-28 shrink-0 rounded-xl bg-fb-bg p-2 text-center" data-testid="suggestion">
+                <Avatar name={s.user.name} color={s.user.avatarColor} size={56} className="mx-auto" />
+                <p className="mt-1 truncate text-sm font-semibold">{s.user.name}</p>
+                <p className="text-[11px] text-fb-muted">{s.squadmate ? "From your squad" : `${s.mutual} mutual`}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {tab === "friends" && (
         <ul className="mt-3 divide-y divide-fb-bg" data-testid="friends-list">
