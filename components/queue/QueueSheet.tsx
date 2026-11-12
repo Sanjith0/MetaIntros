@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { HardRule, Preference, ShareableLine } from "@/contracts";
 import { IconSparkle } from "@/components/icons";
 import { useLiveEvents } from "@/components/live/LiveProvider";
+import { VoiceButton } from "./VoiceButton";
 import { clock12 } from "@/lib/format";
 
 interface Preview {
@@ -66,6 +67,7 @@ export function QueueSheet({
   invitedBy = null,
   duoEnabled = true,
   night = null,
+  voice = false,
 }: {
   eventId: string;
   landmark: string;
@@ -78,6 +80,8 @@ export function QueueSheet({
   duoEnabled?: boolean;
   /** Whole-night option: how many events there are near here, and tonight anywhere. */
   night?: { nearCount: number; tonightCount: number } | null;
+  /** F16: offer "Say it instead" (off by default). */
+  voice?: boolean;
 }) {
   const [sentence, setSentence] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -234,6 +238,7 @@ export function QueueSheet({
         rows={3}
         className="mt-2 w-full resize-none rounded-[8px] border border-[var(--color-divider)] bg-white px-3 py-2 text-[17px] outline-none focus:border-[var(--color-pq)] focus:ring-2 focus:ring-[var(--color-pq-soft)]"
       />
+      {voice && <VoiceButton onText={(t) => setSentence(t.slice(0, 280))} />}
 
       {preview && (
         <div className="mt-3 rounded-[8px] border border-[var(--color-divider)]" data-testid="brief-preview">

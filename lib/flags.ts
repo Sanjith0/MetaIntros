@@ -1,6 +1,7 @@
 /**
- * Feature flags. One file, every flag default on.
- * Turn one off on the server with PQ_FLAG_<NAME>=0 (for example PQ_FLAG_STAGE_SCRUBBER=0).
+ * Feature flags. One file. Every flag is on by default except VOICE_SENTENCE.
+ * Turn one off on the server with PQ_FLAG_<NAME>=0 (or on with =1), or at runtime from
+ * /demo (a runtime override wins over the environment until the server restarts).
  * Client components get the value from the server page that renders them.
  */
 
@@ -35,16 +36,31 @@ const DEFAULTS = {
   NIGHT_QUEUE: true,
   /** F15: /safety: what code enforces, block and unblock, leave, and report (the reported person is never told). */
   SAFETY_PAGE: true,
-} as const;
+  /** F16: say your sentence instead of typing it (typing always works). OFF by default: browser speech recognition may send audio to the browser vendor's service. */
+  VOICE_SENTENCE: false,
+} as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
 
+const g = globalThis as unknown as { __pqFlagOverrides?: Partial<Record<FlagName, boolean>> };
+
+export function setFlagOverride(name: FlagName, value: boolean | null) {
+  const o = (g.__pqFlagOverrides ??= {});
+  if (value === null) delete o[name];
+  else o[name] = value;
+}
+
 export function flag(name: FlagName): boolean {
+  const override = g.__pqFlagOverrides?.[name];
+  if (typeof override === "boolean") return override;
   const raw = typeof process !== "undefined" ? process.env?.[`PQ_FLAG_${name}`] : undefined;
   if (raw === "0" || raw === "false" || raw === "off") return false;
   if (raw === "1" || raw === "true" || raw === "on") return true;
   return DEFAULTS[name];
 }
+
+export const FLAG_NAMES = Object.keys(DEFAULTS) as FlagName[];
+export const flagDefault = (name: FlagName): boolean => DEFAULTS[name];
 
 export function allFlags(): Record<FlagName, boolean> {
   return Object.fromEntries((Object.keys(DEFAULTS) as FlagName[]).map((k) => [k, flag(k)])) as Record<FlagName, boolean>;

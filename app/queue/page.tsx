@@ -70,6 +70,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
             friends={friends}
             invitedBy={inviter}
             duoEnabled={duoOn}
+            voice={flag("VOICE_SENTENCE")}
             night={flag("NIGHT_QUEUE") ? { nearCount: candidatePlans(e.landmark, e.date).length, tonightCount: nightPlans(e.date).length } : null}
             initialStatus={
               active

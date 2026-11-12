@@ -30,6 +30,18 @@ const PACES: { label: string; ms: number | null }[] = [
 export function DemoPanel({ people }: { people: Person[] }) {
   const [st, setSt] = useState<Status | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [flags, setFlags] = useState<{ name: string; on: boolean; default: boolean }[]>([]);
+  useEffect(() => {
+    fetch("/api/demo/flags", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((b: { flags: typeof flags }) => setFlags(b.flags))
+      .catch(() => {});
+  }, []);
+  const toggleFlag = async (name: string, on: boolean) => {
+    const r = await fetch("/api/demo/flags", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name, value: on }) });
+    if (r.ok) setFlags(((await r.json()) as { flags: typeof flags }).flags);
+    setMsg(`${name} ${on ? "on" : "off"} (reload a page to see it)`);
+  };
   const byId = Object.fromEntries(people.map((p) => [p.id, p]));
 
   const refresh = useCallback(async () => {
@@ -191,6 +203,28 @@ export function DemoPanel({ people }: { people: Person[] }) {
 
       {/* Status */}
       <aside className="space-y-4">
+        {flags.length > 0 && (
+          <section className={card} data-testid="demo-flags">
+            <h2 className="text-[17px] font-bold">Layers</h2>
+            <p className="text-[12px] text-[var(--color-ink-2)]">Every feature is a layer behind a flag. Switch one off and the app still works.</p>
+            <ul className="mt-2 space-y-1">
+              {flags.map((f) => (
+                <li key={f.name} className="flex items-center justify-between gap-2 text-[12px]">
+                  <span className="font-mono">{f.name}</span>
+                  <button
+                    role="switch"
+                    aria-checked={f.on}
+                    data-testid={`flag-${f.name}`}
+                    onClick={() => toggleFlag(f.name, !f.on)}
+                    className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${f.on ? "bg-[var(--color-pq)]" : "bg-[var(--color-btn-2-hover)]"}`}
+                  >
+                    <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${f.on ? "left-[18px]" : "left-0.5"}`} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <section className={card} data-testid="demo-status">
           <h2 className="text-[17px] font-bold">Right now</h2>
           <dl className="mt-2 space-y-1.5 text-[14px]">
