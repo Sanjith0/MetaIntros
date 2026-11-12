@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { Check, Clock, UserPlus } from "lucide-react";
-import { Avatar, Button, ButtonLink, ListRow, Section, Stack } from "@/components/fb";
+import { Check, ChevronRight, Clock, Images, UserPlus } from "lucide-react";
+import { Avatar, Button, ButtonLink, IconCircle, ListRow, Section, Stack } from "@/components/fb";
 import { TopBar } from "@/components/fb/TopBar";
 import { useLiveEvents } from "@/components/useLiveEvents";
 
@@ -11,7 +11,7 @@ interface Member { id: string; name: string; avatarColor: string; isSimulated?: 
 interface Data { partyId: string; eventTitle: string; over: boolean; members: Member[] }
 
 /** After the event: add squadmates. Blue Add friend per row, as on Facebook's people lists. Only mutual adds connect. */
-export function SquadConnect({ initial }: { initial: Data }) {
+export function SquadConnect({ initial, sharePrompt = false }: { initial: Data; sharePrompt?: boolean }) {
   const [data, setData] = useState(initial);
   const reload = useCallback(() => fetch(`/api/squad/${initial.partyId}/connect`).then((r) => r.json()).then(setData).catch(() => {}), [initial.partyId]);
   useLiveEvents(["friends"], reload, reload);
@@ -57,6 +57,18 @@ export function SquadConnect({ initial }: { initial: Data }) {
             ))}
           </ul>
         </Section>
+        {sharePrompt && (
+          <Section flush>
+            <ListRow
+              href={`/squad/${initial.partyId}/share`}
+              testId="connect-share"
+              leading={<IconCircle><Images size={18} /></IconCircle>}
+              title="Share the outing"
+              subtitle="Post photos from your squad album, or skip it"
+              trailing={<ChevronRight size={20} className="text-muted" aria-hidden />}
+            />
+          </Section>
+        )}
         {friends > 0 && (
           <Section>
             <ButtonLink href="/friends?tab=queueup" block data-testid="see-new-friends">

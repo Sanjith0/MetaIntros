@@ -76,6 +76,18 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await page.getByTestId("stay-in-touch").click();
   await expect(page.getByTestId("squad-connect")).toBeVisible();
   await shot(page, "29-connect");
+  await page.getByTestId("connect-share").click();
+  await expect(page.getByTestId("share-outing")).toBeVisible();
+  await shot(page, "30-share-outing");
+  await page.getByTestId("share-own").click();
+  await expect(page.getByTestId("post-composer")).toBeVisible();
+  await shot(page, "31-share-compose");
+  await page.getByTestId("composer-cancel").click();
+  await page.getByTestId("back").click();
+  await expect(page.getByTestId("squad-info-page")).toBeVisible();
+  await page.getByTestId("open-album").click();
+  await expect(page.getByTestId("squad-album")).toBeVisible();
+  await shot(page, "32-squad-album");
 
   expect(errors.filter((e) => !e.includes("404"))).toEqual([]);
 });

@@ -6,6 +6,7 @@ import { publish } from "./bus";
 import { cancelAllSims } from "./queue";
 import { nowMs } from "@/lib/clock";
 import { sweepExpiredSignups } from "./signup";
+import { purgeSocialOrphans } from "./socialOrphans";
 
 export async function demoStatus() {
   await sweepExpiredSignups(prisma); // /join promises deletion after 24h
@@ -54,6 +55,7 @@ export async function kickLiveUsers() {
   const parties = await prisma.partyMember.findMany({ where: { userId: { in: ids } }, select: { partyId: true } });
   await prisma.party.deleteMany({ where: { id: { in: parties.map((p) => p.partyId) } } });
   await prisma.user.deleteMany({ where: { id: { in: ids } } });
+  await purgeSocialOrphans(prisma);
   publish("demo", { type: "kick" });
   return ids.length;
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, CalendarDays, MessageCircleOff, UserPlus, Users } from "lucide-react";
+import { Bell, CalendarDays, Image as ImageIcon, MessageCircleOff, UserPlus, Users } from "lucide-react";
 import { TopBar } from "@/components/fb/TopBar";
 import { Avatar, Badge, cn } from "@/components/fb";
 import { getCurrentUserId } from "@/lib/server/session";
@@ -16,6 +16,7 @@ const KIND: Record<NotificationKind, { Icon: typeof Bell; tone: string }> = {
   reminder: { Icon: CalendarDays, tone: "bg-date" },
   friend_queue: { Icon: Users, tone: "bg-accent" },
   group_invite: { Icon: UserPlus, tone: "bg-accent" },
+  squad_post: { Icon: ImageIcon, tone: "bg-positive" },
 };
 
 /**

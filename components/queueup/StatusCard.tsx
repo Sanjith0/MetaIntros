@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CalendarDays, Hourglass, MapPin, UserPlus } from "lucide-react";
+import { CalendarDays, Hourglass, Images, MapPin, UserPlus } from "lucide-react";
 import { ButtonLink, FacePile, IconCircle } from "@/components/fb";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { fmtDuration, fmtEventWhen } from "@/lib/format";
@@ -47,10 +48,13 @@ export function StatusCard({ card }: { card: Card }) {
   }
 
   const when = fmtEventWhen(new Date(card.startsAt));
+  const sharing = card.state === "after" && card.action.href.endsWith("/share");
   const copy = {
     ready: { title: `Your squad is going to ${card.title}`, sub: `${when} · ${card.faces.length} people`, Icon: CalendarDays },
     venue: { title: card.checkedIn ? "You're checked in" : `${card.title} is starting`, sub: `Meet at the front entrance · ${card.venueName}`, Icon: MapPin },
-    after: { title: `How was ${card.title}?`, sub: "Add the people you'd like to see again. Only mutual adds become friends.", Icon: UserPlus },
+    after: sharing
+      ? { title: `How was ${card.title}?`, sub: "Share photos from your squad album, or skip it.", Icon: Images }
+      : { title: `How was ${card.title}?`, sub: "Add the people you'd like to see again. Only mutual adds become friends.", Icon: UserPlus },
   }[card.state];
 
   return (
@@ -65,6 +69,11 @@ export function StatusCard({ card }: { card: Card }) {
       <ButtonLink href={card.action.href} variant="primary" block className="mt-3" data-testid="status-action" icon={<copy.Icon size={16} />}>
         {card.action.label}
       </ButtonLink>
+      {card.secondary && (
+        <Link href={card.secondary.href} className="mt-2 flex h-9 items-center justify-center text-body font-semibold text-link" data-testid="status-secondary">
+          {card.secondary.label}
+        </Link>
+      )}
     </section>
   );
 }

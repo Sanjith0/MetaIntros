@@ -30,12 +30,14 @@ export type StatusCard =
       faces: { id: string; name: string; avatarColor: string }[];
       checkedIn: boolean;
       action: { label: string; href: string };
+      /** after: at most one quiet link next to the primary action (e.g. "Share the outing") */
+      secondary?: { label: string; href: string };
     };
 
 const HOUR = 3600_000;
 /** "At the venue" opens an hour before doors and lasts until the event ends. */
 export const VENUE_WINDOW_BEFORE_MS = HOUR;
-/** The after card stays for three days, or until you've handled every squadmate. */
+/** The after card stays for three days, or until you've handled every squadmate and answered "Share the outing". */
 export const AFTER_CARD_MS = 72 * HOUR;
 
 export function phaseFor(startsAt: Date, endsAt: Date, archived: boolean, now: Date): "ready" | "venue" | "after" {
@@ -80,6 +82,9 @@ export async function getStatusCard(userId: string, now: Date, eventId?: string)
     },
     orderBy: { joinedAt: "desc" },
   });
+  const shared = new Set(
+    (await prisma.shareChoice.findMany({ where: { userId, partyId: { in: ms.map((m) => m.partyId) } }, select: { partyId: true } })).map((c) => c.partyId),
+  );
 
   for (const m of ms) {
     const p = m.party;
@@ -87,10 +92,10 @@ export async function getStatusCard(userId: string, now: Date, eventId?: string)
     if (!ev) continue;
     const phase = phaseFor(ev.startsAt, ev.endsAt, Boolean(p.chat?.archived), now);
     const others = p.members.filter((x) => x.userId !== userId);
+    const handled = p.friendRequests.length >= others.length;
     if (phase === "after") {
-      const handled = p.friendRequests.length >= others.length;
       const stale = now.getTime() - ev.endsAt.getTime() > AFTER_CARD_MS;
-      if ((handled || stale) && !eventId) continue;
+      if (((handled && shared.has(p.id)) || stale) && !eventId) continue;
     }
     const base = {
       partyId: p.id,
@@ -110,7 +115,12 @@ export async function getStatusCard(userId: string, now: Date, eventId?: string)
         state: "venue",
         action: m.checkedInAt ? { label: "Find each other", href: `/squad/${p.id}?tab=find` } : { label: "I'm here", href: `/squad/${p.id}?tab=find` },
       };
-    return { ...base, state: "after", action: { label: "Add your squad as friends", href: `/squad/${p.id}/connect` } };
+    const friends = { label: "Add your squad as friends", href: `/squad/${p.id}/connect` };
+    const share = { label: "Share the outing", href: `/squad/${p.id}/share` };
+    // one primary action: friends first, then "Share the outing"; the other shows as a quiet link
+    if (shared.has(p.id)) return { ...base, state: "after", action: friends };
+    if (!handled) return { ...base, state: "after", action: friends, secondary: share };
+    return { ...base, state: "after", action: share };
   }
   return null;
 }

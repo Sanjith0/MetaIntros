@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarDays, ChevronRight, MapPin, MessageCircle, MessageSquareQuote, Clock } from "lucide-react";
+import { CalendarDays, ChevronRight, Images, MapPin, MessageCircle, MessageSquareQuote, Clock } from "lucide-react";
 import { TopBar } from "@/components/fb/TopBar";
-import { Avatar, FacePile, IconCircle, ListRow, Section, Stack } from "@/components/fb";
+import { Avatar, ButtonLink, FacePile, IconCircle, ListRow, Section, Stack } from "@/components/fb";
 import { TraceRow } from "@/components/trace/TraceList";
 import { getPartyForUser } from "@/lib/server/party";
 import { getCurrentUserId } from "@/lib/server/session";
 import { squadName } from "@/lib/server/squadChat";
 import { fmtEventWhen, fmtTime } from "@/lib/format";
+import { albumCount } from "@/lib/server/album";
+import { getShareChoice, shareOpen } from "@/lib/server/posts";
+import { now as clockNow } from "@/lib/server/clock";
 
 function RoundAction({ href, label, icon, testId }: { href: string; label: string; icon: React.ReactNode; testId?: string }) {
   return (
@@ -27,6 +30,10 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
   const ev = p.event;
   const people = p.members.map((m) => ({ ...m.user, checkedIn: Boolean(m.checkedInAt) }));
   const others = people.filter((u) => u.id !== me);
+  // the squad album opens once the squad is ready; "Share the outing" once the event is over
+  const ready = p.status === "confirmed" || p.status === "completed";
+  const [photos, choice, now] = await Promise.all([ready ? albumCount(partyId, people.map((u) => u.id)) : 0, getShareChoice(partyId, me), clockNow()]);
+  const sharePrompt = ready && shareOpen(p, now) && !choice;
   return (
     <div data-testid="squad-info-page">
       <TopBar back={p.chat ? `/chats/${p.chat.id}` : "/events"} title="Squad info" />
@@ -42,6 +49,14 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
           </div>
         </Section>
 
+        {sharePrompt && (
+          <Section testId="share-prompt">
+            <h2 className="text-title font-semibold">Share the outing</h2>
+            <p className="mt-1 text-meta text-muted">Post photos from your squad album, let the AI host suggest a post, or skip it. It&apos;s your call.</p>
+            <ButtonLink href={`/squad/${partyId}/share`} variant="primary" block className="mt-3" data-testid="open-share">Share the outing</ButtonLink>
+          </Section>
+        )}
+
         <Section flush title="Plan">
           <ListRow leading={<IconCircle><CalendarDays size={18} /></IconCircle>} title={ev.title} subtitle={fmtEventWhen(ev.startsAt, ev.endsAt)} href={`/events/${ev.id}`} />
           <ListRow leading={<IconCircle><MapPin size={18} /></IconCircle>} title={`Meet at the front entrance, ${ev.venueName}`} subtitle={ev.venueAddress} href={`/squad/${partyId}/find`} trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
@@ -49,6 +64,9 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
         </Section>
 
         <Section flush>
+          {ready && (
+            <ListRow href={`/squad/${partyId}/album`} testId="open-album" leading={<IconCircle><Images size={18} /></IconCircle>} title="Squad album" subtitle={photos ? `${photos} ${photos === 1 ? "photo" : "photos"} · only your squad can see them` : "Add photos only your squad can see"} trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
+          )}
           <ListRow href={`/squad/${partyId}/cards`} testId="open-talk-cards" leading={<IconCircle><MessageSquareQuote size={18} /></IconCircle>} title="Talk cards" subtitle="What you have in common with each person" trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
           <ListRow href={`/squad/${partyId}/find`} testId="open-find" leading={<IconCircle><MapPin size={18} /></IconCircle>} title="Find each other" subtitle="Check in at the door and see who's here" trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
           <TraceRow partyId={partyId} />

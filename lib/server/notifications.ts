@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/db";
 import { fmtEventWhen } from "@/lib/format";
 import { listFriendQueues } from "./friendQueues";
+import { squadPostsFor } from "./posts";
 
 /**
  * The Notifications tab, derived from data Queue Up already keeps (no new table): squads formed, chats
  * that ended, friend requests, friendships made through Queue Up, and upcoming events you're interested in.
  */
-export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue" | "group_invite";
+export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue" | "group_invite" | "squad_post";
 
 export interface NotificationItem {
   id: string;
@@ -23,7 +24,7 @@ export interface NotificationItem {
 const DAY = 24 * 3600_000;
 
 export async function listNotifications(userId: string, now: Date): Promise<NotificationItem[]> {
-  const [memberships, requests, friendships, rsvps, friendQueues, groupInvites] = await Promise.all([
+  const [memberships, requests, friendships, rsvps, friendQueues, groupInvites, squadPosts] = await Promise.all([
     prisma.partyMember.findMany({
       where: { userId, party: { status: { in: ["confirmed", "completed"] } } },
       include: { party: { include: { event: true, chat: { select: { id: true, archived: true, expiresAt: true } }, members: true } } },
@@ -39,6 +40,7 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
     }),
     listFriendQueues(userId),
     prisma.queueGroupMember.findMany({ where: { userId, status: "invited", group: { status: { in: ["open", "queued"] } } }, include: { group: true } }),
+    squadPostsFor(userId, now),
   ]);
 
   const out: NotificationItem[] = [];
@@ -121,6 +123,18 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       if (!h) continue;
       out.push({ id: `gi-${inv.id}`, kind: "group_invite", avatar: { name: h.name, color: h.avatarColor }, bold: h.name, text: "invited you to queue together. You'd be in the same squad.", href: "/queue/start", at: inv.createdAt });
     }
+  }
+  // A squadmate posted about an outing you were on (only posts you're allowed to see)
+  for (const sp of squadPosts) {
+    out.push({
+      id: `sp-${sp.id}`,
+      kind: "squad_post",
+      avatar: { name: sp.author.name, color: sp.author.avatarColor },
+      bold: sp.author.name,
+      text: sp.kind === "story" ? `added a story from ${sp.eventTitle}.` : `posted about ${sp.eventTitle}.`,
+      href: sp.kind === "story" ? "/home" : `/home#post-${sp.id}`,
+      at: sp.createdAt,
+    });
   }
   return out.sort((a, b) => b.at.getTime() - a.at.getTime());
 }
