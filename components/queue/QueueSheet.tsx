@@ -23,6 +23,8 @@ interface Status {
   duo?: { with: string; confirmed: boolean } | null;
   group?: { of: string; joined: string[]; waitingFor: string[] } | null;
   scope?: "event" | "night";
+  /** F34: your own sentence, so you can change it while you wait. */
+  sentence?: string;
 }
 
 /** F26: queuing with your standing party. */
@@ -76,6 +78,7 @@ export function QueueSheet({
   night = null,
   voice = false,
   standing = null,
+  editable = false,
 }: {
   eventId: string;
   landmark: string;
@@ -91,6 +94,8 @@ export function QueueSheet({
   /** F16: offer "Say it instead" (off by default). */
   voice?: boolean;
   standing?: Standing | null;
+  /** F34: offer "Change it" while waiting. */
+  editable?: boolean;
 }) {
   const [sentence, setSentence] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -103,6 +108,25 @@ export function QueueSheet({
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
   const [forming, setForming] = useState<string | null>(initialStatus?.partyId ?? null);
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const saveSentence = async () => {
+    setEditError(null);
+    const res = await fetch("/api/queue/sentence", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ sentence, approvedLineIds: Object.keys(approved).filter((k) => approved[k]) }),
+    });
+    const body = (await res.json()) as { error?: string; status?: { sentence: string } };
+    if (!res.ok) {
+      setEditError(body.error ?? "Could not save.");
+      return;
+    }
+    setStatus((st) => (st ? { ...st, sentence: body.status?.sentence ?? sentence } : st));
+    setEditing(false);
+    setSaved(true);
+  };
   const seq = useRef(0);
   const now = useNow(!!status && !forming);
 
@@ -152,7 +176,7 @@ export function QueueSheet({
       return;
     }
     const st = (await (await fetch("/api/queue/status")).json()) as {
-      status: { entry: { joinedAt: string; landmark: string; scope?: "event" | "night" }; inBucket: number; needed: number; partyId: string | null; duo: Status["duo"]; group?: Status["group"] } | null;
+      status: { entry: { joinedAt: string; landmark: string; scope?: "event" | "night" }; inBucket: number; needed: number; partyId: string | null; duo: Status["duo"]; group?: Status["group"]; sentence?: string } | null;
     };
     if (st.status)
       setStatus({
@@ -163,6 +187,7 @@ export function QueueSheet({
         landmark: st.status.entry.landmark,
         duo: st.status.duo,
         group: st.status.group ?? null,
+        sentence: st.status.sentence,
         scope: st.status.entry.scope,
       });
     if (body.partyId) setForming(body.partyId);
@@ -220,6 +245,69 @@ export function QueueSheet({
                   ? `Your standing party is all in: you'll land together, with ${5 - status!.group.joined.length} new ${5 - status!.group.joined.length === 1 ? "person" : "people"}`
                   : `Waiting for ${status!.group.waitingFor.map((id) => standing.others.find((o) => o.id === id)?.firstName ?? "someone").join(" and ")} to join you`}
               </p>
+            )}
+            {editable && (
+              <div className="mx-auto mt-3 max-w-[420px] text-left" data-testid="queue-sentence">
+                {!editing ? (
+                  <div className="rounded-[8px] bg-[var(--color-wash)] px-3 py-2 text-[14px]">
+                    <div className="text-[12px] font-semibold text-[var(--color-ink-2)]">Your sentence · only you see it</div>
+                    <div data-testid="queue-sentence-text">“{status!.sentence}”</div>
+                    <button
+                      onClick={() => {
+                        setSentence(status!.sentence ?? "");
+                        setSaved(false);
+                        setEditing(true);
+                      }}
+                      data-testid="queue-edit"
+                      className="mt-1 text-[13px] font-semibold text-[var(--color-link)] hover:underline"
+                    >
+                      Change it
+                    </button>
+                    {saved && (
+                      <div className="mt-1 text-[13px] font-semibold text-[var(--color-on-ink)]" data-testid="queue-saved" role="status">
+                        Saved. You kept your place in line.
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <label htmlFor="sentence-edit" className="text-[13px] font-semibold">
+                      Change your sentence
+                    </label>
+                    <textarea
+                      id="sentence-edit"
+                      data-testid="sentence-edit"
+                      value={sentence}
+                      maxLength={280}
+                      rows={2}
+                      onChange={(e) => setSentence(e.target.value)}
+                      className="mt-1 block w-full resize-none rounded-[8px] border border-[var(--color-divider)] p-2.5 text-[15px]"
+                    />
+                    {preview && (
+                      <ul className="mt-1.5 flex flex-wrap gap-1.5" data-testid="sentence-edit-rules" aria-label="Private rules your agent will hold to">
+                        {preview.hardRules.length === 0 ? (
+                          <li className="text-[13px] text-[var(--color-ink-2)]">No rules found.</li>
+                        ) : (
+                          preview.hardRules.map((r) => (
+                            <li key={r.id} className="rounded-full bg-[var(--color-ink)] px-2.5 py-1 text-[13px] font-semibold text-white">
+                              {ruleLabel(r)}
+                            </li>
+                          ))
+                        )}
+                      </ul>
+                    )}
+                    <div className="mt-2 flex gap-2">
+                      <button onClick={saveSentence} disabled={sentence.trim().length < 3} data-testid="queue-save-sentence" className="press rounded-[6px] bg-[var(--color-pq)] px-3 py-1.5 text-[14px] font-semibold text-white disabled:opacity-50">
+                        Save, keep my place
+                      </button>
+                      <button onClick={() => setEditing(false)} className="press rounded-[6px] bg-[var(--color-btn-2)] px-3 py-1.5 text-[14px] font-semibold">
+                        Cancel
+                      </button>
+                    </div>
+                    {editError && <p className="mt-1 text-[13px] text-[#a8132d]">{editError}</p>}
+                  </div>
+                )}
+              </div>
             )}
             <p className="mt-3 text-[13px] text-[var(--color-ink-2)]">You can leave this page. We'll notify you when your party is set.</p>
             <div className="mt-4 flex justify-center gap-2">

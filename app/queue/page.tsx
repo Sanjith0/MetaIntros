@@ -78,11 +78,12 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
             invitedBy={inviter}
             duoEnabled={duoOn}
             voice={flag("VOICE_SENTENCE")}
+            editable={flag("EDIT_SENTENCE")}
             standing={standing ?? (active?.group ? { partyId: active.group.of, others: (s.standing.get(active.group.of)?.memberIds ?? []).filter((id) => id !== viewer).map((id) => ({ id, firstName: s.profiles.get(id)!.firstName })) } : null)}
             night={flag("NIGHT_QUEUE") ? { nearCount: candidatePlans(e.landmark, e.date).length, tonightCount: nightPlans(e.date).length } : null}
             initialStatus={
               active
-                ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark, duo: active.duo, group: active.group, scope: active.entry.scope }
+                ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark, duo: active.duo, group: active.group, scope: active.entry.scope, sentence: active.sentence }
                 : null
             }
           />

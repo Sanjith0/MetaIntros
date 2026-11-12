@@ -109,6 +109,25 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
   return { entry, partyId };
 }
 
+/**
+ * F34: change your sentence while you're still waiting. Your brief is rebuilt
+ * from the new words; your queue entry, and so your place in line, stays.
+ * Once a party forms, the agents are already working from the old brief.
+ */
+export async function updateSentence(userId: string, sentence: string, approvedLineIds?: string[]) {
+  if (!flag("EDIT_SENTENCE")) throw new Error("Changing your sentence is turned off.");
+  const s = store();
+  const entry = [...s.queue].reverse().find((e) => e.userId === userId && e.status === "waiting");
+  if (!entry) throw new Error("You can change your sentence while you're waiting. Once your party forms, the agents are already working from it.");
+  const text = sentence.trim();
+  if (text.length < 3) throw new Error("Type one sentence about your night.");
+  const built = await buildBrief(userId, text, profile(userId).facts, approvedLineIds);
+  for (const [id, f] of s.briefFacts) if (f.ownerId === userId && f.source === "brief") s.briefFacts.delete(id);
+  s.briefs.set(built.brief.id, built.brief);
+  for (const f of built.facts) s.briefFacts.set(f.id, f);
+  return { entry, brief: built.brief };
+}
+
 export function leaveQueue(userId: string) {
   for (const e of store().queue) if (e.userId === userId && e.status === "waiting") e.status = "left";
 }
@@ -133,6 +152,8 @@ export function queueStatus(userId: string) {
     inBucket,
     needed: Math.max(0, PARTY_SIZE - inBucket),
     waitingSeconds: Math.round((Date.now() - Date.parse(entry.joinedAt)) / 1000),
+    /** Your own sentence, for your own sheet (F34). */
+    sentence: s.briefs.get(entry.briefId)?.sentence ?? "",
     partyId: entry.status === "waiting" ? null : (party?.id ?? null),
   };
 }

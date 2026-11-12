@@ -72,6 +72,8 @@ const DEFAULTS = {
   CHAT_WHY: true,
   /** F33: a big caption on /stage saying what just happened, in plain words, for the back of the room. */
   STAGE_CAPTIONS: true,
+  /** F34: change your sentence while you wait in the queue, and keep your place in line. */
+  EDIT_SENTENCE: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
