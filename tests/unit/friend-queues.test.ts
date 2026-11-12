@@ -33,7 +33,8 @@ describe("canSeeQueue (pure)", () => {
   it("hides on a block either way, across age bands, and women-only queues from non-women", () => {
     expect(canSeeQueue(subj("v", { blocked: new Set(["o"]) }), subj("o"), true)).toBe(false);
     expect(canSeeQueue(subj("v"), subj("o", { blocked: new Set(["v"]) }), true)).toBe(false);
-    expect(canSeeQueue(subj("v", { ageBand: "25+" }), subj("o"), true)).toBe(false);
+    expect(canSeeQueue(subj("v", { ageBand: "16-17" }), subj("o"), true)).toBe(false);
+    expect(canSeeQueue(subj("v", { ageBand: "25+" }), subj("o"), true)).toBe(true); // all adults are one group
     const wo = subj("o", { gender: "woman", womenOnlyParty: true });
     expect(canSeeQueue(subj("v", { gender: "man" }), wo, true)).toBe(false);
     expect(canSeeQueue(subj("v", { gender: "woman" }), wo, true)).toBe(true);

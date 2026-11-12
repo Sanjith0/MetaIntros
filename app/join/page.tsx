@@ -102,7 +102,7 @@ export default function JoinPage() {
           {minor ? (
             <p role="alert" className="mt-1.5 text-meta font-semibold text-badge">Queue Up is for people 18 and over.</p>
           ) : (
-            <p className="mt-1.5 text-meta text-muted">You&apos;re only matched with people in your own age range.</p>
+            <p className="mt-1.5 text-meta text-muted">Queue Up is 18+, so you&apos;re only ever matched with other adults.</p>
           )}
           <p className="mt-4 text-body font-semibold">Gender</p>
           <div className="mt-1.5 flex flex-wrap gap-2">

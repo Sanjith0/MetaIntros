@@ -13,6 +13,7 @@
  */
 import { prisma } from "@/lib/db";
 import { nowDate } from "@/lib/clock";
+import { matchBand } from "@/lib/domain/enums";
 import { pairAllowed } from "@/lib/match/safety";
 import { loadPeople } from "@/lib/profile/load";
 import { publish } from "./bus";
@@ -40,7 +41,7 @@ async function blockerFor(friendId: string, withIds: string[]): Promise<FriendBl
     const o = people.get(id);
     if (!o) continue;
     if (o.blocked.has(f.id) || f.blocked.has(o.id)) return "blocked";
-    if (o.ageBand !== f.ageBand) return "age_band";
+    if (matchBand(o.ageBand) !== matchBand(f.ageBand)) return "age_band";
     if (!pairAllowed(o, f)) return "women_only";
   }
   return null;

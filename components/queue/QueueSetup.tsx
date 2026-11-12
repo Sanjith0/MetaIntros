@@ -201,7 +201,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
       <p className="mx-4 mt-3 flex items-start gap-2 rounded-card bg-wash p-3 text-meta text-muted">
         <ShieldCheck size={16} className="mt-px shrink-0 text-ink" aria-hidden />
         <span>
-          18+ only, matched within your age range{mode === "hangout" ? ", with other people planning a hangout" : ""}. Squads only meet at public places, never include anyone you&apos;ve blocked, and you can leave any time.
+          18+ only{mode === "hangout" ? ", with other people planning a hangout" : ""}. Squads only meet at public places, never include anyone you&apos;ve blocked, and you can leave any time.
         </span>
       </p>
 

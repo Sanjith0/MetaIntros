@@ -7,7 +7,7 @@ import { rankEvents } from "@/lib/match/eventFit";
 import { buildTasteProfile } from "@/lib/profile/builder";
 import { graphFromSignup } from "@/lib/signup";
 import { SIGNUP_CHIPS } from "@/lib/graph/vocabulary";
-import { AGE_BANDS, isMinorBand } from "@/lib/domain/enums";
+import { AGE_BANDS, isMinorBand, matchBand } from "@/lib/domain/enums";
 import type { Person } from "@/lib/profile/load";
 
 const landmarks = new Map(LANDMARKS.map((l) => [l.id, l]));
@@ -64,8 +64,8 @@ function buildWorld([raw, blocks]: [ReturnType<typeof personArb> extends fc.Arbi
 
 function assertInvariants(userIds: string[], people: Map<string, Person>) {
   const ms = userIds.map((u) => people.get(u)!);
-  const bands = new Set(ms.map((m) => m.ageBand));
-  expect(bands.size).toBe(1); // users only match within their own age band
+  const bands = new Set(ms.map((m) => matchBand(m.ageBand)));
+  expect(bands.size).toBe(1); // users only match within their group: one minor band, or all adults (18+)
   const hasMinor = ms.some((m) => isMinorBand(m.ageBand as never));
   const hasAdult = ms.some((m) => !isMinorBand(m.ageBand as never));
   expect(hasMinor && hasAdult).toBe(false); // minors and adults NEVER together
@@ -138,6 +138,10 @@ describe("safety rules (examples)", () => {
     expect(pairAllowed(P("a", { ageBand: "16-17" }), P("b"))).toBe(false);
     expect(validateParty([P("a", { ageBand: "16-17" }), P("b")]).violations[0].rule).toBe("age_band");
     expect(pairAllowed(P("a", { ageBand: "13-15" }), P("b", { ageBand: "13-15" }))).toBe(true);
+  });
+  it("all adults are one group: 18-24 and 25+ can share a squad", () => {
+    expect(pairAllowed(P("a", { ageBand: "25+" }), P("b"))).toBe(true);
+    expect(validateParty([P("a", { ageBand: "25+" }), P("b")]).ok).toBe(true);
   });
   it("women-only users only join all-women parties", () => {
     expect(pairAllowed(P("a", { womenOnlyParty: true }), P("b", { gender: "man" }))).toBe(false);

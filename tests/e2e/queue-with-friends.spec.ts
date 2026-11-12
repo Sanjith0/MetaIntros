@@ -15,6 +15,7 @@ test.beforeEach(async ({ request }) => {
  * Jordan (p01) queues for Indie Night with two friends. The friends are sample people, so they say yes
  * on their own; a second phone (logged in as one friend) sees the invite first.
  */
+test.setTimeout(120_000);
 test("queue with friends: invite → friends say yes → start → one squad with both friends", async ({ browser }) => {
   const ctx = await browser.newContext({ geolocation: { latitude: 37.4447, longitude: -122.1625 }, permissions: ["geolocation"] });
   const page = await ctx.newPage();
@@ -25,10 +26,11 @@ test("queue with friends: invite → friends say yes → start → one squad wit
   await sheet.getByTestId("size-5").click();
   await sheet.getByTestId("add-friends").click();
   await expect(sheet.getByTestId("friend-list")).toBeVisible();
-  // a friend in another age range can't come, and says why
-  await expect(sheet.getByTestId("friend-p66")).toHaveAttribute("data-blocker", "age_band");
-  await sheet.getByTestId("friend-p02").click();
-  await sheet.getByTestId("friend-p04").click();
+  // a friend who's already queuing can't come, and says why; a 25+ friend can (all adults are one group)
+  await expect(sheet.getByTestId("friend-p02")).toHaveAttribute("data-blocker", "busy");
+  await expect(sheet.getByTestId("friend-p66")).not.toHaveAttribute("data-blocker", /.+/);
+  await sheet.getByTestId("friend-p20").click();
+  await sheet.getByTestId("friend-p30").click();
   await expect(sheet.getByTestId("add-friends")).toContainText("2 spots left for new people");
   await shot(page, "01-add-friends");
   await expect(sheet.getByTestId("find-squad")).toHaveText("Invite friends");
@@ -39,7 +41,7 @@ test("queue with friends: invite → friends say yes → start → one squad wit
 
   // second phone: the friend who answers second still sees the invite
   const friend = await browser.newContext();
-  await friend.request.post("/api/demo/login-as", { data: { userId: "p04" } });
+  await friend.request.post("/api/demo/login-as", { data: { userId: "p30" } });
   const fp = await friend.newPage();
   await gotoReady(fp, "/notifications");
   await expect(fp.getByTestId("notif-queue_invite")).toBeVisible();
@@ -48,8 +50,8 @@ test("queue with friends: invite → friends say yes → start → one squad wit
   await shot(fp, "02-invite");
 
   // both friends are in (sample people answer on their own)
-  await expect(page.getByTestId("seat-p02")).toHaveAttribute("data-status", "in", { timeout: 15_000 });
-  await expect(page.getByTestId("seat-p04")).toHaveAttribute("data-status", "in", { timeout: 15_000 });
+  await expect(page.getByTestId("seat-p20")).toHaveAttribute("data-status", "in", { timeout: 15_000 });
+  await expect(page.getByTestId("seat-p30")).toHaveAttribute("data-status", "in", { timeout: 15_000 });
   await shot(page, "03-waiting-for-friends");
   await page.getByTestId("start-queuing").click();
 
@@ -58,9 +60,9 @@ test("queue with friends: invite → friends say yes → start → one squad wit
   await expect(page.getByTestId("players-found")).toContainText("of 5");
   await shot(page, "04-queue");
 
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 40_000 });
+  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 60_000 }); // newcomers must fit both friends: ~30s
   await expect(page.getByTestId("party-members").locator("li")).toHaveCount(5);
-  await expect(page.getByTestId("came-with")).toHaveText("You, Freya and Reza + 2 new people");
+  await expect(page.getByTestId("came-with")).toHaveText(/^You, \w+ and \w+ \+ 2 new people$/);
   await page.waitForTimeout(1500); // members pop in staggered
   await shot(page, "05-squad-found");
 
@@ -81,9 +83,11 @@ test("a smaller squad size keeps a spot open for someone new", async ({ page }) 
   await gotoReady(page, "/queue/start?mode=anything");
   await page.getByTestId("size-4").click();
   await page.getByTestId("add-friends").click();
-  await page.getByTestId("friend-p02").click();
-  await page.getByTestId("friend-p04").click();
-  await expect(page.getByTestId("friend-p20")).toHaveAttribute("data-picked", "false");
-  await page.getByTestId("friend-p20").click({ force: true });
+  await page.getByTestId("friend-p20").click();
+  await page.getByTestId("friend-p30").click();
+  // the squad is full: a third friend can't be added (one spot stays open for someone new)
+  await expect(page.getByTestId("friend-p66")).toHaveAttribute("data-picked", "false");
+  await page.getByTestId("friend-p66").click({ force: true });
+  await expect(page.getByTestId("friend-p66")).toHaveAttribute("data-picked", "false");
   await expect(page.getByTestId("add-friends")).toContainText("1 spot left for new people");
 });

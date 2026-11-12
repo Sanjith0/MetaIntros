@@ -400,8 +400,9 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
       if (picked.every((p) => pairAllowed(p, next))) picked.push(next);
     }
     function fitScore(c: Person) {
-      const all = [me, ...picked];
-      return Math.min(...all.map((x) => score(x, c).score)) + score(me, c).score;
+      // Queuing with friends: fillers must fit every friend, not just the host.
+      const all = [...squad, ...picked];
+      return Math.min(...all.map((x) => score(x, c).score)) + Math.min(...squad.map((x) => score(x, c).score));
     }
     return picked;
   };
