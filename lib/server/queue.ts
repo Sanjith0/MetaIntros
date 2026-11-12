@@ -388,7 +388,6 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
       ? (await prisma.queueEntry.findMany({ where: { status: "waiting", groupId: entry.groupId }, select: { userId: true } })).map((x) => x.userId)
       : [entry.userId];
     const people = await loadPeople(prisma, [...new Set([entry.userId, ...friendIds, ...sims.map((s) => s.id)])]);
-    const me = people.get(entry.userId)!;
     const squad = friendIds.map((id) => people.get(id)).filter((p): p is Person => Boolean(p));
     const score = makePairScorer();
     const pool = [...people.values()].filter((p) => p.isSimulated && !busy.has(p.id) && squad.every((f) => pairAllowed(f, p)));
