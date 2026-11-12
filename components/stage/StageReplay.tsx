@@ -106,6 +106,8 @@ export function StageReplay({
   follow = null,
   keys = false,
   splash = false,
+  bigText = false,
+  bigAtLoad = false,
 }: {
   initial: StageView;
   leakTest?: boolean;
@@ -123,7 +125,21 @@ export function StageReplay({
   keys?: boolean;
   /** F48: a MATCH FOUND splash when a lock arrives live. */
   splash?: boolean;
+  /** F52: offer big text for large rooms, and whether the page opened with it. */
+  bigText?: boolean;
+  bigAtLoad?: boolean;
 }) {
+  const [big, setBig] = useState(bigText && bigAtLoad);
+  const toggleBig = () => {
+    setBig((b) => {
+      const next = !b;
+      const url = new URL(window.location.href);
+      if (next) url.searchParams.set("big", "1");
+      else url.searchParams.delete("big");
+      window.history.replaceState(null, "", url);
+      return next;
+    });
+  };
   const [moment, setMoment] = useState<{ title: string; detail: string } | null>(null);
   const [acked, setAcked] = useState<{ n: number; slowest: number } | null>(null);
   const splashRef = useRef(splash);
@@ -272,6 +288,10 @@ export function StageReplay({
   keyState.current = { pos, total, live, playing };
   const toggleRef = useRef(togglePublic);
   toggleRef.current = togglePublic;
+  const toggleBigRef = useRef(toggleBig);
+  toggleBigRef.current = toggleBig;
+  const bigTextRef = useRef(bigText);
+  bigTextRef.current = bigText;
   useEffect(() => {
     if (!keys) return;
     const onKey = (e: KeyboardEvent) => {
@@ -321,6 +341,10 @@ export function StageReplay({
         case "2":
         case "4":
           setSpeed(Number(e.key) as (typeof SPEEDS)[number]);
+          break;
+        case "b":
+        case "B":
+          if (bigTextRef.current) toggleBigRef.current();
           break;
         case "?":
           setHelp((x) => !x);
@@ -392,7 +416,12 @@ export function StageReplay({
   };
 
   return (
-    <div className="fixed inset-0 z-[45] flex flex-col overflow-y-auto bg-[#0c0d12] text-white lg:overflow-hidden" data-testid="stage">
+    <div
+      className="fixed inset-0 z-[45] flex flex-col overflow-y-auto bg-[#0c0d12] text-white lg:overflow-hidden"
+      data-testid="stage"
+      data-big={big}
+      style={big ? { zoom: 1.35 } : undefined}
+    >
       {prompt && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-label="Agent prompt" onClick={(e) => e.target === e.currentTarget && setPrompt(null)}>
           <div className="flex max-h-[88vh] w-full max-w-[860px] flex-col rounded-[14px] bg-[#14151c] ring-1 ring-white/15" data-testid="prompt-view">
@@ -513,6 +542,7 @@ export function StageReplay({
               ["L or End", "live"],
               ["P", "public screen on or off"],
               ["C", "captions on or off"],
+              ...(bigText ? [["B", "big text for a large room"]] : []),
               ["1 2 4", "replay speed"],
               ["?", "this list"],
             ].map(([k, d]) => (

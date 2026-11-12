@@ -108,6 +108,8 @@ const DEFAULTS = {
   SPANISH_SENTENCE: true,
   /** F51: queue pulse on the Event page: how many are waiting near here tonight (counts only; "a few" under three). */
   QUEUE_PULSE: true,
+  /** F52: big text on the projector for large rooms (B, or ?big=1). */
+  STAGE_BIG: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

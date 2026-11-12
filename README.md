@@ -53,7 +53,7 @@ real table talk; `npm run record` saves a run for the recorded replay.
 Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/demo`, run
 **Preflight** first: it rehearses the whole party in a sandbox and says what to fix. The
 **Run of show** below it has the same script as nine timed beats with one-click setup. On the
-projector, press **?** for the presenter keys. Then:
+projector, press **?** for the presenter keys (**B** for big text in a large room). Then:
 **Reset everything**, then **Pre-queue Dev, Ana, Kai, Zoe**. Pick a pace (Stage is good).
 
 1. **One sentence (Maya's phone).** Events → *Rooftop Sunset Session* → **Find my party**.
@@ -160,6 +160,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `WIDEN_SEARCH` | while waiting near one place with fewer than five, "Widen to anywhere tonight (9 events)" switches you in one tap, keeps your place in line, and tries to form a party at once |
 | `SPANISH_SENTENCE` | your one sentence can be in Spanish ("salgo a las once, menos de veinte dólares, sin consumo mínimo"): the same rules and preferences, your own words kept as your words |
 | `QUEUE_PULSE` | on an Event page, how many are waiting near there tonight and how many parties have formed; counts only, and "a few" under three so a count can't single anyone out |
+| `STAGE_BIG` | big text on `/stage` for a large room: B (or `?big=1`) scales the whole projector up and it still fits the screen |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes

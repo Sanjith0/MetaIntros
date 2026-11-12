@@ -21,8 +21,8 @@ async function followQr(): Promise<{ url: string; svg: string } | null> {
   return { url, svg: await QRCode.toString(url, { type: "svg", margin: 1, color: { dark: "#0c0d12", light: "#ffffff" } }) };
 }
 
-export default async function StagePage({ searchParams }: { searchParams: Promise<{ party?: string; screen?: string }> }) {
-  const { party, screen } = await searchParams;
+export default async function StagePage({ searchParams }: { searchParams: Promise<{ party?: string; screen?: string; big?: string }> }) {
+  const { party, screen, big } = await searchParams;
   const room = screen === "room" && flag("FOLLOW_ALONG");
   const view = room ? publicStageView(party) : stageView(party);
   if (!flag("STAGE_SCRUBBER")) return <StageBoard initial={view} />;
@@ -39,6 +39,8 @@ export default async function StagePage({ searchParams }: { searchParams: Promis
       follow={await followQr()}
       keys={flag("STAGE_KEYS") && !room}
       splash={flag("LOCK_SPLASH")}
+      bigText={flag("STAGE_BIG")}
+      bigAtLoad={big === "1"}
     />
   );
 }
