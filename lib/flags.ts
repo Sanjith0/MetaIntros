@@ -76,6 +76,8 @@ const DEFAULTS = {
   EDIT_SENTENCE: true,
   /** F35: a run of show on /demo: nine timed beats to 5:00, what to say, where to show it, one-click setup. */
   RUN_OF_SHOW: true,
+  /** F36: "Tell a friend where you'll be": a message for someone outside the app with the plan and when you'll check in. Never names the others. */
+  TELL_A_FRIEND: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

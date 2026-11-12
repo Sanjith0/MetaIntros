@@ -20,6 +20,8 @@ import { explainSources } from "@/lib/server/provenance";
 import { WhyLine } from "@/components/party/WhyLine";
 import { isForgotten } from "@/lib/server/forget";
 import { agentStory } from "@/lib/server/story";
+import { friendMessage } from "@/lib/server/tellfriend";
+import { TellFriend } from "@/components/party/TellFriend";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
@@ -63,6 +65,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
   const why = flag("WHY_PLAN") && !forgotten ? whyThisPlan(v.party.id, viewer) : null;
   const noMatch = flag("NO_MATCH") ? noMatchView(v.party.id, viewer) : null;
   const story = flag("AGENT_STORY") ? agentStory(v.party.id, viewer) : null;
+  const friend = flag("TELL_A_FRIEND") ? friendMessage(v.party.id, viewer) : null;
   const waiting = noMatch?.requeued ? queueStatus(viewer) : null;
 
   return (
@@ -172,6 +175,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
         </section>
 
         {why && <WhyPlanCard v={why} />}
+        {friend && <TellFriend m={friend} />}
         {secret && <SecretPanel v={secret} />}
         {forgotten && (
           <section className="rounded-[12px] bg-white p-4 text-[14px] text-[var(--color-ink-2)] shadow-[var(--shadow-card)]" data-testid="party-forgotten">
