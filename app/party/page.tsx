@@ -19,6 +19,7 @@ import { noMatchView } from "@/lib/server/nomatch";
 import { explainSources } from "@/lib/server/provenance";
 import { WhyLine } from "@/components/party/WhyLine";
 import { isForgotten } from "@/lib/server/forget";
+import { agentStory } from "@/lib/server/story";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
@@ -61,6 +62,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
   const secret = flag("SECRET_PANEL") && !forgotten ? secretView(v.party.id, viewer) : null;
   const why = flag("WHY_PLAN") && !forgotten ? whyThisPlan(v.party.id, viewer) : null;
   const noMatch = flag("NO_MATCH") ? noMatchView(v.party.id, viewer) : null;
+  const story = flag("AGENT_STORY") ? agentStory(v.party.id, viewer) : null;
   const waiting = noMatch?.requeued ? queueStatus(viewer) : null;
 
   return (
@@ -226,6 +228,23 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
             <div className="text-[13px] text-[var(--color-ink-2)]">Your agent is reading the plans…</div>
           ) : (
             <>
+              {story && story.length > 0 && (
+                <>
+                  <div className="text-[13px] font-semibold text-[var(--color-ink-3)]">How your agent did it</div>
+                  <ol className="mb-3 mt-1 space-y-1.5 text-[13px]" data-testid="agent-story">
+                    {story.map((st, i) => (
+                      <li key={i} className="flex gap-2" data-tone={st.tone}>
+                        <span
+                          className={`mt-px shrink-0 self-start rounded px-1 text-[11px] font-semibold ${st.tone === "code" ? "bg-[var(--color-codebg,#e7f0fe)] text-[var(--color-link)]" : "bg-[var(--color-pq-soft)] text-[var(--color-pq-ink)]"}`}
+                        >
+                          {st.round ? `R${st.round}` : "Lock"}
+                        </span>
+                        <span>{st.text}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              )}
               <div className="text-[13px] font-semibold text-[var(--color-ink-3)]">Considered</div>
               <ul className="mb-3 mt-1 space-y-1 text-[13px]">
                 {(v.receipt?.considered ?? myOwnVerdicts.map((x) => ({ planId: x.planId, title: s.plans.get(x.planId)?.title ?? x.planId, preference: x.preference }))).map((c) => (

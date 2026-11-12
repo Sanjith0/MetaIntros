@@ -66,6 +66,8 @@ const DEFAULTS = {
   PROOF_HUB: true,
   /** F30: /evals runs a whole fair (100 fictional guests) through the real loop in a sandbox and reports timing, validity and leaks. */
   SCALE_TEST: true,
+  /** F31: "How your agent did it" in your receipt: a private, round-by-round story of your own agent's moves. */
+  AGENT_STORY: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
