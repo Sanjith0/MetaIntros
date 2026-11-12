@@ -56,6 +56,8 @@ export interface Store {
   operator: { fastForward: Set<string>; forceLock: Set<string>; cancelled: Set<string> };
   /** Run it back: groups of 3+ who all picked each other, with their chat that doesn't close. */
   standing: Map<string, { memberIds: string[]; chatId: string }>;
+  /** Safety reports. Stored for a human review queue; never shown in the app, never told to the subject. */
+  reports: { id: string; reporterId: string; subjectId: string; partyId: string | null; reason: string; note: string; at: string }[];
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -93,6 +95,7 @@ function fresh(): Store {
     acks: [],
     agentCalls: [],
     standing: new Map(),
+    reports: [],
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

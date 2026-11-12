@@ -33,6 +33,8 @@ const DEFAULTS = {
   WHY_PLAN: true,
   /** F14: queue for a whole night: join any landmark's queue that evening; a whole-night party picks from every event that night. */
   NIGHT_QUEUE: true,
+  /** F15: /safety: what code enforces, block and unblock, leave, and report (the reported person is never told). */
+  SAFETY_PAGE: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;
