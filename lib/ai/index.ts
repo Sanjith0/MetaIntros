@@ -70,7 +70,9 @@ export interface AiResult<T> {
 
 async function callProvider(p: LlmProvider, task: string, messages: ChatMessage[], c: AiCall<unknown>) {
   const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), c.timeoutMs ?? 8000);
+  // AI_TIMEOUT_MS raises the floor (the warm script uses it: reasoning models are slow, and warming isn't live).
+  const ms = Math.max(c.timeoutMs ?? 8000, Number(process.env.AI_TIMEOUT_MS) || 0);
+  const timer = setTimeout(() => ctl.abort(), ms);
   try {
     return await p.complete({ task, messages, maxTokens: c.maxTokens, temperature: c.temperature, json: true, timeoutMs: c.timeoutMs }, ctl.signal);
   } finally {

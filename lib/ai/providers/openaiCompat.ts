@@ -7,7 +7,14 @@ import type { CompletionRequest, CompletionResult, LlmProvider } from "../types"
 export class OpenAICompatProvider implements LlmProvider {
   constructor(
     readonly name: string,
-    private cfg: { baseUrl: string; apiKey: string; model: string },
+    private cfg: {
+      baseUrl: string;
+      apiKey: string;
+      model: string;
+      /** Reasoning models (Muse Spark) spend hidden tokens before answering; they count against max_tokens. */
+      reasoningHeadroom?: number;
+      reasoningEffort?: string;
+    },
   ) {}
 
   async complete(req: CompletionRequest, signal: AbortSignal): Promise<CompletionResult> {
@@ -18,15 +25,21 @@ export class OpenAICompatProvider implements LlmProvider {
       body: JSON.stringify({
         model: this.cfg.model,
         messages: req.messages,
-        max_tokens: req.maxTokens ?? 600,
+        // Answer budget + reasoning headroom; you're billed only for tokens actually used.
+        max_tokens: (req.maxTokens ?? 600) + (this.cfg.reasoningHeadroom ?? 0),
         temperature: req.temperature ?? 0.4,
+        ...(this.cfg.reasoningEffort ? { reasoning_effort: this.cfg.reasoningEffort } : {}),
         ...(req.json ? { response_format: { type: "json_object" } } : {}),
       }),
     });
     if (!res.ok) throw new Error(`${this.name} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
     const j = await res.json();
-    const text = j?.choices?.[0]?.message?.content;
-    if (typeof text !== "string") throw new Error(`${this.name}: empty completion`);
+    const choice = j?.choices?.[0];
+    const text = choice?.message?.content;
+    if (typeof text !== "string" || !text.trim()) {
+      const why = choice?.finish_reason === "length" ? " (hit max_tokens — reasoning used the budget)" : choice?.message?.refusal ? ` (refused: ${choice.message.refusal})` : ` (finish_reason: ${choice?.finish_reason ?? "none"})`;
+      throw new Error(`${this.name}: empty completion${why}`);
+    }
     return { text, model: j.model ?? this.cfg.model, usage: { promptTokens: j.usage?.prompt_tokens, completionTokens: j.usage?.completion_tokens } };
   }
 }
@@ -38,6 +51,9 @@ export function museFromEnv(): OpenAICompatProvider | null {
     baseUrl: process.env.MUSE_BASE_URL ?? "https://api.meta.ai/v1",
     apiKey: key,
     model: process.env.MUSE_MODEL ?? "muse-spark-1.1",
+    reasoningHeadroom: Number(process.env.MUSE_REASONING_HEADROOM) || 2000,
+    // "low" is accepted by Muse and roughly halves reasoning tokens; set MUSE_REASONING_EFFORT=none to omit.
+    reasoningEffort: process.env.MUSE_REASONING_EFFORT === "none" ? undefined : process.env.MUSE_REASONING_EFFORT || "low",
   });
 }
 

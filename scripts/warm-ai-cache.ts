@@ -10,6 +10,7 @@ import { existsSync, rmSync } from "node:fs";
 if (existsSync(".env")) process.loadEnvFile(".env");
 process.env.DATABASE_URL = "file:./warm.db";
 process.env.AI_MODE = "live";
+process.env.AI_TIMEOUT_MS ??= "45000"; // warming isn't live; give the reasoning model time
 
 async function main() {
   if (!process.env.MODEL_API_KEY) {
