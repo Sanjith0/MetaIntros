@@ -45,6 +45,16 @@ export function DoorClient({
   const [late, setLate] = useState<Record<string, number>>(initialDoor?.late ?? {});
   const [meet, setMeet] = useState<{ text: string; byName: string } | null>(initialDoor?.meet ?? null);
   const [spot, setSpot] = useState("");
+  const [home, setHome] = useState<string[]>(initialDoor?.home ?? []);
+  const [leaving, setLeaving] = useState<"idle" | "confirm" | { friendText: string }>("idle");
+  const leave = async () => {
+    const r = await fetch("/api/door/leave", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ partyId }) });
+    const body = (await r.json()) as { friendText?: string; error?: string };
+    if (r.ok && body.friendText) {
+      setLeaving({ friendText: body.friendText });
+      setHome((h) => [...h, viewerId]);
+    } else setDoorMsg(body.error ?? "Couldn't send.");
+  };
   const [doorMsg, setDoorMsg] = useState<string | null>(null);
   const nameOf = (id: string) => members.find((m) => m.id === id)?.firstName ?? "Someone";
   const tellLate = async (minutes: number) => {
@@ -82,6 +92,7 @@ export function DoorClient({
       const p = e.payload;
       if (p.lateMinutes !== null) setLate((l) => ({ ...l, [p.userId]: p.lateMinutes! }));
       if (p.meetSpot) setMeet({ text: p.meetSpot, byName: p.userId === viewerId ? "You" : nameOf(p.userId) });
+      if (p.headedHome) setHome((h) => (h.includes(p.userId) ? h : [...h, p.userId]));
     }
   });
 
@@ -195,7 +206,7 @@ export function DoorClient({
               Share
             </button>
           </div>
-          {!here && (
+          {!here && !home.includes(viewerId) && (
             <div className="mt-2 flex flex-wrap items-center gap-1.5" role="group" aria-label="Running late">
               <span className="text-[13px] font-semibold">Running late?</span>
               {[10, 20, 30].map((m) => (
@@ -209,6 +220,37 @@ export function DoorClient({
             <p className="mt-1.5 text-[13px] text-[var(--color-ink-2)]" role="status" data-testid="door-msg">
               {doorMsg}
             </p>
+          )}
+          {home.includes(viewerId) && typeof leaving === "object" ? (
+            <div className="mt-3 rounded-[8px] bg-[var(--color-wash)] p-3 text-[14px]" data-testid="left-quietly" role="status">
+              <div className="font-semibold">You said goodbye. You don&apos;t owe anyone a reason.</div>
+              <div className="mt-1 text-[13px] text-[var(--color-ink-2)]">For your friend, if you like:</div>
+              <div className="mt-1 rounded-[6px] bg-white px-2 py-1.5" data-testid="left-friend-text">
+                {leaving.friendText}
+              </div>
+              <a href="/safety" className="mt-2 inline-block text-[13px] font-semibold text-[var(--color-link)]">
+                Something happened? Safety →
+              </a>
+            </div>
+          ) : home.includes(viewerId) ? (
+            <p className="mt-3 text-[13px] text-[var(--color-ink-2)]">You said goodbye to your party.</p>
+          ) : leaving === "confirm" ? (
+            <div className="mt-3 rounded-[8px] bg-[var(--color-wash)] p-3 text-[13px]" data-testid="leave-quietly-confirm">
+              <div className="font-semibold">Head home?</div>
+              <div className="text-[var(--color-ink-2)]">Your party gets one line from you: “I&apos;m heading off. Have a good night, everyone!” No reason, nothing else.</div>
+              <div className="mt-2 flex gap-2">
+                <button onClick={leave} data-testid="leave-quietly-yes" className="press rounded-[6px] bg-[var(--color-ink)] px-3 py-1.5 font-semibold text-white">
+                  Head home
+                </button>
+                <button onClick={() => setLeaving("idle")} className="press rounded-[6px] bg-[var(--color-btn-2)] px-3 py-1.5 font-semibold">
+                  Stay
+                </button>
+              </div>
+            </div>
+          ) : !initialDoor.leaveQuietly ? null : (
+            <button onClick={() => setLeaving("confirm")} data-testid="leave-quietly" className="mt-3 text-[13px] font-semibold text-[var(--color-ink-2)] hover:underline">
+              Leave quietly
+            </button>
           )}
         </section>
       )}
@@ -230,7 +272,7 @@ export function DoorClient({
                 </span>
                 <span className="text-[13px] font-semibold">{m.firstName}</span>
                 <span className="text-[11px] text-[var(--color-ink-2)]" data-testid={`status-${m.id}`}>
-                  {arrived.has(m.id) ? "Here" : late[m.id] ? `~${late[m.id]} min late` : "On the way"}
+                  {home.includes(m.id) ? "Headed home" : arrived.has(m.id) ? "Here" : late[m.id] ? `~${late[m.id]} min late` : "On the way"}
                 </span>
               </button>
             </li>

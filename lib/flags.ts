@@ -122,6 +122,8 @@ const DEFAULTS = {
   REVOKE_SHARING: true,
   /** F58: notifications, kept: a bell with an unread count and /notifications, from the events only you were sent. */
   NOTIFICATIONS_LIST: true,
+  /** F59: leave quietly from the door: one plain goodbye in the chat, no reason owed, "Headed home" for the others, a text for your friend. */
+  LEAVE_QUIETLY: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -67,7 +67,7 @@ export interface Store {
   /** People who asked to forget their private data from a party: `${partyId}:${userId}`. */
   forgotten: Set<string>;
   /** F37: per party, who said they're running late (minutes) and where to meet. */
-  door: Map<string, { late: Record<string, number>; meet: { text: string; by: string } | null }>;
+  door: Map<string, { late: Record<string, number>; meet: { text: string; by: string } | null; home?: string[] }>;
   /** F39: what each person's agent remembers about plans they liked, with their OK. Never about people. */
   memory: Map<string, { tag: string; weight: number; from: string }[]>;
   /** F42: people who can't make a locked plan and weren't replaced: `${partyId}:${userId}`. */

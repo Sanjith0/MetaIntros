@@ -114,6 +114,8 @@ export const DoorUpdatePayload = z
     userId: Id,
     lateMinutes: z.number().int().min(0).max(120).nullable(),
     meetSpot: z.string().max(80).nullable(),
+    /** F59: this person headed home. */
+    headedHome: z.boolean().optional(),
   })
   .strict();
 

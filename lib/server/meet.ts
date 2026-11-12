@@ -16,6 +16,26 @@ export const MAX_SPOT = 80;
 export interface DoorState {
   late: Record<string, number>;
   meet: { text: string; by: string; byName: string } | null;
+  /** F59: who headed home, and whether leaving quietly is on. */
+  home: string[];
+  leaveQuietly: boolean;
+}
+
+export const GOODBYE = "I'm heading off. Have a good night, everyone!";
+
+/** F59: leave quietly. One plain goodbye, as your own message; no reason asked or given. */
+export function leaveQuietly(partyId: string, userId: string): { friendText: string } {
+  if (!flag("LEAVE_QUIETLY")) throw new Error("turned off");
+  const p = party(partyId, userId);
+  const st = state(partyId);
+  st.home ??= [];
+  if (st.home.includes(userId)) throw new Error("You already said goodbye.");
+  st.home.push(userId);
+  delete st.late[userId];
+  say(p.chatId, userId, GOODBYE);
+  publish("door.update", { partyId, userId, lateMinutes: null, meetSpot: null, headedHome: true }, p.memberIds);
+  const plan = p.planId ? store().plans.get(p.planId) : undefined;
+  return { friendText: `Heading home now from ${plan?.title ?? "my night out"}. All good. I'll text you when I'm in.` };
 }
 
 function party(partyId: string, userId: string) {
@@ -66,5 +86,5 @@ export function clearLate(partyId: string, userId: string) {
 
 export function doorState(partyId: string): DoorState {
   const d = store().door.get(partyId) ?? { late: {}, meet: null };
-  return { late: { ...d.late }, meet: d.meet ? { ...d.meet, byName: profile(d.meet.by).firstName } : null };
+  return { late: { ...d.late }, meet: d.meet ? { ...d.meet, byName: profile(d.meet.by).firstName } : null, home: [...(d.home ?? [])], leaveQuietly: flag("LEAVE_QUIETLY") };
 }
