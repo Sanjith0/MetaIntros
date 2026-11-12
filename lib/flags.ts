@@ -46,6 +46,8 @@ const DEFAULTS = {
   CONTEXT_AUDIT: true,
   /** F20: "Try to leak it" on the stage: type a line as any agent and watch the verifier stop it. */
   LEAK_TEST: true,
+  /** F21: "What if" on the stage: re-run the table in a sandbox without one member's rule. */
+  WHAT_IF: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

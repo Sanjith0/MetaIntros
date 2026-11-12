@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 /* F19: every agent turn on the stage carries a context audit chip; tapping one shows the exact prompt. */
@@ -28,6 +29,8 @@ test("context audit: own brief only on every turn, and the exact prompt one tap 
   for (const w of ["out by eleven", "under twenty bucks", "nowhere I have to drink"]) await expect(text).toContainText(w);
   for (const w of ["fine spending up to 40", "home by midnight", "nothing too loud", "budget around 25"]) await expect(text).not.toContainText(w);
   await page.screenshot({ path: "shots/f19-context-audit.png", animations: "disabled" });
+  const axe = await new AxeBuilder({ page }).include("[data-testid=prompt-view]").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(axe.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => v.id)).toEqual([]);
 
   await expect(page.getByRole("button", { name: "Close" })).toBeFocused();
   await page.keyboard.press("Escape");

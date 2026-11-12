@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Trace } from "@/contracts";
 import { Avatar } from "@/components/Avatar";
 import { LeakTest } from "@/components/stage/LeakTest";
+import { WhatIf } from "@/components/stage/WhatIf";
 import { boardAt, replayDelay } from "@/lib/stage/board";
 import type { StageView } from "@/lib/server/views";
 
@@ -92,7 +93,7 @@ function Body({ text }: { text: string }) {
  * The projector, with a scrubber. Every position on the scrubber rebuilds
  * the board (plans, signatures, the lock) from the trace up to that point.
  */
-export function StageReplay({ initial, leakTest = false }: { initial: StageView; leakTest?: boolean }) {
+export function StageReplay({ initial, leakTest = false, whatIf = false }: { initial: StageView; leakTest?: boolean; whatIf?: boolean }) {
   const [prompt, setPrompt] = useState<PromptView | null>(null);
   const openPrompt = async (t: Trace) => {
     if (!t.actorId || !t.meta?.round) return;
@@ -257,6 +258,7 @@ export function StageReplay({ initial, leakTest = false }: { initial: StageView;
             Start demo party
           </button>
           {leakTest && <LeakTest partyId={view.partyId} members={view.members} />}
+          {whatIf && <WhatIf partyId={view.partyId} locked={view.traces.some((t) => t.meta?.kind === "locked")} />}
           <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
         </div>
       </header>

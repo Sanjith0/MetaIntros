@@ -367,7 +367,7 @@ export const Trace = z.object({
       round: z.number().int().optional(),
       planId: z.string().optional(),
       decision: z.enum(["accept", "reject", "concede", "hold", "sign"]).optional(),
-      kind: z.enum(["open", "verdicts", "unavailable", "leading", "tally", "locked", "line", "pair", "formed", "attempt"]).optional(),
+      kind: z.enum(["open", "verdicts", "unavailable", "leading", "tally", "locked", "line", "pair", "formed", "attempt", "whatif"]).optional(),
       source: z.enum(["model", "mock", "fallback", "recorded"]).optional(),
       ms: z.number().optional(),
       /** Why a fallback answered (for example "timeout after 2500 ms"), or where a replay came from. */

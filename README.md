@@ -46,6 +46,8 @@ Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/
    land; the Dolores Night Market locks. Scrub back to show any moment.
    Tap any agent's **own brief only ✓** chip to show the exact prompt it got. Then **Try to
    leak it**: type Maya's limits as Dev's agent and watch the verifier block it, live.
+   **What if…** takes rules away and re-runs the same five in a sandbox: without Maya's drink
+   rule the rooftop opens; the late show needs both curfews gone; the market still wins.
 3. **MATCH FOUND** on all five phones at once, with a chime (use `/phones` and real phones:
    each scans a QR code; the board shows each phone's lag in ms).
 4. **Maya's secret.** On her `/party`: her rules in her own words, and "What the party knows":
@@ -93,6 +95,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `HOW_PAGE` | `/how`: the architecture diagram and what code guarantees |
 | `CONTEXT_AUDIT` | every agent prompt checked by code for other members' private words; per-turn chip and the exact prompt on `/stage` |
 | `LEAK_TEST` | **Try to leak it** on `/stage`: type a line as any agent; the verifier blocks it live, and nothing reaches a phone |
+| `WHAT_IF` | **What if…** on `/stage` after the lock: take rules away and re-run the same five in a sandbox (mock model, nothing live touched) |
 
 ## Routes
 
@@ -137,7 +140,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 148 unit tests (vitest)
+npm test                       # 154 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import fs from "node:fs";
 import path from "node:path";
 import type { z } from "zod";
@@ -40,6 +41,17 @@ export interface CallOptions<T> {
   /** Which agent (owner id, or a pair key) is calling. Keys recordings, timeouts and latency labels. */
   agent?: string;
 }
+
+/* --------------------------- sandbox scope --------------------------- */
+
+const gm = globalThis as unknown as { __pqMockScope?: AsyncLocalStorage<true> };
+const mockScope = (gm.__pqMockScope ??= new AsyncLocalStorage<true>());
+
+/** Run work on the deterministic mock only: no real calls, no latency, no recordings (sandbox "what if" runs). */
+export function withMockModel<T>(fn: () => Promise<T>): Promise<T> {
+  return mockScope.run(true, fn);
+}
+export const inMockScope = () => mockScope.getStore() === true;
 
 export function modelConfig() {
   const key = process.env.META_API_KEY ?? "";
@@ -130,7 +142,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function callModel<T>(opts: CallOptions<T>): Promise<ModelResult<T>> {
   const result = await callModelInner(opts);
-  if (modelSettings().record && result.source !== "recorded") {
+  if (modelSettings().record && result.source !== "recorded" && !inMockScope()) {
     capture(callKey(opts.task, opts.agent), { value: result.value, ms: result.ms, source: result.source });
   }
   return result;
@@ -147,6 +159,7 @@ async function callModelInner<T>(opts: CallOptions<T>): Promise<ModelResult<T>> 
     const value = opts.schema.parse(fn());
     return { value, source, ms: Date.now() - t0, note };
   };
+  if (inMockScope()) return safe(opts.mock, "mock");
 
   // A recorded run replays exactly, labelled as recorded.
   if (st.source === "recorded") {

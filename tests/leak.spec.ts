@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 /* F20: on the projector, type Maya's limits as Dev's agent; the verifier blocks it live and no phone hears it. */
@@ -32,6 +33,8 @@ test("try to leak it: Dev's agent types Maya's limits, the verifier blocks it, M
   await expect(page.getByTestId("leak-table-sees")).toHaveText("That works for me.");
   await expect(page.getByTestId("leak-prompt")).toContainText("its own brief only");
   await page.screenshot({ path: "shots/f20-leak-blocked.png", animations: "disabled" });
+  const axe = await new AxeBuilder({ page }).include("[data-testid=leak-test]").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(axe.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => v.id)).toEqual([]);
 
   // The exact neutral phrase goes through: the verifier isn't just blocking everything.
   await page.getByRole("button", { name: "A neutral phrase, exactly" }).click();

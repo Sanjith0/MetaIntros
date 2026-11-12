@@ -37,7 +37,8 @@ tab, group chat and notifications.
 
 On the projector, every agent turn carries a context audit: code checks each prompt, before
 the call, for anyone else's private words, and one tap shows the exact prompt. **Try to leak
-it** lets the room type a leak as any agent and watch the verifier stop it.
+it** lets the room type a leak as any agent and watch the verifier stop it, and **What if…**
+re-runs the same five in a sandbox with rules taken away, to show which rules closed which plans.
 
 On your own phone, **Maya's secret** shows your rules next to "What the party knows". That
 column is computed by scanning everything the other four can load, and it stays empty.
@@ -52,7 +53,7 @@ column is computed by scanning everything the other four can load, and it stays 
 - A code judge, a verifier for public lines, and pair talk where the model only picks fact ids.
 - A projector view with a scrubber that rebuilds the board (plans, signatures, the lock) at
   any moment of the replay.
-- Vitest (148 unit tests), Playwright (35+ end-to-end specs on a production build, including
+- Vitest (154 unit tests), Playwright (35+ end-to-end specs on a production build, including
   five phones at once, 390-pixel layouts and axe accessibility checks), and an eval harness.
 
 ## The leak test
