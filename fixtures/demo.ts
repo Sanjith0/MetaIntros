@@ -20,6 +20,8 @@ export const DEMO_PARTY = {
     ana: "outdoors if possible, low-key, home by 9:30",
     zoe: "open to anything, just want to meet people, budget around 15",
   } as Record<string, string>,
+  /** F26: where the standing party queues together the next night (Sunday trivia at the Ferry Building). */
+  standingEventId: "evt-ferry-trivia",
   /** What the demo expects code to lock. */
   expectedPlanEventId: "evt-night-market",
   rooftopEventId: "evt-rooftop",

@@ -62,7 +62,9 @@ Open **`/demo`** (the presenter's panel) and **`/stage`** (the projector). On `/
 7. **After.** `/runitback`: private picks; only mutual pairs are revealed; three who all picked
    each other become a standing party; everyone else sees the same "queue again" card. On
    `/safety`, **Forget my night** deletes Maya's private data from the night, then scans every
-   value on the server: none of her words remain.
+   value on the server: none of her words remain. **Standing party queues again (Sun)** on
+   `/demo` sets up the next beat: Dev and Ana queue for Sunday with their standing party; Maya
+   taps the invite, types her own sentence, and the three land in one party with two new people.
 8. **Why it's built this way.** `/how`: one diagram of what each piece sees and where code
    decides. `/evals`: the leak test four ways (one prompt, one prompt + verifier, five agents +
    verifier, a code solver).
@@ -108,6 +110,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `WHY_LINE` | **Why this?** under every opener on `/party` and on the door card: the approved facts each line came from, in plain words (no ids, no unnamed third person) |
 | `FORGET_ME` | **Forget my night** on `/safety` after the plan is set: deletes your sentence, rules, private reasons, prompts, checks and receipt, then scans every value on the server for your words |
 | `PREFLIGHT` | **Preflight** on `/demo`: rehearses the demo party in a sandbox and checks layers, model and call budget, pace, privacy, live state, screens and fallbacks |
+| `STANDING_QUEUE` | a standing party (3+ who all picked each other) queues together again from `/runitback`: one invite each, they wait for each other, land in one party with new people, and each types their own sentence |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -153,7 +156,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 174 unit tests (vitest)
+npm test                       # 178 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

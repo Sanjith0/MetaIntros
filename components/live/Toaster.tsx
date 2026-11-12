@@ -56,11 +56,14 @@ export function Toaster({ people, keyboard = true }: { people: Directory; keyboa
       }
       case "queue.invite": {
         const from = people[e.payload.fromId];
+        const group = e.payload.groupOf;
         push({
           id: e.id,
           title: "Party Queue",
-          body: `${from?.firstName ?? "A friend"} wants to queue with you. You'd be in the same party.`,
-          href: `/queue?event=${e.payload.eventId}&duo=${e.payload.fromId}`,
+          body: group
+            ? `${from?.firstName ?? "Someone"} wants your standing party to queue again. You'd all be in one party, with new people.`
+            : `${from?.firstName ?? "A friend"} wants to queue with you. You'd be in the same party.`,
+          href: group ? `/queue?event=${e.payload.eventId}&group=${group}` : `/queue?event=${e.payload.eventId}&duo=${e.payload.fromId}`,
           layer: true,
           who: e.payload.fromId,
         });

@@ -56,6 +56,8 @@ const DEFAULTS = {
   FORGET_ME: true,
   /** F25: preflight on /demo: rehearse the whole demo party in a sandbox and check everything the presenter needs. */
   PREFLIGHT: true,
+  /** F26: a standing party (3+ who all picked each other) queues together again; code keeps them together and fills the party with new people. */
+  STANDING_QUEUE: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

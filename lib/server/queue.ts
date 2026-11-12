@@ -17,6 +17,8 @@ export interface JoinInput {
   approvedLineIds?: string[];
   /** Queue together with this friend (duo queue). */
   duoWith?: string | null;
+  /** Queue together with your standing party (the party id it came from). Everyone in it lands in one party. */
+  groupOf?: string | null;
   /** "night": anywhere tonight, any of the evening's events (F14). Default: near this event. */
   scope?: "event" | "night";
   /** Saved to the profile: only all-women parties; never the only woman. */
@@ -47,12 +49,19 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
   if (!event) throw new Error("unknown event");
   if (!event.partyEligible) throw new Error("this event is not open to Party Queue");
 
+  if (input.duoWith && input.groupOf) throw new Error("Queue with your standing party or with a friend, not both.");
   if (input.duoWith) {
     if (input.duoWith === input.userId) throw new Error("You can't queue with yourself.");
     const friend = s.profiles.get(input.duoWith);
     if (!friend || !areFriends(input.userId, input.duoWith)) throw new Error("You can only queue with a friend.");
     if (eligibleToQueue(friend)) throw new Error("Your friend can't join Party Queue.");
     if (p.blocks.includes(friend.id) || friend.blocks.includes(p.id)) throw new Error("You can't queue with that person.");
+  }
+  let groupWith: string[] = [];
+  if (input.groupOf) {
+    const standing = flag("STANDING_QUEUE") ? s.standing.get(input.groupOf) : undefined;
+    if (!standing || !standing.memberIds.includes(input.userId)) throw new Error("You can only queue with your own standing party.");
+    groupWith = [...standing.memberIds];
   }
   if (input.settings) p.settings = { ...p.settings, ...input.settings };
 
@@ -72,6 +81,8 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
     briefId: built.brief.id,
     consentBridges: input.consentBridges,
     duoWith: input.duoWith ?? null,
+    groupOf: input.groupOf ?? null,
+    groupWith,
     scope: input.scope === "night" && flag("NIGHT_QUEUE") ? "night" : "event",
     joinedAt: nowIso(),
     status: "waiting",
@@ -82,6 +93,15 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
   if (entry.duoWith) {
     const theirs = s.queue.find((q) => q.userId === entry.duoWith && q.status === "waiting" && q.duoWith === entry.userId);
     if (!theirs) publish("queue.invite", { fromId: entry.userId, toId: entry.duoWith, eventId: event.id }, [entry.duoWith]);
+  }
+  // Standing party: invite whoever hasn't joined this one yet.
+  if (entry.groupOf) {
+    for (const id of entry.groupWith) {
+      if (id === entry.userId) continue;
+      const theirs = s.queue.find((q) => q.userId === id && q.status === "waiting" && q.groupOf === entry.groupOf);
+      const asked = s.events_log.some((e) => e.type === "queue.invite" && e.payload.groupOf === entry.groupOf && e.payload.toId === id && e.payload.eventId === event.id);
+      if (!theirs && !asked) publish("queue.invite", { fromId: entry.userId, toId: id, eventId: event.id, groupOf: entry.groupOf }, [id]);
+    }
   }
   ensureTicker();
 
@@ -103,6 +123,13 @@ export function queueStatus(userId: string) {
   return {
     entry,
     duo: entry.duoWith ? { with: entry.duoWith, confirmed: !!partner && partner.duoWith === userId } : null,
+    group: entry.groupOf
+      ? {
+          of: entry.groupOf,
+          joined: entry.groupWith.filter((id) => s.queue.some((q) => q.userId === id && q.status !== "left" && q.groupOf === entry.groupOf)),
+          waitingFor: entry.groupWith.filter((id) => !s.queue.some((q) => q.userId === id && q.status !== "left" && q.groupOf === entry.groupOf)),
+        }
+      : null,
     inBucket,
     needed: Math.max(0, PARTY_SIZE - inBucket),
     waitingSeconds: Math.round((Date.now() - Date.parse(entry.joinedAt)) / 1000),

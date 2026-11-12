@@ -29,7 +29,20 @@ interface View {
   queueAgain?: QueueAgain | null;
 }
 
-export function RunItBack({ partyId, viewerId, members, initial }: { partyId: string; viewerId: string; members: Member[]; initial: View }) {
+export function RunItBack({
+  partyId,
+  viewerId,
+  members,
+  initial,
+  nextEvents = [],
+}: {
+  partyId: string;
+  viewerId: string;
+  members: Member[];
+  initial: View;
+  /** F26: where the standing party can queue together next. */
+  nextEvents?: { id: string; title: string; when: string; landmark: string }[];
+}) {
   const router = useRouter();
   const [standing, setStanding] = useState(initial.standing ?? null);
   const [queueAgain, setQueueAgain] = useState<QueueAgain | null>(initial.queueAgain ?? null);
@@ -159,6 +172,24 @@ export function RunItBack({ partyId, viewerId, members, initial }: { partyId: st
           <Link href={`/chat/${standing.chatId}`} className="press mt-2 inline-block rounded-[6px] bg-[var(--color-pq)] px-3 py-1.5 text-[14px] font-semibold text-white">
             Open the standing chat
           </Link>
+          {nextEvents.length > 0 && (
+            <div className="mt-3" data-testid="standing-queue">
+              <div className="text-[14px] font-semibold">Queue together again</div>
+              <p className="text-[13px] text-[var(--color-ink-2)]">You&apos;ll all land in one party, with new people. Each of you still types your own sentence.</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {nextEvents.map((e) => (
+                  <Link
+                    key={e.id}
+                    href={`/queue?event=${e.id}&group=${partyId}`}
+                    data-testid={`standing-queue-${e.id}`}
+                    className="press rounded-[6px] bg-white px-3 py-1.5 text-[14px] font-semibold ring-1 ring-[var(--color-pq)]/40"
+                  >
+                    {e.when} · {e.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
       {revealed >= mutual.length && queueAgain && (

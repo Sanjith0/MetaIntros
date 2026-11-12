@@ -14,14 +14,16 @@ import { currentViewerId } from "@/lib/server/viewer";
 export const metadata: Metadata = { title: "Find my party" };
 export const dynamic = "force-dynamic";
 
-export default async function QueuePage({ searchParams }: { searchParams: Promise<{ event?: string; duo?: string }> }) {
-  const { event: eventParam, duo } = await searchParams;
+export default async function QueuePage({ searchParams }: { searchParams: Promise<{ event?: string; duo?: string; group?: string }> }) {
+  const { event: eventParam, duo, group } = await searchParams;
   const viewer = await currentViewerId();
   const s = store();
   const st = queueStatus(viewer);
   const eventId = eventParam ?? st?.entry.eventId ?? DEMO_PARTY.entryEventId;
   const e = s.events.get(eventId) ?? s.events.get(DEMO_PARTY.entryEventId)!;
-  const active = st && (st.entry.status === "waiting" || st.partyId) ? st : null;
+  // A party that already locked (or found no plan) doesn't hold the sheet: you can queue for another night.
+  const stParty = st?.partyId ? s.parties.get(st.partyId) : undefined;
+  const active = st && (st.entry.status === "waiting" || (stParty && (stParty.status === "forming" || stParty.status === "talking"))) ? st : null;
   const placeholder = DEMO_PARTY.sentences[viewer] ?? "e.g. low-key, home by eleven, under $20";
   const me = s.profiles.get(viewer)!;
   const duoOn = flag("DUO_QUEUE");
@@ -32,6 +34,11 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
         .map((p) => ({ id: p.id, name: p.name }))
     : [];
   const inviter = duo ? friends.find((f) => f.id === duo) ?? null : null;
+  const standingGroup = group && flag("STANDING_QUEUE") ? s.standing.get(group) : undefined;
+  const standing =
+    standingGroup && standingGroup.memberIds.includes(viewer)
+      ? { partyId: group!, others: standingGroup.memberIds.filter((id) => id !== viewer).map((id) => ({ id, firstName: s.profiles.get(id)!.firstName })) }
+      : null;
 
   return (
     <main className="relative min-h-[calc(100vh-56px)]">
@@ -71,10 +78,11 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
             invitedBy={inviter}
             duoEnabled={duoOn}
             voice={flag("VOICE_SENTENCE")}
+            standing={standing ?? (active?.group ? { partyId: active.group.of, others: (s.standing.get(active.group.of)?.memberIds ?? []).filter((id) => id !== viewer).map((id) => ({ id, firstName: s.profiles.get(id)!.firstName })) } : null)}
             night={flag("NIGHT_QUEUE") ? { nearCount: candidatePlans(e.landmark, e.date).length, tonightCount: nightPlans(e.date).length } : null}
             initialStatus={
               active
-                ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark, duo: active.duo, scope: active.entry.scope }
+                ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark, duo: active.duo, group: active.group, scope: active.entry.scope }
                 : null
             }
           />

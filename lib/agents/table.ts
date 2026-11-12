@@ -141,7 +141,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   const briefs = party.memberIds.map(briefFor);
   party.status = "talking";
 
-  postTable(party, { round: 0, authorId: null, kind: "system", text: `The table is open: ${plans.length} plans, 5 agents, up to ${MAX_ROUNDS} rounds.`, sourceIds: plans.map((p) => p.id) }, { meta: { kind: "open" } });
+  postTable(party, { round: 0, authorId: null, kind: "system", text: `The table is open: ${plans.length} ${plans.length === 1 ? "plan" : "plans"}, 5 agents, up to ${MAX_ROUNDS} rounds.`, sourceIds: plans.map((p) => p.id) }, { meta: { kind: "open" } });
   await pauseFor(pace(), partyId);
 
   // Party-wide safety first: private venues never reach the agents as options.

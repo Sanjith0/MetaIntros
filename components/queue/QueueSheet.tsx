@@ -21,7 +21,14 @@ interface Status {
   partyId: string | null;
   landmark: string;
   duo?: { with: string; confirmed: boolean } | null;
+  group?: { of: string; joined: string[]; waitingFor: string[] } | null;
   scope?: "event" | "night";
+}
+
+/** F26: queuing with your standing party. */
+export interface Standing {
+  partyId: string;
+  others: { id: string; firstName: string }[];
 }
 
 export interface Friend {
@@ -68,6 +75,7 @@ export function QueueSheet({
   duoEnabled = true,
   night = null,
   voice = false,
+  standing = null,
 }: {
   eventId: string;
   landmark: string;
@@ -82,6 +90,7 @@ export function QueueSheet({
   night?: { nearCount: number; tonightCount: number } | null;
   /** F16: offer "Say it instead" (off by default). */
   voice?: boolean;
+  standing?: Standing | null;
 }) {
   const [sentence, setSentence] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -130,7 +139,8 @@ export function QueueSheet({
         sentence,
         consentBridges: consent,
         approvedLineIds: Object.keys(approved).filter((k) => approved[k]),
-        duoWith: duoWith || null,
+        duoWith: standing ? null : duoWith || null,
+        groupOf: standing?.partyId ?? null,
         scope,
         ...(isWoman ? { settings } : {}),
       }),
@@ -142,7 +152,7 @@ export function QueueSheet({
       return;
     }
     const st = (await (await fetch("/api/queue/status")).json()) as {
-      status: { entry: { joinedAt: string; landmark: string; scope?: "event" | "night" }; inBucket: number; needed: number; partyId: string | null; duo: Status["duo"] } | null;
+      status: { entry: { joinedAt: string; landmark: string; scope?: "event" | "night" }; inBucket: number; needed: number; partyId: string | null; duo: Status["duo"]; group?: Status["group"] } | null;
     };
     if (st.status)
       setStatus({
@@ -152,6 +162,7 @@ export function QueueSheet({
         partyId: st.status.partyId,
         landmark: st.status.entry.landmark,
         duo: st.status.duo,
+        group: st.status.group ?? null,
         scope: st.status.entry.scope,
       });
     if (body.partyId) setForming(body.partyId);
@@ -203,6 +214,13 @@ export function QueueSheet({
                   : `Waiting for ${friends.find((f) => f.id === status!.duo!.with)?.name.split(" ")[0] ?? "your friend"} to join you`}
               </p>
             )}
+            {status!.group && standing && (
+              <p className="mt-1 text-[13px] font-semibold text-[var(--color-pq-ink)]" data-testid="queue-group">
+                {status!.group.waitingFor.length === 0
+                  ? `Your standing party is all in: you'll land together, with ${5 - status!.group.joined.length} new ${5 - status!.group.joined.length === 1 ? "person" : "people"}`
+                  : `Waiting for ${status!.group.waitingFor.map((id) => standing.others.find((o) => o.id === id)?.firstName ?? "someone").join(" and ")} to join you`}
+              </p>
+            )}
             <p className="mt-3 text-[13px] text-[var(--color-ink-2)]">You can leave this page. We'll notify you when your party is set.</p>
             <div className="mt-4 flex justify-center gap-2">
               <Link href="/events" className="press rounded-[6px] bg-[var(--color-btn-2)] px-4 py-2 text-[15px] font-semibold">
@@ -220,7 +238,12 @@ export function QueueSheet({
 
   return (
     <div className="p-5">
-      {invitedBy && (
+      {standing && (
+        <div className="mb-3 rounded-[8px] bg-[var(--color-pq-soft)] px-3 py-2 text-[14px] font-semibold text-[var(--color-pq-ink)]" data-testid="standing-invite">
+          Queuing with your standing party: {standing.others.map((o) => o.firstName).join(" and ")}. You&apos;ll all land in one party, with new people. Your sentence is still only yours.
+        </div>
+      )}
+      {invitedBy && !standing && (
         <div className="mb-3 rounded-[8px] bg-[var(--color-pq-soft)] px-3 py-2 text-[14px] font-semibold text-[var(--color-pq-ink)]" data-testid="duo-invite">
           {invitedBy.name.split(" ")[0]} asked to queue with you. You'll be in the same party.
         </div>
@@ -321,7 +344,7 @@ export function QueueSheet({
         </div>
       )}
 
-      {duoEnabled && friends.length > 0 && (
+      {duoEnabled && friends.length > 0 && !standing && (
         <label className="mt-3 block text-[13px] font-semibold text-[var(--color-ink-3)]">
           Bring a friend (optional)
           <select

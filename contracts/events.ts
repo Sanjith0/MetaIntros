@@ -48,6 +48,8 @@ export const QueueInvitePayload = z.object({
   fromId: Id,
   toId: Id,
   eventId: Id,
+  /** Set when a standing party is queuing together again. */
+  groupOf: Id.optional(),
 });
 
 export const QueueTickPayload = z.object({

@@ -4,6 +4,8 @@ import { RunItBack } from "@/components/after/RunItBack";
 import { runItBackView } from "@/lib/server/after";
 import { partyForViewer, person } from "@/lib/server/social";
 import { store } from "@/lib/server/store";
+import { flag } from "@/lib/flags";
+import { dayLabel } from "@/lib/format";
 import { currentViewerId } from "@/lib/server/viewer";
 
 export const metadata: Metadata = { title: "Run it back" };
@@ -14,6 +16,16 @@ export default async function RunItBackPage() {
   const party = partyForViewer(viewer);
   const plan = party?.planId ? store().plans.get(party.planId) : undefined;
   const view = party ? runItBackView(party.id, viewer) : null;
+  // F26: the next nights a standing party could queue for together.
+  const planDate = plan ? store().events.get(plan.eventId)?.date : undefined;
+  const nextEvents =
+    flag("STANDING_QUEUE") && planDate
+      ? [...store().events.values()]
+          .filter((e) => e.partyEligible && e.date > planDate && Number(e.start.slice(0, 2)) >= 16)
+          .sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start))
+          .slice(0, 3)
+          .map((e) => ({ id: e.id, title: e.title, when: dayLabel(e.date).split(",")[0]!, landmark: e.landmark }))
+      : [];
 
   if (!party || party.status !== "locked" || !view) {
     return (
@@ -33,7 +45,7 @@ export default async function RunItBackPage() {
         <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--color-pq)]">Party Queue · Run it back</div>
         <h1 className="text-[24px] font-bold leading-tight">How was {plan?.title ?? "your night"}?</h1>
       </div>
-      <RunItBack key={viewer} partyId={party.id} viewerId={viewer} members={party.memberIds.map(person)} initial={view} />
+      <RunItBack key={viewer} partyId={party.id} viewerId={viewer} members={party.memberIds.map(person)} initial={view} nextEvents={nextEvents} />
     </main>
   );
 }

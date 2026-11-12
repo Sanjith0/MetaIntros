@@ -48,6 +48,18 @@ export function eligibleToQueue(p: Profile): Violation | null {
   return p.age < MIN_AGE ? { rule: "age", userIds: [p.id], detail: "Party Queue is for people 18 and over." } : null;
 }
 
+/** A standing party queuing together is ready once every member has joined, for the same place. */
+export function groupReady(cands: Candidate[], c: Candidate): boolean {
+  if (!c.entry.groupOf) return true;
+  return c.entry.groupWith.every((id) => cands.some((x) => x.profile.id === id && x.entry.groupOf === c.entry.groupOf));
+}
+
+/** All of a group or none of it. */
+export function groupsWhole(combo: Candidate[]): boolean {
+  const ids = new Set(combo.map((c) => c.profile.id));
+  return combo.every((c) => !c.entry.groupOf || c.entry.groupWith.every((id) => ids.has(id)));
+}
+
 /** Two people who queued together and both confirmed it. */
 export function confirmedDuo(cands: Candidate[], c: Candidate): Candidate | null {
   const partnerId = c.entry.duoWith;
@@ -64,9 +76,11 @@ export function partyBridges(members: Profile[], nameOf: (id: string) => string,
       const b = members[j]!;
       const ea = entries.find((e) => e.userId === a.id);
       const eb = entries.find((e) => e.userId === b.id);
+      const [x, y] = a.id < b.id ? [a.id, b.id] : [b.id, a.id];
       if (ea?.duoWith === b.id && eb?.duoWith === a.id) {
-        const [x, y] = a.id < b.id ? [a.id, b.id] : [b.id, a.id];
         out.push({ id: `br-${x}-${y}-duo`, a: x, b: y, kind: "queued_together", viaId: `${x}|${y}`, viaName: "queued together" });
+      } else if (ea?.groupOf && ea.groupOf === eb?.groupOf) {
+        out.push({ id: `br-${x}-${y}-grp`, a: x, b: y, kind: "queued_together", viaId: `${x}|${y}`, viaName: "queued together" });
       }
       out.push(...bridgesBetween(a, b, nameOf));
     }
@@ -142,6 +156,8 @@ export function formParty(cands: Candidate[], opts: { mustInclude?: string; name
     .filter((c) => c.entry.status === "waiting" && c.profile.age >= MIN_AGE)
     // Someone who invited a friend waits until the friend has joined too.
     .filter((c, _i, all) => !c.entry.duoWith || confirmedDuo(all, c))
+    // A standing party waits until all of them are in.
+    .filter((c, _i, all) => groupReady(all, c))
     .sort((a, b) => a.entry.joinedAt.localeCompare(b.entry.joinedAt));
   const byBucket = new Map<string, Candidate[]>();
   const add = (k: string, c: Candidate) => {
@@ -163,6 +179,7 @@ export function formParty(cands: Candidate[], opts: { mustInclude?: string; name
       if (++tried > 50_000) break; // hard ceiling; buckets are small in practice
       if (opts.mustInclude && !combo.some((c) => c.profile.id === opts.mustInclude)) continue;
       if (opts.avoid?.(combo.map((c) => c.profile.id))) continue; // these five already found no plan together
+      if (!groupsWhole(combo)) continue;
       if (checkParty(combo, nameOf).length === 0) {
         return { members: combo, bridges: partyBridges(combo.map((c) => c.profile), nameOf, combo.map((c) => c.entry)) };
       }
