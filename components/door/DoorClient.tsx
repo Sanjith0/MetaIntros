@@ -17,7 +17,23 @@ interface Member {
 /** At the door: "I'm here", the card for whoever is spotted, and a
  *  tap-a-face list. The card says who is in front of you and what to say.
  *  Nothing on it is inferred from a face. */
-export function DoorClient({ partyId, viewerId, members, cards, initialSpotted }: { partyId: string; viewerId: string; members: Member[]; cards: Card[]; initialSpotted: string | null }) {
+export function DoorClient({
+  partyId,
+  viewerId,
+  members,
+  cards,
+  initialSpotted,
+  cameraOn = true,
+  sourceLabel = "",
+}: {
+  partyId: string;
+  viewerId: string;
+  members: Member[];
+  cards: Card[];
+  initialSpotted: string | null;
+  cameraOn?: boolean;
+  sourceLabel?: string;
+}) {
   const [here, setHere] = useState(members.find((m) => m.id === viewerId)?.arrived ?? false);
   const [arrived, setArrived] = useState(() => new Set(members.filter((m) => m.arrived).map((m) => m.id)));
   const [spotted, setSpotted] = useState<{ id: string; method: string } | null>(initialSpotted ? { id: initialSpotted, method: "stub" } : null);
@@ -96,7 +112,10 @@ export function DoorClient({ partyId, viewerId, members, cards, initialSpotted }
           <div className="flex flex-col items-center gap-2 px-5 py-10 text-center text-[var(--color-ink-2)]">
             <IconDoor size={32} />
             <div className="text-[17px] font-semibold text-[var(--color-ink)]">Waiting for your party</div>
-            <div className="text-[13px]">When the door camera spots someone from your party, their card shows here. Or tap a face below.</div>
+            <div className="text-[13px]" data-testid="door-camera-state">
+              {cameraOn ? "When the door camera spots someone from your party, their card shows here. Or tap a face below." : "The door camera is off. Tap a face below to see who's in front of you."}
+            </div>
+            {sourceLabel && <div className="mt-1 rounded-full bg-[var(--color-wash)] px-2.5 py-0.5 text-[11px] font-semibold">Frame source: {sourceLabel}</div>}
           </div>
         )}
       </section>

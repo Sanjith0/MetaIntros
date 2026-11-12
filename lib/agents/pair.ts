@@ -5,7 +5,7 @@ import { callModel, type ModelSource } from "@/model/client";
 import { publish } from "@/lib/server/bus";
 import { factById, nextId, nowIso, profile, store } from "@/lib/server/store";
 import { trace } from "@/lib/server/trace";
-import { briefFor, paceFromEnv } from "./table";
+import { briefFor, paceFromEnv, pauseFor } from "./table";
 import { flag } from "@/lib/flags";
 
 /**
@@ -108,7 +108,7 @@ export function openerText(target: { firstName: string }, fact: Fact): string {
   return `${target.firstName}, ${lowerFirst(fact.ask)}`;
 }
 
-async function onePair(party: Party, a: string, b: string, pace: number): Promise<PairResult> {
+async function onePair(party: Party, a: string, b: string, pace: () => number): Promise<PairResult> {
   const A = sideFor(a);
   const B = sideFor(b);
   const bridges = consentedBridges(party, a, b);
@@ -144,7 +144,7 @@ async function onePair(party: Party, a: string, b: string, pace: number): Promis
     const from = line.ownerId;
     post({ fromId: from, toId: from === a ? b : a, kind: "exchange", text: line.text, sourceIds: line.factIds });
     trace(party.id, "shared", "pair", from, `${profile(a).firstName} + ${profile(b).firstName}`, `${profile(from).firstName}'s agent: ${line.text}`, { meta: { kind: "pair" } });
-    if (pace) await new Promise((res) => setTimeout(res, pace / 3));
+    if (pace()) await pauseFor(pace() / 3, party.id);
   }
 
   // One shared line, from matching approved facts, else the bridge.
@@ -174,11 +174,19 @@ async function onePair(party: Party, a: string, b: string, pace: number): Promis
 export async function runPairTalk(partyId: string, opts: { paceMs?: number } = {}): Promise<PairResult[]> {
   const party = store().parties.get(partyId);
   if (!party) throw new Error("unknown party");
-  const pace = opts.paceMs ?? paceFromEnv();
+  const ff = () => store().operator.fastForward.has(partyId);
+  const pace = () => (ff() ? 0 : (opts.paceMs ?? paceFromEnv()));
   const ids = party.memberIds;
   const pairs: [string, string][] = [];
   for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) pairs.push([ids[i]!, ids[j]!]);
   const results: PairResult[] = [];
-  for (const [a, b] of pairs) results.push(await onePair(party, a, b, pace));
+  for (let i = 0; i < pairs.length; i++) {
+    // Fast-forward: run the remaining pairs at once.
+    if (ff()) {
+      results.push(...(await Promise.all(pairs.slice(i).map(([a, b]) => onePair(party, a, b, pace)))));
+      break;
+    }
+    results.push(await onePair(party, pairs[i]![0], pairs[i]![1], pace));
+  }
   return results;
 }

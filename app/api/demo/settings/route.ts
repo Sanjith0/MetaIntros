@@ -12,6 +12,7 @@ const Patch = z
     agentTimeoutMs: z.number().int().min(50).max(60_000),
     source: z.enum(["live", "recorded"]),
     latencyScale: z.number().min(0.01).max(2),
+    paceMs: z.number().int().min(0).max(5000).nullable(),
   })
   .partial();
 

@@ -7,6 +7,7 @@ import { feasibleFor, ownerChecks, partyChecks, rankPlans } from "./judge";
 import { verifyPublicLine, type NeutralId, type PublicLine } from "./verifier";
 import { flag } from "@/lib/flags";
 import type { ModelSource } from "@/model/client";
+import { modelSettings } from "@/model/settings";
 
 export const MAX_ROUNDS = 3;
 
@@ -24,29 +25,35 @@ export interface TableResult {
   unavailable: string[];
 }
 
-export const paceFromEnv = () => Number(process.env.PQ_PACE_MS ?? 600);
+export const paceFromEnv = () => modelSettings().paceMs ?? Number(process.env.PQ_PACE_MS ?? 600);
 
 /**
  * Start every agent's call at once. With MODEL_READINESS on, handle each
  * result the moment it returns (streamed), one at a time so table state stays
  * consistent; with it off, handle them in member order after all return.
  */
-async function streamed<T>(briefs: Brief[], start: (b: Brief) => Promise<T>, handle: (b: Brief, r: T) => Promise<void>) {
+async function streamed<T>(briefs: Brief[], start: (b: Brief) => Promise<T>, handle: (b: Brief, r: T) => Promise<void>, abort: () => boolean = () => false) {
   if (!flag("MODEL_READINESS")) {
     const all = await Promise.all(briefs.map(start));
     for (let i = 0; i < briefs.length; i++) await handle(briefs[i]!, all[i]!);
     return;
   }
   let chain: Promise<void> = Promise.resolve();
-  await Promise.all(
+  const all = Promise.all(
     briefs.map((b) =>
       start(b).then((r) => {
-        chain = chain.then(() => handle(b, r));
+        chain = chain.then(() => (abort() ? undefined : handle(b, r)));
         return chain;
       }),
     ),
-  );
-  await chain;
+  ).then(() => chain);
+  // An operator "lock now" stops waiting for slow agents.
+  let poll: ReturnType<typeof setInterval> | undefined;
+  const aborted = new Promise<void>((res) => {
+    poll = setInterval(() => abort() && res(), 100);
+  });
+  await Promise.race([all, aborted]);
+  clearInterval(poll);
 }
 
 function logCall(partyId: string, ownerId: string, round: number, turn: { source: ModelSource; ms: number; note?: string }) {
@@ -60,6 +67,15 @@ const turnLabel = (turn: { source: ModelSource; ms: number; note?: string }) =>
 const agentTitle = (ownerId: string, round: number, turn: { source: ModelSource; ms: number; note?: string }) =>
   `${profile(ownerId).firstName}'s agent · round ${round}${flag("MODEL_READINESS") ? "" : ` · ${turnLabel(turn)}`}`;
 const sleep = (ms: number) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve());
+
+/** A pause that ends early if the operator fast-forwards this party. */
+export async function pauseFor(ms: number, partyId: string) {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    if (store().operator.fastForward.has(partyId)) return;
+    await sleep(Math.min(50, end - Date.now()));
+  }
+}
 
 export function briefFor(userId: string): Brief {
   const b = store().briefs.get(`brief-${userId}`);
@@ -100,13 +116,15 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   const s = store();
   const party = s.parties.get(partyId);
   if (!party) throw new Error("unknown party");
-  const pace = opts.paceMs ?? paceFromEnv();
+  const s0 = store();
+  const pace = () => (s0.operator.fastForward.has(partyId) ? 0 : (opts.paceMs ?? paceFromEnv()));
+  const forced = () => s0.operator.forceLock.has(partyId);
   const plans = party.candidatePlanIds.map((id) => s.plans.get(id)!).filter(Boolean) as CandidatePlan[];
   const briefs = party.memberIds.map(briefFor);
   party.status = "talking";
 
   postTable(party, { round: 0, authorId: null, kind: "system", text: `The table is open: ${plans.length} plans, 5 agents, up to ${MAX_ROUNDS} rounds.`, sourceIds: plans.map((p) => p.id) }, { meta: { kind: "open" } });
-  await sleep(pace);
+  await pauseFor(pace(), partyId);
 
   // Party-wide safety first: private venues never reach the agents as options.
   const unavailable = new Set<string>();
@@ -130,6 +148,24 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   });
 
   const prefs = new Map<string, Record<string, number>>();
+
+  /** The operator locked now: code picks the best feasible plan from what it has. */
+  const forcedLock = (round: number): TableResult | null => {
+    const totalsNow = new Map<string, number>();
+    for (const p of plans) totalsNow.set(p.id, [...prefs.values()].reduce((sum, own) => sum + (own[p.id] ?? 0), 0));
+    const pick =
+      rankPlans(plans.filter((p) => feasibleFor(partyId, p, briefs) && !unavailable.has(p.id)), totalsNow)[0] ??
+      rankPlans(plans.filter((p) => feasibleFor(partyId, p, briefs)), totalsNow)[0];
+    if (!pick) {
+      party.status = "failed";
+      postTable(party, { round, authorId: null, kind: "system", text: "No plan works for everyone tonight.", sourceIds: plans.map((p) => p.id) });
+      return null;
+    }
+    postTable(party, { round, authorId: null, kind: "system", text: "The organiser asked for the plan now.", sourceIds: [pick.id] });
+    trace(partyId, "private", "judge", null, "Operator locked now", `Code picked ${pick.title}, the best plan that passes every member's rules, from the preferences so far.`, { tone: "lock", meta: { planId: pick.id } });
+    return { planId: pick.id, lockedBy: "fallback", signatures: [], rounds: round, unavailable: [...unavailable] };
+  };
+
   await streamed(briefs, (b) => round1Turn(ctxFor(b, 1, null)), async (b, turn) => {
     logCall(partyId, b.ownerId, 1, turn);
     const out = (opts.override?.(b.ownerId, 1, turn.out) as Round1Out | undefined) ?? turn.out;
@@ -167,14 +203,15 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
       meta: { kind: "verdicts", round: 1, source: turn.source, ms: turn.ms, note: turn.note },
     });
     speak(party, b, 1, out.publicLine, "neutral-hello");
-    await sleep(pace);
-  });
+    await pauseFor(pace(), partyId);
+  }, forced);
+  if (forced()) return forcedLock(1);
 
   // The table learns only that a plan is unavailable. Never why, never who.
   for (const p of plans.filter((x) => unavailable.has(x.id))) {
     publish("plan.unavailable", { partyId, planId: p.id, round: 1 }, party.memberIds, { stage: true });
     postTable(party, { round: 1, authorId: null, kind: "unavailable", text: `${p.title} · unavailable`, sourceIds: [p.id], planId: p.id });
-    await sleep(pace / 2);
+    await pauseFor(pace() / 2, partyId);
   }
 
   const available = plans.filter((p) => !unavailable.has(p.id));
@@ -204,8 +241,9 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   let leading = rankPlans(available, totals)[0]!;
   let signatures: string[] = [];
   for (let round = 2; round <= MAX_ROUNDS; round++) {
+    if (forced()) return forcedLock(round);
     postTable(party, { round, authorId: null, kind: "leading", text: `Leading: ${leading.title}`, sourceIds: [leading.id], planId: leading.id });
-    await sleep(pace);
+    await pauseFor(pace(), partyId);
     signatures = [];
     const lead = leading;
     await streamed(briefs, (b) => laterTurn(ctxFor(b, round, lead.id, prefs.get(b.ownerId))), async (b, turn) => {
@@ -236,14 +274,15 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
         meta: { kind: "verdicts", round, decision, planId, source: turn.source, ms: turn.ms, note: turn.note },
       });
       speak(party, b, round, raw.publicLine, decision === "hold" ? "neutral-thinking" : "neutral-in");
-      await sleep(pace);
-    });
+      await pauseFor(pace(), partyId);
+    }, forced);
+    if (forced()) return forcedLock(round);
     postTable(
       party,
       { round, authorId: null, kind: "system", text: `${signatures.length} of 5 signed ${leading.title}.`, sourceIds: [leading.id] },
       { tone: signatures.length === party.memberIds.length ? "sign" : "neutral", meta: { kind: "tally", planId: leading.id } },
     );
-    await sleep(pace);
+    await pauseFor(pace(), partyId);
     if (signatures.length === party.memberIds.length) return finish(leading.id, "signatures", signatures, round);
     leading = rankPlans(available, totals)[0]!;
   }

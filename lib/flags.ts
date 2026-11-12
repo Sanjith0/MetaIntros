@@ -13,6 +13,8 @@ const DEFAULTS = {
   REAL_PHONES: true,
   /** F4: verdicts streamed as each agent returns, per-agent latency, labelled fallbacks and recorded replays. */
   MODEL_READINESS: true,
+  /** F5: /demo control panel: reset, pre-queue four, lock now, frame source, model behaviour, pace. */
+  DEMO_PANEL: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

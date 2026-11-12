@@ -16,6 +16,8 @@ export interface ModelSettings {
   record: boolean;
   /** Multiply simulated delays (tests use a small value; the demo uses 1). */
   latencyScale: number;
+  /** Pause between table steps, overriding PQ_PACE_MS (null = use the env). */
+  paceMs: number | null;
 }
 
 export const DEFAULT_SETTINGS: ModelSettings = {
@@ -25,6 +27,7 @@ export const DEFAULT_SETTINGS: ModelSettings = {
   source: "live",
   record: false,
   latencyScale: 1,
+  paceMs: null,
 };
 
 const g = globalThis as unknown as { __pqModelSettings?: ModelSettings };

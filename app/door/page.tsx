@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DoorClient } from "@/components/door/DoorClient";
+import { FRAME_SOURCES, frameSource } from "@/lib/door/source";
 import { clock12 } from "@/lib/format";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
@@ -44,6 +45,8 @@ export default async function DoorPage() {
         members={v.members.map((m) => ({ id: m.id, name: m.name, firstName: m.firstName, hue: m.hue, arrived: m.arrived }))}
         cards={v.cards}
         initialSpotted={lastSpotted?.subjectId ?? null}
+        cameraOn={frameSource() !== "tap-only"}
+        sourceLabel={FRAME_SOURCES.find((f) => f.id === frameSource())!.label}
       />
     </main>
   );
