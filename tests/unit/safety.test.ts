@@ -16,19 +16,20 @@ const SLOTS = ["fri-eve", "sat-am", "sat-pm", "sat-eve", "sun-am", "sun-pm", "su
 
 const personArb = (i: number) =>
   fc.record({
-    ageBand: fc.constantFrom(...AGE_BANDS),
+    // weighted so groups actually form, but every band (incl. minors) appears
+    ageBand: fc.constantFrom(...AGE_BANDS, "18-24", "16-17", "18-24"),
     gender: fc.constantFrom("woman", "man", "nonbinary", null),
-    womenOnlyParty: fc.boolean(),
+    womenOnlyParty: fc.integer({ min: 0, max: 4 }).map((x) => x === 0),
     interests: fc.uniqueArray(fc.constantFrom(...CHIP_TAGS), { minLength: 5, maxLength: 8 }),
     availability: fc.uniqueArray(fc.constantFrom(...SLOTS), { minLength: 1, maxLength: 4 }),
     bucket: fc.constantFrom(...LANDMARKS.map((l) => l.id)),
-    size: fc.integer({ min: 2, max: 8 }),
+    size: fc.constantFrom(2, 3, 3, 4, 6, 8),
     joinedAt: fc.integer({ min: 0, max: 60_000 }),
     simulated: fc.boolean(),
   }).map((r) => ({ ...r, id: `u${i}` }));
 
 const worldArb = fc
-  .integer({ min: 6, max: 40 })
+  .integer({ min: 10, max: 50 })
   .chain((n) =>
     fc.tuple(
       fc.tuple(...Array.from({ length: n }, (_, i) => personArb(i))),
@@ -75,6 +76,7 @@ function assertInvariants(userIds: string[], people: Map<string, Person>) {
 
 describe("safety invariants (property-based)", () => {
   it("hold for every party formed from random queues, at every widening level and fill mode", () => {
+    let formed = 0;
     fc.assert(
       fc.property(worldArb, ([raw, blocks, fillMode]) => {
         const { people, queue } = buildWorld([raw as never, blocks]);
@@ -82,6 +84,7 @@ describe("safety invariants (property-based)", () => {
         for (let t = 0; t <= 150_000; t += 5_000) {
           const res = runTick(waiting.filter((w) => w.joinedAt <= t), people, landmarks, { now: t, fillMode, liveFloor: true });
           for (const { chosen } of res) {
+            formed++;
             assertInvariants(chosen.userIds, people);
             if (fillMode === "live") expect(chosen.userIds.every((u) => !people.get(u)!.isSimulated)).toBe(true);
             for (const id of chosen.entryIds) waiting.splice(waiting.findIndex((w) => w.entryId === id), 1);
@@ -90,6 +93,7 @@ describe("safety invariants (property-based)", () => {
       }),
       { numRuns: 120 },
     );
+    expect(formed).toBeGreaterThan(100); // the property is exercised, not vacuous
   });
 
   it("hold even when a (malicious/buggy) agent tries to pick an unsafe group", () => {
