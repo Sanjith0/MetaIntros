@@ -11,6 +11,6 @@ export async function GET(req: Request) {
   // Tunnels set x-forwarded-proto=https; a plain LAN address (http://192.168.x.x:3000) must stay http.
   const proto = req.headers.get("x-forwarded-proto")?.split(",")[0] ?? new URL(req.url).protocol.replace(":", "");
   const joinUrl = `${process.env.PUBLIC_URL ?? `${proto}://${host}`}/join`;
-  const qr = await QRCode.toString(joinUrl, { type: "svg", margin: 1, width: 220, color: { dark: "#0b1640", light: "#ffffff" } });
+  const qr = await QRCode.toString(joinUrl, { type: "svg", margin: 1, width: 220, color: { dark: "#050505", light: "#ffffff" } });
   return NextResponse.json({ ...s, joinUrl, qr });
 }

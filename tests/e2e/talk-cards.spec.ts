@@ -31,8 +31,9 @@ test("talk cards render for every party member, reachable from header + avatars"
   await pre.locator("summary").click();
   await expect(pre).toContainText("not real messages");
 
-  // deep link from a member avatar opens that member's card
+  // deep link from a member row in squad info opens that member's card
   await page.goBack();
+  await page.getByTestId("squad-info").click();
   const avatar = page.locator('[data-testid^="member-avatar-"]').nth(2);
   const id = (await avatar.getAttribute("data-testid"))!.replace("member-avatar-", "");
   await avatar.click();

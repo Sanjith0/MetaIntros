@@ -1,57 +1,63 @@
-import Link from "next/link";
-import { Archive, Clock, Swords } from "lucide-react";
-import { Avatar } from "@/components/Avatar";
+import { Users } from "lucide-react";
+import { TopBar } from "@/components/fb/TopBar";
+import { Avatar, Badge, FacePile, ListRow } from "@/components/fb";
 import { listInbox } from "@/lib/server/chats";
 import { getCurrentUserId } from "@/lib/server/session";
 import { fmtDuration, timeAgo } from "@/lib/format";
 import { now as clockNow } from "@/lib/server/clock";
 import { sweepExpiredChats } from "@/lib/server/expiry";
 
+/** Chats (behind the top bar's Messages button): Messenger-style rows, active squad chats pinned on top. */
 export default async function ChatsPage() {
   const userId = await getCurrentUserId();
   await sweepExpiredChats();
   const [rows, now] = await Promise.all([listInbox(userId), clockNow()]);
   return (
-    <div data-testid="chats-page" className="bg-white">
-      <h1 className="px-4 pt-3 text-2xl font-bold">Chats</h1>
-      <ul data-testid="inbox">
-        {rows.map((r) => (
-          <li key={r.id}>
-            <Link href={`/chats/${r.id}`} data-testid={`inbox-row-${r.id}`} data-type={r.type} className={`flex items-center gap-3 px-4 py-2.5 active:bg-fb-bg ${r.type === "squad" && !r.archived ? "bg-gradient-to-r from-[#f3efff] to-white" : ""}`}>
-              <span className="relative">
-                <Avatar name={r.avatar.name} color={r.avatar.color} size={56} />
-                {r.type === "squad" && (
-                  <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-queue-glow text-white ring-2 ring-white">
-                    <Swords size={13} />
+    <div data-testid="chats-page" className="min-h-[70dvh] bg-surface">
+      <TopBar back="/home" title="Chats" />
+      <ul data-testid="inbox" className="pt-1">
+        {rows.map((r) => {
+          const squad = r.type === "squad";
+          const others = r.members.filter((m) => m.id !== userId);
+          const snippet = `${r.lastSender ? `${r.lastSender}: ` : ""}${r.lastMessage ?? "Say hi"} · ${timeAgo(r.lastMessageAt, now)}`;
+          return (
+            <li key={r.id}>
+              <ListRow
+                href={`/chats/${r.id}`}
+                testId={`inbox-row-${r.id}`}
+                data={{ type: r.type }}
+                bold={r.unread > 0}
+                leading={
+                  <span className="relative">
+                    {squad ? <FacePile people={others.slice(0, 2)} size={40} max={2} /> : <Avatar name={r.avatar.name} color={r.avatar.color} size={56} />}
+                    {squad && (
+                      <span className="absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-surface ring-2 ring-surface" aria-hidden>
+                        <Users size={11} />
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-1.5">
-                  {r.type === "squad" && (
-                    <span data-testid="squad-badge" className="rounded bg-queue-glow px-1.5 py-px text-[10px] font-bold uppercase text-white">Squad</span>
-                  )}
-                  <span className={`truncate ${r.unread ? "font-bold" : "font-medium"}`}>{r.title}</span>
-                </span>
-                {r.type === "squad" && r.event && (
-                  <span className="block truncate text-xs text-queue-glow" data-testid="squad-event">{r.event.title}</span>
-                )}
-                <span className={`block truncate text-sm ${r.unread ? "font-semibold text-fb-text" : "text-fb-muted"}`}>
-                  {r.lastSender ? `${r.lastSender}: ` : ""}
-                  {r.lastMessage ?? "Say hi 👋"} · {timeAgo(r.lastMessageAt, now)}
-                </span>
-                {r.type === "squad" && r.expiresAt && (
-                  <span className="flex items-center gap-1 text-[11px] text-fb-muted" data-testid="squad-expiry">
-                    {r.archived ? <><Archive size={11} /> Archived</> : <><Clock size={11} /> Expires in {fmtDuration(r.expiresAt.getTime() - now.getTime())} (24h after the event)</>}
+                }
+                title={
+                  <span className="flex items-center gap-1.5">
+                    <span className="truncate">{r.title}</span>
+                    {squad && <span data-testid="squad-badge" className="shrink-0 text-meta font-normal text-muted">· Squad</span>}
                   </span>
-                )}
-              </span>
-              {r.unread > 0 && (
-                <span data-testid="unread-count" className="min-w-[20px] rounded-full bg-fb-blue px-1.5 text-center text-xs font-bold leading-5 text-white">{r.unread}</span>
-              )}
-            </Link>
-          </li>
-        ))}
+                }
+                subtitle={<span className="block truncate">{snippet}</span>}
+                meta={
+                  squad && r.expiresAt ? (
+                    <span data-testid="squad-expiry">
+                      {r.event && !r.archived && <span data-testid="squad-event">{r.event.title} · </span>}
+                      {r.archived ? "Chat ended" : `ends in ${fmtDuration(r.expiresAt.getTime() - now.getTime())}`}
+                    </span>
+                  ) : undefined
+                }
+                trailing={r.unread > 0 ? <Badge count={r.unread} tone="blue" testId="unread-count" /> : null}
+              />
+            </li>
+          );
+        })}
+        {rows.length === 0 && <li className="px-4 py-10 text-center text-muted">No chats yet.</li>}
       </ul>
     </div>
   );

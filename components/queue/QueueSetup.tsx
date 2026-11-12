@@ -2,23 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CalendarDays, Crosshair, Lock, MapPin, ShieldCheck, Sparkles, Swords, Users } from "lucide-react";
+import { CalendarDays, ChevronRight, Crosshair, Lock, MapPin, MapPinned, ShieldCheck } from "lucide-react";
+import { Button, Chip, IconCircle, ListRow } from "@/components/fb";
+import { DateLine } from "@/components/events/DateLine";
 
 type Mode = "events" | "hangout";
 
+export interface SetupEvent { id: string; title: string; startsAt: string; venue: string; isPublic: boolean }
+
 interface Props {
-  /** initial queue when not queuing from a specific event */
   mode?: Mode;
-  event: { id: string; title: string; when: string; venue: string; isPublic: boolean } | null;
+  event: SetupEvent | null;
   landmarks: { id: string; name: string; city: string }[];
+  /** "page" = /queue/start; "sheet" = inside the event page's bottom sheet */
+  variant?: "page" | "sheet";
 }
 
-type LocState =
-  | { kind: "idle" }
-  | { kind: "locating" }
-  | { kind: "manual"; reason: string };
+type LocState = { kind: "idle" } | { kind: "locating" } | { kind: "manual"; reason: string };
 
-const SIZES = [2, 3, 4, 5, 6, 7, 8];
+/**
+ * Squad sizes offered. The engine supports 2–8; the council (SYNTHESIS §5) recommended 4–6: 2 reads as a
+ * date, 3 becomes two-and-one, 7–8 splits into two conversations. Open decision, one line to change.
+ */
+export const SIZES = [4, 5, 6] as const;
+export const DEFAULT_SIZE = 5;
 
 function getPosition(timeoutMs = 6000): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
@@ -27,10 +34,15 @@ function getPosition(timeoutMs = 6000): Promise<GeolocationPosition> {
   });
 }
 
-export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: Props) {
+const ERRORS: Record<string, string> = {
+  private_event: "Queue Up only works for events at public venues.",
+  age: "Queue Up is for people 18 and over.",
+};
+
+export function QueueSetup({ event, landmarks, mode: initialMode = "events", variant = "page" }: Props) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(event ? "events" : initialMode);
-  const [size, setSize] = useState(6);
+  const [size, setSize] = useState<number>(DEFAULT_SIZE);
   const [loc, setLoc] = useState<LocState>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -41,107 +53,141 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: P
     const r = await fetch("/api/queue/join", {
       method: "POST",
       body: JSON.stringify({ mode, eventId: mode === "events" ? event?.id ?? null : null, targetSize: size, ...body }),
-    });
-    const j = await r.json();
+    }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : { error: "network" };
     if (j.ok) return router.push("/queue");
     setBusy(false);
     if (j.error === "too_far") setLoc({ kind: "manual", reason: "You look far from our Queue Up areas. Pick where you'll meet:" });
-    else setError(j.error === "private_event" ? "Queue Up is only for public venues." : "Couldn't join the queue. Try again.");
+    else setError(ERRORS[j.error] ?? "Couldn't join the queue. Try again.");
   };
 
   const findSquad = async () => {
-    // Joining triggers the browser's location permission prompt; any failure → manual pick.
+    // Joining triggers the browser's location prompt; any failure → manual pick.
     setLoc({ kind: "locating" });
     try {
       const pos = await getPosition();
       await join({ lat: pos.coords.latitude, lng: pos.coords.longitude, locationSource: "gps" });
     } catch {
-      setLoc({ kind: "manual", reason: "Location unavailable — choose your area instead:" });
+      setLoc({ kind: "manual", reason: "Location is off. Choose your area instead:" });
     }
   };
 
-  return (
-    <div data-testid="queue-setup" className="min-h-[80dvh] bg-gradient-to-b from-[#0b1640] via-[#1b1464] to-[#2a0f5c] px-4 pb-8 pt-5 text-white">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#a5b4fc]">Queue Up</p>
-      <h1 className="mt-1 text-2xl font-extrabold leading-tight" data-testid="queue-title">{event ? event.title : mode === "hangout" ? "Plan a new hangout" : "Any event this weekend"}</h1>
-      <p className="text-sm text-[#c7d2fe]">
-        {event
-          ? `${event.when} · ${event.venue}`
-          : mode === "hangout"
-            ? "No event needed: we'll match your squad, then plan a hangout at a public spot near all of you, when you're all free."
-            : "We'll match your squad, then sort you into an existing event you'll all like."}
+  if (event && !event.isPublic)
+    return (
+      <p data-testid="queue-setup" className="flex items-center gap-2 bg-surface p-4 text-muted">
+        <Lock size={16} aria-hidden /> Queue Up only works for events at public venues.
       </p>
+    );
 
-      {!event && (
-        <div className="mt-4 grid grid-cols-2 gap-1.5 rounded-xl bg-white/10 p-1" role="radiogroup" aria-label="Queue type">
-          {([
-            ["events", "Existing events", CalendarDays],
-            ["hangout", "New hangout", Sparkles],
-          ] as const).map(([m, text, Icon]) => (
-            <button key={m} type="button" role="radio" aria-checked={mode === m} data-testid={`queue-mode-${m}`} onClick={() => setMode(m)}
-              className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-bold transition ${mode === m ? "bg-white text-[#3b0f7a]" : "text-white/80"}`}>
-              <Icon size={15} /> {text}
-            </button>
-          ))}
+  return (
+    <div data-testid="queue-setup" className="bg-surface">
+      {variant === "page" && (
+        <div className="px-4 pt-3">
+          {event ? (
+            <>
+              <DateLine start={new Date(event.startsAt)} />
+              <h2 className="text-headline font-bold" data-testid="queue-title">{event.title}</h2>
+              <p className="text-meta text-muted">{event.venue}</p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-headline font-bold" data-testid="queue-title">{mode === "hangout" ? "Plan a new hangout" : "Any event this weekend"}</h2>
+              <p className="text-body text-muted">
+                {mode === "hangout"
+                  ? "We'll match your squad, then plan a hangout at a public spot near all of you, when you're all free."
+                  : "We'll match your squad, then pick an existing event you'll all like."}
+              </p>
+            </>
+          )}
+        </div>
+      )}
+      {variant === "sheet" && (
+        <h3 className="sr-only" data-testid="queue-title">{event ? event.title : mode === "hangout" ? "Plan a new hangout" : "Any event this weekend"}</h3>
+      )}
+      {variant === "sheet" && !event && (
+        <p className="px-4 text-body text-muted">
+          {mode === "hangout" ? "We'll match your squad, then plan a hangout at a public spot near all of you, when you're all free." : "We'll match your squad, then pick an existing event you'll all like."}
+        </p>
+      )}
+
+      {!event && variant === "page" && (
+        <div className="mt-3 flex gap-2 px-4" role="radiogroup" aria-label="Queue for">
+          <Chip on={mode === "events"} role="radio" aria-checked={mode === "events"} data-testid="queue-mode-events" onClick={() => setMode("events")}>
+            <CalendarDays size={16} aria-hidden /> Any event
+          </Chip>
+          <Chip on={mode === "hangout"} role="radio" aria-checked={mode === "hangout"} data-testid="queue-mode-hangout" onClick={() => setMode("hangout")}>
+            <MapPinned size={16} aria-hidden /> New hangout
+          </Chip>
         </div>
       )}
 
-      {event && !event.isPublic ? (
-        <p className="mt-6 flex items-center gap-2 rounded-xl bg-white/10 p-3"><Lock size={16} /> Queue Up is only available for public venues.</p>
-      ) : (
-        <>
-          <section className="mt-6">
-            <p className="flex items-center gap-1.5 text-sm font-semibold"><Users size={16} /> Party size</p>
-            <div className="mt-2 grid grid-cols-7 gap-1.5" role="radiogroup" aria-label="Party size">
-              {SIZES.map((n) => (
-                <button key={n} type="button" role="radio" aria-checked={size === n} data-testid={`size-${n}`} onClick={() => setSize(n)}
-                  className={`rounded-lg py-2.5 text-lg font-extrabold transition ${size === n ? "scale-105 bg-gradient-to-b from-[#60a5fa] to-[#7c3aed] shadow-[0_0_18px_rgba(124,58,237,.8)]" : "bg-white/10"}`}>
-                  {n}
-                </button>
+      <section className={variant === "page" ? "mt-4 px-4" : "mt-2 px-4"} aria-labelledby="size-label">
+        <h3 id="size-label" className="text-body font-semibold">Squad size</h3>
+        <div className="mt-2 flex gap-2" role="radiogroup" aria-labelledby="size-label">
+          {SIZES.map((n) => (
+            <Chip key={n} on={size === n} role="radio" aria-checked={size === n} data-testid={`size-${n}`} onClick={() => setSize(n)} className="min-w-14 justify-center">
+              {n} people
+            </Chip>
+          ))}
+        </div>
+        <p className="mt-1.5 text-meta text-muted">Including you. You&apos;re only matched with people who picked the same size.</p>
+      </section>
+
+      <section className="mt-4" aria-labelledby="where-label">
+        <h3 id="where-label" className="px-4 text-body font-semibold">Where you&apos;ll start from</h3>
+        {loc.kind !== "manual" ? (
+          <>
+            <p className="px-4 text-meta text-muted">We use your location once to pick a nearby area. It isn&apos;t stored or shown to anyone.</p>
+            <ListRow
+              onClick={() => setLoc({ kind: "manual", reason: "Choose your area:" })}
+              testId="choose-area"
+              leading={<IconCircle><MapPin size={18} /></IconCircle>}
+              title="Choose an area instead"
+              trailing={<ChevronRight size={20} className="text-muted" aria-hidden />}
+            />
+          </>
+        ) : (
+          <div data-testid="area-picker">
+            <p className="px-4 text-meta text-muted">{loc.reason}</p>
+            <ul className="mt-1">
+              {landmarks.map((l) => (
+                <li key={l.id}>
+                  <ListRow
+                    onClick={() => join({ landmarkId: l.id, locationSource: "manual" })}
+                    disabled={busy}
+                    testId={`area-${l.id}`}
+                    leading={<IconCircle><MapPin size={18} /></IconCircle>}
+                    title={l.name}
+                    subtitle={l.city}
+                  />
+                </li>
               ))}
-            </div>
-            <p className="mt-1 text-xs text-[#c7d2fe]">You&apos;ll only match with people who picked the same size.</p>
-          </section>
+            </ul>
+          </div>
+        )}
+      </section>
 
-          {loc.kind !== "manual" && (
-            <button type="button" disabled={busy || loc.kind === "locating"} onClick={findSquad} data-testid="find-squad"
-              className="queue-shimmer mt-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#22d3ee] via-[#6366f1] to-[#a855f7] py-4 text-xl font-extrabold shadow-[0_0_30px_rgba(99,102,241,.7)] disabled:opacity-70">
-              {loc.kind === "locating" ? <><Crosshair className="animate-spin" size={22} /> Finding your area…</> : <><Swords size={22} /> Find my squad</>}
-            </button>
-          )}
-          {loc.kind !== "manual" && (
-            <button type="button" className="mt-3 w-full text-center text-sm text-[#c7d2fe] underline" data-testid="choose-area"
-              onClick={() => setLoc({ kind: "manual", reason: "Choose your area:" })}>
-              Choose area instead
-            </button>
-          )}
+      <p className="mx-4 mt-3 flex items-start gap-2 rounded-card bg-wash p-3 text-meta text-muted">
+        <ShieldCheck size={16} className="mt-px shrink-0 text-ink" aria-hidden />
+        <span>
+          18+ only, matched within your age range{mode === "hangout" ? ", with other people planning a hangout" : ""}. Squads only meet at public places, never include anyone you&apos;ve blocked, and you can leave any time.
+        </span>
+      </p>
 
-          {loc.kind === "manual" && (
-            <section className="mt-6" data-testid="area-picker">
-              <p className="text-sm font-semibold">{loc.reason}</p>
-              <ul className="mt-2 grid grid-cols-2 gap-2">
-                {landmarks.map((l) => (
-                  <li key={l.id}>
-                    <button type="button" disabled={busy} data-testid={`area-${l.id}`} onClick={() => join({ landmarkId: l.id, locationSource: "manual" })}
-                      className="flex w-full items-center gap-1.5 rounded-xl bg-white/10 p-3 text-left text-sm hover:bg-white/20">
-                      <MapPin size={15} className="shrink-0 text-[#a5b4fc]" />
-                      <span>
-                        <span className="block font-semibold leading-tight">{l.name}</span>
-                        <span className="text-xs text-[#c7d2fe]">{l.city}</span>
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {error && <p className="mt-4 rounded-lg bg-red-500/20 p-2 text-sm" data-testid="queue-error">{error}</p>}
-          <p className="mt-6 flex items-start gap-1.5 text-xs text-[#c7d2fe]">
-            <ShieldCheck size={14} className="mt-0.5 shrink-0" />
-            Squads only include people in your age range{mode === "hangout" ? " who are also planning a hangout" : ""}, always meet at public venues, and never include anyone you&apos;ve blocked. Your location is only used to pick a nearby area.
-          </p>
-        </>
+      {error && (
+        <p role="alert" className="mx-4 mt-3 text-meta font-semibold text-badge" data-testid="queue-error">
+          {error}
+        </p>
       )}
+
+      {loc.kind !== "manual" && (
+        <div className={variant === "page" ? "sticky bottom-[calc(52px+env(safe-area-inset-bottom))] mt-4 border-t border-divider bg-surface px-4 py-3" : "px-4 pt-4 pb-1"}>
+          <Button variant="primary" size="lg" block disabled={busy || loc.kind === "locating"} onClick={findSquad} data-testid="find-squad" icon={loc.kind === "locating" ? <Crosshair size={18} className="animate-spin" /> : null}>
+            {loc.kind === "locating" ? "Finding your area…" : "Find my squad"}
+          </Button>
+        </div>
+      )}
+      {loc.kind === "manual" && <div className="h-4" />}
     </div>
   );
 }

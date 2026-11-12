@@ -5,8 +5,10 @@ import { getSetting } from "./settings";
 import { publish } from "./bus";
 import { cancelAllSims } from "./queue";
 import { nowMs } from "@/lib/clock";
+import { sweepExpiredSignups } from "./signup";
 
 export async function demoStatus() {
+  await sweepExpiredSignups(prisma); // /join promises deletion after 24h
   const [waiting, parties, liveUsers] = await Promise.all([
     prisma.queueEntry.findMany({
       where: { status: "waiting" },

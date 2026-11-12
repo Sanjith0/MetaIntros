@@ -11,7 +11,7 @@ test.beforeEach(async ({ request }) => {
 test("check-ins sync across members; party photos visible only inside the party", async ({ browser }) => {
   const a = await (await browser.newContext()).newPage(); // Me
   await gotoReady(a, "/queue/start?eventId=ev-indie-guild");
-  await a.getByTestId("size-3").click();
+  await a.getByTestId("size-4").click();
   await a.getByTestId("choose-area").click();
   await a.getByTestId("area-lm-downtown-pa").click();
   await expect(a.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
@@ -21,13 +21,14 @@ test("check-ins sync across members; party photos visible only inside the party"
 
   const b = await (await browser.newContext()).newPage(); // a squadmate's phone
   await b.request.post("/api/demo/login-as", { data: { userId: mateId } });
-  await gotoReady(b, `/chats/${party.chat.id}`);
-  await gotoReady(a, `/chats/${party.chat.id}`);
-  await expect(b.getByTestId("arrival-count")).toHaveText("0/3 here");
-  await expect(a.getByTestId("meeting-pin")).toContainText("The Guild Theatre");
+  await gotoReady(b, `/squad/${party.id}/find`);
+  await gotoReady(a, `/squad/${party.id}/find`);
+  await expect(b.getByTestId("arrival-count")).toHaveText("0 of 4 here");
+  await expect(a.getByTestId("meeting-pin")).toBeVisible();
+  await expect(a.getByTestId("find-your-party")).toContainText("The Guild Theatre");
 
   await a.getByTestId("im-here").click();
-  await expect(b.getByTestId("arrival-count")).toHaveText(/[1-3]\/3 here/); // live update on another phone
+  await expect(b.getByTestId("arrival-count")).toHaveText(/[1-4] of 4 here/); // live update on another phone
 
   await b.getByTestId("photo-input").setInputFiles({ name: "me.png", mimeType: "image/png", buffer: PNG });
   await expect(a.locator(`[data-testid="arrival-list"] img`)).toHaveCount(1);

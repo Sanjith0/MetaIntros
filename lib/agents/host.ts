@@ -33,7 +33,7 @@ export function templateWelcome(ctx: HostContext): HostWelcome {
   const top = icebreakerInterest(ctx);
   const lbl = top ? label(top.tag).toLowerCase() : "this weekend";
   return {
-    welcome: `Hey ${ctx.memberNames.join(", ")} 👋 I'm your Queue Up host. Plan: ${ctx.eventTitle}, ${ctx.when}. Meet at ${ctx.meetingSpot} 10 minutes early so you can walk in together. I'll stay quiet — @host me if you need anything.`,
+    welcome: `Hi all, I'm the Queue Up host, an AI. The plan: ${ctx.eventTitle}, ${ctx.when}. Meet at ${ctx.meetingSpot} 10 minutes early and walk in together. I'll stay out of the way. Ask me anything with @host.`,
     icebreaker: top ? `${top.count} of you are into ${lbl}. What got you into ${lbl}, and what's the best one you've been to/tried lately?` : "What are you most looking forward to this weekend?",
     interestTag: top?.tag ?? "",
   };

@@ -1,82 +1,126 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Lock, MapPin, Sparkles, Swords, Users } from "lucide-react";
-import { EventCover } from "@/components/EventCover";
-import { AvatarStack } from "@/components/Avatar";
-import { RsvpButtons } from "@/components/RsvpButtons";
-import { SquadBanner } from "@/components/SquadBanner";
+import { Flag, Globe, Lock, MapPin, MapPinned, Users } from "lucide-react";
+import { TopBar } from "@/components/fb/TopBar";
+import { FacePile, IconCircle, Section, Stack } from "@/components/fb";
+import { EventCover } from "@/components/events/EventCover";
+import { DateLine } from "@/components/events/DateLine";
+import { ActionRow } from "@/components/events/RsvpButtons";
+import { QueueEntry } from "@/components/queueup/QueueEntry";
+import { StatusCard } from "@/components/queueup/StatusCard";
+import { prisma } from "@/lib/db";
 import { getEventDetail } from "@/lib/server/events";
 import { getCurrentUserId } from "@/lib/server/session";
-import { fmtEventWhen } from "@/lib/format";
-import { getSquadForEvent } from "@/lib/server/squads";
+import { now } from "@/lib/server/clock";
+import { getStatusCard } from "@/lib/server/status";
+import { pulseLine, queuePulse } from "@/lib/server/pulse";
+
+function DetailRow({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-3 py-1.5">
+      <span className="mt-0.5 shrink-0 text-muted" aria-hidden>{icon}</span>
+      <span className="min-w-0 text-body">{children}</span>
+    </li>
+  );
+}
 
 export default async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const userId = await getCurrentUserId();
   const e = await getEventDetail(userId, id);
   if (!e) notFound();
-  const squad = await getSquadForEvent(userId, id);
   const hangout = e.kind === "hangout";
+  const [card, pulse, landmarks] = await Promise.all([
+    getStatusCard(userId, await now(), id),
+    queuePulse(id),
+    prisma.landmark.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, city: true } }),
+  ]);
+  const friendsGoing = e.friendRsvps.filter((f) => f.status === "going").length;
+
   return (
-    <div data-testid="event-detail" className="bg-white pb-6">
-      <EventCover color={e.coverColor} pattern={e.coverPattern} height={180}>
-        <Link href="/events" aria-label="Back" className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white">
-          <ArrowLeft size={20} />
-        </Link>
-      </EventCover>
-      <div className="space-y-3 p-4">
-        <p className="text-sm font-semibold uppercase text-[#e41e3f]">{fmtEventWhen(e.startsAt, e.endsAt)}</p>
-        <h1 className="text-2xl font-bold leading-tight" data-testid="event-title">{e.title}</h1>
-        <p className="flex items-start gap-2 text-fb-muted">
-          <MapPin size={18} className="mt-0.5 shrink-0" />
-          <span>
-            <span className="font-semibold text-fb-text">{e.venueName}</span>
-            <br />
-            {e.venueAddress}
-          </span>
-        </p>
-        {hangout ? (
-          <p data-testid="hangout-badge" className="flex items-start gap-2 rounded-xl bg-[#e7f3ff] p-3 text-sm text-fb-blue">
-            <Sparkles size={16} className="mt-0.5 shrink-0" />
-            <span>A new hangout Queue Up planned for your squad at a public spot near all of you. Only your squad can see it.</span>
-          </p>
-        ) : (
-          <p className="flex items-center gap-2 text-fb-muted">
-            <Users size={18} /> {e.friendsInterested} friends interested · {e.goingCount} going · hosted by {e.hostName}
-          </p>
-        )}
-        {!hangout && e.friendRsvps.length > 0 && <AvatarStack people={e.friendRsvps} />}
-
-        {squad && <SquadBanner squad={squad} />}
-
-        {!hangout && <RsvpButtons eventId={e.id} initial={e.myRsvp} />}
-
-        {hangout ? null : e.isPublicVenue ? (
-          squad ? null : (
-            <Link
-              href={`/queue/start?eventId=${e.id}`}
-              data-testid="queue-up-button"
-              className="queue-shimmer flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#1877f2] to-[#9333ea] py-3.5 text-lg font-bold text-white shadow-lg"
-            >
-              <Swords size={22} /> Queue Up — go with a squad
-            </Link>
-          )
-        ) : (
-          <p data-testid="queue-up-private" className="flex items-center gap-2 rounded-xl bg-fb-bg p-3 text-sm text-fb-muted">
-            <Lock size={16} /> Queue Up is only available for events at public venues.
-          </p>
-        )}
-
-        <section>
-          <h2 className="font-bold">About</h2>
-          <p className="mt-1 text-fb-text">{e.description}</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {e.tagsList.map((t) => (
-              <span key={t} className="rounded-full bg-fb-bg px-2.5 py-0.5 text-xs text-fb-muted">#{t}</span>
-            ))}
+    <div data-testid="event-detail">
+      <TopBar back="/events" title={e.title} />
+      <Stack>
+        <div className="bg-surface pb-3">
+          <EventCover color={e.coverColor} pattern={e.coverPattern} className="aspect-[2/1]" />
+          <div className="px-4 pt-3">
+            <DateLine start={e.startsAt} end={e.endsAt} />
+            <h1 className="mt-1 text-page font-bold" data-testid="event-title">{e.title}</h1>
+            <p className="mt-1 text-body text-muted">{e.venueName}</p>
+            {!hangout && <p className="text-meta text-muted">Event by {e.hostName}</p>}
           </div>
-        </section>
-      </div>
+          {!hangout && (
+            <div className="mt-3 px-4">
+              <ActionRow eventId={e.id} initial={e.myRsvp} />
+            </div>
+          )}
+        </div>
+
+        {hangout ? (
+          <p data-testid="hangout-badge" className="flex items-start gap-3 bg-surface px-4 py-3 text-body">
+            <IconCircle tone="on"><MapPinned size={18} /></IconCircle>
+            <span>A hangout Queue Up planned for your squad, at a public spot near all of you. Only your squad can see it.</span>
+          </p>
+        ) : null}
+
+        {card ? (
+          <StatusCard card={card} />
+        ) : hangout ? null : e.isPublicVenue ? (
+          <QueueEntry
+            pulse={pulseLine(pulse)}
+            event={{ id: e.id, title: e.title, startsAt: e.startsAt.toISOString(), venue: e.venueName, isPublic: e.isPublicVenue }}
+            landmarks={landmarks}
+          />
+        ) : (
+          <p data-testid="queue-up-private" className="flex items-center gap-2 bg-surface px-4 py-3 text-meta text-muted">
+            <Lock size={16} aria-hidden /> Queue Up only works for events at public venues.
+          </p>
+        )}
+
+        <Section title="Details">
+          <ul>
+            {!hangout && <DetailRow icon={<Users size={20} />}>{e.goingCount + e.interestedCount} people responded</DetailRow>}
+            {!hangout && <DetailRow icon={<Flag size={20} />}>Event by <span className="font-semibold">{e.hostName}</span></DetailRow>}
+            <DetailRow icon={<MapPin size={20} />}>
+              <span className="font-semibold">{e.venueName}</span>
+              <span className="block text-meta text-muted">{e.venueAddress}</span>
+            </DetailRow>
+            <DetailRow icon={hangout ? <Lock size={20} /> : <Globe size={20} />}>{hangout ? "Private · Only your squad" : e.isPublicVenue ? "Public · Anyone can see this event" : "Public event at a private venue"}</DetailRow>
+          </ul>
+          <p className="mt-2 text-body">{e.description}</p>
+          {e.tagsList.length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {e.tagsList.map((t) => (
+                <li key={t} className="rounded-btn bg-control px-2.5 py-1 text-meta font-semibold">{t.replace(/[-_]/g, " ")}</li>
+              ))}
+            </ul>
+          )}
+        </Section>
+
+        {!hangout && (
+          <Section title="Guests" className="pb-4">
+            <div className="grid grid-cols-2 text-center">
+              <div>
+                <p className="text-headline font-bold">{e.goingCount}</p>
+                <p className="text-meta text-muted">Going</p>
+              </div>
+              <div>
+                <p className="text-headline font-bold">{e.interestedCount}</p>
+                <p className="text-meta text-muted">Interested</p>
+              </div>
+            </div>
+            {e.friendRsvps.length > 0 && (
+              <div className="mt-3 flex items-center gap-2" data-testid="friend-rsvps">
+                <FacePile people={e.friendRsvps} size={32} max={5} />
+                <span className="text-meta text-muted">
+                  {e.friendRsvps[0].name.split(" ")[0]}
+                  {e.friendRsvps.length > 1 ? ` and ${e.friendRsvps.length - 1} other friend${e.friendRsvps.length > 2 ? "s" : ""}` : ""}
+                  {friendsGoing === e.friendRsvps.length ? " going" : " interested"}
+                </span>
+              </div>
+            )}
+          </Section>
+        )}
+      </Stack>
     </div>
   );
 }

@@ -16,13 +16,13 @@ test("fast-forward archives the squad chat: read-only + stay-in-touch prompt", a
   await expect(page.getByTestId("msg-host").first()).toBeVisible();
   await expect(page.getByTestId("composer")).toBeVisible();
 
-  await page.getByTestId("fast-forward").click();
+  await page.request.post("/api/demo/fast-forward"); // presenter's /demo control; the open chat archives live
   await expect(page.getByTestId("read-only")).toBeVisible();
   await expect(page.getByTestId("stay-in-touch")).toBeVisible();
   await expect(page.getByTestId("composer")).toHaveCount(0);
   await expect(page.getByTestId("chat-thread")).toHaveAttribute("data-archived", "true");
   await gotoReady(page, "/chats");
-  await expect(page.locator('[data-testid^="inbox-row-"][data-type="squad"]').getByTestId("squad-expiry")).toContainText("Archived");
+  await expect(page.locator('[data-testid^="inbox-row-"][data-type="squad"]').getByTestId("squad-expiry")).toContainText("Chat ended");
 });
 
 test("global clock: Fast-forward ends the event for everyone; Reset & reseed keeps the clock and the demo works again", async ({ page }) => {
@@ -35,7 +35,7 @@ test("global clock: Fast-forward ends the event for everyone; Reset & reseed kee
   };
   await queueForBouldering();
   await page.getByTestId("open-squad-chat").click();
-  await page.getByTestId("fast-forward").click();
+  await page.request.post("/api/demo/fast-forward"); // the presenter's /demo control
   await expect(page.getByTestId("read-only")).toBeVisible();
 
   await gotoReady(page, "/demo");
