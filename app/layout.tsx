@@ -7,6 +7,7 @@ import { Toaster, type Directory } from "@/components/live/Toaster";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 import { flag } from "@/lib/flags";
+import { unreadCount } from "@/lib/server/notifications";
 
 export const metadata: Metadata = {
   title: { default: "Party Queue (hackathon prototype)", template: "%s · Party Queue prototype" },
@@ -35,7 +36,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         )}
         <LiveProvider viewerId={viewerId}>
-          <TopBar viewer={toP(viewer)} demo={all.filter((p) => demoSet.has(p.id)).map(toP)} others={all.filter((p) => !demoSet.has(p.id)).map(toP)} />
+          <TopBar
+            viewer={toP(viewer)}
+            demo={all.filter((p) => demoSet.has(p.id)).map(toP)}
+            others={all.filter((p) => !demoSet.has(p.id)).map(toP)}
+            unread={flag("NOTIFICATIONS_LIST") ? unreadCount(viewerId) : null}
+          />
           <MobilePrototypeLabel />
           <div data-viewer={viewerId} id="main" tabIndex={-1} className="outline-none">
             {children}

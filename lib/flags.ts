@@ -120,6 +120,8 @@ const DEFAULTS = {
   STORY_MEMORY: true,
   /** F57: take back what you shared: stop sharing a fact, and every card, opener and line built from it is rewritten. */
   REVOKE_SHARING: true,
+  /** F58: notifications, kept: a bell with an unread count and /notifications, from the events only you were sent. */
+  NOTIFICATIONS_LIST: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

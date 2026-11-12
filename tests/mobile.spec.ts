@@ -49,6 +49,7 @@ test("every route fits a 390-pixel phone", async ({ browser, baseURL, request })
     ["/safety", "safety"],
     ["/how", "how"],
     ["/me", "me"],
+    ["/notifications", "notifications"],
     ["/demo", "demo"],
     ["/phones", "phones"],
     ["/evals", "evals"],

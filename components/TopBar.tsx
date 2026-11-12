@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconCalendar, IconChat, IconHome, IconSearch, IconSparkle } from "./icons";
+import { IconBell, IconCalendar, IconChat, IconHome, IconSearch, IconSparkle } from "./icons";
 import { UserSwitcher, type SwitcherPerson } from "./UserSwitcher";
 
 /** 56px white bar: logo and search at left, nav in the centre, actions at
  *  right. Our own mark; no Meta logo, wordmark or icon. */
-export function TopBar({ viewer, demo, others }: { viewer: SwitcherPerson; demo: SwitcherPerson[]; others: SwitcherPerson[] }) {
+export function TopBar({ viewer, demo, others, unread = null }: { viewer: SwitcherPerson; demo: SwitcherPerson[]; others: SwitcherPerson[]; unread?: number | null }) {
   const path = usePathname() ?? "";
   const active = path.startsWith("/chat") ? "chat" : path.startsWith("/party") ? "party" : path.startsWith("/event") ? "events" : "";
   const nav = [
@@ -45,6 +45,21 @@ export function TopBar({ viewer, demo, others }: { viewer: SwitcherPerson; demo:
       </nav>
 
       <div className="flex items-center gap-2">
+        {unread !== null && (
+          <Link
+            href="/notifications"
+            data-testid="bell"
+            aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}
+            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-btn-2)] text-[var(--color-ink)] hover:bg-[var(--color-btn-2-hover)]"
+          >
+            <IconBell size={20} />
+            {unread > 0 && !path.startsWith("/notifications") && (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--color-badge)] px-1 text-[11px] font-bold text-white" data-testid="bell-count">
+                {unread > 9 ? "9+" : unread}
+              </span>
+            )}
+          </Link>
+        )}
         <span
           data-testid="prototype-label"
           className="hidden whitespace-nowrap rounded-full border border-[var(--color-divider)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-ink-2)] sm:inline"

@@ -79,6 +79,8 @@ export interface Store {
   friendGroups: Map<string, { by: string; memberIds: string[] }>;
   /** F54: who asked to switch to plan B, per party (never shown; only the count is). */
   switchVotes: Map<string, Set<string>>;
+  /** F58: the last notification each person has seen (event seq). */
+  notifSeen: Map<string, number>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -132,6 +134,7 @@ function fresh(): Store {
     autoForgotten: new Set(),
     friendGroups: new Map(),
     switchVotes: new Map(),
+    notifSeen: new Map(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

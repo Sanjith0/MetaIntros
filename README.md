@@ -166,6 +166,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `EVENT_IMPACT` | on the Event page a party picked: "Party Queue: 1 party of five is coming tonight · 1 already here", whole parties only |
 | `STORY_MEMORY` | your agent's story says when it used what it remembers ("It used what it remembers about you: prefers quiet (remembered from Dolores Night Market).") |
 | `REVOKE_SHARING` | take back what you shared: on `/me`, **Stop sharing** a fact and every card, opener, pair and table line built from it is rewritten on everyone's phone (and in the replayable event log); agents can't use it again |
+| `NOTIFICATIONS_LIST` | notifications, kept: a bell with an unread count in the top bar and `/notifications`, built from the events only you were sent, in the toasts' words |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -182,6 +183,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `/safety` | what code enforces; block, leave, report |
 | `/stage`, `/demo`, `/phones`, `/evals`, `/how` | projector, presenter panel, real phones, the leak test, how it works |
 | `/me` | your data: everything Party Queue holds about you, where to change it, and a JSON download |
+| `/notifications` | your Party Queue notifications, kept, with the unread count on the bell |
 
 ## The rules, and where code enforces them
 
@@ -212,7 +214,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 267 unit tests (vitest)
+npm test                       # 270 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests
