@@ -11,6 +11,7 @@ import { EventCover } from "@/components/events/EventCover";
 import { DateLine } from "@/components/events/DateLine";
 import { TraceRow } from "@/components/trace/TraceList";
 import { fmtDuration } from "@/lib/format";
+import { SearchMap, type SearchAreaView } from "./SearchMap";
 
 interface Status {
   state: "idle" | "waiting" | "matched";
@@ -24,6 +25,7 @@ interface Status {
   waitedMs?: number;
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
+  searchArea?: SearchAreaView;
   partyId?: string | null;
 }
 
@@ -111,6 +113,7 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
             {fmtDuration(elapsed)}
           </p>
           <p className="text-center text-meta text-muted" aria-live="polite">{widening}</p>
+          {status.searchArea && <SearchMap area={status.searchArea} me={users[0]} />}
 
           <p className="mt-5 text-body font-semibold" data-testid="players-found">
             {found} of {n} found

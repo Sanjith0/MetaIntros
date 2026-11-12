@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/db";
 import { PartySize } from "@/lib/domain/enums";
-import { assignBucket } from "@/lib/match/buckets";
+import { assignBucket, bucketDistanceKm } from "@/lib/match/buckets";
 import { makePairScorer } from "@/lib/match/compat";
-import { playersFound, runTickAsync, type Candidate, type Proposal, type QueueItem, type QueueMode } from "@/lib/match/engine";
+import { levelFor, playersFound, queuesCompatible, runTickAsync, type Candidate, type Proposal, type QueueItem, type QueueMode } from "@/lib/match/engine";
 import { pairAllowed } from "@/lib/match/safety";
 import { loadPeople, type Person } from "@/lib/profile/load";
 import { publish } from "./bus";
@@ -14,6 +14,7 @@ import { sweepExpiredChats } from "./expiry";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { nowMs } from "@/lib/clock";
+import { PULSE_MIN } from "./pulse";
 
 // ───────────────────────── join / leave ─────────────────────────
 
@@ -103,8 +104,21 @@ export interface QueueStatus {
   waitedMs?: number;
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
+  /** Where the search reaches right now, for the queue screen's search map. Counts only, never faces. */
+  searchArea?: SearchArea;
   partyId?: string | null;
 }
+
+export interface SearchArea {
+  /** Current search radius around your area; 0 = your area only. Grows as the search widens. */
+  radiusKm: number;
+  center: { id: string; name: string; lat: number; lng: number };
+  /** Every area on the map. `waiting` is null below PULSE_MIN, so a small count never shows who's alone. */
+  areas: { id: string; name: string; lat: number; lng: number; km: number; inRange: boolean; waiting: number | null }[];
+}
+
+/** The search map shows areas up to this far away (the widest simulated search level). */
+export const SEARCH_MAP_KM = 15;
 
 export async function getQueueStatus(userId: string): Promise<QueueStatus> {
   const entry = await prisma.queueEntry.findFirst({ where: { userId, status: { in: ["waiting", "matched"] } }, orderBy: { joinedAt: "desc" }, include: { bucketLandmark: true } });
@@ -118,6 +132,7 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
   const anchor = waiting.find((w) => w.entryId === entry.id);
   const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: nowMs(), fillMode: await getFillMode() }) : { found: 1, userIds: [userId] };
   const users = await prisma.user.findMany({ where: { id: { in: pf.userIds } }, select: { id: true, name: true, avatarColor: true } });
+  const searchArea = anchor ? searchAreaFor(anchor, waiting, people, landmarks, await getFillMode()) : undefined;
   return {
     state: "waiting",
     entryId: entry.id,
@@ -130,7 +145,38 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
     waitedMs: nowMs() - entry.joinedAt.getTime(),
     found: pf.found,
     foundUsers: pf.userIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean),
+    searchArea,
   };
+}
+
+/** The areas your search reaches now, and how many compatible people wait in each (same filters as matching). */
+function searchAreaFor(
+  anchor: QueueItem,
+  waiting: QueueItem[],
+  people: Map<string, Person>,
+  landmarks: Map<string, { id: string; name: string; lat: number; lng: number }>,
+  fillMode: "simulated" | "mixed" | "live",
+): SearchArea | undefined {
+  const center = landmarks.get(anchor.bucketId);
+  if (!center) return undefined;
+  const { level } = levelFor(nowMs() - anchor.joinedAt, { fillMode });
+  const me = people.get(anchor.userId);
+  const counts = new Map<string, number>();
+  for (const c of waiting) {
+    if (c.userId === anchor.userId || !queuesCompatible(anchor, c)) continue;
+    if (c.isSimulated && fillMode === "live") continue;
+    const cp = people.get(c.userId);
+    if (!me || !cp || !pairAllowed(me, cp)) continue;
+    counts.set(c.bucketId, (counts.get(c.bucketId) ?? 0) + 1);
+  }
+  const areas = [...landmarks.values()]
+    .map((l) => ({ l, km: bucketDistanceKm(center.id, l.id, landmarks) }))
+    .filter(({ km }) => km <= SEARCH_MAP_KM)
+    .map(({ l, km }) => {
+      const n = counts.get(l.id) ?? 0;
+      return { id: l.id, name: l.name, lat: l.lat, lng: l.lng, km: Math.round(km * 10) / 10, inRange: km <= level.radiusKm, waiting: n >= PULSE_MIN ? n : null };
+    });
+  return { radiusKm: level.radiusKm, center: { id: center.id, name: center.name, lat: center.lat, lng: center.lng }, areas };
 }
 
 // ───────────────────────── tick ─────────────────────────
