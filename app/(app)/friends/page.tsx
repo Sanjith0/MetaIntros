@@ -4,6 +4,7 @@ import { Avatar, Badge, Button, ChipLink, ChipRow, IconCircle, ListRow, Section,
 import { FriendRequestActions } from "@/components/FriendRequestActions";
 import { listFriends, listQueueUpFriends, listRequests, listSuggestions } from "@/lib/server/friends";
 import { getCurrentUserId } from "@/lib/server/session";
+import { listFriendQueues } from "@/lib/server/friendQueues";
 
 const TABS = [
   { id: "friends", label: "Your friends" },
@@ -15,7 +16,8 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const tab = TABS.find((t) => t.id === sp.tab)?.id ?? "friends";
   const userId = await getCurrentUserId();
-  const [friends, requests, queueUp, suggestions] = await Promise.all([listFriends(userId), listRequests(userId), listQueueUpFriends(userId), listSuggestions(userId)]);
+  const [friends, requests, queueUp, suggestions, friendQueues] = await Promise.all([listFriends(userId), listRequests(userId), listQueueUpFriends(userId), listSuggestions(userId), listFriendQueues(userId)]);
+  const queueOf = new Map(friendQueues.map((q) => [q.friend.id, q]));
   const counts = { friends: friends.length, requests: requests.incoming.length, queueup: queueUp.length };
 
   return (
@@ -57,7 +59,18 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
             <ul data-testid="friends-list">
               {friends.map((f) => (
                 <li key={f.id} data-testid="friend-row">
-                  <ListRow leading={<Avatar name={f.name} color={f.avatarColor} size={56} />} title={f.name} subtitle={`${f.mutual} mutual friends${f.neighborhood ? ` · ${f.neighborhood}` : ""}`} />
+                  <ListRow
+                    leading={<Avatar name={f.name} color={f.avatarColor} size={56} />}
+                    title={f.name}
+                    href={queueOf.get(f.id) ? "/events#friends-queuing" : undefined}
+                    subtitle={
+                      queueOf.get(f.id) ? (
+                        <span className="font-semibold text-link" data-testid="friend-queue-status">{queueOf.get(f.id)!.label}</span>
+                      ) : (
+                        `${f.mutual} mutual friends${f.neighborhood ? ` · ${f.neighborhood}` : ""}`
+                      )
+                    }
+                  />
                 </li>
               ))}
             </ul>
