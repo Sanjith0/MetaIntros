@@ -1,0 +1,63 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Cover } from "@/components/events/Cover";
+import { IconSparkle } from "@/components/icons";
+import { QueueSheet } from "@/components/queue/QueueSheet";
+import { DEMO_PARTY } from "@/fixtures";
+import { eventWhen } from "@/lib/format";
+import { queueStatus } from "@/lib/server/queue";
+import { store } from "@/lib/server/store";
+import { currentViewerId } from "@/lib/server/viewer";
+
+export const metadata: Metadata = { title: "Find my party" };
+export const dynamic = "force-dynamic";
+
+export default async function QueuePage({ searchParams }: { searchParams: Promise<{ event?: string }> }) {
+  const { event: eventParam } = await searchParams;
+  const viewer = await currentViewerId();
+  const s = store();
+  const st = queueStatus(viewer);
+  const eventId = eventParam ?? st?.entry.eventId ?? DEMO_PARTY.entryEventId;
+  const e = s.events.get(eventId) ?? s.events.get(DEMO_PARTY.entryEventId)!;
+  const active = st && (st.entry.status === "waiting" || st.partyId) ? st : null;
+  const placeholder = DEMO_PARTY.sentences[viewer] ?? "e.g. low-key, home by eleven, under $20";
+
+  return (
+    <main className="relative min-h-[calc(100vh-56px)]">
+      {/* The event underneath, dimmed: the sheet is a layer on top of it */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <Cover hue={e.coverHue} title={e.title} className="h-[320px] w-full opacity-60" />
+        <div className="absolute inset-0 bg-[var(--color-wash)]/70" />
+      </div>
+      <div className="relative mx-auto max-w-[560px] px-4 py-8">
+        <div className="sheet-up overflow-hidden rounded-[12px] bg-white shadow-[var(--shadow-elevated)]" data-testid="queue-sheet">
+          <div className="flex items-center gap-3 bg-gradient-to-br from-[var(--color-pq)] to-[var(--color-pq-2)] px-5 py-4 text-white">
+            <IconSparkle size={22} />
+            <div className="min-w-0">
+              <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-white/80">Party Queue</div>
+              <div className="truncate text-[17px] font-bold">Find my party</div>
+            </div>
+            <Link href={`/event/${e.id}`} className="ml-auto text-[13px] font-semibold text-white/90 hover:underline">
+              Close
+            </Link>
+          </div>
+          <div className="flex items-center gap-3 border-b border-[var(--color-divider)] px-5 py-3">
+            <Cover hue={e.coverHue} title={e.title} className="h-12 w-12 shrink-0" rounded="rounded-[8px]" />
+            <div className="min-w-0">
+              <div className="text-[12px] font-semibold uppercase text-[var(--color-date)]">{eventWhen(e.date, e.start)}</div>
+              <div className="truncate text-[15px] font-semibold">{e.title}</div>
+              <div className="text-[13px] text-[var(--color-ink-2)]">Your party can pick anything near {e.landmark} that night.</div>
+            </div>
+          </div>
+          <QueueSheet
+            key={viewer}
+            eventId={e.id}
+            landmark={e.landmark}
+            placeholder={placeholder}
+            initialStatus={active ? { joinedAt: active.entry.joinedAt, inBucket: active.inBucket, needed: active.needed, partyId: active.partyId, landmark: active.entry.landmark } : null}
+          />
+        </div>
+      </div>
+    </main>
+  );
+}
