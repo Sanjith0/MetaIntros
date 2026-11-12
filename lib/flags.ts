@@ -124,6 +124,8 @@ const DEFAULTS = {
   NOTIFICATIONS_LIST: true,
   /** F59: leave quietly from the door: one plain goodbye in the chat, no reason owed, "Headed home" for the others, a text for your friend. */
   LEAVE_QUIETLY: true,
+  /** F60: consent history on /me: what you agreed to, when, and what you took back. */
+  CONSENT_HISTORY: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

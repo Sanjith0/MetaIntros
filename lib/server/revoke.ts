@@ -1,5 +1,6 @@
 import { flag } from "@/lib/flags";
 import { factById, profile, store } from "./store";
+import { logConsent } from "./consent";
 
 /**
  * Take back what you shared (F57). Approving a fact isn't forever: you can
@@ -26,6 +27,7 @@ export function revokeFact(userId: string, factId: string): RevokeResult {
   if (!f || f.ownerId !== userId) throw new Error("That isn't one of your facts.");
   if (!f.approved) throw new Error("You already stopped sharing that.");
   f.approved = false;
+  logConsent(userId, `Stopped sharing “${f.tag}”; everything built from it was rewritten.`, "withdrew");
   const s = store();
 
   // Lines in your brief built from it are withdrawn; remember them to find table lines.

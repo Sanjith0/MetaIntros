@@ -81,6 +81,8 @@ export interface Store {
   switchVotes: Map<string, Set<string>>;
   /** F58: the last notification each person has seen (event seq). */
   notifSeen: Map<string, number>;
+  /** F60: each person's consent history. */
+  consentLog: Map<string, { at: string; text: string; kind: "gave" | "withdrew" }[]>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -135,6 +137,7 @@ function fresh(): Store {
     friendGroups: new Map(),
     switchVotes: new Map(),
     notifSeen: new Map(),
+    consentLog: new Map(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

@@ -2,6 +2,7 @@ import type { Brief } from "@/contracts";
 import { PREFS } from "@/lib/agents/brief";
 import { flag } from "@/lib/flags";
 import { store } from "./store";
+import { logConsent } from "./consent";
 
 /**
  * Your agent remembers, with your OK (F39). After the night you say,
@@ -55,12 +56,14 @@ export function remember(partyId: string, userId: string, feeling: Feeling, tags
   const s = store();
   const mine = (s.memory.get(userId) ?? []).filter((m) => !keep.some((k) => k.tag === m.tag));
   s.memory.set(userId, [...mine, ...keep]);
+  if (keep.length) logConsent(userId, `Let your agent remember: ${keep.map((k) => LABEL[k.tag] ?? k.tag).join(", ")} (from ${keep[0]!.from}).`);
   return memoryOf(userId);
 }
 
 export const memoryOf = (userId: string): Remembered[] => [...(store().memory.get(userId) ?? [])];
 
 export function forgetMemory(userId: string) {
+  if (store().memory.has(userId)) logConsent(userId, "Made your agent forget what it remembered.", "withdrew");
   store().memory.delete(userId);
 }
 

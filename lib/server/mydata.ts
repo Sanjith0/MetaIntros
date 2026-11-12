@@ -1,4 +1,6 @@
 import { ruleLabel } from "./secret";
+import { flag } from "@/lib/flags";
+import { consentHistory } from "./consent";
 import { LABEL, memoryOf } from "./memory";
 import { profile, store } from "./store";
 
@@ -77,6 +79,16 @@ export function myData(userId: string): { userId: string; name: string; sections
       manage: { label: "Safety", href: "/safety" },
       items: [...me.blocks.map((id) => `Blocked ${profile(id).firstName}`), ...s.reports.filter((r) => r.reporterId === userId).map((r) => `Reported ${profile(r.subjectId).firstName} (${r.reason})`)],
     },
+    ...(flag("CONSENT_HISTORY")
+      ? [
+          {
+            id: "consents",
+            title: "Your consent history",
+            manage: { label: "Take something back", href: "/me#sharing" },
+            items: consentHistory(userId).map((e) => `${e.kind === "withdrew" ? "Took back" : "Agreed"} · ${e.text}`),
+          },
+        ]
+      : []),
     {
       id: "messages",
       title: "Messages you sent",

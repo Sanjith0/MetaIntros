@@ -32,7 +32,7 @@ describe("your data (F40)", () => {
     submitPicks(pid, "maya", ["dev"]);
     remember(pid, "maya", "loud", ["quiet"]);
     const d = myData("maya");
-    expect(d.sections.map((s) => s.id)).toEqual(["profile", "brief", "queue", "parties", "memory", "picks", "safety", "messages"]);
+    expect(d.sections.map((s) => s.id)).toEqual(["profile", "brief", "queue", "parties", "memory", "picks", "safety", "consents", "messages"]);
     expect(section(d, "brief")).toEqual(expect.arrayContaining([`Sentence: “${D.sentences.maya}”`, "Rule: Done by 11 PM (“out by eleven”)", "Rule: $20 or less (“under twenty bucks”)"]));
     expect(section(d, "parties")).toEqual([expect.stringMatching(/^Dolores Night Market \(locked\): 7 private agent decisions, 3 prompts, a receipt$/)]);
     expect(section(d, "memory")).toEqual(["prefers quiet (from Dolores Night Market)"]);

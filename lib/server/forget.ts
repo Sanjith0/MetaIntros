@@ -1,6 +1,7 @@
 import { flag } from "@/lib/flags";
 import { chatExpiry, demoNow } from "./clock";
 import { profile, store } from "./store";
+import { logConsent } from "./consent";
 
 /**
  * "Forget my night". After the plan is set (or no plan was found), a member
@@ -123,6 +124,7 @@ export function forgetNight(partyId: string, userId: string): ForgetResult {
   count("private projector notes", traces);
 
   s.forgotten.add(`${partyId}:${userId}`);
+  logConsent(userId, `Your private data from ${party.planId ? (s.plans.get(party.planId)?.title ?? "the night") : "the night"} was deleted.`, "withdrew");
   const scan = scanStore(phrases);
   return { partyId, removed, checked: scan.checked, found: scan.found };
 }
@@ -173,6 +175,8 @@ export function setKeepNight(partyId: string, userId: string, keep: boolean) {
   const party = store().parties.get(partyId);
   if (!party || !party.memberIds.includes(userId)) throw new Error("Not your party.");
   const k = `${partyId}:${userId}`;
+  const title = party.planId ? (store().plans.get(party.planId)?.title ?? "the night") : "the night";
+  logConsent(userId, keep ? `Chose to keep your private data from ${title} after the night.` : `Chose to have your private data from ${title} deleted after the night.`, keep ? "gave" : "withdrew");
   if (keep) store().keepNight.add(k);
   else store().keepNight.delete(k);
 }

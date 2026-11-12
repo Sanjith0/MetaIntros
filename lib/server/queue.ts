@@ -10,6 +10,7 @@ import { areFriends } from "@/lib/graph";
 import { publish } from "./bus";
 import { isIsolated, nextId, nowIso, outsideIsolation, profile, store } from "./store";
 import { trace } from "./trace";
+import { logConsent } from "./consent";
 
 export interface JoinInput {
   userId: string;
@@ -112,6 +113,10 @@ export async function joinQueue(input: JoinInput): Promise<JoinResult> {
     status: "waiting",
   };
   s.queue.push(entry);
+  {
+    const lines = built.brief.shareable.filter((l) => l.approved).length;
+    logConsent(input.userId, `Queued for ${event.title}: ${entry.consentBridges ? "your party may see how you're tied (a friend in common or a small Group)" : "how you're tied stays hidden"}; your agent may share ${lines} ${lines === 1 ? "line" : "lines"} you approved.`);
+  }
   publish("queue.joined", { entryId: entry.id, userId: entry.userId, eventId: entry.eventId, landmark: entry.landmark }, [entry.userId]);
   // Duo: if the friend hasn't joined with us yet, invite them.
   if (entry.duoWith) {

@@ -27,7 +27,7 @@ export default async function MyDataPage() {
         </a>
       </div>
       {flag("REVOKE_SHARING") && (
-        <section className="rounded-[12px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="data-sharing">
+        <section id="sharing" className="scroll-mt-16 rounded-[12px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="data-sharing">
           <h2 className="text-[17px] font-bold">What you share, and taking it back</h2>
           <p className="text-[13px] text-[var(--color-ink-2)]">
             Stop sharing a fact and every card, opener and line built from it is rewritten, on everyone&apos;s phone. Agents can&apos;t use it again.
