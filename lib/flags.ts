@@ -40,6 +40,8 @@ const DEFAULTS = {
   VOICE_SENTENCE: false,
   /** F17: skip link, MATCH FOUND focus and Escape, chat send retry. (Contrast and labels are always on.) */
   UX_STATES: true,
+  /** F18: /how: the architecture diagram and the guarantees, for judges. */
+  HOW_PAGE: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
