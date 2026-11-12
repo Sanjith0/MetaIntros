@@ -23,6 +23,8 @@ const DEFAULTS = {
   CHAT_LIFECYCLE: true,
   /** F9: a glasses (heads-up) view on the same Spotted contract, and a recorded-clip frame source labelled as recorded. */
   GLASSES_VIEW: true,
+  /** F10: run it back: a two-person chat per mutual pair, the same "queue again" card for everyone without a match, standing parties. */
+  RUN_IT_BACK_PLUS: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

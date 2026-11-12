@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Avatar } from "@/components/Avatar";
 import { IconLock, IconSparkle } from "@/components/icons";
@@ -13,7 +15,36 @@ interface Member {
 }
 
 /** Private picks; only mutual picks are shown, one pair at a time. */
-export function RunItBack({ partyId, viewerId, members, initial }: { partyId: string; viewerId: string; members: Member[]; initial: { submitted: boolean; myPicks: string[]; mutual: string[] } }) {
+interface QueueAgain {
+  title: string;
+  body: string;
+  cta: string;
+  href: string;
+}
+interface View {
+  submitted: boolean;
+  myPicks: string[];
+  mutual: string[];
+  standing?: { memberIds: string[]; chatId: string } | null;
+  queueAgain?: QueueAgain | null;
+}
+
+export function RunItBack({ partyId, viewerId, members, initial }: { partyId: string; viewerId: string; members: Member[]; initial: View }) {
+  const router = useRouter();
+  const [standing, setStanding] = useState(initial.standing ?? null);
+  const [queueAgain, setQueueAgain] = useState<QueueAgain | null>(initial.queueAgain ?? null);
+  const refresh = async () => {
+    const r = await fetch(`/api/runitback?partyId=${partyId}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const { view } = (await r.json()) as { view: View };
+    setMutual(view.mutual);
+    setStanding(view.standing ?? null);
+    setQueueAgain(view.queueAgain ?? null);
+  };
+  const openChat = async (otherId: string) => {
+    const r = await fetch("/api/runitback/chat", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ partyId, otherId }) });
+    if (r.ok) router.push(`/chat/${((await r.json()) as { chatId: string }).chatId}`);
+  };
   const [picks, setPicks] = useState<Set<string>>(new Set(initial.myPicks));
   const [submitted, setSubmitted] = useState(initial.submitted);
   const [mutual, setMutual] = useState<string[]>(initial.mutual);
@@ -24,6 +55,7 @@ export function RunItBack({ partyId, viewerId, members, initial }: { partyId: st
     if (e.type !== "runitback.mutual" || e.payload.partyId !== partyId) return;
     const other = e.payload.a === viewerId ? e.payload.b : e.payload.a;
     setMutual((m) => (m.includes(other) ? m : [...m, other]));
+    void refresh();
   });
 
   // Reveal pair by pair.
@@ -38,8 +70,10 @@ export function RunItBack({ partyId, viewerId, members, initial }: { partyId: st
     const res = await fetch("/api/runitback", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ partyId, pickedIds: [...picks] }) });
     setSaving(false);
     if (!res.ok) return;
-    const { view } = (await res.json()) as { view: { mutual: string[] } };
+    const { view } = (await res.json()) as { view: View };
     setMutual(view.mutual);
+    setStanding(view.standing ?? null);
+    setQueueAgain(view.queueAgain ?? null);
     setSubmitted(true);
   };
 
@@ -95,20 +129,50 @@ export function RunItBack({ partyId, viewerId, members, initial }: { partyId: st
           const m = byId[id];
           if (!m) return null;
           return (
-            <li key={id} data-testid={`mutual-${id}`} className="match-pop flex items-center gap-3 rounded-[12px] bg-gradient-to-br from-[var(--color-pq)] to-[var(--color-pq-2)] p-4 text-white">
+            <li key={id} data-testid={`mutual-${id}`} className="match-pop flex flex-wrap items-center gap-3 rounded-[12px] bg-gradient-to-br from-[var(--color-pq)] to-[var(--color-pq-2)] p-4 text-white">
               <IconSparkle />
               <Avatar name={m.name} hue={m.hue} size={48} />
-              <div>
+              <div className="min-w-0 flex-1">
                 <div className="text-[17px] font-bold">You and {m.firstName} both said yes</div>
                 <div className="text-[13px] text-white/85">Run it back: plan something together.</div>
               </div>
+              <button onClick={() => openChat(id)} data-testid={`message-${id}`} className="press w-full shrink-0 rounded-[6px] bg-white px-3 py-1.5 text-[13px] font-semibold text-[var(--color-pq)] sm:w-auto">
+                Message {m.firstName}
+              </button>
             </li>
           );
         })}
       </ul>
+      {revealed >= mutual.length && standing && (
+        <div className="match-pop mt-3 rounded-[12px] border-2 border-[var(--color-pq)] bg-[var(--color-pq-soft)] p-4" data-testid="standing-party">
+          <div className="text-[12px] font-bold uppercase tracking-wide text-[var(--color-pq)]">Standing party</div>
+          <div className="mt-1 flex -space-x-2">
+            {standing.memberIds.map((id) => byId[id] && <Avatar key={id} name={byId[id]!.name} hue={byId[id]!.hue} size={36} ring />)}
+          </div>
+          <div className="mt-2 text-[15px] font-semibold">
+            {standing.memberIds
+              .filter((id) => id !== viewerId)
+              .map((id) => byId[id]?.firstName)
+              .join(", ")}{" "}
+            and you all picked each other.
+          </div>
+          <Link href={`/chat/${standing.chatId}`} className="press mt-2 inline-block rounded-[6px] bg-[var(--color-pq)] px-3 py-1.5 text-[14px] font-semibold text-white">
+            Open the standing chat
+          </Link>
+        </div>
+      )}
+      {revealed >= mutual.length && queueAgain && (
+        <div className="mt-3 rounded-[12px] bg-[var(--color-wash)] p-4" data-testid="queue-again">
+          <div className="text-[17px] font-bold">{queueAgain.title}</div>
+          <p className="mt-1 text-[14px] text-[var(--color-ink-2)]">{queueAgain.body}</p>
+          <Link href={queueAgain.href} className="press mt-3 inline-block rounded-[6px] bg-[var(--color-pq)] px-3 py-1.5 text-[14px] font-semibold text-white">
+            {queueAgain.cta}
+          </Link>
+        </div>
+      )}
       {revealed >= mutual.length && (
         <p className="mt-4 text-[13px] text-[var(--color-ink-2)]" data-testid="runitback-done">
-          {mutual.length === 0 ? "No mutual picks yet. If someone you picked picks you back, you'll both get a notification." : "That's everyone so far. More can appear as others save their picks."}
+          {mutual.length === 0 ? "If someone you picked picks you back later, you'll both get a notification." : "That's everyone so far. More can appear as others save their picks."}
         </p>
       )}
       <button onClick={() => (setSubmitted(false), setRevealed(0))} className="mt-3 text-[13px] font-semibold text-[var(--color-link)] hover:underline">

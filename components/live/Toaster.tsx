@@ -92,6 +92,7 @@ export function Toaster({ people }: { people: Directory }) {
         push({ id: e.id, title: "Party Queue", body: `${people[e.payload.userId]?.firstName ?? "Someone"} just arrived.`, href: "/door", layer: true, who: e.payload.userId });
         break;
       case "runitback.mutual": {
+        if (pathname?.startsWith("/runitback")) return; // the page reveals it itself
         const other = e.payload.a === viewerId ? e.payload.b : e.payload.a;
         push({ id: e.id, title: "Run it back", body: `You and ${people[other]?.firstName ?? "someone"} both said yes.`, href: "/runitback", layer: true, who: other });
         break;
