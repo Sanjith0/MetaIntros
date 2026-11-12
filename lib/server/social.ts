@@ -1,6 +1,7 @@
 import type { ChatMessage, EventItem, Party } from "@/contracts";
 import { friendsOf } from "@/lib/graph";
 import { publish } from "./bus";
+import { demoNow } from "./clock";
 import { nextId, nowIso, profile, store, type Rsvp } from "./store";
 
 /* ------------------------------- RSVPs -------------------------------- */
@@ -37,7 +38,9 @@ export interface EventView {
 }
 
 export function partyForViewer(viewerId: string): Party | null {
-  const parties = [...store().parties.values()].filter((p) => p.memberIds.includes(viewerId));
+  const s = store();
+  // A party someone left before the lock is gone for everyone in it.
+  const parties = [...s.parties.values()].filter((p) => p.memberIds.includes(viewerId) && !s.operator.cancelled.has(p.id));
   return parties.at(-1) ?? null;
 }
 
@@ -78,13 +81,24 @@ export function chatsFor(viewerId: string) {
     .sort((a, b) => (b.last?.at ?? "").localeCompare(a.last?.at ?? ""));
 }
 
+/** After the event, a party chat closes: its messages are deleted and it is read-only. */
+export function expireIfDue(chatId: string): boolean {
+  const s = store();
+  const chat = s.chats.get(chatId);
+  if (!chat?.expiresAt || demoNow() < Date.parse(chat.expiresAt)) return false;
+  s.messages = s.messages.filter((m) => m.chatId !== chatId);
+  chat.pinnedMessageId = null;
+  return true;
+}
+
 export function chatView(chatId: string, viewerId: string) {
   const s = store();
   const chat = s.chats.get(chatId);
   if (!chat || !chat.memberIds.includes(viewerId)) return null;
+  if (expireIfDue(chatId)) return { chat, messages: [], pinned: null, members: chat.memberIds.map(person), expired: true };
   const messages = s.messages.filter((m) => m.chatId === chatId);
   const pinned = chat.pinnedMessageId ? messages.find((m) => m.id === chat.pinnedMessageId) ?? null : null;
-  return { chat, messages, pinned, members: chat.memberIds.map(person) };
+  return { chat, messages, pinned, members: chat.memberIds.map(person), expired: false };
 }
 
 export function postMessage(
@@ -98,6 +112,7 @@ export function postMessage(
   const chat = s.chats.get(chatId);
   if (!chat) throw new Error("unknown chat");
   if (senderId && !chat.memberIds.includes(senderId)) throw new Error("not a member");
+  if (expireIfDue(chatId)) throw new Error("This chat closed after the event.");
   const msg: ChatMessage = { id: nextId("m"), chatId, senderId, kind, text, sourceIds, at: nowIso() };
   s.messages.push(msg);
   if (kind === "pinned") chat.pinnedMessageId = msg.id;

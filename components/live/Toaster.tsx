@@ -65,6 +65,10 @@ export function Toaster({ people }: { people: Directory }) {
         });
         break;
       }
+      case "party.dissolved":
+        push({ id: e.id, title: "Party Queue", body: "Your party changed before the plan was set. Nobody was named. You're back at the front of the queue.", href: "/queue", layer: true });
+        router.refresh();
+        break;
       case "party.forming":
         push({ id: e.id, title: "Party Queue", body: "Your party of five is forming. Your agents are talking it over.", href: "/party", layer: true });
         break;
@@ -83,7 +87,7 @@ export function Toaster({ people }: { people: Directory }) {
         break;
       }
       case "member.arrived":
-        if (e.payload.userId === viewerId) return;
+        if (e.payload.userId === viewerId || pathname?.startsWith("/chat")) return; // the chat shows the ping itself
         push({ id: e.id, title: "Party Queue", body: `${people[e.payload.userId]?.firstName ?? "Someone"} just arrived.`, href: "/door", layer: true, who: e.payload.userId });
         break;
       case "runitback.mutual": {
@@ -102,7 +106,7 @@ export function Toaster({ people }: { people: Directory }) {
 
   return (
     <>
-      <div className="pointer-events-none fixed bottom-4 left-4 z-50 flex w-[328px] max-w-[calc(100vw-32px)] flex-col gap-2" aria-live="polite">
+      <div className="pointer-events-none fixed left-4 top-[88px] z-50 flex w-[328px] max-w-[calc(100vw-32px)] flex-col gap-2 sm:bottom-4 sm:top-auto" aria-live="polite">
         {toasts.map((t) => (
           <div
             key={t.id}
@@ -112,7 +116,7 @@ export function Toaster({ people }: { people: Directory }) {
             {t.who && people[t.who] ? <Avatar name={people[t.who]!.name} hue={people[t.who]!.hue} size={40} /> : <span className="mt-0.5 text-[var(--color-pq)]"><IconSparkle /></span>}
             <div className="min-w-0 flex-1">
               <div className="text-[15px] font-semibold">{t.title}</div>
-              <div className="line-clamp-2 text-[13px] text-[var(--color-ink-2)]">{t.body}</div>
+              <div className="line-clamp-3 text-[13px] text-[var(--color-ink-2)]">{t.body}</div>
               {t.href && (
                 <Link href={t.href} className="text-[13px] font-semibold text-[#216fdb] hover:underline">
                   Open

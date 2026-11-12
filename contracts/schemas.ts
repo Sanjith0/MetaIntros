@@ -395,5 +395,7 @@ export const Chat = z.object({
   title: z.string(),
   memberIds: z.array(Id),
   pinnedMessageId: Id.nullable(),
+  /** Party chats close after the event; their messages are deleted then. */
+  expiresAt: IsoTime.nullable().default(null),
 });
 export type Chat = z.infer<typeof Chat>;

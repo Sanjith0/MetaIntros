@@ -8,6 +8,16 @@ import { timeAgo } from "@/lib/format";
 import { chatsFor, chatView } from "@/lib/server/social";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
+import { flag } from "@/lib/flags";
+
+function closesLabel(iso: string): string {
+  const d = new Date(iso);
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  // Shown in Pacific time, where the demo night happens.
+  const pt = new Date(d.getTime() - 8 * 3600_000);
+  const h = pt.getUTCHours();
+  return `${days[pt.getUTCDay()]} ${h % 12 === 0 ? 12 : h % 12} ${h >= 12 ? "PM" : "AM"}`;
+}
 
 export const metadata: Metadata = { title: "Chats" };
 export const dynamic = "force-dynamic";
@@ -18,6 +28,8 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
   const view = chatView(id, viewer);
   if (!view) notFound();
   const list = chatsFor(viewer);
+  const party = view.chat.partyId ? store().parties.get(view.chat.partyId) : undefined;
+  const canPing = flag("CHAT_LIFECYCLE") && party?.status === "locked" && !(store().arrivals.get(party.id)?.has(viewer) ?? false);
   const s = store();
   const people = Object.fromEntries([...s.profiles.values()].map((p) => [p.id, { name: p.name, firstName: p.firstName, hue: p.avatarHue }]));
 
@@ -55,9 +67,14 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
             <div className="truncate text-[17px] font-semibold" data-testid="chat-title">
               {view.chat.title}
             </div>
-            <div className="flex items-center gap-2 text-[13px] text-[var(--color-ink-2)]">
-              {view.members.length} members
-              {view.chat.partyId && <span className="rounded bg-[var(--color-pq-soft)] px-1.5 py-0.5 text-[11px] font-semibold uppercase text-[var(--color-pq)]">Party Queue</span>}
+            <div className="flex flex-wrap items-center gap-x-2 text-[13px] text-[var(--color-ink-2)]">
+              <span className="whitespace-nowrap">{view.members.length} members</span>
+              {view.chat.expiresAt && !view.expired && (
+                <span className="whitespace-nowrap" data-testid="chat-expiry">
+                  · closes {closesLabel(view.chat.expiresAt)}
+                </span>
+              )}
+              {view.chat.partyId && <span className="hidden whitespace-nowrap rounded bg-[var(--color-pq-soft)] px-1.5 py-0.5 text-[11px] font-semibold uppercase text-[var(--color-pq)] sm:inline">Party Queue</span>}
             </div>
           </div>
           <div className="hidden -space-x-2 sm:flex">
@@ -66,7 +83,25 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
             ))}
           </div>
         </header>
-        <ChatThread key={`${id}-${viewer}`} chatId={id} viewerId={viewer} initial={view.messages} pinned={view.pinned} people={people} />
+        {view.expired ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 bg-white p-8 text-center" data-testid="chat-expired">
+            <div className="text-[17px] font-semibold">This chat closed after the event</div>
+            <p className="max-w-[360px] text-[14px] text-[var(--color-ink-2)]">Party chats close 12 hours after the night ends, and their messages are deleted. If you'd like to see someone again, say so privately in Run it back.</p>
+            <Link href="/runitback" className="press mt-2 rounded-[6px] bg-[var(--color-pq)] px-4 py-2 text-[15px] font-semibold text-white">
+              Run it back
+            </Link>
+          </div>
+        ) : (
+          <ChatThread
+            key={`${id}-${viewer}`}
+            chatId={id}
+            viewerId={viewer}
+            initial={view.messages}
+            pinned={view.pinned}
+            people={people}
+            hereFor={canPing ? view.chat.partyId : null}
+          />
+        )}
       </section>
     </main>
   );

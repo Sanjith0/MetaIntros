@@ -21,6 +21,7 @@ export const EVENT_TYPES = [
   "queue.invite",
   "queue.tick",
   "party.forming",
+  "party.dissolved",
   "agent.verdict",
   "table.message",
   "pair.message",
@@ -71,6 +72,13 @@ export const PlanUnavailablePayload = z
   })
   .strict();
 
+/** Someone left before the plan was set. Deliberately strict: it never says who. */
+export const PartyDissolvedPayload = z
+  .object({
+    partyId: Id,
+  })
+  .strict();
+
 export const PlanLockedPayload = z.object({
   partyId: Id,
   planId: Id,
@@ -100,6 +108,7 @@ export const PAYLOADS = {
   "queue.invite": QueueInvitePayload,
   "queue.tick": QueueTickPayload,
   "party.forming": PartyFormingPayload,
+  "party.dissolved": PartyDissolvedPayload,
   "agent.verdict": Verdict,
   "table.message": TableMessage,
   "pair.message": PairMessage,
@@ -137,6 +146,7 @@ export const PQEvent = z.discriminatedUnion("type", [
   envelope("queue.invite"),
   envelope("queue.tick"),
   envelope("party.forming"),
+  envelope("party.dissolved"),
   envelope("agent.verdict"),
   envelope("table.message"),
   envelope("pair.message"),

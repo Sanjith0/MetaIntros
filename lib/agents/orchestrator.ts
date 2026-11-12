@@ -7,6 +7,8 @@ import { trace } from "@/lib/server/trace";
 import { bridgeLine, consentedBridges, openerText, runPairTalk, type PairResult } from "./pair";
 import { runTableTalk, type TableOptions, type TableResult } from "./table";
 import { pairKey } from "@/lib/graph";
+import { flag } from "@/lib/flags";
+import { chatExpiry } from "@/lib/server/clock";
 
 export interface RunOptions extends TableOptions {}
 
@@ -21,6 +23,7 @@ export function runParty(partyId: string, opts: RunOptions = {}): Promise<void> 
   if (existing) return existing;
   const p = (async () => {
     const [table, pairs] = await Promise.all([runTableTalk(partyId, opts), runPairTalk(partyId, { paceMs: opts.paceMs })]);
+    if (store().operator.cancelled.has(partyId)) return; // someone left before the lock
     if (!table) {
       trace(partyId, "shared", "judge", null, "No match", "No plan worked for everyone. Members stay in the queue.");
       return;
@@ -76,7 +79,14 @@ export function finalize(partyId: string, table: TableResult, pairs: PairResult[
 
   // The group chat: plan pinned, one opener per person.
   const chatId = party.chatId;
-  s.chats.set(chatId, { id: chatId, partyId: party.id, title: `${plan.title} · party of 5`, memberIds: [...party.memberIds], pinnedMessageId: null });
+  s.chats.set(chatId, {
+    id: chatId,
+    partyId: party.id,
+    title: `${plan.title} · party of 5`,
+    memberIds: [...party.memberIds],
+    pinnedMessageId: null,
+    expiresAt: flag("CHAT_LIFECYCLE") ? chatExpiry(plan.date, plan.start, plan.end) : null,
+  });
   postMessage(chatId, null, "Party Queue made this chat for your party of five.", "system");
   postMessage(
     chatId,

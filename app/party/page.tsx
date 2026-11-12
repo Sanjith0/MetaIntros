@@ -5,6 +5,7 @@ import { Cover } from "@/components/events/Cover";
 import { IconChat, IconDoor, IconLock, IconPin, IconSparkle } from "@/components/icons";
 import { PartyLive } from "@/components/party/PartyLive";
 import { SecretPanel } from "@/components/party/SecretPanel";
+import { LeaveParty } from "@/components/party/LeaveParty";
 import { flag } from "@/lib/flags";
 import { secretView } from "@/lib/server/secret";
 import { clock12, dayLabel, price } from "@/lib/format";
@@ -16,7 +17,8 @@ import { queueStatus } from "@/lib/server/queue";
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
 
-export default async function PartyPage() {
+export default async function PartyPage({ searchParams }: { searchParams: Promise<{ left?: string }> }) {
+  const { left } = await searchParams;
   const viewer = await currentViewerId();
   const v = memberPartyViewForViewer(viewer);
   const s = store();
@@ -28,7 +30,10 @@ export default async function PartyPage() {
         <PartyLive />
         <div className="rounded-[12px] bg-white p-6 text-center shadow-[var(--shadow-card)]" data-testid="no-party">
           <IconSparkle size={28} className="mx-auto text-[var(--color-pq)]" />
-          <h1 className="mt-2 text-[20px] font-bold">{q?.entry.status === "waiting" ? "You're in the queue" : "No party yet"}</h1>
+          <h1 className="mt-2 text-[20px] font-bold" data-testid="no-party-title">
+            {left ? "You left the party" : q?.entry.status === "waiting" ? "You're in the queue" : "No party yet"}
+          </h1>
+          {left && <p className="mt-1 text-[15px] text-[var(--color-ink-2)]">The other four are back at the front of the queue. They weren't told who left.</p>}
           <p className="mt-1 text-[15px] text-[var(--color-ink-2)]">
             {q?.entry.status === "waiting" ? `${q.inBucket} of 5 near ${q.entry.landmark}. We'll notify you when your party is set.` : "Open any event and tap Find my party."}
           </p>
@@ -93,6 +98,11 @@ export default async function PartyPage() {
                   {v.party.status === "failed" ? "No plan worked tonight" : "Your agents are talking"}
                 </h1>
                 <p className="text-[15px] text-[var(--color-ink-2)]">Five agents, one table. Code locks the plan the moment all five sign.</p>
+                {flag("CHAT_LIFECYCLE") && v.party.status !== "failed" && (
+                  <div className="mt-3">
+                    <LeaveParty partyId={v.party.id} />
+                  </div>
+                )}
               </>
             )}
           </div>

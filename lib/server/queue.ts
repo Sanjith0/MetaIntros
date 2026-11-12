@@ -108,7 +108,12 @@ export function queueStatus(userId: string) {
 
 /* -------------------------------- forming -------------------------------- */
 
-async function tryForm(mustInclude: string, startTalk: boolean): Promise<string | null> {
+/** Try to form a party from whoever is waiting (after someone leaves, for example). */
+export async function reform(startTalk = true): Promise<string | null> {
+  return tryForm(undefined, startTalk);
+}
+
+async function tryForm(mustInclude: string | undefined, startTalk: boolean): Promise<string | null> {
   const s = store();
   const cands: Candidate[] = s.queue.filter((e) => e.status === "waiting").map((entry) => ({ entry, profile: profile(entry.userId) }));
   const formed = formParty(cands, { mustInclude, nameOf: (id) => profile(id).name });

@@ -209,6 +209,7 @@ export async function runPairTalk(partyId: string, opts: { paceMs?: number } = {
   for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) pairs.push([ids[i]!, ids[j]!]);
   const results: PairResult[] = [];
   for (let i = 0; i < pairs.length; i++) {
+    if (store().operator.cancelled.has(partyId)) break; // someone left before the lock
     // Fast-forward: run the remaining pairs at once.
     if (ff()) {
       results.push(...(await Promise.all(pairs.slice(i).map(([a, b]) => onePair(party, a, b, pace)))));

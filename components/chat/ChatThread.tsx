@@ -17,13 +17,21 @@ export function ChatThread({
   initial,
   pinned: pinnedInitial,
   people,
+  hereFor = null,
 }: {
   chatId: string;
   viewerId: string;
   initial: ChatMessage[];
   pinned: ChatMessage | null;
   people: People;
+  /** Party id: shows an "I'm here" button until this person has arrived. */
+  hereFor?: string | null;
 }) {
+  const [showHere, setShowHere] = useState(!!hereFor);
+  const imHere = async () => {
+    setShowHere(false);
+    await fetch("/api/door/arrive", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ partyId: hereFor }) });
+  };
   const [messages, setMessages] = useState(initial);
   const [pinned, setPinned] = useState(pinnedInitial);
   const [draft, setDraft] = useState("");
@@ -123,6 +131,13 @@ export function ChatThread({
         <div ref={end} />
       </div>
 
+      {showHere && (
+        <div className="flex justify-center border-t border-[var(--color-divider)] bg-white pt-2">
+          <button data-testid="chat-im-here" onClick={imHere} className="press rounded-full bg-[var(--color-pq-soft)] px-4 py-1.5 text-[14px] font-semibold text-[var(--color-pq)]">
+            📍 I'm here
+          </button>
+        </div>
+      )}
       <form
         className="flex items-center gap-2 border-t border-[var(--color-divider)] bg-white px-3 py-2"
         onSubmit={(e) => {

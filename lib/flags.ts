@@ -19,6 +19,8 @@ const DEFAULTS = {
   DUO_QUEUE: true,
   /** F7: bridge lines say a tie exists without naming a third person who never opted in. */
   BRIDGE_PRIVACY: true,
+  /** F8: chat lifecycle: I'm here pings, leaving before the lock without attribution, expiry after the event. */
+  CHAT_LIFECYCLE: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

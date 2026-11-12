@@ -8,6 +8,7 @@ export const SAMPLE_PAYLOADS: { [T in EventType]: PayloadOf<T> } = {
   "queue.invite": { fromId: "zoe", toId: "sam", eventId: "evt-rooftop" },
   "queue.tick": { userId: "maya", waitingSeconds: 12, inBucket: 3, needed: 2 },
   "party.forming": { partyId: "p-1", memberIds: ["maya", "dev", "ana", "kai", "zoe"], landmark: "Dolores Park" },
+  "party.dissolved": { partyId: "p-1" },
   "agent.verdict": {
     partyId: "p-1",
     ownerId: "maya",

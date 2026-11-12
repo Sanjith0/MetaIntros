@@ -148,6 +148,15 @@ export function DemoPanel({ people }: { people: Person[] }) {
               Camera off (tap only)
             </button>
           </div>
+          <div className="mt-3 text-[13px] font-semibold">After the event</div>
+          <div className="mt-1 flex flex-wrap gap-2">
+            <button className={grey} data-testid="clock-after" onClick={() => act("Clock moved past the event", "/api/demo/clock", { body: JSON.stringify({ to: "after-event" }) })}>
+              Jump past the event (chats close)
+            </button>
+            <button className={grey} data-testid="clock-now" onClick={() => act("Clock back to now", "/api/demo/clock", { body: JSON.stringify({ to: "now" }) })}>
+              Back to now
+            </button>
+          </div>
           <div className="mt-3 text-[13px] font-semibold">Send a frame to Maya's door</div>
           <div className="mt-1 flex flex-wrap gap-2">
             {people

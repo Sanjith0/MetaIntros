@@ -1,7 +1,9 @@
 import { Frame, type Spotted } from "@/contracts";
 import { matchFrame } from "@/lib/door/recognition";
 import { publish } from "./bus";
-import { nextId, nowIso, store } from "./store";
+import { nextId, nowIso, profile, store } from "./store";
+import { postMessage } from "./social";
+import { flag } from "@/lib/flags";
 
 function lockedParty(partyId: string, viewerId: string) {
   const party = store().parties.get(partyId);
@@ -17,6 +19,14 @@ export function arrive(partyId: string, userId: string) {
   if (!s.arrivals.has(partyId)) s.arrivals.set(partyId, new Set());
   s.arrivals.get(partyId)!.add(userId);
   publish("member.arrived", { partyId, userId, at: nowIso() }, party.memberIds, { stage: true });
+  // An "I'm here" ping in the party chat: a fact this person just created by tapping.
+  if (flag("CHAT_LIFECYCLE") && party.chatId && s.chats.has(party.chatId)) {
+    try {
+      postMessage(party.chatId, null, `${profile(userId).firstName} is here.`, "system", [`arrival-${userId}`]);
+    } catch {
+      /* the chat may have closed after the event */
+    }
+  }
 }
 
 /** A frame from the viewer's door camera. Only the viewer hears the result. */

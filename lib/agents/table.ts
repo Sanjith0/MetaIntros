@@ -72,7 +72,8 @@ const sleep = (ms: number) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : 
 export async function pauseFor(ms: number, partyId: string) {
   const end = Date.now() + ms;
   while (Date.now() < end) {
-    if (store().operator.fastForward.has(partyId)) return;
+    const op = store().operator;
+    if (op.fastForward.has(partyId) || op.cancelled.has(partyId)) return;
     await sleep(Math.min(50, end - Date.now()));
   }
 }
@@ -119,6 +120,8 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   const s0 = store();
   const pace = () => (s0.operator.fastForward.has(partyId) ? 0 : (opts.paceMs ?? paceFromEnv()));
   const forced = () => s0.operator.forceLock.has(partyId);
+  const cancelled = () => s0.operator.cancelled.has(partyId);
+  const stop = () => forced() || cancelled();
   const plans = party.candidatePlanIds.map((id) => s.plans.get(id)!).filter(Boolean) as CandidatePlan[];
   const briefs = party.memberIds.map(briefFor);
   party.status = "talking";
@@ -204,7 +207,8 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
     });
     speak(party, b, 1, out.publicLine, "neutral-hello");
     await pauseFor(pace(), partyId);
-  }, forced);
+  }, stop);
+  if (cancelled()) return null;
   if (forced()) return forcedLock(1);
 
   // The table learns only that a plan is unavailable. Never why, never who.
@@ -241,6 +245,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   let leading = rankPlans(available, totals)[0]!;
   let signatures: string[] = [];
   for (let round = 2; round <= MAX_ROUNDS; round++) {
+    if (cancelled()) return null;
     if (forced()) return forcedLock(round);
     postTable(party, { round, authorId: null, kind: "leading", text: `Leading: ${leading.title}`, sourceIds: [leading.id], planId: leading.id });
     await pauseFor(pace(), partyId);
@@ -275,7 +280,8 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
       });
       speak(party, b, round, raw.publicLine, decision === "hold" ? "neutral-thinking" : "neutral-in");
       await pauseFor(pace(), partyId);
-    }, forced);
+    }, stop);
+    if (cancelled()) return null;
     if (forced()) return forcedLock(round);
     postTable(
       party,
