@@ -141,7 +141,7 @@ async function onePair(party: Party, a: string, b: string, pace: number): Promis
     const line = [...A.lines, ...B.lines].find((l) => l.id === lineId)!;
     const from = line.ownerId;
     post({ fromId: from, toId: from === a ? b : a, kind: "exchange", text: line.text, sourceIds: line.factIds });
-    trace(party.id, "shared", "pair", from, `${profile(a).firstName} + ${profile(b).firstName}`, `${profile(from).firstName}'s agent: ${line.text}`);
+    trace(party.id, "shared", "pair", from, `${profile(a).firstName} + ${profile(b).firstName}`, `${profile(from).firstName}'s agent: ${line.text}`, { meta: { kind: "pair" } });
     if (pace) await new Promise((res) => setTimeout(res, pace / 3));
   }
 
@@ -156,7 +156,7 @@ async function onePair(party: Party, a: string, b: string, pace: number): Promis
   } else {
     shared = post({ fromId: null, toId: null, kind: "shared", text: "You both joined this party.", sourceIds: [party.id] });
   }
-  trace(party.id, "shared", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · in common`, shared.text);
+  trace(party.id, "shared", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · in common`, shared.text, { meta: { kind: "pair" } });
 
   // One opener in each direction, from the other person's approved fact.
   const fa = factById(out.askForA)!; // B's fact, for A to ask
@@ -165,7 +165,7 @@ async function onePair(party: Party, a: string, b: string, pace: number): Promis
     [a]: post({ fromId: a, toId: b, kind: "opener", text: openerText(B, fa), sourceIds: [fa.id] }),
     [b]: post({ fromId: b, toId: a, kind: "opener", text: openerText(A, fb), sourceIds: [fb.id] }),
   };
-  trace(party.id, "private", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · openers · ${r.source} ${r.ms}ms`, `${A.firstName} → ${openers[a]!.text}\n${B.firstName} → ${openers[b]!.text}`);
+  trace(party.id, "private", "pair", null, `${profile(a).firstName} + ${profile(b).firstName} · openers · ${r.source} ${r.ms}ms`, `${A.firstName} → ${openers[a]!.text}\n${B.firstName} → ${openers[b]!.text}`, { meta: { kind: "pair", source: r.source } });
   return { key, a, b, shared, openers, bridge, source: r.source };
 }
 

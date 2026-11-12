@@ -35,6 +35,7 @@ export function Toaster({ people }: { people: Directory }) {
   };
 
   useLiveEvents((e) => {
+    if (pathname?.startsWith("/stage")) return; // the projector never shows a member's notifications
     switch (e.type) {
       case "match.found": {
         const shownAt = Date.now();

@@ -14,9 +14,10 @@ export function trace(
   actorId: string | null,
   title: string,
   body: string,
+  extra: { tone?: Trace["tone"]; meta?: Trace["meta"] } = {},
 ): Trace {
   const s = store();
-  const t: Trace = { id: `tr-${s.traces.length + 1}`, partyId, seq: s.traces.length, lane, conversation, actorId, title, body, at: nowIso() };
+  const t: Trace = { id: `tr-${s.traces.length + 1}`, partyId, seq: s.traces.length, lane, conversation, actorId, title, body, at: nowIso(), ...extra };
   s.traces.push(t);
   for (const l of listeners()) {
     try {

@@ -16,7 +16,7 @@ hues (spread across the wheel, layout picked from a title hash).
 
 | # | Feature | Flag | Status | Proof |
 |---|---|---|---|---|
-| 1 | Stage view: live replay with a scrubber, private and shared columns, code rejections in red, signatures landing | `STAGE_SCRUBBER` | todo | |
+| 1 | Stage view: live replay with a scrubber, private and shared columns, code rejections in red, signatures landing | `STAGE_SCRUBBER` | done (F1) | see Done |
 | 2 | Maya's secret: her private rule on her phone only, her receipt, and a "what the party knows" column that stays empty | | todo | |
 | 3 | Real phones: join by QR on the local network, MATCH FOUND on all five within a second, with sound and vibration | | todo | |
 | 4 | Real-model readiness: streamed verdicts, per-agent latency, a timeout with a fallback labelled on screen, a cached replay labelled as recorded | | todo | |
@@ -37,4 +37,6 @@ hues (spread across the wheel, layout picked from a title hash).
 
 ## Done
 
-(rows added as features land)
+| F | Feature | Flag | Proof |
+|---|---|---|---|
+| F1 | Stage view with a scrubber: play/pause at the recorded pace (1×/2×/4×), drag to any point and the board (plans, signatures, lock) rebuilds from the trace; Live button follows new traces; rejections and verifier blocks in red, holds amber, signatures land with a check; member toasts never show on the projector | `STAGE_SCRUBBER` | `npm test -- stage`: `Tests 7 passed` (board at end: 3 out, Night Market locked, 5 signatures; rewind to round 2: Kai holding, nothing locked; 4 rejecting agents tagged red). `npx playwright test tests/stage.spec.ts`: `✓ stage: live replay with a scrubber, rejections in red, signatures landing (15.3s)`. Gate: typecheck exit 0, `Tests 60 passed (60)`, demo path `1 passed (17.0s)` with lag 4 ms. `shots/f1-stage-live.png`, `shots/f1-stage-scrub.png` |

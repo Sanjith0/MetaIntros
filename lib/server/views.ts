@@ -55,12 +55,18 @@ export function memberPartyViewForViewer(viewerId: string): MemberPartyView | nu
 export interface StageView {
   partyId: string | null;
   members: Person[];
+  plans: { id: string; title: string }[];
   traces: Trace[];
 }
 
 export function stageView(partyId?: string): StageView {
   const s = store();
   const party = partyId ? s.parties.get(partyId) : [...s.parties.values()].at(-1);
-  if (!party) return { partyId: null, members: [], traces: [] };
-  return { partyId: party.id, members: party.memberIds.map(person), traces: s.traces.filter((t) => t.partyId === party.id) };
+  if (!party) return { partyId: null, members: [], plans: [], traces: [] };
+  return {
+    partyId: party.id,
+    members: party.memberIds.map(person),
+    plans: party.candidatePlanIds.map((id) => ({ id, title: s.plans.get(id)?.title ?? id })),
+    traces: s.traces.filter((t) => t.partyId === party.id),
+  };
 }

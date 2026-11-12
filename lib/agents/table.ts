@@ -1,4 +1,4 @@
-import type { Brief, CandidatePlan, Party, TableMessage, Verdict } from "@/contracts";
+import type { Brief, CandidatePlan, Party, TableMessage, Trace, Verdict } from "@/contracts";
 import { publish } from "@/lib/server/bus";
 import { nextId, nowIso, profile, store } from "@/lib/server/store";
 import { trace } from "@/lib/server/trace";
@@ -31,12 +31,16 @@ export function briefFor(userId: string): Brief {
   return b;
 }
 
-function postTable(party: Party, msg: Omit<TableMessage, "id" | "partyId" | "at">): TableMessage {
+function postTable(party: Party, msg: Omit<TableMessage, "id" | "partyId" | "at">, extra: { tone?: Trace["tone"]; meta?: Trace["meta"] } = {}): TableMessage {
   const m: TableMessage = { id: nextId("t"), partyId: party.id, at: nowIso(), ...msg };
   store().table.push(m);
   publish("table.message", m, party.memberIds, { stage: true });
   const who = m.authorId ? `${profile(m.authorId).firstName}'s agent` : "Table";
-  trace(party.id, "shared", "table", m.authorId, `${who} · round ${m.round}`, m.text);
+  const kind = m.kind === "line" ? "line" : m.kind === "unavailable" ? "unavailable" : m.kind === "leading" ? "leading" : undefined;
+  trace(party.id, "shared", "table", m.authorId, `${who} · round ${m.round}`, m.text, {
+    tone: extra.tone ?? (m.kind === "unavailable" ? "reject" : undefined),
+    meta: { round: m.round, planId: m.planId, kind, ...extra.meta },
+  });
   return m;
 }
 
@@ -50,7 +54,7 @@ function publicRows(partyId: string): PublicTableRow[] {
 function speak(party: Party, brief: Brief, round: number, line: PublicLine, fallback: NeutralId) {
   const v = verifyPublicLine(line, brief, fallback);
   if (!v.ok) {
-    trace(party.id, "private", "table", brief.ownerId, `Verifier blocked ${profile(brief.ownerId).firstName}'s line`, `Blocked "${line.text}" (${v.reason}). Posted a neutral phrase instead.`);
+    trace(party.id, "private", "table", brief.ownerId, `Verifier blocked ${profile(brief.ownerId).firstName}'s line`, `Blocked "${line.text}" (${v.reason}). Posted a neutral phrase instead.`, { tone: "block", meta: { round } });
     store().blockedLines.push({ partyId: party.id, ownerId: brief.ownerId, round, text: line.text, reason: v.reason });
   }
   postTable(party, { round, authorId: brief.ownerId, kind: "line", text: v.line.text, sourceIds: v.line.sourceIds });
@@ -65,7 +69,7 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
   const briefs = party.memberIds.map(briefFor);
   party.status = "talking";
 
-  postTable(party, { round: 0, authorId: null, kind: "system", text: `The table is open: ${plans.length} plans, 5 agents, up to ${MAX_ROUNDS} rounds.`, sourceIds: plans.map((p) => p.id) });
+  postTable(party, { round: 0, authorId: null, kind: "system", text: `The table is open: ${plans.length} plans, 5 agents, up to ${MAX_ROUNDS} rounds.`, sourceIds: plans.map((p) => p.id) }, { meta: { kind: "open" } });
   await sleep(pace);
 
   // Party-wide safety first: private venues never reach the agents as options.
@@ -124,7 +128,11 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
       lines.push(`${decision === "reject" ? "✗" : "✓"} ${plan.title} (${verdict.preference}/5): ${verdict.privateReason}`);
     }
     prefs.set(b.ownerId, own);
-    trace(partyId, "private", "table", b.ownerId, `${profile(b.ownerId).firstName}'s agent · round 1 · ${turn.source} ${turn.ms}ms`, lines.join("\n"));
+    const anyReject = s.verdicts.some((v) => v.partyId === partyId && v.ownerId === b.ownerId && v.round === 1 && v.decision === "reject");
+    trace(partyId, "private", "table", b.ownerId, `${profile(b.ownerId).firstName}'s agent · round 1 · ${turn.source} ${turn.ms}ms`, lines.join("\n"), {
+      tone: anyReject ? "reject" : "accept",
+      meta: { kind: "verdicts", round: 1, source: turn.source, ms: turn.ms },
+    });
     speak(party, b, 1, out.publicLine, "neutral-hello");
     await sleep(pace);
   }
@@ -191,11 +199,18 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
       s.verdicts.push(verdict);
       publish("agent.verdict", verdict, [b.ownerId], { stage: true });
       if (decision !== "hold") signatures.push(b.ownerId);
-      trace(partyId, "private", "table", b.ownerId, `${profile(b.ownerId).firstName}'s agent · round ${round} · ${turn.source} ${turn.ms}ms`, `${decision.toUpperCase()} ${plans.find((p) => p.id === planId)?.title ?? planId}: ${verdict.privateReason}`);
+      trace(partyId, "private", "table", b.ownerId, `${profile(b.ownerId).firstName}'s agent · round ${round} · ${turn.source} ${turn.ms}ms`, `${decision.toUpperCase()} ${plans.find((p) => p.id === planId)?.title ?? planId}: ${verdict.privateReason}`, {
+        tone: decision === "hold" ? "hold" : "sign",
+        meta: { kind: "verdicts", round, decision, planId, source: turn.source, ms: turn.ms },
+      });
       speak(party, b, round, raw.publicLine, decision === "hold" ? "neutral-thinking" : "neutral-in");
       await sleep(pace);
     }
-    postTable(party, { round, authorId: null, kind: "system", text: `${signatures.length} of 5 signed ${leading.title}.`, sourceIds: [leading.id] });
+    postTable(
+      party,
+      { round, authorId: null, kind: "system", text: `${signatures.length} of 5 signed ${leading.title}.`, sourceIds: [leading.id] },
+      { tone: signatures.length === party.memberIds.length ? "sign" : "neutral", meta: { kind: "tally", planId: leading.id } },
+    );
     await sleep(pace);
     if (signatures.length === party.memberIds.length) return finish(leading.id, "signatures", signatures, round);
     leading = rankPlans(available, totals)[0]!;
@@ -208,6 +223,6 @@ export async function runTableTalk(partyId: string, opts: TableOptions = {}): Pr
     postTable(party, { round: MAX_ROUNDS, authorId: null, kind: "system", text: "No plan works for everyone tonight.", sourceIds: plans.map((p) => p.id) });
     return null;
   }
-  trace(partyId, "private", "judge", null, "Fallback", `No five signatures after round ${MAX_ROUNDS}. Code picked ${fallback.title}, the best feasible plan by total preference.`);
+  trace(partyId, "private", "judge", null, "Fallback", `No five signatures after round ${MAX_ROUNDS}. Code picked ${fallback.title}, the best feasible plan by total preference.`, { tone: "lock", meta: { planId: fallback.id } });
   return finish(fallback.id, "fallback", signatures, MAX_ROUNDS);
 }

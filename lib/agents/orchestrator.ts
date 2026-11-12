@@ -94,7 +94,10 @@ export function finalize(partyId: string, table: TableResult, pairs: PairResult[
     if (opener && fact) postMessage(chatId, from, openerText(profile(to), fact), "opener", opener.sourceIds);
   });
 
-  trace(partyId, "shared", "judge", null, "Plan locked", `${plan.title} · ${table.lockedBy === "signatures" ? "five signatures" : "code fallback"} · round ${table.rounds}`);
+  trace(partyId, "shared", "judge", null, "Plan locked", `${plan.title} · ${table.lockedBy === "signatures" ? "five signatures" : "code fallback"} · round ${table.rounds}`, {
+    tone: "lock",
+    meta: { kind: "locked", planId: plan.id, round: table.rounds },
+  });
   store().table.push({
     id: `t-lock-${party.id}`,
     partyId: party.id,

@@ -115,7 +115,7 @@ async function tryForm(mustInclude: string, startTalk: boolean): Promise<string 
   s.parties.set(party.id, party);
   for (const m of formed.members) m.entry.status = "forming";
 
-  trace(party.id, "shared", "formation", null, "Party formed", `Five people near ${event.landmark} on ${event.date}. Every member shares a mutual friend or a small Group with someone here.`);
+  trace(party.id, "shared", "formation", null, "Party formed", `Five people near ${event.landmark} on ${event.date}. Every member shares a mutual friend or a small Group with someone here.`, { meta: { kind: "formed" } });
   trace(
     party.id,
     "private",

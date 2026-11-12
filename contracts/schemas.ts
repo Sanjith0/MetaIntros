@@ -351,8 +351,22 @@ export const Trace = z.object({
   title: z.string(),
   body: z.string(),
   at: IsoTime,
+  /** How the stage colours it: rejections and blocks in red, signatures in green. */
+  tone: z.enum(["neutral", "reject", "block", "accept", "sign", "hold", "lock"]).optional(),
+  /** Structured facts so the stage can rebuild the board at any point in time. */
+  meta: z
+    .object({
+      round: z.number().int().optional(),
+      planId: z.string().optional(),
+      decision: z.enum(["accept", "reject", "concede", "hold", "sign"]).optional(),
+      kind: z.enum(["open", "verdicts", "unavailable", "leading", "tally", "locked", "line", "pair", "formed"]).optional(),
+      source: z.enum(["model", "mock", "fallback"]).optional(),
+      ms: z.number().optional(),
+    })
+    .optional(),
 });
 export type Trace = z.infer<typeof Trace>;
+export type TraceMeta = NonNullable<Trace["meta"]>;
 
 /* ------------------------------------------------------------------ */
 /* Chat                                                                */
