@@ -1,18 +1,22 @@
 import Link from "next/link";
-import { Image as ImageIcon, Plus } from "lucide-react";
+import { ChevronRight, Image as ImageIcon, Plus } from "lucide-react";
 import { TopBar } from "@/components/fb/TopBar";
-import { Avatar, Stack } from "@/components/fb";
+import { Avatar, FacePile, Stack } from "@/components/fb";
 import { EventCover } from "@/components/events/EventCover";
 import { DateLine } from "@/components/events/DateLine";
 import { Post } from "@/components/feed/Post";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/server/session";
 import { POSTS, STORIES } from "@/lib/mock/feed";
+import { friendQueueSummary } from "@/lib/server/friendQueues";
 
 /** Home: a seeded mock feed. One post shares an event, which is how people reach Events from Home. */
 export default async function HomePage() {
   const me = await getCurrentUser();
-  const shared = await prisma.event.findMany({ where: { id: { in: POSTS.flatMap((p) => (p.eventId ? [p.eventId] : [])) } } });
+  const [shared, fq] = await Promise.all([
+    prisma.event.findMany({ where: { id: { in: POSTS.flatMap((p) => (p.eventId ? [p.eventId] : [])) } } }),
+    friendQueueSummary(me.id),
+  ]);
   return (
     <div data-testid="home-page">
       <TopBar variant="home" />
@@ -37,6 +41,20 @@ export default async function HomePage() {
             </EventCover>
           ))}
         </div>
+        {fq.count > 0 && fq.first && (
+          <Link href="/events#friends-queuing" className="flex items-center gap-3 bg-surface px-4 py-3 hover:bg-press" data-testid="home-friend-queues">
+            <FacePile people={fq.faces} size={36} max={3} />
+            <span className="min-w-0 flex-1">
+              <span className="block text-body font-semibold">
+                {fq.count === 1 ? `${fq.first.friend.name.split(" ")[0]} is queuing this weekend` : `${fq.count} friends are queuing this weekend`}
+              </span>
+              <span className="block truncate text-meta text-muted">
+                {fq.count === 1 ? fq.first.label : `${fq.first.friend.name.split(" ")[0]}: ${fq.first.label.charAt(0).toLowerCase()}${fq.first.label.slice(1)}`} · Queue up too
+              </span>
+            </span>
+            <ChevronRight size={20} className="text-muted" aria-hidden />
+          </Link>
+        )}
         {POSTS.map((p) => {
           const ev = shared.find((e) => e.id === p.eventId);
           return (
