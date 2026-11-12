@@ -74,6 +74,8 @@ const DEFAULTS = {
   STAGE_CAPTIONS: true,
   /** F34: change your sentence while you wait in the queue, and keep your place in line. */
   EDIT_SENTENCE: true,
+  /** F35: a run of show on /demo: nine timed beats to 5:00, what to say, where to show it, one-click setup. */
+  RUN_OF_SHOW: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

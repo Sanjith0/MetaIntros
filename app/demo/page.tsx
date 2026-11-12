@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DemoPanel } from "@/components/demo/DemoPanel";
 import { Preflight } from "@/components/demo/Preflight";
+import { RunOfShow } from "@/components/demo/RunOfShow";
 import { DEMO_IDS } from "@/fixtures";
 import { flag } from "@/lib/flags";
 import { profile } from "@/lib/server/store";
@@ -23,6 +24,7 @@ export default function DemoPage() {
         <p className="text-[15px] text-[var(--color-ink-2)]">For whoever is presenting. Seeded, fictional people only.</p>
       </div>
       {flag("PREFLIGHT") && <Preflight />}
+      {flag("RUN_OF_SHOW") && <RunOfShow />}
       <DemoPanel people={people} />
     </main>
   );
