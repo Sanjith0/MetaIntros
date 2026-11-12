@@ -123,6 +123,11 @@ export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {})
 
       await tx.block.createMany({ data: BLOCKS.map((b) => ({ id: `blk-${b.blockerId}-${b.blockedId}`, ...b })) });
 
+      // One pending incoming request so the Requests tab isn't empty.
+      await tx.friendRequest.create({
+        data: { id: "freq-p78-p01", fromId: "p78", toId: ME_ID, status: "pending", createdAt: new Date(now.getTime() - 3 * 3600_000) },
+      });
+
       await tx.event.createMany({
         data: EVENTS.map((e) => {
           const { startsAt, endsAt } = eventTimes(now, e.dayOffset, e.start, e.durationMin);
