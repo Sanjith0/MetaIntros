@@ -141,6 +141,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `STAGE_KEYS` | presenter keys on `/stage`: Space play/pause, ← → step (Shift: 10), Home start, L live, P public screen, C captions, 1/2/4 speed, ? the list |
 | `LOCK_SPLASH` | the lock as a moment on `/stage`: a full-screen MATCH FOUND with the plan, and "2 phones showed it · slowest 6 ms after the lock" from the phones' server-clock acks; non-blocking, gone in 5 s |
 | `WIDEN_SEARCH` | while waiting near one place with fewer than five, "Widen to anywhere tonight (9 events)" switches you in one tap, keeps your place in line, and tries to form a party at once |
+| `SPANISH_SENTENCE` | your one sentence can be in Spanish ("salgo a las once, menos de veinte dólares, sin consumo mínimo"): the same rules and preferences, your own words kept as your words |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes
@@ -187,7 +188,7 @@ inferred from a face; no score or label about a person or a pair.
 
 ```bash
 npm run typecheck
-npm test                       # 247 unit tests (vitest)
+npm test                       # 252 unit tests (vitest)
 npm run contract:check         # fixtures and events against the Zod contracts
 npm run eval -- --mock         # 7 eval suites
 npx playwright install chromium  # once, for the browser tests

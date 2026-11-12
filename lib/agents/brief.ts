@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Brief, Clock, HardRule, type Fact, type Preference, type ShareableLine } from "@/contracts";
 import { callModel, type ModelSource } from "@/model/client";
+import { flag } from "@/lib/flags";
 
 /**
  * One sentence becomes:
@@ -80,6 +81,48 @@ export const PREFS: PrefSpec[] = [
   { tag: "open", re: /\b(open to anything|down for anything|up for anything)\b/i, line: "Open to anything.", ask: "What's the best spontaneous plan you've said yes to?" },
 ];
 
+/* --------------------- F50: the same sentence in Spanish --------------------- */
+
+const ES_NUM: Record<string, number> = {
+  una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10, once: 11, doce: 12,
+  quince: 15, veinte: 20, veinticinco: 25, treinta: 30, cuarenta: 40, cincuenta: 50, sesenta: 60, cien: 100,
+};
+const ES_NUM_RE = `(?:\\$?\\d+(?::\\d{2})?|${Object.keys(ES_NUM).join("|")})`;
+const END_BY_ES = new RegExp(
+  `\\b(?:salgo|salir|vuelvo|volver|estar en casa|en casa|a casa|termino|terminar|acabo|acabar|me voy|irme|de vuelta)\\s+(?:a las|antes de las|para las|a la|antes de la)\\s+(medianoche|${ES_NUM_RE})`,
+  "i",
+);
+const MAX_PRICE_ES = new RegExp(`\\b(?:menos de|como máximo|máximo|maximo|no más de|no mas de|hasta|presupuesto de)\\s+(${ES_NUM_RE})(?:\\s*(?:dólares|dolares|pavos|usd))?`, "i");
+const NO_DRINK_ES = /\bsin consumo m[ií]nimo\b|\bsin tener que (?:beber|tomar)\b|\bno bebo\b|\bno tomo alcohol\b|\bsin alcohol\b/i;
+const PUBLIC_ES = /\b(?:lugar p[uú]blico|en p[uú]blico|sitio p[uú]blico)\b/i;
+/** Spanish words for the same preference tags (the lines your agent may share stay the catalogue's). */
+const PREFS_ES: Record<string, RegExp> = {
+  chill: /\b(tranquil[oa]s?|relajad[oa]s?)\b/i,
+  quiet: /\b(sin mucho ruido|poco ruido|silencios[oa]|que se pueda hablar)\b/i,
+  music: /\b(m[uú]sica|concierto)\b/i,
+  outdoors: /\b(al aire libre|afuera|en el parque)\b/i,
+  games: /\b(juegos?|trivia)\b/i,
+  "hands-on": /\b(manualidades|con las manos|un taller)\b/i,
+  new: /\b(algo nuevo|probar algo)\b/i,
+  social: /\b(conocer gente|hacer amigos)\b/i,
+  food: /\b(comida|comer|cenar)\b/i,
+  open: /\b(lo que sea|me apunto a todo|abiert[oa] a todo)\b/i,
+};
+const esNumber = (raw: string): number | null => {
+  const s = raw.trim().toLowerCase().replace(/^\$/, "");
+  if (/^\d+$/.test(s)) return Number(s);
+  return ES_NUM[s] ?? null;
+};
+/** "once" -> "23:00", "10:30" -> "22:30", "medianoche" -> "00:00". Evening by default, like the English. */
+const esEvening = (raw: string): string | null => {
+  const s = raw.trim().toLowerCase();
+  if (s === "medianoche") return "00:00";
+  const m = s.match(/^(\d{1,2}):(\d{2})$/);
+  if (m) return parseEvening(`${m[1]}:${m[2]}`);
+  const n = esNumber(s);
+  return n === null ? null : parseEvening(String(n));
+};
+
 export interface ParsedBrief {
   hardRules: HardRule[];
   preferences: Preference[];
@@ -102,16 +145,31 @@ export function parseSentence(ownerId: string, sentence: string): ParsedBrief {
   const pub = sentence.match(PUBLIC);
   if (pub) hardRules.push({ id: `hr-${ownerId}-public`, kind: "public_venue", value: true, sourceText: pub[0] });
 
+  // F50: the same rules said in Spanish, for whatever the English didn't find.
+  if (flag("SPANISH_SENTENCE")) {
+    const has = (k: HardRule["kind"]) => hardRules.some((r) => r.kind === k);
+    const endEs = has("end_by") ? null : sentence.match(END_BY_ES);
+    const t = endEs ? esEvening(endEs[1]!) : null;
+    if (endEs && t) hardRules.push({ id: `hr-${ownerId}-end`, kind: "end_by", value: t, sourceText: endEs[0] });
+    const priceEs = has("max_price") ? null : sentence.match(MAX_PRICE_ES);
+    const n = priceEs ? esNumber(priceEs[1]!) : null;
+    if (priceEs && n !== null) hardRules.push({ id: `hr-${ownerId}-price`, kind: "max_price", value: n, sourceText: priceEs[0] });
+    const drinkEs = has("no_drink_minimum") ? null : sentence.match(NO_DRINK_ES);
+    if (drinkEs) hardRules.push({ id: `hr-${ownerId}-drink`, kind: "no_drink_minimum", value: true, sourceText: drinkEs[0] });
+    const pubEs = has("public_venue") ? null : sentence.match(PUBLIC_ES);
+    if (pubEs) hardRules.push({ id: `hr-${ownerId}-public`, kind: "public_venue", value: true, sourceText: pubEs[0] });
+  }
+
   // Preferences: never read from inside a hard rule's own words.
   let rest = sentence;
   for (const r of hardRules) rest = rest.replace(r.sourceText, " ");
   const preferences: Preference[] = [];
   for (const p of PREFS) {
-    const m = rest.match(p.re);
+    const m = rest.match(p.re) ?? (flag("SPANISH_SENTENCE") && PREFS_ES[p.tag] ? rest.match(PREFS_ES[p.tag]!) : null);
     if (!m) continue;
     const idx = m.index ?? 0;
     const near = rest.slice(idx, idx + m[0].length + 18).toLowerCase();
-    const weight = /if possible|maybe|ideally/.test(near) ? 1 : 2;
+    const weight = /if possible|maybe|ideally|si es posible|quiz[aá]s|tal vez|a ser posible/.test(near) ? 1 : 2;
     preferences.push({ id: `pf-${ownerId}-${p.tag}`, tag: p.tag, weight, sourceText: m[0] });
   }
   return { hardRules, preferences };

@@ -104,6 +104,8 @@ const DEFAULTS = {
   LOCK_SPLASH: true,
   /** F49: while waiting near one place with too few people, widen to anywhere tonight in one tap and keep your place. */
   WIDEN_SEARCH: true,
+  /** F50: your one sentence can be in Spanish: the same rules and preferences, your own words kept as your words. */
+  SPANISH_SENTENCE: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
