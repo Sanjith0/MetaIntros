@@ -68,7 +68,7 @@ server, and a test records its live stream to prove it.
 - A code judge, a verifier for public lines, and pair talk where the model only picks fact ids.
 - A projector view with a scrubber that rebuilds the board (plans, signatures, the lock) at
   any moment of the replay.
-- Vitest (261 unit tests), Playwright (65+ end-to-end specs on a production build, including
+- Vitest (263 unit tests), Playwright (65+ end-to-end specs on a production build, including
   five phones at once, every route at 390 pixels and axe accessibility checks), and an eval
   harness. Fifty features, each a layer behind one flags file, each with its proof in
   `FEATURES.md`.

@@ -11,7 +11,7 @@ import { clock12, eventWhen, price } from "@/lib/format";
 import { eventView } from "@/lib/server/social";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
-import { queuePulse } from "@/lib/server/pulse";
+import { eventImpact, queuePulse } from "@/lib/server/pulse";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +42,8 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   const suggested = [...s.events.values()].filter((x) => x.id !== e.id && x.landmark === e.landmark).slice(0, 3);
   const queued = s.queue.find((q) => q.userId === viewer && q.status === "waiting");
   const partyHere = v.party?.planHere && v.party.status === "locked";
-  const pulse = queuePulse(e.id, viewer);
+  const impact = eventImpact(e.id);
+  const pulse = queuePulse(e.id, viewer, { omitFormed: !!impact });
 
   return (
     <main data-testid="event-page">
@@ -58,6 +59,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               {e.venueName} · {e.city}
             </div>
 
+            {impact && (
+              <div className="mt-2 flex items-center gap-1.5 text-[14px] font-semibold text-[var(--color-pq-ink)]" data-testid="event-impact">
+                <IconSparkle size={16} className="shrink-0 text-[var(--color-pq)]" /> {impact.text}
+              </div>
+            )}
             {pulse && !partyHere && (
               <div className="mt-2 flex items-center gap-1.5 text-[14px] font-semibold text-[var(--color-pq-ink)]" data-testid="queue-pulse">
                 <IconSparkle size={16} className="shrink-0 text-[var(--color-pq)]" /> {pulse.text}
