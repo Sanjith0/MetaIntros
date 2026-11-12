@@ -7,6 +7,7 @@ Branch: `swarit-baseline`. Everything runs locally with `npm install && npm run 
 | Milestone | Result | Proving command | Last lines of output |
 |---|---|---|---|
 | M0 Foundations | PASS | `npm run contract:check && npm test` | `contract:check PASS - 314/314 checks passed` · `Test Files  2 passed (2)` · `Tests  11 passed (11)` |
+| M1 The Facebook layer | PASS | `npx playwright test tests/shots.spec.ts` (`npm run shots`) | `✓ events tab` · `✓ event page with Interested, Going, guest list and Find my party` · `✓ messenger-style group chat` · `✓ notification toast arrives live` · `✓ demo user switcher` · `5 passed (2.3s)`; screenshots in `shots/m1-*.png` |
 
 ## Facebook reference (Step 1)
 

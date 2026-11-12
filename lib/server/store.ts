@@ -1,0 +1,154 @@
+import type {
+  Brief,
+  CandidatePlan,
+  Card,
+  Chat,
+  ChatMessage,
+  CodeCheck,
+  EventItem,
+  Fact,
+  MutualPair,
+  PairMessage,
+  Party,
+  PQEvent,
+  Profile,
+  QueueEntry,
+  Receipt,
+  RunItBackPick,
+  Spotted,
+  TableMessage,
+  Trace,
+  Verdict,
+} from "@/contracts";
+import { EVENTS, PROFILES } from "@/fixtures";
+
+export type Rsvp = "interested" | "going";
+
+/** All app state lives in memory, on globalThis so that Next's separate
+ *  module instances (route handlers, server components, HMR) share it. */
+export interface Store {
+  profiles: Map<string, Profile>;
+  events: Map<string, EventItem>;
+  rsvps: Map<string, Map<string, Rsvp>>; // eventId -> userId -> rsvp
+  queue: QueueEntry[];
+  briefs: Map<string, Brief>; // briefId -> brief
+  briefFacts: Map<string, Fact>; // facts created from briefs (approved by owner)
+  parties: Map<string, Party>;
+  plans: Map<string, CandidatePlan>;
+  verdicts: Verdict[];
+  codeChecks: CodeCheck[];
+  table: TableMessage[];
+  pairs: PairMessage[];
+  traces: Trace[];
+  receipts: Map<string, Receipt>; // `${partyId}:${ownerId}`
+  cards: Card[];
+  chats: Map<string, Chat>;
+  messages: ChatMessage[];
+  arrivals: Map<string, Set<string>>; // partyId -> userIds
+  spotted: Spotted[];
+  picks: RunItBackPick[];
+  mutuals: MutualPair[];
+  events_log: PQEvent[];
+  seq: number;
+  idSeq: number;
+  version: number;
+}
+
+const g = globalThis as unknown as { __pq?: Store };
+
+function fresh(): Store {
+  const s: Store = {
+    profiles: new Map(PROFILES.map((p) => [p.id, structuredClone(p)])),
+    events: new Map(EVENTS.map((e) => [e.id, structuredClone(e)])),
+    rsvps: new Map(),
+    queue: [],
+    briefs: new Map(),
+    briefFacts: new Map(),
+    parties: new Map(),
+    plans: new Map(),
+    verdicts: [],
+    codeChecks: [],
+    table: [],
+    pairs: [],
+    traces: [],
+    receipts: new Map(),
+    cards: [],
+    chats: new Map(),
+    messages: [],
+    arrivals: new Map(),
+    spotted: [],
+    picks: [],
+    mutuals: [],
+    events_log: [],
+    seq: 0,
+    idSeq: 0,
+    version: (g.__pq?.version ?? 0) + 1,
+  };
+  seedChats(s);
+  return s;
+}
+
+export function store(): Store {
+  if (!g.__pq) g.__pq = fresh();
+  return g.__pq;
+}
+
+export function resetStore(): Store {
+  g.__pq = fresh();
+  return g.__pq;
+}
+
+export function nextId(prefix: string): string {
+  const s = store();
+  s.idSeq += 1;
+  return `${prefix}-${s.idSeq.toString(36)}`;
+}
+
+export const nowIso = () => new Date().toISOString();
+
+export function profile(id: string): Profile {
+  const p = store().profiles.get(id);
+  if (!p) throw new Error(`unknown profile ${id}`);
+  return p;
+}
+
+/** Every fact a person has approved, from their profile or their brief. */
+export function approvedFacts(ownerId: string): Fact[] {
+  const s = store();
+  const fromProfile = s.profiles.get(ownerId)?.facts ?? [];
+  const fromBrief = [...s.briefFacts.values()].filter((f) => f.ownerId === ownerId);
+  return [...fromProfile, ...fromBrief].filter((f) => f.approved);
+}
+
+export function factById(id: string): Fact | undefined {
+  const s = store();
+  const b = s.briefFacts.get(id);
+  if (b) return b;
+  for (const p of s.profiles.values()) {
+    const f = p.facts.find((x) => x.id === id);
+    if (f) return f;
+  }
+  return undefined;
+}
+
+/* A Groups-based chat so Messenger has something before any party forms. */
+function seedChats(s: Store) {
+  const t = (minsAgo: number) => new Date(Date.now() - minsAgo * 60_000).toISOString();
+  s.chats.set("chat-portuguese", {
+    id: "chat-portuguese",
+    partyId: null,
+    title: "Portuguese Practice SF",
+    memberIds: ["maya", "zoe", "leo", "elena", "yara"],
+    pinnedMessageId: "m-seed-0",
+  });
+  const lines: [string | null, ChatMessage["kind"], string, number][] = [
+    [null, "pinned", "Practice night is the second Thursday of every month.", 300],
+    ["leo", "user", "Who's coming Thursday?", 62],
+    ["elena", "user", "Me! I'll bring the flashcards", 58],
+    ["zoe", "user", "Count me in", 41],
+    ["yara", "user", "Running late but I'll be there by 7", 12],
+  ];
+  lines.forEach(([sender, kind, text, ago], i) =>
+    s.messages.push({ id: `m-seed-${i}`, chatId: "chat-portuguese", senderId: sender, kind, text, sourceIds: [], at: t(ago) }),
+  );
+}

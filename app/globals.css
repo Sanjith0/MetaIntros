@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/* Tokens from reference/EVENT_PAGE.md and reference/MESSENGER_CHAT.md,
+   written as our own names. The "pq" colours mark our layers. */
+@theme {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  --color-accent: #0866ff;
+  --color-link: #0064d1;
+  --color-ink: #050505;
+  --color-ink-2: #65676b;
+  --color-ink-3: #4b4c4f;
+  --color-ink-disabled: #bcc0c4;
+  --color-wash: #f0f2f5;
+  --color-card: #ffffff;
+  --color-btn-2: #e4e6eb;
+  --color-btn-2-hover: #d8dadf;
+  --color-divider: #ced0d4;
+  --color-positive: #31a24c;
+  --color-negative: #e9344f;
+  --color-badge: #e41e3f;
+  --color-date: #f3425f;
+  --color-on-bg: #ebf5ff;
+  --color-on-ink: #0064d1;
+  --color-new-notif: #e7f3ff;
+  --color-bubble-in: #f0f0f0;
+  --color-toast-ink: #1c2b33;
+
+  /* Party Queue layer */
+  --color-pq: #6d28d9;
+  --color-pq-2: #8b5cf6;
+  --color-pq-soft: #f3efff;
+  --color-pq-ink: #4c1d95;
+
+  --radius-btn: 6px;
+  --radius-card: 8px;
+  --radius-bubble: 18px;
+
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+  --shadow-elevated: 0 12px 28px 0 rgb(0 0 0 / 0.2), 0 2px 4px 0 rgb(0 0 0 / 0.1);
+}
+
+html,
+body {
+  background: var(--color-wash);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.3333;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.press:active {
+  transform: scale(0.96);
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.toast-in {
+  animation: toast-in 180ms ease-out;
+}
+
+@keyframes match-pop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.match-pop {
+  animation: match-pop 360ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.sheet-up {
+  animation: sheet-up 200ms ease-out;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.typing span {
+  animation: pulse-dot 1.2s infinite;
+}
+.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-in,
+  .match-pop,
+  .sheet-up,
+  .typing span {
+    animation: none;
+  }
+}
