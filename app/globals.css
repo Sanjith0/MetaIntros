@@ -18,3 +18,23 @@ body {
   color: var(--color-fb-text);
   font-family: var(--font-sans);
 }
+
+/* game-like shimmer on Queue Up CTAs */
+.queue-shimmer {
+  position: relative;
+}
+.queue-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.28) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: qu-shimmer 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes qu-shimmer {
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
