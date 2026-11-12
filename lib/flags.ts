@@ -7,6 +7,8 @@
 const DEFAULTS = {
   /** F1: /stage live replay with a scrubber, rejections in red, signatures landing. */
   STAGE_SCRUBBER: true,
+  /** F2: on your own phone, your private rules and receipt next to a computed "what the party knows" column. */
+  SECRET_PANEL: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -4,6 +4,9 @@ import { Avatar } from "@/components/Avatar";
 import { Cover } from "@/components/events/Cover";
 import { IconChat, IconDoor, IconLock, IconPin, IconSparkle } from "@/components/icons";
 import { PartyLive } from "@/components/party/PartyLive";
+import { SecretPanel } from "@/components/party/SecretPanel";
+import { flag } from "@/lib/flags";
+import { secretView } from "@/lib/server/secret";
 import { clock12, dayLabel, price } from "@/lib/format";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
@@ -43,6 +46,7 @@ export default async function PartyPage() {
   const myOwnVerdicts = s.verdicts.filter((x) => x.partyId === v.party.id && x.ownerId === viewer && x.round === 1);
   const others = v.members.filter((m) => m.id !== viewer);
   const cardFor = (id: string) => v.cards.find((c) => c.subjectId === id);
+  const secret = flag("SECRET_PANEL") ? secretView(v.party.id, viewer) : null;
 
   return (
     <main className="mx-auto grid max-w-[1040px] grid-cols-1 gap-4 px-4 py-5 lg:grid-cols-[1fr_380px]">
@@ -115,6 +119,8 @@ export default async function PartyPage() {
           </ul>
         </section>
 
+        {secret && <SecretPanel v={secret} />}
+
         {/* The public table */}
         <section className="rounded-[8px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="party-table">
           <h2 className="text-[17px] font-semibold">The table</h2>
@@ -169,9 +175,9 @@ export default async function PartyPage() {
                   </li>
                 ))}
               </ul>
-              <div className="text-[13px] font-semibold text-[var(--color-ink-3)]">Turned down for you</div>
+              {!secret && <div className="text-[13px] font-semibold text-[var(--color-ink-3)]">Turned down for you</div>}
               <ul className="mb-3 mt-1 space-y-1 text-[13px]">
-                {(v.receipt?.rejected ?? myOwnVerdicts.filter((x) => x.decision === "reject").map((x) => ({ planId: x.planId, title: s.plans.get(x.planId)?.title ?? "", reason: x.privateReason, byCode: x.overriddenByCode }))).map((r) => (
+                {(secret ? [] : v.receipt?.rejected ?? myOwnVerdicts.filter((x) => x.decision === "reject").map((x) => ({ planId: x.planId, title: s.plans.get(x.planId)?.title ?? "", reason: x.privateReason, byCode: x.overriddenByCode }))).map((r) => (
                   <li key={r.planId}>
                     <span className="font-semibold">{r.title}:</span> {r.reason}
                     {r.byCode && <span className="ml-1 rounded bg-[var(--color-btn-2)] px-1 text-[11px]">code</span>}
