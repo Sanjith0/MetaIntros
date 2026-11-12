@@ -24,6 +24,7 @@ export const EVENT_TYPES = [
   "party.dissolved",
   "party.nomatch",
   "party.seat",
+  "party.switched",
   "agent.verdict",
   "table.message",
   "pair.message",
@@ -79,6 +80,13 @@ export const PlanUnavailablePayload = z
 
 /** Someone left before the plan was set. Deliberately strict: it never says who. */
 export const PartyDissolvedPayload = z
+  .object({
+    partyId: Id,
+  })
+  .strict();
+
+/** F54: the party switched to plan B. Who asked is never carried. */
+export const PartySwitchedPayload = z
   .object({
     partyId: Id,
   })
@@ -141,6 +149,7 @@ export const PAYLOADS = {
   "party.dissolved": PartyDissolvedPayload,
   "party.nomatch": PartyNoMatchPayload,
   "party.seat": PartySeatPayload,
+  "party.switched": PartySwitchedPayload,
   "agent.verdict": Verdict,
   "table.message": TableMessage,
   "pair.message": PairMessage,
@@ -182,6 +191,7 @@ export const PQEvent = z.discriminatedUnion("type", [
   envelope("party.dissolved"),
   envelope("party.nomatch"),
   envelope("party.seat"),
+  envelope("party.switched"),
   envelope("agent.verdict"),
   envelope("table.message"),
   envelope("pair.message"),

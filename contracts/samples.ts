@@ -11,6 +11,7 @@ export const SAMPLE_PAYLOADS: { [T in EventType]: PayloadOf<T> } = {
   "party.dissolved": { partyId: "p-1" },
   "party.nomatch": { partyId: "p-1" },
   "party.seat": { partyId: "p-1", refilled: true },
+  "party.switched": { partyId: "p-1" },
   "agent.verdict": {
     partyId: "p-1",
     ownerId: "maya",

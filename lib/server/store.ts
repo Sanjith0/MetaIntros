@@ -77,6 +77,8 @@ export interface Store {
   autoForgotten: Set<string>;
   /** F44: friend groups queuing together: id -> who started it and everyone in it. */
   friendGroups: Map<string, { by: string; memberIds: string[] }>;
+  /** F54: who asked to switch to plan B, per party (never shown; only the count is). */
+  switchVotes: Map<string, Set<string>>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -129,6 +131,7 @@ function fresh(): Store {
     keepNight: new Set(),
     autoForgotten: new Set(),
     friendGroups: new Map(),
+    switchVotes: new Map(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

@@ -85,6 +85,10 @@ export function Toaster({ people, keyboard = true }: { people: Directory; keyboa
         });
         router.refresh();
         break;
+      case "party.switched":
+        push({ id: e.id, title: "Party Queue", body: "Your party switched to plan B. Your RSVP moved.", href: "/party", layer: true });
+        router.refresh();
+        break;
       case "party.nomatch":
         push({ id: e.id, title: "Party Queue", body: "No plan fit all five of you. Nobody was told why. Open your party for what's next.", href: "/party", layer: true });
         router.refresh();

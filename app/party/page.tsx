@@ -27,6 +27,8 @@ import { closestFit } from "@/lib/server/closest";
 import { hasDropped } from "@/lib/server/refill";
 import { autoForgetDue } from "@/lib/server/forget";
 import { planB } from "@/lib/server/planb";
+import { switchState } from "@/lib/server/switchplan";
+import { SwitchPlanB } from "@/components/party/SwitchPlanB";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
@@ -78,6 +80,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
   const story = flag("AGENT_STORY") ? agentStory(v.party.id, viewer) : null;
   const friend = flag("TELL_A_FRIEND") ? friendMessage(v.party.id, viewer) : null;
   const backup = planB(v.party.id);
+  const switching = backup ? switchState(v.party.id, viewer) : null;
   const closest = flag("CLOSEST_FIT") && noMatch && !noMatch.requeued ? closestFit(v.party.id, viewer) : null;
   const waiting = noMatch?.requeued ? queueStatus(viewer) : null;
 
@@ -110,6 +113,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
                     <span className="font-semibold text-[var(--color-ink)]">Plan B</span>, if it doesn&apos;t work out: {backup.title} · {backup.when} · {backup.venueName}. It fits everyone&apos;s rules too.
                   </div>
                 )}
+                {backup && switching && <SwitchPlanB key={`${v.party.id}-${backup.planId}`} partyId={v.party.id} initial={switching} />}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Link href={`/chat/${v.party.chatId}`} data-testid="open-party-chat" className="press flex h-9 items-center gap-1.5 rounded-[6px] bg-[var(--color-pq)] px-3 text-[15px] font-semibold text-white">
                     <IconChat size={18} /> Group chat

@@ -39,6 +39,9 @@ export function boardAt(traces: Trace[], upto: number): BoardState {
         st.locked = m.planId ?? null;
         st.done = true;
         break;
+      case "switched": // F54: the party moved to plan B
+        st.locked = m.planId ?? st.locked;
+        break;
     }
   }
   return st;
