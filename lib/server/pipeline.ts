@@ -13,6 +13,7 @@ import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { writeTrace, type TraceStep } from "./trace";
 import { partyFormationAgent, templateRationale } from "@/lib/agents/partyFormation";
+import { eventSelectionAgent } from "@/lib/agents/eventSelection";
 
 const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
 const candKey = (c: Candidate) => [...c.entryIds].sort().join(",");
@@ -50,7 +51,27 @@ export async function selectEventFallback(members: Person[], cand: Candidate, la
 
 export type EventChooser = (members: Person[], cand: Candidate, landmarkId: string, partyId: string) => Promise<{ eventId: string; runnersUp: string[]; reasons: string[] } | null>;
 
-let eventChooser: EventChooser = (m, c, l) => selectEventFallback(m, c, l);
+/** Default chooser: the Event Selection Agent (its steps go to the party's trace). */
+export const agentEventChooser: EventChooser = async (members, cand, landmarkId, partyId) => {
+  const lm = await prisma.landmark.findUniqueOrThrow({ where: { id: landmarkId } });
+  const now = await clockNow();
+  const { end } = weekendRange(now);
+  const rows = cand.eventId
+    ? await prisma.event.findMany({ where: { id: cand.eventId } })
+    : await prisma.event.findMany({ where: { startsAt: { gt: now, lt: end } } });
+  const r = await eventSelectionAgent({
+    queuedEventId: cand.eventId,
+    events: rows.map((e) => ({ ...e, tags: e.tags as string[] })),
+    group: groupContext(members, cand, lm),
+    cand,
+    now,
+  });
+  if (!r) return null;
+  await writeTrace(partyId, r.steps);
+  return { eventId: r.eventId, runnersUp: r.runnersUp, reasons: r.reasons };
+};
+
+let eventChooser: EventChooser = agentEventChooser;
 export function setEventChooser(fn: EventChooser) {
   eventChooser = fn;
 }
