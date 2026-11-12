@@ -15,6 +15,7 @@ import { writeTrace, type TraceStep } from "./trace";
 import { partyFormationAgent, templateRationale } from "@/lib/agents/partyFormation";
 import { eventSelectionAgent } from "@/lib/agents/eventSelection";
 import { afterPartyConfirmed } from "./hooks";
+import { planHangout } from "./hangout";
 
 const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
 const candKey = (c: Candidate) => [...c.entryIds].sort().join(",");
@@ -40,10 +41,10 @@ export async function selectEventFallback(members: Person[], cand: Candidate, la
   const now = await clockNow();
   if (cand.eventId) {
     const ev = await prisma.event.findUniqueOrThrow({ where: { id: cand.eventId } });
-    return ev.isPublicVenue ? { eventId: ev.id, runnersUp: [] as string[], reasons: ["You queued for this event"] } : null;
+    return ev.isPublicVenue && ev.kind === "event" ? { eventId: ev.id, runnersUp: [] as string[], reasons: ["You queued for this event"] } : null;
   }
   const { end } = weekendRange(now);
-  const events = await prisma.event.findMany({ where: { startsAt: { gt: now, lt: end } } });
+  const events = await prisma.event.findMany({ where: { kind: "event", startsAt: { gt: now, lt: end } } });
   const ranked = rankEvents(events.map((e) => ({ ...e, tags: e.tags as string[] })), groupContext(members, cand, lm), now);
   const ok = ranked.filter((r) => r.ok);
   if (!ok.length) return null;
@@ -58,8 +59,8 @@ export const agentEventChooser: EventChooser = async (members, cand, landmarkId,
   const now = await clockNow();
   const { end } = weekendRange(now);
   const rows = cand.eventId
-    ? await prisma.event.findMany({ where: { id: cand.eventId } })
-    : await prisma.event.findMany({ where: { startsAt: { gt: now, lt: end } } });
+    ? await prisma.event.findMany({ where: { id: cand.eventId, kind: "event" } })
+    : await prisma.event.findMany({ where: { kind: "event", startsAt: { gt: now, lt: end } } });
   const r = await eventSelectionAgent({
     queuedEventId: cand.eventId,
     events: rows.map((e) => ({ ...e, tags: e.tags as string[] })),
@@ -107,10 +108,16 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
   await prisma.party.update({ where: { id: partyId }, data: { rationale: agentOut?.rationale ?? templateRationale(c) } });
   if (agentOut) await writeTrace(partyId, agentOut.steps);
 
-  const choice = await eventChooser(members, c, p.bucketId, partyId).catch(() => null) ?? (await selectEventFallback(members, c, p.bucketId));
+  // Existing-events queue → pick a real event; hangout queue → plan a new one at common ground.
+  const choice =
+    p.mode === "hangout"
+      ? await planHangout(members, c, p.bucketId, partyId).catch(() => null)
+      : (await eventChooser(members, c, p.bucketId, partyId).catch(() => null)) ?? (await selectEventFallback(members, c, p.bucketId));
   const event = choice ? await prisma.event.findUnique({ where: { id: choice.eventId } }) : null;
-  if (!event || !validateParty(members, event).ok) {
-    // No safe event → release everyone back to the queue.
+  const wrongKind = event && (p.mode === "hangout") !== (event.kind === "hangout");
+  if (!event || wrongKind || !validateParty(members, event).ok) {
+    // No safe event → release everyone back to the queue (and drop a hangout we just created).
+    if (event?.kind === "hangout") await prisma.event.delete({ where: { id: event.id } }).catch(() => {});
     await prisma.$transaction([
       prisma.queueEntry.updateMany({ where: { id: { in: c.entryIds } }, data: { status: "waiting", partyId: null, matchedAt: null } }),
       prisma.party.update({ where: { id: partyId }, data: { status: "cancelled" } }),

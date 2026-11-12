@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
 import { getQueueStatus, joinQueue, leaveQueue, tick } from "@/lib/server/queue";
 import { setSetting } from "@/lib/server/settings";
+import { getEventDetail, getFeed } from "@/lib/server/events";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -61,5 +62,41 @@ describe("queue service (DB)", () => {
     expect(await tick()).toBe(1);
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true } });
     expect(party.event!.isPublicVenue).toBe(true);
+  });
+  it("hangout queue: plans a new, squad-only, public hangout (not an existing event)", async () => {
+    const r = await joinQueue("p01", { mode: "hangout", eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
+    expect(r.ok).toBe(true);
+    await wait(300);
+    expect((await getQueueStatus("p01")).mode).toBe("hangout");
+    expect(await tick()).toBe(1);
+    const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true, members: true, chat: true } });
+    const ev = party.event!;
+    expect(ev.kind).toBe("hangout");
+    expect(ev.isPublicVenue).toBe(true);
+    expect(ev.hostName).toBe("Queue Up");
+    expect(ev.startsAt.getTime()).toBeGreaterThan(Date.now() - 1);
+    expect(party.chat).toBeTruthy(); // squad chat, host, cards all run as usual
+    // every queuer in this party was in the hangout queue
+    const entries = await prisma.queueEntry.findMany({ where: { partyId: party.id } });
+    expect(entries.every((e) => e.mode === "hangout" && e.eventId === null)).toBe(true);
+    expect(await prisma.agentTrace.count({ where: { partyId: party.id, agent: "hangout_planner" } })).toBeGreaterThanOrEqual(3);
+    expect(await prisma.agentTrace.count({ where: { partyId: party.id, agent: "event_selection" } })).toBe(0);
+    // private to the squad: never in the feed, detail 404s for outsiders
+    const feed = await getFeed("p01", "foryou", new Date(2026, 10, 12, 9));
+    expect(feed.some((e) => e.id === ev.id)).toBe(false);
+    expect(await getEventDetail("p01", ev.id)).not.toBeNull();
+    const outsider = (await prisma.user.findFirstOrThrow({ where: { id: { notIn: party.members.map((m) => m.userId) } } })).id;
+    expect(await getEventDetail(outsider, ev.id)).toBeNull();
+    // nobody can queue into a squad's hangout
+    expect(await joinQueue(outsider, { eventId: ev.id, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" })).toMatchObject({ ok: false, error: "no_event" });
+  });
+
+  it("hangout queue rejects an eventId; existing-events queue never yields a hangout", async () => {
+    expect(await joinQueue("p01", { mode: "hangout", eventId: "ev-indie-guild", targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" })).toMatchObject({ ok: false, error: "bad_mode" });
+    await joinQueue("p01", { eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
+    await wait(300);
+    expect(await tick()).toBe(1);
+    const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { event: true } });
+    expect(party.event!.kind).toBe("event");
   });
 });

@@ -76,13 +76,16 @@ export function filterFeed(events: FeedEvent[], tab: FeedTab, now: Date): FeedEv
 }
 
 export async function getFeed(userId: string, tab: FeedTab, now: Date) {
-  const events = await prisma.event.findMany();
+  // Queue Up hangouts are private to their squad and never appear in the public feed.
+  const events = await prisma.event.findMany({ where: { kind: "event" } });
   return filterFeed(await decorateEvents(userId, events), tab, now);
 }
 
 export async function getEventDetail(userId: string, eventId: string) {
   const e = await prisma.event.findUnique({ where: { id: eventId }, include: { landmark: true } });
   if (!e) return null;
+  // A hangout's time and place are visible only to its squad (anyone else gets a 404).
+  if (e.kind === "hangout" && !(await prisma.partyMember.findFirst({ where: { userId, party: { eventId } } }))) return null;
   const [d] = await decorateEvents(userId, [e]);
   const friends = await friendIdsOf(userId);
   const friendRsvps = await prisma.eventRsvp.findMany({

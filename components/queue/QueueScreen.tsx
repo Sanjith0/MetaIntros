@@ -11,6 +11,8 @@ import { MatchTracePanel } from "@/components/trace/MatchTracePanel";
 interface Status {
   state: "idle" | "waiting" | "matched";
   targetSize?: number;
+  mode?: "events" | "hangout";
+  eventId?: string | null;
   bucketName?: string;
   waitedMs?: number;
   found?: number;
@@ -23,7 +25,7 @@ interface Party {
   cohesion: number | null;
   rationale: string | null;
   members: { user: { id: string; name: string; avatarColor: string } }[];
-  event: { id: string; title: string; startsAt: string; venueName: string } | null;
+  event: { id: string; title: string; startsAt: string; venueName: string; kind?: string; description?: string } | null;
   landmark: { name: string };
   chat: { id: string } | null;
 }
@@ -80,7 +82,9 @@ export function QueueScreen() {
   return (
     <div data-testid="queue-screen" className="relative min-h-[80dvh] overflow-hidden bg-gradient-to-b from-[#0b1640] via-[#1b1464] to-[#2a0f5c] px-4 pb-8 pt-6 text-white">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#a5b4fc]">In queue · {status.bucketName}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#a5b4fc]" data-testid="queue-kind">
+          {status.mode === "hangout" ? "New hangout" : status.eventId ? "This event" : "Any event"} queue · {status.bucketName}
+        </p>
         <button type="button" data-testid="leave-queue" aria-label="Leave queue"
           onClick={async () => { await fetch("/api/queue/leave", { method: "POST" }); window.location.href = "/events"; }}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10"><X size={16} /></button>
@@ -142,8 +146,11 @@ function PartyFound({ party }: { party: Party }) {
       </ul>
       {party.event && (
         <div className="mt-6 rounded-2xl bg-white/10 p-4 backdrop-blur" data-testid="party-event">
-          <p className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#c4b5fd]"><Sparkles size={14} /> Your squad is going to</p>
-          <p className="mt-1 text-lg font-bold">{party.event.title}</p>
+          <p className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#c4b5fd]">
+            <Sparkles size={14} /> {party.event.kind === "hangout" ? "New hangout planned for your squad" : "Your squad is going to"}
+          </p>
+          <p className="mt-1 text-lg font-bold" data-testid="party-event-title">{party.event.title}</p>
+          {party.event.kind === "hangout" && party.event.description && <p className="text-sm text-[#ddd6fe]">{party.event.description}</p>}
           <p className="flex items-center gap-1.5 text-sm text-[#ddd6fe]"><CalendarDays size={14} /> {fmtEventWhen(new Date(party.event.startsAt))}</p>
           <p className="flex items-center gap-1.5 text-sm text-[#ddd6fe]"><MapPin size={14} /> {party.event.venueName}</p>
         </div>
@@ -157,7 +164,7 @@ function PartyFound({ party }: { party: Party }) {
         )}
         {party.event && (
           <Link href={`/events/${party.event.id}`} data-testid="view-event" className={`flex items-center justify-center gap-1.5 rounded-xl bg-white/15 py-3 font-bold ${party.chat ? "" : "col-span-2"}`}>
-            <CalendarDays size={18} /> View event
+            <CalendarDays size={18} /> {party.event.kind === "hangout" ? "View plan" : "View event"}
           </Link>
         )}
       </div>

@@ -16,6 +16,7 @@ interface Step {
 const AGENT_LABEL: Record<string, string> = {
   party_formation: "Party Formation Agent",
   event_selection: "Event Selection Agent",
+  hangout_planner: "Hangout Planner Agent",
   host: "AI Host",
   talk_cards: "Talk Cards Agent",
   companion: "Companion Agents",

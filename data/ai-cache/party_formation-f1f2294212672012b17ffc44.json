@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all share a love for vinyl records, indie music, and climbing! With bouldering and live music also in common, you'll have plenty to talk about all day.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 431,
+    "completionTokens": 234
+  },
+  "savedAt": "2026-11-12T18:15:24.804Z"
+}

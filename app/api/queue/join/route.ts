@@ -4,6 +4,7 @@ import { joinQueue } from "@/lib/server/queue";
 import { getCurrentUserId } from "@/lib/server/session";
 
 const Body = z.object({
+  mode: z.enum(["events", "hangout"]).default("events"),
   eventId: z.string().nullable(),
   targetSize: z.number().int(),
   lat: z.number().optional(),

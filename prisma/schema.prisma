@@ -168,6 +168,8 @@ model Event {
   hostName      String
   landmarkId    String?
   landmark      Landmark? @relation(fields: [landmarkId], references: [id], onDelete: SetNull)
+  /// "event" = a real Facebook event · "hangout" = planned by Queue Up for one squad (squad-only, never in the feed)
+  kind          String    @default("event")
   createdAt     DateTime  @default(now())
 
   rsvps        EventRsvp[]
@@ -194,7 +196,9 @@ model QueueEntry {
   id               String    @id @default(cuid())
   userId           String
   user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  /// null = "anything this weekend"
+  /// "events" = existing events (eventId set = from that event; null = any event) · "hangout" = plan a new hangout
+  mode             String    @default("events")
+  /// null = "any event this weekend"
   eventId          String?
   event            Event?    @relation(fields: [eventId], references: [id], onDelete: SetNull)
   targetPartySize  Int       @default(6)

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { PartySize } from "@/lib/domain/enums";
 import { assignBucket } from "@/lib/match/buckets";
 import { makePairScorer } from "@/lib/match/compat";
-import { playersFound, runTickAsync, type Candidate, type Proposal, type QueueItem } from "@/lib/match/engine";
+import { playersFound, runTickAsync, type Candidate, type Proposal, type QueueItem, type QueueMode } from "@/lib/match/engine";
 import { pairAllowed } from "@/lib/match/safety";
 import { loadPeople, type Person } from "@/lib/profile/load";
 import { publish } from "./bus";
@@ -15,6 +15,8 @@ import { sweepExpiredChats } from "./expiry";
 // ───────────────────────── join / leave ─────────────────────────
 
 export interface JoinInput {
+  /** "events" (default) = existing events; "hangout" = plan a new hangout (eventId must be null) */
+  mode?: QueueMode;
   eventId: string | null;
   targetSize: number;
   /** GPS fix; ignored if landmarkId is given */
@@ -27,13 +29,16 @@ export interface JoinInput {
 
 export type JoinResult =
   | { ok: true; entryId: string; bucketId: string; bucketName: string }
-  | { ok: false; error: "too_far" | "bad_size" | "private_event" | "no_event" | "no_location"; nearest?: string };
+  | { ok: false; error: "too_far" | "bad_size" | "private_event" | "no_event" | "no_location" | "bad_mode"; nearest?: string };
 
 export async function joinQueue(userId: string, input: JoinInput): Promise<JoinResult> {
   if (!PartySize.safeParse(input.targetSize).success) return { ok: false, error: "bad_size" };
+  const mode: QueueMode = input.mode ?? "events";
+  if (mode !== "events" && mode !== "hangout") return { ok: false, error: "bad_mode" };
+  if (mode === "hangout" && input.eventId) return { ok: false, error: "bad_mode" }; // hangouts are new, never an existing event
   if (input.eventId) {
     const ev = await prisma.event.findUnique({ where: { id: input.eventId } });
-    if (!ev) return { ok: false, error: "no_event" };
+    if (!ev || ev.kind !== "event") return { ok: false, error: "no_event" }; // can't queue into another squad's hangout
     if (!ev.isPublicVenue) return { ok: false, error: "private_event" }; // hard rule: public venues only
   }
   const landmarks = await prisma.landmark.findMany();
@@ -51,7 +56,7 @@ export async function joinQueue(userId: string, input: JoinInput): Promise<JoinR
 
   await prisma.queueEntry.updateMany({ where: { userId, status: "waiting" }, data: { status: "left" } });
   const entry = await prisma.queueEntry.create({
-    data: { userId, eventId: input.eventId, targetPartySize: input.targetSize, lat: lat!, lng: lng!, bucketLandmarkId: bucket.id },
+    data: { userId, mode, eventId: input.eventId, targetPartySize: input.targetSize, lat: lat!, lng: lng!, bucketLandmarkId: bucket.id },
   });
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
   if (!user.isSimulated) {
@@ -78,6 +83,7 @@ export interface QueueStatus {
   state: "idle" | "waiting" | "matched";
   entryId?: string;
   targetSize?: number;
+  mode?: QueueMode;
   eventId?: string | null;
   bucketName?: string;
   waitedMs?: number;
@@ -89,7 +95,7 @@ export interface QueueStatus {
 export async function getQueueStatus(userId: string): Promise<QueueStatus> {
   const entry = await prisma.queueEntry.findFirst({ where: { userId, status: { in: ["waiting", "matched"] } }, orderBy: { joinedAt: "desc" }, include: { bucketLandmark: true } });
   if (!entry) return { state: "idle" };
-  if (entry.status === "matched") return { state: "matched", entryId: entry.id, partyId: entry.partyId, targetSize: entry.targetPartySize, eventId: entry.eventId };
+  if (entry.status === "matched") return { state: "matched", entryId: entry.id, partyId: entry.partyId, targetSize: entry.targetPartySize, mode: entry.mode as QueueMode, eventId: entry.eventId };
   ensureTicker();
   const waiting = await waitingItems();
   const people = await loadPeople(prisma, waiting.map((w) => w.userId));
@@ -101,6 +107,7 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
     state: "waiting",
     entryId: entry.id,
     targetSize: entry.targetPartySize,
+    mode: entry.mode as QueueMode,
     eventId: entry.eventId,
     bucketName: entry.bucketLandmark.name,
     waitedMs: Date.now() - entry.joinedAt.getTime(),
@@ -119,6 +126,7 @@ async function waitingItems(): Promise<QueueItem[]> {
     targetSize: r.targetPartySize,
     bucketId: r.bucketLandmarkId,
     eventId: r.eventId,
+    mode: r.mode as QueueMode,
     joinedAt: r.joinedAt.getTime(),
     isSimulated: r.user.isSimulated,
   }));
@@ -222,7 +230,7 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
     const fresh = await prisma.queueEntry.findUnique({ where: { id: entryId } });
     if (!fresh || fresh.status !== "waiting") return [];
     const busy = new Set((await prisma.queueEntry.findMany({ where: { status: "waiting" }, select: { userId: true } })).map((x) => x.userId));
-    const sameSizeReal = await prisma.queueEntry.count({ where: { status: "waiting", targetPartySize: entry.targetPartySize, user: { isSimulated: false } } });
+    const sameSizeReal = await prisma.queueEntry.count({ where: { status: "waiting", targetPartySize: entry.targetPartySize, mode: entry.mode, user: { isSimulated: false } } });
     const need = Math.max(0, entry.targetPartySize - sameSizeReal);
     if (need === 0) return [];
     const sims = await prisma.user.findMany({ where: { isSimulated: true }, select: { id: true } });
@@ -256,6 +264,7 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
           const e = await prisma.queueEntry.create({
             data: {
               userId: p.id,
+              mode: entry.mode,
               eventId: entry.eventId,
               targetPartySize: entry.targetPartySize,
               lat: entry.lat + jitter(1),

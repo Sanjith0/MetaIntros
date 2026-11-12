@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Lock, MapPin, Swords, Users } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, Sparkles, Swords, Users } from "lucide-react";
 import { EventCover } from "@/components/EventCover";
 import { AvatarStack } from "@/components/Avatar";
 import { RsvpButtons } from "@/components/RsvpButtons";
@@ -16,6 +16,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   const e = await getEventDetail(userId, id);
   if (!e) notFound();
   const squad = await getSquadForEvent(userId, id);
+  const hangout = e.kind === "hangout";
   return (
     <div data-testid="event-detail" className="bg-white pb-6">
       <EventCover color={e.coverColor} pattern={e.coverPattern} height={180}>
@@ -34,16 +35,23 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
             {e.venueAddress}
           </span>
         </p>
-        <p className="flex items-center gap-2 text-fb-muted">
-          <Users size={18} /> {e.friendsInterested} friends interested · {e.goingCount} going · hosted by {e.hostName}
-        </p>
-        {e.friendRsvps.length > 0 && <AvatarStack people={e.friendRsvps} />}
+        {hangout ? (
+          <p data-testid="hangout-badge" className="flex items-start gap-2 rounded-xl bg-[#e7f3ff] p-3 text-sm text-fb-blue">
+            <Sparkles size={16} className="mt-0.5 shrink-0" />
+            <span>A new hangout Queue Up planned for your squad at a public spot near all of you. Only your squad can see it.</span>
+          </p>
+        ) : (
+          <p className="flex items-center gap-2 text-fb-muted">
+            <Users size={18} /> {e.friendsInterested} friends interested · {e.goingCount} going · hosted by {e.hostName}
+          </p>
+        )}
+        {!hangout && e.friendRsvps.length > 0 && <AvatarStack people={e.friendRsvps} />}
 
         {squad && <SquadBanner squad={squad} />}
 
-        <RsvpButtons eventId={e.id} initial={e.myRsvp} />
+        {!hangout && <RsvpButtons eventId={e.id} initial={e.myRsvp} />}
 
-        {e.isPublicVenue ? (
+        {hangout ? null : e.isPublicVenue ? (
           squad ? null : (
             <Link
               href={`/queue/start?eventId=${e.id}`}

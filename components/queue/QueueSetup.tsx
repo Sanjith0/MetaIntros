@@ -2,9 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Crosshair, Lock, MapPin, ShieldCheck, Swords, Users } from "lucide-react";
+import { CalendarDays, Crosshair, Lock, MapPin, ShieldCheck, Sparkles, Swords, Users } from "lucide-react";
+
+type Mode = "events" | "hangout";
 
 interface Props {
+  /** initial queue when not queuing from a specific event */
+  mode?: Mode;
   event: { id: string; title: string; when: string; venue: string; isPublic: boolean } | null;
   landmarks: { id: string; name: string; city: string }[];
 }
@@ -23,8 +27,9 @@ function getPosition(timeoutMs = 6000): Promise<GeolocationPosition> {
   });
 }
 
-export function QueueSetup({ event, landmarks }: Props) {
+export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: Props) {
   const router = useRouter();
+  const [mode, setMode] = useState<Mode>(event ? "events" : initialMode);
   const [size, setSize] = useState(6);
   const [loc, setLoc] = useState<LocState>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +40,7 @@ export function QueueSetup({ event, landmarks }: Props) {
     setError(null);
     const r = await fetch("/api/queue/join", {
       method: "POST",
-      body: JSON.stringify({ eventId: event?.id ?? null, targetSize: size, ...body }),
+      body: JSON.stringify({ mode, eventId: mode === "events" ? event?.id ?? null : null, targetSize: size, ...body }),
     });
     const j = await r.json();
     if (j.ok) return router.push("/queue");
@@ -58,8 +63,28 @@ export function QueueSetup({ event, landmarks }: Props) {
   return (
     <div data-testid="queue-setup" className="min-h-[80dvh] bg-gradient-to-b from-[#0b1640] via-[#1b1464] to-[#2a0f5c] px-4 pb-8 pt-5 text-white">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#a5b4fc]">Queue Up</p>
-      <h1 className="mt-1 text-2xl font-extrabold leading-tight">{event ? event.title : "Anything this weekend"}</h1>
-      <p className="text-sm text-[#c7d2fe]">{event ? `${event.when} · ${event.venue}` : "We'll match your squad, then pick an event you'll all like."}</p>
+      <h1 className="mt-1 text-2xl font-extrabold leading-tight" data-testid="queue-title">{event ? event.title : mode === "hangout" ? "Plan a new hangout" : "Any event this weekend"}</h1>
+      <p className="text-sm text-[#c7d2fe]">
+        {event
+          ? `${event.when} · ${event.venue}`
+          : mode === "hangout"
+            ? "No event needed: we'll match your squad, then plan a hangout at a public spot near all of you, when you're all free."
+            : "We'll match your squad, then sort you into an existing event you'll all like."}
+      </p>
+
+      {!event && (
+        <div className="mt-4 grid grid-cols-2 gap-1.5 rounded-xl bg-white/10 p-1" role="radiogroup" aria-label="Queue type">
+          {([
+            ["events", "Existing events", CalendarDays],
+            ["hangout", "New hangout", Sparkles],
+          ] as const).map(([m, text, Icon]) => (
+            <button key={m} type="button" role="radio" aria-checked={mode === m} data-testid={`queue-mode-${m}`} onClick={() => setMode(m)}
+              className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-bold transition ${mode === m ? "bg-white text-[#3b0f7a]" : "text-white/80"}`}>
+              <Icon size={15} /> {text}
+            </button>
+          ))}
+        </div>
+      )}
 
       {event && !event.isPublic ? (
         <p className="mt-6 flex items-center gap-2 rounded-xl bg-white/10 p-3"><Lock size={16} /> Queue Up is only available for public venues.</p>
@@ -113,7 +138,7 @@ export function QueueSetup({ event, landmarks }: Props) {
           {error && <p className="mt-4 rounded-lg bg-red-500/20 p-2 text-sm" data-testid="queue-error">{error}</p>}
           <p className="mt-6 flex items-start gap-1.5 text-xs text-[#c7d2fe]">
             <ShieldCheck size={14} className="mt-0.5 shrink-0" />
-            Squads only include people in your age range, always meet at public venues, and never include anyone you&apos;ve blocked. Your location is only used to pick a nearby area.
+            Squads only include people in your age range{mode === "hangout" ? " who are also planning a hangout" : ""}, always meet at public venues, and never include anyone you&apos;ve blocked. Your location is only used to pick a nearby area.
           </p>
         </>
       )}

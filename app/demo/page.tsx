@@ -14,8 +14,8 @@ interface Status {
   model: string;
   clockOffsetMs: number;
   liveUsers: number;
-  buckets: Record<string, { size: number; users: { id: string; name: string; avatarColor: string; real: boolean; waitedMs: number; event: string | null }[] }[]>;
-  parties: { id: string; status: string; event: string | null; area: string; size: number; real: number; cohesion: number | null }[];
+  buckets: Record<string, { size: number; queue: string; users: { id: string; name: string; avatarColor: string; real: boolean; waitedMs: number; event: string | null }[] }[]>;
+  parties: { id: string; status: string; event: string | null; hangout?: boolean; area: string; size: number; real: number; cohesion: number | null }[];
   aiLog: { task: string; source: string; ms: number; error?: string }[];
   joinUrl: string;
   qr: string;
@@ -119,8 +119,8 @@ export default function DemoPage() {
           <div key={bucket} className="mt-2 rounded-xl bg-white/5 p-2">
             <p className="text-xs font-semibold text-[#a5b4fc]">{bucket}</p>
             {groups.map((g) => (
-              <div key={g.size} className="mt-1 flex items-center gap-2">
-                <span className="w-14 text-xs">size {g.size}</span>
+              <div key={`${g.size}-${g.queue}`} className="mt-1 flex items-center gap-2" data-testid={`demo-queue-${g.queue.replace(" ", "-")}`}>
+                <span className="w-24 text-xs">size {g.size} · {g.queue}</span>
                 <span className="flex flex-wrap gap-1">
                   {g.users.map((u) => (
                     <span key={u.id} title={`${u.name} · ${Math.round(u.waitedMs / 1000)}s`} className={u.real ? "rounded-full ring-2 ring-[#67e8f9]" : ""}>
@@ -135,7 +135,7 @@ export default function DemoPage() {
         {s && s.parties.length > 0 && (
           <ul className="mt-3 space-y-1 text-xs" data-testid="demo-parties">
             {s.parties.map((p) => (
-              <li key={p.id} className="rounded-lg bg-white/5 px-2 py-1">{p.status === "completed" ? "✓" : "●"} {p.size}-squad → {p.event} · {p.area} · {p.real} real · cohesion {Math.round((p.cohesion ?? 0) * 100)}%</li>
+              <li key={p.id} className="rounded-lg bg-white/5 px-2 py-1">{p.status === "completed" ? "✓" : "●"} {p.size}-squad → {p.hangout ? "new hangout: " : ""}{p.event} · {p.area} · {p.real} real · cohesion {Math.round((p.cohesion ?? 0) * 100)}%</li>
             ))}
           </ul>
         )}

@@ -10,6 +10,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const parsed = Body.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "bad body" }, { status: 400 });
   const userId = await getCurrentUserId();
+  const ev = await prisma.event.findUnique({ where: { id }, select: { kind: true } });
+  if (!ev || ev.kind !== "event") return NextResponse.json({ error: "not found" }, { status: 404 }); // hangouts have no RSVPs
   if (parsed.data.status === null) {
     await prisma.eventRsvp.deleteMany({ where: { eventId: id, userId } });
   } else {

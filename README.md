@@ -1,10 +1,20 @@
 # Queue Up — go to events with a squad, not alone
 
-**Queue Up** is a feature inside Facebook Events. Tap **Queue Up** on an event, or "Queue Up for anything this weekend". Queue Up then:
+**Queue Up** is a feature inside Facebook Events. It has three ways in, which run as separate queues:
+
+| Queue | Where you start it | What you get |
+|---|---|---|
+| **This event** | **Queue Up** on an event page | A squad for that event |
+| **Any event** | "Queue Up for any event this weekend" on Events | A squad, plus an existing event you'll all like |
+| **New hangout** | "Plan a hangout with a new squad" on Events | A squad, plus a brand-new hangout at a public spot near all of you, at a time you're all free |
+
+Hangout queuers only ever match other hangout queuers. Inside the existing-events queue, "any event" queuers can join someone who queued from a specific event, and then go to that event. Two different specific events never mix.
+
+Whichever queue you pick, Queue Up then:
 
 1. Builds your taste profile from your (mocked) Facebook data.
 2. Queues you with nearby people, like a ranked game queue.
-3. Forms a compatible **squad** of 2–8 strangers, and an AI agent picks the event.
+3. Forms a compatible **squad** of 2–8 strangers. An AI agent picks the event, or plans the hangout.
 4. Opens a temporary squad chat with an **AI host**.
 5. Gives you **talk cards**: grounded icebreakers for each squadmate.
 6. Helps you find each other at the venue.
@@ -83,6 +93,7 @@ flowchart LR
     subgraph Agents["lib/agents (1 Muse call each)"]
       PFA["Party Formation Agent"]
       ESA["Event Selection Agent"]
+      HPA["Hangout Planner Agent"]
       HOST["AI Host"]
       CARDS["Talk Cards Agent"]
       COMP["Companion pre-chats"]
@@ -105,9 +116,12 @@ flowchart LR
   ENGINE --> SAFE
   ENGINE -->|top candidate groups| PFA
   PFA -->|choice| SAFE
-  SAFE --> ESA --> FIT
-  ESA --> HOST --> COMP --> CARDS
-  PFA & ESA & HOST & CARDS & COMP --> AI
+  SAFE -->|existing-events queue| ESA --> FIT
+  SAFE -->|hangout queue| HPA
+  ESA --> HOST
+  HPA --> HOST
+  HOST --> COMP --> CARDS
+  PFA & ESA & HPA & HOST & CARDS & COMP --> AI
   AI --> CACHE
   AI -.->|cache miss, live mode only| MUSE
   Agents --> TRACE --> DB
@@ -121,7 +135,9 @@ flowchart LR
 1. The engine proposes candidate groups.
 2. The **Party Formation Agent** picks one using its tools: `getProfiles`, `scoreGroup`, `checkSafetyRules`.
 3. **Code re-checks safety** on that pick.
-4. The **Event Selection Agent** chooses from events that code has already verified. Its pick is then re-validated.
+4. The next step depends on the queue:
+   - **Existing-events queue:** the **Event Selection Agent** chooses from events that code has already verified. Its pick is then re-validated.
+   - **Hangout queue:** code builds every option: a public spot (`data/seed/spots.json`) within 12 km of *every* member's area, a slot inside everyone's shared free time and the spot's hours, and nothing anyone dislikes. The **Hangout Planner Agent** picks one and names it, in one Muse call. Its pick is re-validated, and its text is length-capped and sensitivity-filtered. The plan is saved as a squad-only event (`Event.kind = "hangout"`), so chat, check-ins, expiry and "Met through Queue Up" work unchanged.
 5. The squad chat is created and the **AI host** welcomes everyone.
 6. **Companion pre-chats** run, and their sparks feed the **talk cards**.
 7. Every step is written to `AgentTrace` and streamed to the "How we matched you" panel.
@@ -132,13 +148,13 @@ flowchart LR
 |---|---|
 | `lib/graph` | Graph API–shaped schemas, mock source, interest vocabulary |
 | `lib/profile` | taste profile builder, deterministic embeddings |
-| `lib/match` | compatibility, cohesion, queue engine, safety, event fit, friend safety |
-| `lib/agents` | the five agents (prompts + validation) |
+| `lib/match` | compatibility, cohesion, queue engine (separate queues), safety, event fit, hangout fit, friend safety |
+| `lib/agents` | the six agents (prompts + validation) |
 | `lib/ai` | the single model interface |
 | `lib/server` | DB services (queue, pipeline, chats, host, expiry, friending, demo) |
 | `app/` | UI and API routes |
-| `tests/unit` | Vitest (151 tests) |
-| `tests/e2e` | Playwright (22 tests, iPhone viewport, production build, network disabled) |
+| `tests/unit` | Vitest (168 tests) |
+| `tests/e2e` | Playwright (24 tests, iPhone viewport, production build, network disabled) |
 
 ---
 
@@ -160,7 +176,8 @@ All of these are enforced **in code**, with property-based tests. An agent can p
 - **Age bands.** Users only match within their own band (13–15, 16–17, 18–24, 25+), so minors and adults are never in the same squad. Search widening never relaxes this. Friend suggestions never cross the minor/adult line. *(The demo uses self-declared age at sign-up. Production would use Facebook's verified age.)*
 - **Women-only option.** A woman can choose to be matched only into all-women squads. This is enforced pairwise and at party level.
 - **Blocks.** Blocked users are never matched together, never suggested as friends, and can't send squad friend requests, in either direction.
-- **Public venues only.** Queueing for a private-address event is refused. The event agent's pick is re-validated against `isPublicVenue`.
+- **Public venues only.** Queueing for a private-address event is refused. The event agent's pick is re-validated against `isPublicVenue`. Hangouts are only ever planned at public spots from a curated list, never someone's home.
+- **Squad-only hangouts.** A planned hangout never appears in the feed, can't be RSVP'd or queued into, and its page 404s for anyone outside the squad.
 - **Opt-in, party-scoped photos.** Members can add a "find me" photo that only their squad can fetch. Anyone outside the squad gets a 404. Photos are deleted when the chat ends.
 - **Grounded talk cards.** Every claim cites the exact field it came from, such as `p05:groups[1]` or `mutualFriends`. Claims whose sources don't resolve are stripped, and cards are re-validated again when read.
 - **No sensitive inferences.** Politics, religion, health and sexuality are never used for matching and never shown. Sensitive pages are flagged at the vocabulary level, and a text filter backs that up. Tests run against a deliberately hostile mock model and planted sensitive data.

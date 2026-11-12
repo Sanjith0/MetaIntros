@@ -92,3 +92,48 @@ test("live mode: three real people pick size 3 and land in the same party", asyn
   }
   expect(new Set(ids).size).toBe(1);
 });
+
+test("new hangout queue: Events → Plan a hangout → squad gets a squad-only hangout at a public spot", async ({ page, browser }) => {
+  await gotoReady(page, "/events");
+  await page.getByTestId("queue-hangout").click();
+  await expect(page.getByTestId("queue-title")).toHaveText("Plan a new hangout");
+  await expect(page.getByTestId("queue-mode-hangout")).toHaveAttribute("aria-checked", "true");
+  await page.getByTestId("size-4").click();
+  await page.getByTestId("choose-area").click();
+  await page.getByTestId("area-lm-downtown-pa").click();
+
+  await expect(page.getByTestId("queue-kind")).toContainText("New hangout queue");
+  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("party-event")).toContainText("New hangout planned for your squad");
+  await expect.poll(() => page.locator('[data-testid="trace-step"]').filter({ hasText: "Hangout Planner Agent" }).count(), { timeout: 15_000 }).toBeGreaterThanOrEqual(2);
+  const title = (await page.getByTestId("party-event-title").textContent())!;
+
+  await page.getByTestId("view-event").click();
+  await expect(page.getByTestId("hangout-badge")).toBeVisible();
+  await expect(page.getByTestId("queue-up-button")).toHaveCount(0);
+  const url = page.url();
+
+  // not in the public feed…
+  await gotoReady(page, "/events");
+  await expect(page.getByTestId("event-feed")).not.toContainText(title);
+  // …and invisible to anyone outside the squad
+  const other = await browser.newContext();
+  const o = await other.newPage();
+  await o.request.post("/api/demo/login-as", { data: { userId: "p09" } }); // Jordan blocked p09, so p09 can never be in this squad
+  // (Status is 200 because (app)/loading.tsx streams first; what matters is what the outsider sees.)
+  await o.goto(url);
+  await expect(o.getByTestId("not-found")).toBeVisible();
+  await expect(o.getByTestId("hangout-badge")).toHaveCount(0);
+  await expect(o.locator("body")).not.toContainText(title);
+  await other.close();
+});
+
+test("queue type switch: 'any event' can flip to 'new hangout' before joining", async ({ page }) => {
+  await gotoReady(page, "/queue/start?mode=anything");
+  await expect(page.getByTestId("queue-title")).toHaveText("Any event this weekend");
+  await page.getByTestId("queue-mode-hangout").click();
+  await expect(page.getByTestId("queue-title")).toHaveText("Plan a new hangout");
+  // from a specific event there is no switch
+  await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
+  await expect(page.getByTestId("queue-mode-hangout")).toHaveCount(0);
+});

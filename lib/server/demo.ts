@@ -14,17 +14,19 @@ export async function demoStatus() {
     }),
     prisma.party.findMany({
       where: { status: { in: ["confirmed", "completed"] } },
-      include: { members: { include: { user: { select: { name: true, isSimulated: true } } } }, event: { select: { title: true } }, landmark: { select: { name: true } } },
+      include: { members: { include: { user: { select: { name: true, isSimulated: true } } } }, event: { select: { title: true, kind: true } }, landmark: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
       take: 8,
     }),
     prisma.user.count({ where: { isLive: true } }),
   ]);
-  const buckets: Record<string, { size: number; users: { id: string; name: string; avatarColor: string; real: boolean; waitedMs: number; event: string | null }[] }[]> = {};
+  const buckets: Record<string, { size: number; queue: string; users: { id: string; name: string; avatarColor: string; real: boolean; waitedMs: number; event: string | null }[] }[]> = {};
   for (const w of waiting) {
     const b = (buckets[w.bucketLandmark.name] ??= []);
-    let g = b.find((x) => x.size === w.targetPartySize);
-    if (!g) b.push((g = { size: w.targetPartySize, users: [] }));
+    // Separate queues: hangout vs existing events never match, so show them as separate rows.
+    const queue = w.mode === "hangout" ? "hangout" : w.eventId ? "event" : "any event";
+    let g = b.find((x) => x.size === w.targetPartySize && x.queue === queue);
+    if (!g) b.push((g = { size: w.targetPartySize, queue, users: [] }));
     g.users.push({ id: w.user.id, name: w.user.name, avatarColor: w.user.avatarColor, real: !w.user.isSimulated, waitedMs: Date.now() - w.joinedAt.getTime(), event: w.event?.title ?? null });
   }
   return {
@@ -36,7 +38,7 @@ export async function demoStatus() {
     clockOffsetMs: await getClockOffsetMs(),
     liveUsers,
     buckets,
-    parties: parties.map((p) => ({ id: p.id, status: p.status, event: p.event?.title ?? null, area: p.landmark.name, size: p.members.length, real: p.members.filter((m) => !m.user.isSimulated).length, cohesion: p.cohesion })),
+    parties: parties.map((p) => ({ id: p.id, status: p.status, event: p.event?.title ?? null, hangout: p.event?.kind === "hangout", area: p.landmark.name, size: p.members.length, real: p.members.filter((m) => !m.user.isSimulated).length, cohesion: p.cohesion })),
     aiLog: aiLog().slice(-12),
   };
 }

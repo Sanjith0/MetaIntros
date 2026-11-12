@@ -10,14 +10,21 @@ import { makePairScorer } from "./compat";
 import { pairAllowed, validateParty } from "./safety";
 
 export type FillMode = "simulated" | "mixed" | "live";
+/**
+ * Which queue an entry is in. "events" = existing Facebook events (eventId set = queued from that
+ * event, null = "any event"); "hangout" = Queue Up plans a brand-new hangout. Modes never mix.
+ */
+export type QueueMode = "events" | "hangout";
 
 export interface QueueItem {
   entryId: string;
   userId: string;
   targetSize: number;
   bucketId: string;
-  /** null = "anything this weekend" */
+  /** null = "any event this weekend" (always null in hangout mode) */
   eventId: string | null;
+  /** defaults to "events" */
+  mode?: QueueMode;
   joinedAt: number; // ms epoch
   isSimulated: boolean;
 }
@@ -63,6 +70,7 @@ export interface Candidate {
 export interface Proposal {
   anchorEntryId: string;
   targetSize: number;
+  mode: QueueMode;
   eventId: string | null;
   bucketId: string;
   level: number;
@@ -84,20 +92,29 @@ function levelsFor(opts: Pick<EngineOptions, "fillMode" | "liveFloor">) {
 
 type Scorer = ReturnType<typeof makePairScorer>;
 
-function eventsCompatible(a: string | null, b: string | null) {
-  return a === null || b === null || a === b;
+const modeOf = (q: Pick<QueueItem, "mode">): QueueMode => q.mode ?? "events";
+
+/**
+ * Hard queue separation: hangout ↔ hangout only. Within the existing-events queue, someone who
+ * queued from a specific event can be joined by "any event" queuers (who then go to that event),
+ * but two different specific events never mix.
+ */
+export function queuesCompatible(a: Pick<QueueItem, "mode" | "eventId">, b: Pick<QueueItem, "mode" | "eventId">) {
+  if (modeOf(a) !== modeOf(b)) return false;
+  return a.eventId === null || b.eventId === null || a.eventId === b.eventId;
 }
 
 /** Greedy group growth from a seed set: add whoever maximizes the group's weakest link. */
 function growGroup(seed: QueueItem[], pool: QueueItem[], size: number, people: Map<string, Person>, score: Scorer): QueueItem[] | null {
   const group = [...seed];
+  const mode = modeOf(group[0]);
   let event = group.find((g) => g.eventId)?.eventId ?? null;
   const remaining = pool.filter((p) => !group.some((g) => g.entryId === p.entryId));
   while (group.length < size) {
     let best: { item: QueueItem; min: number; avg: number } | null = null;
     for (const c of remaining) {
       if (group.some((g) => g.userId === c.userId)) continue;
-      if (!eventsCompatible(event, c.eventId)) continue;
+      if (!queuesCompatible({ mode, eventId: event }, c)) continue;
       const pc = people.get(c.userId)!;
       if (!group.every((g) => pairAllowed(people.get(g.userId)!, pc))) continue;
       let min = 1, sum = 0;
@@ -136,7 +153,7 @@ export function findProposal(
   const eligible = pool.filter((c) => {
     if (c.entryId === anchor.entryId || c.userId === anchor.userId) return false;
     if (c.targetSize !== anchor.targetSize) return false; // party size is a hard "game mode"
-    if (!eventsCompatible(anchor.eventId, c.eventId)) return false;
+    if (!queuesCompatible(anchor, c)) return false;
     if (bucketDistanceKm(anchor.bucketId, c.bucketId, landmarks) > level.radiusKm) return false;
     const cp = people.get(c.userId);
     if (!cp || !pairAllowed(anchorP, cp)) return false;
@@ -175,6 +192,7 @@ export function findProposal(
   return {
     anchorEntryId: anchor.entryId,
     targetSize: anchor.targetSize,
+    mode: modeOf(anchor),
     eventId: anchor.eventId ?? candidates[0].eventId,
     bucketId: anchor.bucketId,
     level: index,
@@ -233,7 +251,7 @@ export function playersFound(
   const { level } = levelFor(opts.now - anchor.joinedAt, opts);
   const radius = Math.max(level.radiusKm, 6);
   const eligible = waiting.filter((c) => {
-    if (c.userId === anchor.userId || c.targetSize !== anchor.targetSize || !eventsCompatible(anchor.eventId, c.eventId)) return false;
+    if (c.userId === anchor.userId || c.targetSize !== anchor.targetSize || !queuesCompatible(anchor, c)) return false;
     if (bucketDistanceKm(anchor.bucketId, c.bucketId, landmarks) > radius) return false;
     if (c.isSimulated && opts.fillMode === "live") return false;
     const cp = people.get(c.userId);
