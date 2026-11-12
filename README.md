@@ -147,9 +147,10 @@ flowchart LR
 4. The next step depends on the queue:
    - **Existing-events queue:** the **Event Selection Agent** chooses from events that code has already verified. Its pick is then re-validated.
    - **Hangout queue:** code builds every option: a public spot (`data/seed/spots.json`) within 12 km of *every* member's area, a slot inside everyone's shared free time and the spot's hours, and nothing anyone dislikes. The **Hangout Planner Agent** picks one and names it, in one Muse call. Its pick is re-validated, and its text is length-capped and sensitivity-filtered. The plan is saved as a squad-only event (`Event.kind = "hangout"`), so chat, check-ins, expiry and "Met through Queue Up" work unchanged.
-5. The squad chat is created and the **AI host** welcomes everyone.
-6. **Companion pre-chats** run, and their sparks feed the **talk cards**.
-7. Every step is written to `AgentTrace` and streamed to the "How we matched you" panel.
+5. **Ready check ("I'm in").** Every real member gets 10 minutes (`acceptWindowMs` setting) to tap **I'm in** or **Not for me**. Until everyone is in, the server shows only first name, last initial and shared interests: no photos, no rationale, no trace. Simulated members accept on their own. If someone passes or time runs out, nobody is told who. They leave the queue, and everyone who said yes goes back in with their original place in line. A hangout planned for that squad is dropped (`lib/server/readyCheck.ts`).
+6. On the last accept, "Your squad is ready" plays, the squad chat is created and the **AI host** welcomes everyone.
+7. **Companion pre-chats** run, and their sparks feed the **talk cards**.
+8. Every step is written to `AgentTrace` and streamed to the "How we matched you" panel.
 
 **Code map:**
 

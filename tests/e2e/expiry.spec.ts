@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo, gotoReady } from "./helpers";
+import { resetDemo, gotoReady, lockIn } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -11,7 +11,7 @@ test("fast-forward archives the squad chat: read-only + stay-in-touch prompt", a
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-rwc-courthouse").click();
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page, 30_000);
   await page.getByTestId("open-squad-chat").click();
   await expect(page.getByTestId("msg-host").first()).toBeVisible();
   await expect(page.getByTestId("composer")).toBeVisible();
@@ -31,7 +31,7 @@ test("global clock: Fast-forward ends the event for everyone; Reset & reseed kee
     await page.getByTestId("size-4").click();
     await page.getByTestId("choose-area").click();
     await page.getByTestId("area-lm-rwc-courthouse").click();
-    await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+    await lockIn(page, 30_000);
   };
   await queueForBouldering();
   await page.getByTestId("open-squad-chat").click();

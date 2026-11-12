@@ -235,8 +235,10 @@ model Party {
   targetSize Int
   ageBand    String
   womenOnly  Boolean  @default(false)
-  /// "forming" | "confirmed" | "completed" | "cancelled"
+  /// "forming" | "confirming" (ready check: members tap "I'm in") | "confirmed" | "completed" | "cancelled"
   status     String   @default("forming")
+  /// Ready-check deadline while status = "confirming"; anyone who hasn't accepted by then is dropped
+  acceptBy   DateTime?
   cohesion   Float?
   rationale  String?
   createdAt  DateTime @default(now())
@@ -258,6 +260,8 @@ model PartyMember {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   joinedAt    DateTime  @default(now())
   checkedInAt DateTime?
+  /// Tapped "I'm in" on the ready check (simulated members accept automatically)
+  acceptedAt  DateTime?
   photoOptIn  Boolean   @default(false)
   photoUrl    String?
 
