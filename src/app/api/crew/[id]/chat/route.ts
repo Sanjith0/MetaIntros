@@ -6,9 +6,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!c) return Response.json({ error: "not found" }, { status: 404 });
   const { userId, text } = (await req.json()) as { userId: string; text: string };
   const clean = String(text ?? "").slice(0, 1000).trim();
-  if (!clean) return Response.json(view(c));
+  if (!clean || !c.memberIds.includes(userId)) return Response.json(view(c));
   c.chat.push({ id: `u-${Date.now()}`, authorId: userId, text: clean, at: Date.now() });
-  const reply = await simulatedReply(c, clean);
-  if (reply) c.chat.push({ ...reply, at: Date.now() + 1200 });
+  // Simulated crewmate reply arrives asynchronously, like a real chat.
+  void simulatedReply(c, clean).then((reply) => {
+    if (reply) c.chat.push({ ...reply, at: Math.max(Date.now(), reply.at + 1200) });
+  });
   return Response.json(view(c));
 }

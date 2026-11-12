@@ -14,6 +14,7 @@ export default function CrewPage({ params }: { params: Promise<{ id: string }> }
   const { id } = use(params);
   const { crew, setCrew, missing } = useCrew(id);
   const [showHow, setShowHow] = useState(true);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   if (missing) return <Missing />;
   if (!crew) return <div className="p-6 text-sub">Loading crew…</div>;
   const ev = EVENTS.find((e) => e.id === crew.eventId)!;
@@ -109,6 +110,30 @@ export default function CrewPage({ params }: { params: Promise<{ id: string }> }
               <div className="text-2xl">📍</div>
               <div className="text-sm font-semibold">I&apos;m here</div>
             </Link>
+          </div>
+        )}
+      </div>
+
+      <div className="px-3 pb-6 text-center">
+        {!confirmLeave ? (
+          <button className="text-[13px] text-sub underline" onClick={() => setConfirmLeave(true)} data-testid="leave-crew">
+            Leave this crew
+          </button>
+        ) : (
+          <div className="bg-white rounded-xl p-3 shadow-sm text-[14px]">
+            <p>Leave the crew? Nobody gets a reason, and the plan continues without you.</p>
+            <div className="flex gap-2 mt-2 justify-center">
+              <Button variant="secondary" onClick={() => setConfirmLeave(false)}>Stay</Button>
+              <Button
+                data-testid="confirm-leave"
+                onClick={async () => {
+                  await post(`/api/crew/${id}/leave`, { userId: ME });
+                  location.href = `/events/${crew.eventId}`;
+                }}
+              >
+                Leave
+              </Button>
+            </div>
           </div>
         )}
       </div>

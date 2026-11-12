@@ -155,3 +155,19 @@ test("agent pre-chat: one grounded transcript per crewmate", async ({ request })
     expect(c.summary.length).toBeGreaterThan(5);
   }
 });
+
+test("leaving: a crewmate leaving shrinks the crew; the seeker leaving dissolves it", async ({ request }) => {
+  const { crew } = await formCrew(request, filters());
+  const after = (await (await request.post(`/api/crew/${crew!.id}/leave`, { data: { userId: "priya" } })).json()) as CrewView;
+  expect(after.memberIds).not.toContain("priya");
+  expect(after.memberIds).toHaveLength(5);
+  const gone = await (await request.post(`/api/crew/${crew!.id}/leave`, { data: { userId: ME } })).json();
+  expect(gone.dissolved).toBe(true);
+  expect((await request.get(`/api/crew/${crew!.id}`)).status()).toBe(404);
+});
+
+test("chat ignores messages from non-members", async ({ request }) => {
+  const { crew } = await formCrew(request, filters());
+  const v = (await (await request.post(`/api/crew/${crew!.id}/chat`, { data: { userId: "ethan", text: "hi" } })).json()) as CrewView;
+  expect(v.chat.some((m) => m.authorId === "ethan")).toBe(false);
+});

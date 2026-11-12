@@ -33,3 +33,18 @@ test("menu reset clears crews", async ({ page }) => {
   await page.goto("/crews");
   await expect(page.getByText("No crews yet")).toBeVisible();
 });
+
+test("leave crew from the crew page returns to the event", async ({ page, request }) => {
+  await request.post("/api/reset");
+  const f = { womenOnly: false, ageBand: null, crewSize: 6 };
+  await request.post("/api/queue/join", { data: { eventId: "pale-hour", userId: "maya", filters: f } });
+  await request.post("/api/demo/fill", { data: { eventId: "pale-hour", spacingMs: 1 } });
+  await page.waitForTimeout(100);
+  const body = await (await request.post("/api/crew/form", { data: { eventId: "pale-hour", userId: "maya", filters: f } })).text();
+  const id = JSON.parse(body.trim().split("\n").at(-1)!).crew.id;
+  await page.goto(`/crew/${id}`);
+  await page.getByTestId("leave-crew").click();
+  await page.getByTestId("confirm-leave").click();
+  await expect(page).toHaveURL(/\/events\/pale-hour$/);
+  await expect(page.getByTestId("join-crew")).toBeVisible();
+});
