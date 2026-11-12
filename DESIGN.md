@@ -160,27 +160,49 @@ only.
 - **EventHeader**: cover; date line; title (`text-page`); venue line; host line.
 - **ActionRow**: equal-width grey buttons, Interested (star), Going (check), Invite (mail),
   plus a 36px "…" button. On state is `on`/`link`. [inferred from EVENT_PAGE §4]
-- **QueueEntry** (Events tab feed unit): a Section with a 36px `on`-circle icon, title "Go
-  with a squad", one line of copy, a face pile of people queued nearby, and one primary
-  button that opens the **QueueSheet**.
-- **QueueSheet**: three list rows, one per queue mode: a specific event, any event this
-  weekend, a new hangout.
-- **StatusCard**: the single card showing the user's Queue Up state: waiting → squad found
-  → at the venue → after. It always has exactly one next action. It appears at the top of
-  the Events tab and on the event page it concerns.
-- **QueueScreen**: back bar; event row; a large 34px tabular timer (system font); "3 of 6
-  found" with an accent progress bar; slots (52px avatars pop in, empty slots are dashed
-  `divider` circles); "Leave queue" as a grey button.
-- **SquadFound** (the loud moment): white page; a 88px accent circle with a white check
-  scales in with one pulse ring; "Your squad is ready" (`text-page`); members pop in
-  staggered (56px); the event attachment; "How we matched you"; primary "Open squad chat",
-  secondary "View event".
-- **TraceList** ("How we matched you"): list rows, each with a 32px `control` icon circle,
-  an agent name (13px `muted`, sentence case) and a summary (15px). Steps appear one by one
-  (250ms fade-up).
-- **SquadHub** (`/squad/[id]`): header (event, time, meet spot, face pile), one primary
-  action for the current state, and four underline tabs: Plan, Talk cards, Find each other,
-  How we matched.
+- **QueueEntry** ("Go with a squad", the Events tab feed unit and the event page unit):
+  - A 40px `on`-circle icon, a title, one line of copy, and the queue pulse. The pulse is counts
+    only, shown at 5 or more; it never shows faces of people queuing.
+  - One primary button that opens the **QueueSheet**.
+  - It shares one slot with the StatusCard; the two never stack.
+- **QueueSheet**: a two-step bottom sheet.
+  - Step 1 lists the three queue modes as ListRows: an event you pick (your Interested events
+    first), any event this weekend, a new hangout.
+  - Step 2 is setup: squad size chips (4, 5 or 6), "where you'll start from" (location once, or
+    choose an area), one safety line, and a sticky "Find my squad".
+  - The event page opens straight at step 2.
+- **StatusCard**: the single card showing the user's Queue Up state: waiting → squad ready → at
+  the venue → after. It always has exactly one next action. It appears at the top of the Events
+  tab and on the event page it concerns.
+- **QueueScreen**:
+  - Back bar; an event row (icon, title, "Near {area} · squad of N").
+  - A 34px tabular timer in the system font, and "3 of 5 found" with an accent progress bar.
+  - Slots: other people are blurred until the squad is ready; empty slots are dashed `divider`
+    circles.
+  - A "While you wait" list with three plain safety rows, and "Leave queue" as a grey button.
+- **SquadFound** (the loud moment):
+  - A white page. An 88px accent circle with a white check scales in once, with a single ring.
+  - "Your squad is ready" (`text-page`). Members pop in staggered (48px, one row), and sample
+    people are labeled.
+  - The event attachment, then a "How we matched you" row.
+  - Primary "Open squad chat".
+- **TraceList** ("How we matched you"), in a sheet:
+  - Two groups, **Written by AI** and **Checked by code**. Each AI line says where it came from:
+    written just now, a saved AI response, the test model, or a template because AI was
+    unavailable.
+  - No stagger and no tool-call names.
+- **Squad info** (`/squad/[id]`), modelled on Messenger's chat info:
+  - Face pile, squad name and event line.
+  - Round actions: Chat, Event, I'm here.
+  - Plan rows; rows for Talk cards, Find each other and How we matched you; a member list
+    (sample people labeled).
+- **Chat thread**:
+  - Messenger header: back, face pile, name, "N members · ends in…", and an info button.
+  - A pinned plan strip.
+  - Grey and blue bubbles in runs. The AI host is a plain grey incoming bubble with "Queue Up
+    host" and an AI label.
+  - Quick-reply chips: Ask the host, Talk cards, Find each other. "Aa" composer.
+  - The tab bar steps aside.
 
 ## 4. States
 

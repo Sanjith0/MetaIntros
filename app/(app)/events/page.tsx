@@ -1,73 +1,64 @@
-import Link from "next/link";
-import { Sparkles, Swords } from "lucide-react";
-import { EventCard } from "@/components/EventCard";
+import { TopBar } from "@/components/fb/TopBar";
+import { ChipLink, ChipRow, Section, Stack } from "@/components/fb";
+import { EventCard } from "@/components/events/EventCard";
+import { QueueEntry } from "@/components/queueup/QueueEntry";
+import { StatusCard } from "@/components/queueup/StatusCard";
 import { FEED_TABS, getFeed, type FeedTab } from "@/lib/server/events";
 import { getCurrentUserId } from "@/lib/server/session";
 import { now } from "@/lib/server/clock";
 import { squadEventIds } from "@/lib/server/squads";
+import { getStatusCard } from "@/lib/server/status";
+import { pulseLine, queuePulse } from "@/lib/server/pulse";
+import { prisma } from "@/lib/db";
 
 export default async function EventsPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const sp = await searchParams;
   const tab = (FEED_TABS.some((t) => t.id === sp.tab) ? sp.tab : "foryou") as FeedTab;
   const userId = await getCurrentUserId();
-  const [feed, squads] = await Promise.all([getFeed(userId, tab, await now()), squadEventIds(userId)]);
+  const t = await now();
+  const [feed, squads, card, pulse, upcoming, landmarks] = await Promise.all([
+    getFeed(userId, tab, t),
+    squadEventIds(userId),
+    getStatusCard(userId, t),
+    queuePulse(),
+    getFeed(userId, "foryou", t),
+    prisma.landmark.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, city: true } }),
+  ]);
+  // "An event you pick": public events, the ones you're interested in first (Jordan's story).
+  const pickable = upcoming
+    .filter((e) => e.isPublicVenue)
+    .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
+    .slice(0, 10)
+    .map((e) => ({ id: e.id, title: e.title, startsAt: e.startsAt.toISOString(), venue: e.venueName, isPublic: true, mine: Boolean(e.myRsvp) }));
+  const heading = { foryou: "Suggested for you", nearby: "Near you", weekend: "This weekend" }[tab];
+
   return (
-    <div data-testid="events-page" className="px-3 pt-3">
-      <h1 className="text-2xl font-bold">Events</h1>
-      <div className="mt-2 flex gap-2" role="tablist">
-        {FEED_TABS.map((t) => (
-          <Link
-            key={t.id}
-            href={`/events?tab=${t.id}`}
-            role="tab"
-            aria-selected={t.id === tab}
-            data-testid={`feed-tab-${t.id}`}
-            className={`rounded-full px-3 py-1.5 text-sm font-semibold ${t.id === tab ? "bg-[#e7f3ff] text-fb-blue" : "bg-white text-fb-text"}`}
-          >
-            {t.label}
-          </Link>
-        ))}
-      </div>
+    <div data-testid="events-page">
+      <TopBar title="Events" />
+      <Stack>
+        <div className="bg-surface px-4 pt-1 pb-3">
+          <ChipRow label="Filter events">
+            {FEED_TABS.map((f) => (
+              <ChipLink key={f.id} href={`/events?tab=${f.id}`} on={f.id === tab} data-testid={`feed-tab-${f.id}`} scroll={false}>
+                {f.label}
+              </ChipLink>
+            ))}
+          </ChipRow>
+        </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-2">
-        <Link
-          href="/queue/start?mode=anything"
-          data-testid="queue-anything"
-          className="queue-shimmer flex items-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-[#1877f2] via-[#5b4bf5] to-[#9333ea] p-4 text-white shadow-md"
-        >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/20">
-            <Swords size={22} />
-          </span>
-          <span className="flex-1">
-            <span className="block text-xs font-semibold uppercase tracking-wider opacity-80">Queue Up · existing events</span>
-            <span className="block font-bold leading-tight">Queue Up for any event this weekend</span>
-            <span className="block text-xs opacity-90">We&apos;ll find your squad and sort you into an event you&apos;ll like.</span>
-          </span>
-        </Link>
-        <Link
-          href="/queue/start?mode=hangout"
-          data-testid="queue-hangout"
-          className="flex items-center gap-3 overflow-hidden rounded-xl bg-white p-4 text-fb-text shadow-sm ring-1 ring-[#e4e6eb]"
-        >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e7f3ff] text-fb-blue">
-            <Sparkles size={22} />
-          </span>
-          <span className="flex-1">
-            <span className="block text-xs font-semibold uppercase tracking-wider text-fb-blue">Queue Up · new hangout</span>
-            <span className="block font-bold leading-tight">Plan a hangout with a new squad</span>
-            <span className="block text-xs text-fb-muted">No event needed. We&apos;ll pick a public spot near all of you.</span>
-          </span>
-        </Link>
-      </div>
+        {card ? <StatusCard card={card} /> : <QueueEntry pulse={pulseLine(pulse)} events={pickable} landmarks={landmarks} />}
 
-      <ul className="mt-3 space-y-3 pb-4" data-testid="event-feed" data-count={feed.length}>
-        {feed.map((e) => (
-          <li key={e.id}>
-            <EventCard e={e} squad={squads.has(e.id)} />
-          </li>
-        ))}
-        {feed.length === 0 && <li className="rounded-xl bg-white p-6 text-center text-fb-muted">No events here yet.</li>}
-      </ul>
+        <Section title={heading} className="pb-4">
+          <ul className="flex flex-col gap-3" data-testid="event-feed" data-count={feed.length}>
+            {feed.map((e) => (
+              <li key={e.id}>
+                <EventCard e={e} squad={squads.has(e.id)} />
+              </li>
+            ))}
+            {feed.length === 0 && <li className="py-8 text-center text-muted">No events here yet. Try another filter.</li>}
+          </ul>
+        </Section>
+      </Stack>
     </div>
   );
 }

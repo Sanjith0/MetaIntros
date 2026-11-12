@@ -20,6 +20,11 @@ export default async function CardsPage({ params, searchParams }: { params: Prom
   const order = party.members.map((m) => m.userId);
   cards.sort((a, b) => order.indexOf(a.subject.id) - order.indexOf(b.subject.id));
   const pre = await getPreChatsFor(partyId, me);
-  const withPre = cards.map((c) => ({ ...c, preChat: pre.find((p) => p.otherId === c.subject.id) ?? null }));
-  return <TalkCardDeck cards={withPre} meId={me} initialMember={member ?? null} chatId={party.chat?.id ?? null} eventTitle={party.event?.title ?? ""} />;
+  const flags = new Map((await prisma.user.findMany({ where: { id: { in: order } }, select: { id: true, isSimulated: true, isLive: true } })).map((u) => [u.id, u]));
+  const withPre = cards.map((c) => ({
+    ...c,
+    subject: { ...c.subject, isSimulated: flags.get(c.subject.id)?.isSimulated, isLive: flags.get(c.subject.id)?.isLive },
+    preChat: pre.find((p) => p.otherId === c.subject.id) ?? null,
+  }));
+  return <TalkCardDeck cards={withPre} meId={me} initialMember={member ?? null} partyId={partyId} eventTitle={party.event?.title ?? ""} />;
 }

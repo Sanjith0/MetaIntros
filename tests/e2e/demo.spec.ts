@@ -31,17 +31,20 @@ test("scripted demo flow end-to-end (simulated mode, ~20s queue)", async ({ page
   await page.getByTestId("area-lm-downtown-pa").click();
   // 3. queue visibly fills over ~20s
   await expect(page.getByTestId("queue-screen")).toBeVisible();
-  await expect(page.getByTestId("players-found")).toContainText("/6");
+  await expect(page.getByTestId("players-found")).toContainText("of 6");
   await expect.poll(async () => page.getByTestId("player-filled").count(), { timeout: 25_000 }).toBeGreaterThanOrEqual(3);
-  // 4. party forms, trace streams in
+  // 4. squad forms; "How we matched you" opens in a sheet
   await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 40_000 });
+  await page.getByTestId("trace-toggle").click();
   await expect.poll(() => page.getByTestId("trace-step").count(), { timeout: 20_000 }).toBeGreaterThanOrEqual(8);
-  // 5. event confirmed + squad banner
+  await page.keyboard.press("Escape");
+  // 5. event confirmed + status card
   await page.getByTestId("view-event").click();
   await expect(page.getByTestId("squad-banner")).toBeVisible();
-  // 6. chats badge → squad chat with AI host welcome
+  // 6. Messages badge → squad chat with AI host welcome
+  await page.getByTestId("tab-events").click();
   await expect(page.getByTestId("badge-chats")).toBeVisible();
-  await page.getByTestId("tab-chats").click();
+  await page.getByTestId("open-chats").click();
   await page.locator('[data-testid^="inbox-row-"][data-type="squad"]').click();
   await expect(page.getByTestId("msg-host").first()).toContainText("Indie Night");
   await expect(page.getByTestId("msg-host").nth(1)).toContainText("Icebreaker");
@@ -49,11 +52,13 @@ test("scripted demo flow end-to-end (simulated mode, ~20s queue)", async ({ page
   await page.getByTestId("open-talk-cards").click();
   await expect(page.locator('[data-testid^="talk-card-"]')).toHaveCount(5);
   await page.goBack();
-  // 8. find your party: check in
+  // 8. find each other: check in
+  await page.getByTestId("open-find").click();
   await page.getByTestId("im-here").click();
   await expect(page.getByTestId("im-here")).toHaveText(/You're here/);
-  // 9. fast-forward: archive + add-friend prompt
-  await page.getByTestId("fast-forward").click();
+  // 9. presenter fast-forwards from /demo: the chat archives, add-friend prompt
+  await request.post("/api/demo/fast-forward");
+  await page.goBack();
   await expect(page.getByTestId("read-only")).toBeVisible();
   await page.getByTestId("stay-in-touch").click();
   await expect(page.getByTestId("squad-connect")).toBeVisible();

@@ -1,37 +1,62 @@
 import Link from "next/link";
-import { Avatar } from "@/components/Avatar";
+import { Image as ImageIcon, Plus } from "lucide-react";
+import { TopBar } from "@/components/fb/TopBar";
+import { Avatar, Stack } from "@/components/fb";
+import { EventCover } from "@/components/events/EventCover";
+import { DateLine } from "@/components/events/DateLine";
+import { Post } from "@/components/feed/Post";
+import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/server/session";
+import { POSTS, STORIES } from "@/lib/mock/feed";
 
-const POSTS = [
-  { who: "Peninsula Boulders", color: "#ea580c", text: "New problems set on the cave wall this week 🧗 Come try the purple V3!", ago: "2h" },
-  { who: "Palo Alto Runners", color: "#f59e0b", text: "Saturday 5K is ON. Meet at the Oval at 8. Coffee after ☕️", ago: "5h" },
-  { who: "Bay Area Indie Shows", color: "#7c3aed", text: "Who's going to Indie Night at The Guild this weekend?", ago: "1d" },
-];
-
+/** Home: a seeded mock feed. One post shares an event, which is how people reach Events from Home. */
 export default async function HomePage() {
   const me = await getCurrentUser();
+  const shared = await prisma.event.findMany({ where: { id: { in: POSTS.flatMap((p) => (p.eventId ? [p.eventId] : [])) } } });
   return (
-    <div className="space-y-2" data-testid="home-page">
-      <div className="flex items-center gap-2 bg-white p-3">
-        <Avatar name={me.name} color={me.avatarColor} size={40} />
-        <div className="flex-1 rounded-full border border-fb-divider px-4 py-2 text-fb-muted">What&apos;s on your mind?</div>
-      </div>
-      <Link href="/events" className="block bg-gradient-to-r from-fb-blue to-queue-glow p-4 text-white">
-        <p className="text-xs font-semibold uppercase tracking-wider opacity-80">New in Events</p>
-        <p className="text-lg font-bold">Queue Up — go with a squad, not alone</p>
-      </Link>
-      {POSTS.map((p) => (
-        <article key={p.who} className="bg-white p-3">
-          <div className="flex items-center gap-2">
-            <Avatar name={p.who} color={p.color} size={40} />
-            <div>
-              <p className="font-semibold">{p.who}</p>
-              <p className="text-xs text-fb-muted">{p.ago}</p>
+    <div data-testid="home-page">
+      <TopBar variant="home" />
+      <Stack>
+        <div className="flex items-center gap-2 bg-surface px-4 py-2">
+          <Avatar name={me.name} color={me.avatarColor} size={40} />
+          <div className="flex h-10 flex-1 items-center rounded-full border border-divider px-4 text-body text-muted">What&apos;s on your mind?</div>
+          <ImageIcon size={24} className="text-positive" aria-label="Photo" />
+        </div>
+        <div className="no-scrollbar flex gap-2 overflow-x-auto bg-surface px-4 py-3">
+          <div className="flex h-44 w-24 shrink-0 flex-col overflow-hidden rounded-card border border-divider/70">
+            <div className="flex flex-1 items-center justify-center bg-wash"><Avatar name={me.name} color={me.avatarColor} size={48} /></div>
+            <div className="relative h-12 pt-5 text-center text-meta font-semibold">
+              <span className="absolute -top-4 left-1/2 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full bg-accent text-surface ring-4 ring-surface"><Plus size={16} strokeWidth={3} /></span>
+              Create story
             </div>
           </div>
-          <p className="mt-2">{p.text}</p>
-        </article>
-      ))}
+          {STORIES.map((s) => (
+            <EventCover key={s.id} color={s.color} pattern={s.pattern} label={`${s.name}'s story`} className="h-44 w-24 shrink-0 rounded-card">
+              <span className="absolute top-2 left-2"><Avatar name={s.name} color={s.color} size={32} className="ring-2 ring-accent" /></span>
+              <span className="absolute right-2 bottom-2 left-2 text-meta leading-tight font-semibold text-surface">{s.name}</span>
+            </EventCover>
+          ))}
+        </div>
+        {POSTS.map((p) => {
+          const ev = shared.find((e) => e.id === p.eventId);
+          return (
+            <Post key={p.id} who={p.who} color={p.color} ago={p.ago} text={p.text} likes={p.likes} comments={p.comments}>
+              {ev ? (
+                <Link href={`/events/${ev.id}`} className="block" data-testid="feed-event">
+                  <EventCover color={ev.coverColor} pattern={ev.coverPattern} className="aspect-[2/1]" />
+                  <div className="bg-wash px-4 py-2">
+                    <DateLine start={ev.startsAt} />
+                    <p className="truncate text-body font-semibold">{ev.title}</p>
+                    <p className="truncate text-meta text-muted">{ev.venueName}</p>
+                  </div>
+                </Link>
+              ) : p.cover ? (
+                <EventCover color={p.cover.color} pattern={p.cover.pattern} className="aspect-[2/1]" />
+              ) : null}
+            </Post>
+          );
+        })}
+      </Stack>
     </div>
   );
 }

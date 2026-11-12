@@ -12,29 +12,29 @@ test("two phones sign up live and get separate sessions", async ({ browser }) =>
   await gotoReady(a, "/join");
   await a.getByTestId("join-submit").click();
   await expect(a.getByTestId("join-error")).toBeVisible();
-  await a.getByTestId("join-name").fill("Riley Judge");
+  await a.getByTestId("join-name").fill("Riley");
   await a.getByTestId("join-age-18-24").click();
   await a.getByTestId("join-gender-woman").click();
   for (const t of ["climbing", "indie-music", "coffee", "film", "hiking"]) await a.getByTestId(`join-interest-${t}`).click();
   await a.getByTestId("join-submit").click();
   await expect(a).toHaveURL(/\/events/);
-  await expect(a.getByTestId("header-avatar")).toHaveText("RJ");
+  await expect(a.getByTestId("me-avatar")).toHaveText("R");
 
   await gotoReady(b, "/join");
-  await b.getByTestId("join-name").fill("Morgan Panel");
+  await b.getByTestId("join-name").fill("Morgan");
   await b.getByTestId("join-age-25+").click();
   await b.getByTestId("join-gender-none").click();
   await b.getByTestId("join-sample").click();
   await expect(b).toHaveURL(/\/events/);
-  await expect(b.getByTestId("header-avatar")).toHaveText("MP");
+  await expect(b.getByTestId("me-avatar")).toHaveText("M");
 
   // A is still A
   await reloadReady(a);
-  await expect(a.getByTestId("header-avatar")).toHaveText("RJ");
+  await expect(a.getByTestId("me-avatar")).toHaveText("R");
   // Without a session you're the presenter's "Me"
   const c = await (await browser.newContext()).newPage();
   await gotoReady(c, "/events");
-  await expect(c.getByTestId("header-avatar")).toHaveText("JL");
+  await expect(c.getByTestId("me-avatar")).toHaveText("JL");
   await ctxA.close();
   await ctxB.close();
 });

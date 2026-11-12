@@ -1,3 +1,7 @@
+/*
+ * Event covers are content, standing in for an event photo: the colour and pattern come from the event's data.
+ * This is the one place pattern overlays live (exempt from the no-raw-colour check, like avatars).
+ */
 const PATTERNS: Record<string, string> = {
   dots: "radial-gradient(rgba(255,255,255,.25) 2px, transparent 2.5px) 0 0/16px 16px",
   grid: "linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px) 0 0/20px 20px, linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px) 0 0/20px 20px",
@@ -8,12 +12,14 @@ const PATTERNS: Record<string, string> = {
   diamonds: "linear-gradient(135deg, rgba(255,255,255,.14) 25%, transparent 25%) 0 0/24px 24px, linear-gradient(225deg, rgba(255,255,255,.14) 25%, transparent 25%) 0 0/24px 24px",
 };
 
-export function EventCover({ color, pattern, height = 120, children }: { color: string; pattern: string; height?: number; children?: React.ReactNode }) {
+export function coverBackground(color: string, pattern: string) {
+  return `${PATTERNS[pattern] ?? PATTERNS.dots}, ${color}`;
+}
+
+export function EventCover({ color, pattern, height, className = "", label = "Event cover", children }: { color: string; pattern: string; height?: number; className?: string; label?: string; children?: React.ReactNode }) {
+  const width = /(^|\s)w-/.test(className) ? "" : "w-full";
   return (
-    <div
-      className="relative w-full overflow-hidden"
-      style={{ height, background: `${PATTERNS[pattern] ?? PATTERNS.dots}, linear-gradient(135deg, ${color}, ${color}cc)` }}
-    >
+    <div role="img" aria-label={label} className={`relative overflow-hidden ${width} ${className}`} style={{ height, background: coverBackground(color, pattern) }}>
       {children}
     </div>
   );

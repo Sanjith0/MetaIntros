@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { initials } from "@/components/Avatar";
+import { initials } from "@/components/fb/Avatar";
 
 describe("avatar initials", () => {
   it("never splits surrogate pairs (hydration-safe)", () => {

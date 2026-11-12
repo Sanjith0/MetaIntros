@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/fb";
 
 export function FriendRequestActions({ requestId }: { requestId: string }) {
   const router = useRouter();
@@ -12,9 +13,9 @@ export function FriendRequestActions({ requestId }: { requestId: string }) {
     router.refresh();
   };
   return (
-    <span className="mt-1 flex gap-2">
-      <button disabled={busy} onClick={() => act(true)} data-testid="request-confirm" className="flex-1 rounded-lg bg-fb-blue py-1.5 font-semibold text-white">Confirm</button>
-      <button disabled={busy} onClick={() => act(false)} data-testid="request-delete" className="flex-1 rounded-lg bg-[#e4e6eb] py-1.5 font-semibold">Delete</button>
+    <span className="mt-2 flex gap-2">
+      <Button variant="primary" className="flex-1" disabled={busy} onClick={() => act(true)} data-testid="request-confirm">Confirm</Button>
+      <Button className="flex-1" disabled={busy} onClick={() => act(false)} data-testid="request-delete">Delete</Button>
     </span>
   );
 }

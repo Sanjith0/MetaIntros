@@ -1,15 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useState } from "react";
-import { Check, Clock, Heart, UserPlus } from "lucide-react";
-import { Avatar } from "@/components/Avatar";
+import { Check, Clock, UserPlus } from "lucide-react";
+import { Avatar, Button, ButtonLink, ListRow, Section, Stack } from "@/components/fb";
+import { TopBar } from "@/components/fb/TopBar";
 import { useLiveEvents } from "@/components/useLiveEvents";
 
 type State = "add" | "requested" | "incoming" | "friends" | "unavailable";
-interface Member { id: string; name: string; avatarColor: string; state: State; sharedNote: string | null }
+interface Member { id: string; name: string; avatarColor: string; isSimulated?: boolean; state: State; sharedNote: string | null }
 interface Data { partyId: string; eventTitle: string; over: boolean; members: Member[] }
 
+/** After the event: add squadmates. Blue Add friend per row, as on Facebook's people lists. Only mutual adds connect. */
 export function SquadConnect({ initial }: { initial: Data }) {
   const [data, setData] = useState(initial);
   const reload = useCallback(() => fetch(`/api/squad/${initial.partyId}/connect`).then((r) => r.json()).then(setData).catch(() => {}), [initial.partyId]);
@@ -21,39 +22,49 @@ export function SquadConnect({ initial }: { initial: Data }) {
   };
   const friends = data.members.filter((m) => m.state === "friends").length;
   return (
-    <div className="min-h-[80dvh] bg-white px-4 pb-8 pt-4" data-testid="squad-connect">
-      <p className="text-xs font-semibold uppercase tracking-wider text-queue-glow">After {data.eventTitle}</p>
-      <h1 className="text-2xl font-extrabold leading-tight">Stay in touch with your squad</h1>
-      <p className="mt-1 text-sm text-fb-muted">You only become friends if you both tap Add friend. Nobody is notified if you don&apos;t.</p>
-      {!data.over && <p className="mt-3 rounded-lg bg-fb-bg p-2 text-sm">Friend requests open after the event.</p>}
-      <ul className="mt-4 space-y-3">
-        {data.members.map((m) => (
-          <li key={m.id} className="flex items-center gap-3" data-testid={`connect-${m.id}`} data-state={m.state}>
-            <Avatar name={m.name} color={m.avatarColor} size={52} />
-            <span className="min-w-0 flex-1">
-              <span className="block font-semibold">{m.name}</span>
-              {m.sharedNote && <span className="block truncate text-xs text-queue-glow"><Heart size={11} className="mr-1 inline" />You both love {m.sharedNote}</span>}
-            </span>
-            {m.state === "friends" ? (
-              <span className="flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-700"><Check size={15} /> Friends</span>
-            ) : m.state === "requested" ? (
-              <span className="flex items-center gap-1 rounded-lg bg-fb-bg px-3 py-1.5 text-sm text-fb-muted"><Clock size={14} /> Requested</span>
-            ) : m.state === "unavailable" ? (
-              <span className="text-xs text-fb-muted">Unavailable</span>
-            ) : (
-              <button type="button" disabled={!data.over} onClick={() => add(m.id)} data-testid={`add-${m.id}`}
-                className="flex items-center gap-1 rounded-lg bg-fb-blue px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50">
-                <UserPlus size={15} /> {m.state === "incoming" ? "Accept" : "Add friend"}
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-      {friends > 0 && (
-        <Link href="/friends?tab=queueup" data-testid="see-new-friends" className="mt-6 block rounded-xl bg-gradient-to-r from-[#1877f2] to-[#9333ea] p-3 text-center font-bold text-white">
-          See your new friends ({friends})
-        </Link>
-      )}
+    <div data-testid="squad-connect">
+      <TopBar back={`/squad/${initial.partyId}`} title="Stay in touch" />
+      <Stack>
+        <Section>
+          <h1 className="text-headline font-bold">After {data.eventTitle}</h1>
+          <p className="mt-1 text-body text-muted">You only become friends if you both tap Add friend. Nobody is told if you don&apos;t.</p>
+          {!data.over && <p className="mt-2 rounded-card bg-wash p-3 text-meta text-muted">Friend requests open after the event.</p>}
+        </Section>
+        <Section flush className="pb-4">
+          <ul>
+            {data.members.map((m) => (
+              <li key={m.id} data-testid={`connect-${m.id}`} data-state={m.state}>
+                <ListRow
+                  leading={<Avatar name={m.name} color={m.avatarColor} size={56} />}
+                  title={m.name}
+                  subtitle={m.sharedNote ? `You both love ${m.sharedNote}` : `Met at ${data.eventTitle}`}
+                  meta={m.isSimulated ? "Sample person" : undefined}
+                  trailing={
+                    m.state === "friends" ? (
+                      <Button variant="on" size="sm" disabled icon={<Check size={14} />}>Friends</Button>
+                    ) : m.state === "requested" ? (
+                      <Button size="sm" disabled icon={<Clock size={14} />}>Requested</Button>
+                    ) : m.state === "unavailable" ? (
+                      <span className="text-meta text-muted">Unavailable</span>
+                    ) : (
+                      <Button variant="primary" size="sm" disabled={!data.over} onClick={() => add(m.id)} data-testid={`add-${m.id}`} icon={<UserPlus size={14} />}>
+                        {m.state === "incoming" ? "Confirm" : "Add friend"}
+                      </Button>
+                    )
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+        </Section>
+        {friends > 0 && (
+          <Section>
+            <ButtonLink href="/friends?tab=queueup" block data-testid="see-new-friends">
+              See your new friends ({friends})
+            </ButtonLink>
+          </Section>
+        )}
+      </Stack>
     </div>
   );
 }

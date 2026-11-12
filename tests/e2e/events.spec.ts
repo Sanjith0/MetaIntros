@@ -16,6 +16,7 @@ test("feed renders every event for each tab with correct filtering", async ({ pa
   }
   const forYou: unknown[] = await (await request.get(`/api/events?tab=foryou`)).json();
   expect(forYou.length).toBeGreaterThanOrEqual(20);
+  await page.getByTestId("queue-entry-open").click();
   await expect(page.getByTestId("queue-anything")).toBeVisible();
   expect(errors).toEqual([]);
 });
