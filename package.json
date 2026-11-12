@@ -14,7 +14,7 @@
     "test:all": "pnpm test && pnpm test:e2e",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset --force",
-    "e2e:server": "rm -f prisma/e2e.db* && prisma migrate deploy && pnpm db:seed && next build && next start -p 3100",
+    "e2e:server": "rm -f prisma/e2e.db* && prisma migrate deploy && pnpm db:seed && next build && next start -p ${E2E_PORT:-3100}",
     "gen:personas": "tsx --tsconfig tsconfig.json scripts/gen-personas.ts",
     "db:seed": "tsx --tsconfig tsconfig.json prisma/seed.ts",
     "ai:warm": "tsx --tsconfig tsconfig.json scripts/warm-ai-cache.ts"

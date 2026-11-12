@@ -7,7 +7,7 @@ async function shot(page: Page, name: string) {
   await page.waitForTimeout(400); // let entrance animations settle
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow, `${name} has horizontal scroll`).toBeLessThanOrEqual(1);
-  await page.screenshot({ path: `docs/screens/${name}.png`, fullPage: false });
+  await page.screenshot({ path: `${process.env.SCREENS_DIR ?? "docs/screens"}/${name}.png`, fullPage: false });
 }
 
 test("iPhone screenshots of every screen, no console errors, no horizontal scroll", async ({ page, request }) => {
