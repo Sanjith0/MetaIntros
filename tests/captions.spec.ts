@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 
 /* F33: a caption on the projector says what just happened; it follows the scrubber too. */
 
@@ -11,7 +12,7 @@ test("stage captions: live to the lock, then scrubbed back to Kai holding out", 
   const cap = page.getByTestId("stage-caption");
   await expect(cap).toHaveText("Waiting for the first move.");
   await page.getByTestId("stage-start").click();
-  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 90_000 });
+  await waitForLock(page, 90_000);
   await expect(cap).toHaveText("Code locked Dolores Night Market. MATCH FOUND on all five phones.");
   await expect(cap).toHaveAttribute("aria-live", "polite");
 

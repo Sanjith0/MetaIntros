@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 
 /* F4: per-agent latency, a timeout answered by a labelled fallback, and a recorded replay labelled as recorded. */
 
@@ -12,7 +13,7 @@ test("real-model readiness: latency, a labelled fallback, a labelled recorded re
     await page.goto("/stage");
     await expect(page.locator("[data-live=on]")).toHaveCount(1, { timeout: 30_000 });
     await page.getByTestId("stage-start").click();
-    await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 120_000 });
+    await waitForLock(page, 120_000);
     const fallback = page.locator('[data-testid="source-chip"][data-source="fallback"]');
     expect(await fallback.count()).toBeGreaterThanOrEqual(3);
     await expect(fallback.first()).toContainText("timeout after 2500 ms");
@@ -33,7 +34,7 @@ test("real-model readiness: latency, a labelled fallback, a labelled recorded re
     await request.post("/api/demo/settings", { data: { source: "recorded" } });
     await page.getByTestId("stage-start").click();
     await expect(page.getByTestId("recorded-banner")).toContainText("Recorded replay · recorded from the mock model", { timeout: 30_000 });
-    await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 120_000 });
+    await waitForLock(page, 120_000);
     expect(await page.locator('[data-testid="source-chip"][data-source="recorded"]').count()).toBeGreaterThanOrEqual(15);
     await page.screenshot({ path: "shots/f4-stage-recorded.png", animations: "disabled" });
   } finally {

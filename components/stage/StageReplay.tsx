@@ -105,6 +105,7 @@ export function StageReplay({
   locked = false,
   follow = null,
   keys = false,
+  splash = false,
 }: {
   initial: StageView;
   leakTest?: boolean;
@@ -120,7 +121,13 @@ export function StageReplay({
   follow?: { url: string; svg: string } | null;
   /** F47: presenter keyboard shortcuts. */
   keys?: boolean;
+  /** F48: a MATCH FOUND splash when a lock arrives live. */
+  splash?: boolean;
 }) {
+  const [moment, setMoment] = useState<{ title: string; detail: string } | null>(null);
+  const [acked, setAcked] = useState<{ n: number; slowest: number } | null>(null);
+  const splashRef = useRef(splash);
+  splashRef.current = splash;
   const [showCaptions, setShowCaptions] = useState(true);
   const [help, setHelp] = useState(false);
   const [pub, setPub] = useState(locked || (publicScreen && publicAtLoad));
@@ -220,6 +227,11 @@ export function StageReplay({
         return;
       }
       setView((v) => (v.traces.some((x) => x.id === t.id) ? v : { ...v, traces: [...v.traces, t] }));
+      // F48: the lock, live, is a moment.
+      if (splashRef.current && t.meta?.kind === "locked") {
+        setAcked(null);
+        setMoment({ title: t.body.split(" · ")[0] ?? "", detail: t.body.split(" · ").slice(1).join(" · ") });
+      }
     });
     return () => es.close();
   }, []);
@@ -227,6 +239,33 @@ export function StageReplay({
   useEffect(() => {
     if (live) setPos(total);
   }, [live, total]);
+
+  // F48: while the splash is up, how many phones showed MATCH FOUND, and how fast (counts only). Gone after a few seconds.
+  useEffect(() => {
+    if (!moment) return;
+    let stop = false;
+    const poll = async () => {
+      if (locked) return; // the room's view never asks about phones
+      try {
+        const r = await fetch("/api/phones/status", { cache: "no-store" });
+        if (!r.ok || stop) return;
+        const st = (await r.json()) as { phones: { lagMs: number | null }[] };
+        const lags = st.phones.map((p) => p.lagMs).filter((x): x is number => x !== null);
+        setAcked(lags.length ? { n: lags.length, slowest: Math.max(0, ...lags) } : null);
+      } catch {}
+    };
+    void poll();
+    const t = setInterval(poll, 400);
+    const done = setTimeout(() => setMoment(null), 5000);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMoment(null);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      stop = true;
+      clearInterval(t);
+      clearTimeout(done);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [moment, locked]);
 
   // F47: presenter keys. Ignored while typing, inside a dialog, or on a focused button (Space stays the button's).
   const keyState = useRef({ pos, total, live, playing });
@@ -447,6 +486,22 @@ export function StageReplay({
           <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
         </div>
       </header>
+      {moment && (
+        <div className="pointer-events-none fixed inset-0 z-[58] flex items-center justify-center bg-[#0c0d12]/95 p-6 backdrop-blur-md" data-testid="lock-splash" role="status" aria-live="assertive">
+          <div className="match-pop text-center">
+            <div className="text-[18px] font-bold uppercase tracking-[0.3em] text-emerald-300">Match found</div>
+            <div className="mt-2 text-[44px] font-extrabold leading-tight text-white sm:text-[64px]" data-testid="lock-splash-title">
+              {moment.title}
+            </div>
+            <div className="mt-2 text-[18px] text-white/70">{moment.detail}</div>
+            {acked && (
+              <div className="mt-6 inline-block rounded-full bg-emerald-500/15 px-5 py-2 text-[20px] font-semibold text-emerald-100 ring-1 ring-emerald-400/40" data-testid="lock-splash-acks">
+                {acked.n} {acked.n === 1 ? "phone" : "phones"} showed it · slowest {acked.slowest} ms after the lock
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {keys && help && (
         <div className="fixed bottom-4 right-4 z-[55] w-[300px] rounded-[12px] bg-[#14151c] p-4 text-[14px] text-white/85 shadow-2xl ring-1 ring-white/15" role="note" aria-label="Keyboard shortcuts" data-testid="keys-help">
           <div className="mb-2 text-[15px] font-bold text-white">Presenter keys</div>

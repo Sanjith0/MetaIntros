@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 
 /* F21: on the projector, take rules away and re-run the same five in a sandbox. */
 
@@ -11,7 +12,7 @@ test("what if: without both curfews and the drink rule, two plans open; the live
   await expect(page.locator("[data-live=on]")).toHaveCount(1, { timeout: 30_000 });
   await expect(page.getByTestId("whatif-open")).toHaveCount(0); // only after a lock
   await page.getByTestId("stage-start").click();
-  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 90_000 });
+  await waitForLock(page, 90_000);
   const partyBefore = await (await request.get("/api/party", { headers: { cookie: "pq_viewer=maya" } })).text();
 
   await page.getByTestId("whatif-open").click();

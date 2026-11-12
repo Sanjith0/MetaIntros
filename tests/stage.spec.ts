@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 
 /* F1: /stage live, then scrubbed back to round 2. */
 
@@ -12,7 +13,7 @@ test("stage: live replay with a scrubber, rejections in red, signatures landing"
 
   // Live: start the party from the stage and follow it to the lock.
   await page.getByTestId("stage-start").click();
-  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 90_000 });
+  await waitForLock(page, 90_000);
   await expect(page.locator('[data-testid="stage-plans"] [data-state="locked"]')).toContainText("Dolores Night Market");
   await expect(page.locator('[data-testid="stage-plans"] [data-state="unavailable"]')).toHaveCount(3);
   for (const id of ["maya", "dev", "ana", "kai", "zoe"]) await expect(page.getByTestId(`sig-${id}`)).toHaveAttribute("data-sig", /signed|conceded/);

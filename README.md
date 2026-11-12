@@ -139,6 +139,7 @@ live from `/demo` → Layers, or with `PQ_FLAG_<NAME>=0|1`.
 | `CLOSEST_FIT` | when nothing there fits your own rules, your phone (only yours) names the closest plan and the change that would open it ("stay until 9:30 PM") |
 | `FOLLOW_ALONG` | **Follow along**: the public projector shows a QR to `/stage?screen=room`, the room's view on any phone, enforced on the server: anonymous seats, code's rows, no bus events, no names, no words, no operator controls |
 | `STAGE_KEYS` | presenter keys on `/stage`: Space play/pause, ← → step (Shift: 10), Home start, L live, P public screen, C captions, 1/2/4 speed, ? the list |
+| `LOCK_SPLASH` | the lock as a moment on `/stage`: a full-screen MATCH FOUND with the plan, and "2 phones showed it · slowest 6 ms after the lock" from the phones' server-clock acks; non-blocking, gone in 5 s |
 | `NO_MATCH` | when no plan fits all five: everyone back at the front of the queue, nobody blamed, the same five never re-form; anyone whose own rules close every plan is told privately |
 
 ## Routes

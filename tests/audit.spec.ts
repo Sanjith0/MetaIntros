@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 
 /* F19: every agent turn on the stage carries a context audit chip; tapping one shows the exact prompt. */
 
@@ -10,7 +11,7 @@ test("context audit: own brief only on every turn, and the exact prompt one tap 
   await page.goto("/stage");
   await expect(page.locator("[data-live=on]")).toHaveCount(1, { timeout: 30_000 });
   await page.getByTestId("stage-start").click();
-  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 90_000 });
+  await waitForLock(page, 90_000);
 
   const chips = page.getByTestId("context-chip");
   expect(await chips.count()).toBeGreaterThanOrEqual(10);

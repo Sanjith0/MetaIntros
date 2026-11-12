@@ -1,4 +1,4 @@
-import { expect, type APIRequestContext } from "@playwright/test";
+import { expect, type APIRequestContext, type Page } from "@playwright/test";
 
 /** Reset, queue all five demo members, and wait until code locks their plan. */
 export async function lockedParty(request: APIRequestContext): Promise<string> {
@@ -15,4 +15,10 @@ export async function lockedParty(request: APIRequestContext): Promise<string> {
     )
     .toBe("locked");
   return partyId;
+}
+
+/** The stage reached the lock, and the MATCH FOUND splash (F48) has cleared, so screenshots show the board. */
+export async function waitForLock(page: Page, timeout = 90_000) {
+  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout });
+  await expect(page.getByTestId("lock-splash")).toHaveCount(0, { timeout: 8_000 });
 }

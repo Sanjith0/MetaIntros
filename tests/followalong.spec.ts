@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 import { DEMO_PARTY } from "../fixtures/demo";
 
 /* F46: a phone in the room follows along at /stage?screen=room. Everything it receives (page, API, live stream) is sanitized on the server. */
@@ -55,7 +56,7 @@ test("follow along: the room's phone gets nothing personal, from the page, the A
   for (const w of WORDS) expect(streamed, `stream: ${w}`).not.toContain(w);
 
   // Its page and its API: the same.
-  await expect(phone.getByTestId("stage-status")).toHaveText("Locked", { timeout: 30_000 });
+  await waitForLock(phone, 30_000);
   await expect(phone.getByTestId("signature-count")).toHaveText("5 of 5 signed");
   const text = await phone.getByTestId("stage").innerText();
   for (const w of WORDS) expect(text, `page: ${w}`).not.toContain(w);

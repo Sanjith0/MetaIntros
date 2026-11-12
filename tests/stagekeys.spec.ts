@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 
 /* F47: the presenter drives the projector from the keyboard. */
 
@@ -10,7 +11,7 @@ test("presenter keys: help, step, start, live, public screen and captions, all f
   await page.goto("/stage");
   await expect(page.locator("[data-live=on]")).toHaveCount(1, { timeout: 30_000 });
   await page.getByTestId("stage-start").click();
-  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 90_000 });
+  await waitForLock(page, 90_000);
   await page.locator("body").click({ position: { x: 5, y: 880 } }); // take focus off the button
 
   await page.keyboard.press("?");

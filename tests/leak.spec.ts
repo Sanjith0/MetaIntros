@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 
 /* F20: on the projector, type Maya's limits as Dev's agent; the verifier blocks it live and no phone hears it. */
 
@@ -10,7 +11,7 @@ test("try to leak it: Dev's agent types Maya's limits, the verifier blocks it, M
   await page.goto("/stage");
   await expect(page.locator("[data-live=on]")).toHaveCount(1, { timeout: 30_000 });
   await page.getByTestId("stage-start").click();
-  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 90_000 });
+  await waitForLock(page, 90_000);
 
   // Maya's phone is open the whole time.
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });

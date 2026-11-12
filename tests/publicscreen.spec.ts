@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 import { DEMO_PARTY } from "../fixtures/demo";
 
 /* F41: the projector in public screen mode shows nothing personal: a scan of the whole page finds no names, rules or lines. */
@@ -13,7 +14,7 @@ test("public screen: the whole projector page holds no names, nobody's rules and
   await page.getByTestId("public-toggle").click();
   await expect(page).toHaveURL(/screen=public/);
   await page.getByTestId("stage-start").click();
-  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 90_000 });
+  await waitForLock(page, 90_000);
   await expect(page.getByTestId("signature-count")).toHaveText("5 of 5 signed");
   await expect(page.getByTestId("stage-caption")).toHaveText("Code locked Dolores Night Market. MATCH FOUND on all five phones.");
   await expect(page.getByTestId("leak-open")).toHaveCount(0);

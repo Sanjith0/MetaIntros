@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForLock } from "./helpers";
 
 /* F27: the presenter turns on the rogue model; the stage shows code overriding every bad yes and the verifier blocking every leak. */
 
@@ -22,7 +23,7 @@ test("rogue model: every agent tries to break the rules; code still locks a vali
   await page.goto("/stage");
   await expect(page.locator("[data-live=on]")).toHaveCount(1, { timeout: 30_000 });
   await page.getByTestId("stage-start").click();
-  await expect(page.getByTestId("stage-status")).toHaveText("Locked", { timeout: 90_000 });
+  await waitForLock(page, 90_000);
   await expect(page.getByTestId("rogue-banner")).toHaveText("Rogue model · code still decides");
   await expect(page.locator('[data-testid="stage-plans"] [data-state="locked"]')).toContainText("Dolores Night Market");
   expect(await page.locator('[data-testid="trace-private"]', { hasText: /Verifier blocked/ }).count()).toBeGreaterThanOrEqual(5);

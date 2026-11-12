@@ -100,6 +100,8 @@ const DEFAULTS = {
   FOLLOW_ALONG: true,
   /** F47: presenter keys on /stage: Space play/pause, arrows step, L live, P public screen, C captions, 1/2/4 speed, ? help. */
   STAGE_KEYS: true,
+  /** F48: the lock as a moment on the projector: a MATCH FOUND splash, with how fast the phones showed it when they report. */
+  LOCK_SPLASH: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
