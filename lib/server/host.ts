@@ -7,6 +7,7 @@ import { postMessage } from "./messages";
 import { writeTrace } from "./trace";
 import { getSetting } from "./settings";
 import { label } from "@/lib/agents/describe";
+import { nowMs } from "@/lib/clock";
 
 export const MAX_HOST_REPLIES = 5;
 export const MAX_NUDGES = 2;
@@ -77,7 +78,7 @@ export async function afterUserMessage(chatId: string, _userId: string, body: st
 }
 
 /** Nudge stalled squad chats (template, no model call). Run from the ticker. */
-export async function checkStalls(now = Date.now()) {
+export async function checkStalls(now = nowMs()) {
   const stallMs = Number(await getSetting("stallMs", String(15 * 60_000)));
   const chats = await prisma.chat.findMany({ where: { type: "squad", archived: false, lastMessageAt: { lt: new Date(now - stallMs) } } });
   for (const c of chats) {

@@ -30,9 +30,15 @@ const SCRIPT = [
   "Chats badge → squad chat + AI host welcome",
   "Open talk cards (swipe)",
   "Find your party → I'm here",
-  "Fast-forward past the event → chat archives",
+  "Fast-forward: the event ends for everyone → chat archives",
   "Add squad as friends → Met through Queue Up",
 ];
+
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+function fmtClock(ms: number) {
+  const d = new Date(ms);
+  return `${DAYS[d.getDay()]} ${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, "0")} ${d.getHours() < 12 ? "AM" : "PM"}`;
+}
 
 function fmtOffset(ms: number) {
   const h = Math.round(ms / 3_600_000);
@@ -68,20 +74,16 @@ export default function DemoPage() {
           className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 font-bold"><RotateCcw size={16} /> {busy === "reset" ? "Resetting…" : "Reset & reseed"}</button>
         <Link href="/events" data-testid="demo-start" className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#1877f2] to-[#9333ea] py-3 font-bold"><Play size={16} /> Start as Me</Link>
         <button type="button" data-testid="demo-ff" onClick={() => act("ff", "/api/demo/fast-forward")}
-          className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 text-sm font-semibold"><FastForward size={16} /> Fast-forward time</button>
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 text-sm font-semibold"><FastForward size={16} /> Fast-forward: end event</button>
         <button type="button" data-testid="demo-kick" onClick={() => act("kick", "/api/demo/kick-live")}
           className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 text-sm font-semibold"><UserX size={16} /> Kick live users ({s?.liveUsers ?? 0})</button>
       </section>
 
-      {s && s.clockOffsetMs > 60_000 && (
-        <section className="mt-4 rounded-xl bg-amber-400/15 p-3 text-sm text-amber-100 ring-1 ring-amber-300/40" data-testid="clock-warning">
-          <p>
-            <b>Demo clock is {fmtOffset(s.clockOffsetMs)} ahead</b> (from Fast-forward). Seeded events may already be over, so
-            &ldquo;any event&rdquo; queues can&apos;t find one. Reset the clock (or Reset &amp; reseed) before the next run.
-          </p>
-          <button type="button" data-testid="clock-reset" onClick={() => act("clock", "/api/demo/clock")}
-            className="mt-2 w-full rounded-lg bg-white py-2 font-bold text-[#3b0f7a]">{busy === "clock" ? "Resetting…" : "Reset clock to now"}</button>
-        </section>
+      {s && (
+        <p className="mt-3 text-xs text-[#c7d2fe]" data-testid="global-clock">
+          Global clock: <b className="text-white">{fmtClock(Date.now() + s.clockOffsetMs)}</b>
+          {s.clockOffsetMs > 60_000 ? ` (fast-forwarded ${fmtOffset(s.clockOffsetMs)})` : " (real time)"} · same for every phone
+        </p>
       )}
 
       <section className="mt-5">

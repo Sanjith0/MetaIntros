@@ -12,7 +12,7 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
   await sweepExpiredChats();
   const chat = await getChatForUser(userId, id);
   if (!chat) notFound();
-  await markChatRead(userId, id, new Date(Math.max(Date.now(), (await now()).getTime())));
+  await markChatRead(userId, id, await now());
   const squad = chat.type === "squad" ? await getSquadHeader(id) : null;
   return <ChatThread chat={JSON.parse(JSON.stringify(chat))} meId={userId} squad={squad} />;
 }

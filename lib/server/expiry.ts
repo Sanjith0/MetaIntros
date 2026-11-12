@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/db";
 import { publish } from "./bus";
-import { getClockOffsetMs, now as clockNow, setClockOffsetMs } from "./clock";
+import { advanceClockTo, now as clockNow } from "./clock";
 import { memberIds, postMessage } from "./messages";
-import { CHAT_TTL_AFTER_EVENT_MS } from "./squadChat";
 
 export const ARCHIVE_NOTICE = "This squad chat has ended. Want to stay in touch? Add your squad as friends.";
 
@@ -27,7 +26,12 @@ export async function sweepExpiredChats(at?: Date): Promise<string[]> {
   return due.map((c) => c.id);
 }
 
-/** Demo: jump the clock to just past the expiry of the user's latest squad, then sweep. */
+/**
+ * Demo Fast-forward: end the user's current squad event — for everyone. The global clock moves
+ * forward (never back) to just after the event ends, so every phone, timestamp and countdown
+ * agrees; then every squad at that event has its chat ended now (archive + "add your squad as
+ * friends") instead of 24h later. Other events are untouched and stay aligned with the clock.
+ */
 export async function fastForward(userId: string) {
   const m = await prisma.partyMember.findFirst({
     where: { userId, party: { status: { in: ["confirmed", "completed"] }, eventId: { not: null } } },
@@ -35,10 +39,10 @@ export async function fastForward(userId: string) {
     include: { party: { include: { event: true } } },
   });
   if (!m?.party.event) return { ok: false as const, error: "no squad" };
-  const target = m.party.event.endsAt.getTime() + CHAT_TTL_AFTER_EVENT_MS + 60_000;
-  const offset = Math.max(await getClockOffsetMs(), target - Date.now());
-  await setClockOffsetMs(offset);
-  const archived = await sweepExpiredChats(new Date(Date.now() + offset));
+  const ev = m.party.event;
+  const now = await advanceClockTo(new Date(ev.endsAt.getTime() + 60_000));
+  await prisma.chat.updateMany({ where: { type: "squad", archived: false, party: { eventId: ev.id } }, data: { expiresAt: now } });
+  const archived = await sweepExpiredChats(now);
   publish("demo", { type: "fast-forward" });
-  return { ok: true as const, partyId: m.party.id, archived, now: new Date(Date.now() + offset).toISOString() };
+  return { ok: true as const, partyId: m.party.id, eventId: ev.id, archived, now: now.toISOString() };
 }

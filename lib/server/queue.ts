@@ -13,6 +13,7 @@ import { checkStalls } from "./host";
 import { sweepExpiredChats } from "./expiry";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
+import { nowMs } from "@/lib/clock";
 
 // ───────────────────────── join / leave ─────────────────────────
 
@@ -115,7 +116,7 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
   const landmarks = await landmarkMap();
   const problems = await entryProblems(waiting);
   const anchor = waiting.find((w) => w.entryId === entry.id);
-  const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: Date.now(), fillMode: await getFillMode() }) : { found: 1, userIds: [userId] };
+  const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: nowMs(), fillMode: await getFillMode() }) : { found: 1, userIds: [userId] };
   const users = await prisma.user.findMany({ where: { id: { in: pf.userIds } }, select: { id: true, name: true, avatarColor: true } });
   return {
     state: "waiting",
@@ -126,7 +127,7 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
     bucketName: entry.bucketLandmark.name,
     bucketId: entry.bucketLandmarkId,
     problem: problems.get(entry.id),
-    waitedMs: Date.now() - entry.joinedAt.getTime(),
+    waitedMs: nowMs() - entry.joinedAt.getTime(),
     found: pf.found,
     foundUsers: pf.userIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean),
   };
@@ -172,7 +173,7 @@ async function entryProblems(waiting: QueueItem[]): Promise<Map<string, QueuePro
   for (const w of waiting) {
     if ((w.mode ?? "events") === "events" && !w.eventId && !anyEventsLeft) out.set(w.entryId, "no_events");
     else if (w.eventId && started.has(w.eventId)) out.set(w.entryId, "event_started");
-    else if ((cd.get(w.entryId) ?? 0) > Date.now()) out.set(w.entryId, "no_fit");
+    else if ((cd.get(w.entryId) ?? 0) > nowMs()) out.set(w.entryId, "no_fit");
   }
   return out;
 }
@@ -201,14 +202,14 @@ export async function tick(): Promise<number> {
       waiting,
       people,
       landmarks,
-      { now: Date.now(), fillMode, mixedFillDelayMs },
+      { now: nowMs(), fillMode, mixedFillDelayMs },
       (p: Proposal) => chooseCandidate(p, people),
       async (p: Proposal, c: Candidate) => {
         const r = await formParty(p, c, people);
         if (r.partyId) for (const id of c.entryIds) cleanupSimFor(id);
         else if ("reason" in r && r.reason === "no_event") {
           // Nothing fits this squad right now: let them wait it out instead of retrying every tick.
-          for (const id of c.entryIds) cooldowns().set(id, Date.now() + NO_FIT_COOLDOWN_MS);
+          for (const id of c.entryIds) cooldowns().set(id, nowMs() + NO_FIT_COOLDOWN_MS);
           for (const u of c.userIds) publish("queue", { type: "problem" }, [u]);
         }
         return Boolean(r.partyId);

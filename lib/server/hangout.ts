@@ -10,11 +10,12 @@ import type { HangoutGroup, Spot } from "@/lib/match/hangoutFit";
 import { hangoutPlannerAgent, type HangoutPlan } from "@/lib/agents/hangoutPlanner";
 import type { Person } from "@/lib/profile/load";
 import { now as clockNow } from "./clock";
+import { weekendRange } from "./events";
 import { groupContext } from "./pipeline";
 import { writeTrace } from "./trace";
 
 export const HANGOUT_SPOTS = SPOTS as Spot[];
-export const HANGOUT_HORIZON_MS = 7 * 86_400_000;
+export const HANGOUT_MIN_HORIZON_MS = 2 * 86_400_000;
 
 export async function hangoutGroup(members: Person[], cand: Candidate, bucketId: string): Promise<HangoutGroup> {
   const entries = await prisma.queueEntry.findMany({ where: { id: { in: cand.entryIds } }, include: { bucketLandmark: true } });
@@ -34,7 +35,8 @@ export function setHangoutPlanner(fn: HangoutPlanner) {
 export async function planHangout(members: Person[], cand: Candidate, bucketId: string, partyId: string): Promise<{ eventId: string } | null> {
   const now = await clockNow();
   const group = await hangoutGroup(members, cand, bucketId);
-  const horizon = new Date(now.getTime() + HANGOUT_HORIZON_MS);
+  // Same window as the existing-events queue ("this weekend"), so Fast-forward jumps stay short.
+  const horizon = new Date(Math.max(weekendRange(now).end.getTime(), now.getTime() + HANGOUT_MIN_HORIZON_MS));
   const plan = await planner({ spots: HANGOUT_SPOTS, group, now, horizon }).catch(() => null);
   if (!plan) return null;
   await writeTrace(partyId, plan.steps);

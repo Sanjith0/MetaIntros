@@ -25,18 +25,25 @@ test("fast-forward archives the squad chat: read-only + stay-in-touch prompt", a
   await expect(page.locator('[data-testid^="inbox-row-"][data-type="squad"]').getByTestId("squad-expiry")).toContainText("Archived");
 });
 
-test("after fast-forward, /demo warns the clock is ahead; reset clock clears it", async ({ page }) => {
-  await gotoReady(page, "/queue/start?eventId=ev-boulder-social");
-  await page.getByTestId("size-4").click();
-  await page.getByTestId("choose-area").click();
-  await page.getByTestId("area-lm-rwc-courthouse").click();
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+test("global clock: Fast-forward ends the event for everyone; Reset & reseed keeps the clock and the demo works again", async ({ page }) => {
+  const queueForBouldering = async () => {
+    await gotoReady(page, "/queue/start?eventId=ev-boulder-social");
+    await page.getByTestId("size-4").click();
+    await page.getByTestId("choose-area").click();
+    await page.getByTestId("area-lm-rwc-courthouse").click();
+    await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  };
+  await queueForBouldering();
   await page.getByTestId("open-squad-chat").click();
   await page.getByTestId("fast-forward").click();
   await expect(page.getByTestId("read-only")).toBeVisible();
 
   await gotoReady(page, "/demo");
-  await expect(page.getByTestId("clock-warning")).toBeVisible();
-  await page.getByTestId("clock-reset").click();
-  await expect(page.getByTestId("clock-warning")).toHaveCount(0);
+  await expect(page.getByTestId("global-clock")).toContainText("fast-forwarded");
+  await page.getByTestId("demo-reset").click();
+  await expect(page.getByTestId("demo-reset")).toContainText("Reset & reseed");
+  await expect(page.getByTestId("global-clock")).toContainText("fast-forwarded"); // never snapped back
+
+  // the same scripted path works again, on the same clock
+  await queueForBouldering();
 });

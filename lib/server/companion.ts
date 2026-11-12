@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { publish } from "./bus";
 import { memberIds as chatMemberIds } from "./messages";
+import { nowDate } from "@/lib/clock";
 
 export const MAX_PHOTO_BYTES = 400_000;
 const DATA_URL = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/;
@@ -31,7 +32,7 @@ export async function getPartyPhoto(partyId: string, viewerId: string, ownerId: 
 
 export async function checkIn(partyId: string, userId: string) {
   if (!(await isPartyMember(partyId, userId))) return { ok: false as const, error: "not_member" };
-  const m = await prisma.partyMember.update({ where: { partyId_userId: { partyId, userId } }, data: { checkedInAt: new Date() } });
+  const m = await prisma.partyMember.update({ where: { partyId_userId: { partyId, userId } }, data: { checkedInAt: nowDate() } });
   const members = await partyMemberIds(partyId);
   publish("party-update", { partyId, checkIn: userId }, members);
   void chatMemberIds;
