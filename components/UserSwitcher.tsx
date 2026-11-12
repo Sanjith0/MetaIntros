@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Avatar } from "./Avatar";
 
 export interface SwitcherPerson {
@@ -15,6 +15,18 @@ export function UserSwitcher({ viewer, demo, others }: { viewer: SwitcherPerson;
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onDown = (e: PointerEvent) => !box.current?.contains(e.target as Node) && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onDown);
+    };
+  }, [open]);
 
   const choose = (id: string) => {
     setOpen(false);
@@ -25,7 +37,7 @@ export function UserSwitcher({ viewer, demo, others }: { viewer: SwitcherPerson;
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={box}>
       <button
         data-testid="user-switcher"
         aria-haspopup="listbox"

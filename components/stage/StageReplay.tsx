@@ -178,7 +178,7 @@ export function StageReplay({ initial }: { initial: StageView }) {
           {status}
         </span>
         <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
-          <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-500 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-400">
+          <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-600 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-500">
             Start demo party
           </button>
           <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
@@ -310,7 +310,9 @@ export function StageReplay({ initial }: { initial: StageView }) {
               </div>
               <div className="shrink-0 whitespace-nowrap pl-3 text-[12px] text-red-300">{board.rejections + board.blocks > 0 ? `${board.rejections} rejecting · ${board.blocks} blocked` : ""}</div>
             </div>
-            <ul ref={privRef} className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-3 lg:max-h-none lg:min-h-0 lg:flex-1" data-testid="stage-private">
+            <ul ref={privRef} tabIndex={0}
+              aria-label="Private column"
+              className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-3 lg:max-h-none lg:min-h-0 lg:flex-1" data-testid="stage-private">
               {priv.map((t) => (
                 <Row key={t.id} t={t} />
               ))}
@@ -321,7 +323,9 @@ export function StageReplay({ initial }: { initial: StageView }) {
               <div className="text-[18px] font-bold">Shared</div>
               <div className="text-[13px] text-white/50">What the table and each pair actually see. Rejected plans show only as "unavailable".</div>
             </div>
-            <ul ref={sharedRef} className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-3 lg:max-h-none lg:min-h-0 lg:flex-1" data-testid="stage-shared">
+            <ul ref={sharedRef} tabIndex={0}
+              aria-label="Shared column"
+              className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-3 lg:max-h-none lg:min-h-0 lg:flex-1" data-testid="stage-shared">
               {shared.map((t) => (
                 <Row key={t.id} t={t} />
               ))}

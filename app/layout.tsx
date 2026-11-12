@@ -6,6 +6,7 @@ import { LiveProvider } from "@/components/live/LiveProvider";
 import { Toaster, type Directory } from "@/components/live/Toaster";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
+import { flag } from "@/lib/flags";
 
 export const metadata: Metadata = {
   title: { default: "Party Queue (hackathon prototype)", template: "%s · Party Queue prototype" },
@@ -28,11 +29,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className="min-h-screen">
+        {flag("UX_STATES") && (
+        <a href="#main" className="sr-only z-[80] rounded-[6px] bg-white px-3 py-2 text-[15px] font-semibold text-[var(--color-link)] focus:not-sr-only focus:fixed focus:left-3 focus:top-3" data-testid="skip-link">
+          Skip to content
+        </a>
+        )}
         <LiveProvider viewerId={viewerId}>
           <TopBar viewer={toP(viewer)} demo={all.filter((p) => demoSet.has(p.id)).map(toP)} others={all.filter((p) => !demoSet.has(p.id)).map(toP)} />
           <MobilePrototypeLabel />
-          <div data-viewer={viewerId}>{children}</div>
-          <Toaster people={people} />
+          <div data-viewer={viewerId} id="main" tabIndex={-1} className="outline-none">
+            {children}
+          </div>
+          <Toaster people={people} keyboard={flag("UX_STATES")} />
         </LiveProvider>
       </body>
     </html>

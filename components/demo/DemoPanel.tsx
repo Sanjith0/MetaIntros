@@ -214,6 +214,7 @@ export function DemoPanel({ people }: { people: Person[] }) {
                   <button
                     role="switch"
                     aria-checked={f.on}
+                    aria-label={f.name}
                     data-testid={`flag-${f.name}`}
                     onClick={() => toggleFlag(f.name, !f.on)}
                     className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${f.on ? "bg-[var(--color-pq)]" : "bg-[var(--color-btn-2-hover)]"}`}

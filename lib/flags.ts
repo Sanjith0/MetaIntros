@@ -38,6 +38,8 @@ const DEFAULTS = {
   SAFETY_PAGE: true,
   /** F16: say your sentence instead of typing it (typing always works). OFF by default: browser speech recognition may send audio to the browser vendor's service. */
   VOICE_SENTENCE: false,
+  /** F17: skip link, MATCH FOUND focus and Escape, chat send retry. (Contrast and labels are always on.) */
+  UX_STATES: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

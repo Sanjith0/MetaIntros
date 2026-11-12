@@ -100,6 +100,7 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
             pinned={view.pinned}
             people={people}
             hereFor={canPing ? view.chat.partyId : null}
+            retry={flag("UX_STATES")}
           />
         )}
       </section>

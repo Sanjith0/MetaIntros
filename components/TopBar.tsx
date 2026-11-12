@@ -18,7 +18,7 @@ export function TopBar({ viewer, demo, others }: { viewer: SwitcherPerson; demo:
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-2 bg-white px-4 shadow-[0_1px_2px_rgb(0_0_0/0.1)]">
       <div className="flex min-w-0 items-center gap-2">
-        <Link href="/events" aria-label="Home" className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] text-[17px] font-black lowercase tracking-tight text-white">
+        <Link href="/events" aria-label="pq, Party Queue home" className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] text-[17px] font-black lowercase tracking-tight text-white">
           pq
         </Link>
         <div className="hidden h-10 items-center gap-2 rounded-full bg-[var(--color-wash)] px-3 text-[var(--color-ink-2)] lg:flex lg:w-[240px]">

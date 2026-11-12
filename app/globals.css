@@ -16,10 +16,12 @@
   --color-btn-2: #e4e6eb;
   --color-btn-2-hover: #d8dadf;
   --color-divider: #ced0d4;
-  --color-positive: #31a24c;
+  /* Darkened from the reference's #31A24C so white text on it, and it as text, meet WCAG AA (about 5.4:1). */
+  --color-positive: #1e7a35;
   --color-negative: #e9344f;
   --color-badge: #e41e3f;
-  --color-date: #f3425f;
+  /* Darkened from the reference's #F3425F (3.6:1) to meet WCAG AA at 12-13px (about 5.2:1). */
+  --color-date: #d21f3c;
   --color-on-bg: #ebf5ff;
   --color-on-ink: #0064d1;
   --color-new-notif: #e7f3ff;

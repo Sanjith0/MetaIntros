@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PayloadOf } from "@/contracts";
 import { Avatar } from "@/components/Avatar";
 import { IconClose, IconSparkle } from "@/components/icons";
@@ -22,7 +22,7 @@ interface Toast {
 
 /** Notification toasts (bottom-left, as in the reference) plus the
  *  MATCH FOUND sheet, which is our layer and plays a chime. */
-export function Toaster({ people }: { people: Directory }) {
+export function Toaster({ people, keyboard = true }: { people: Directory; keyboard?: boolean }) {
   const { viewerId, serverNow } = useLive();
   const pathname = usePathname();
   const router = useRouter();
@@ -100,11 +100,18 @@ export function Toaster({ people }: { people: Directory }) {
     }
   });
 
+  const primary = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
-    if (!match) return;
+    if (!match || !keyboard) return;
+    primary.current?.focus();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMatch(null);
+    window.addEventListener("keydown", onKey);
     const t = setTimeout(() => setMatch(null), 20_000);
-    return () => clearTimeout(t);
-  }, [match]);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [match?.partyId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -133,7 +140,7 @@ export function Toaster({ people }: { people: Directory }) {
       </div>
 
       {match && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/30 p-4 sm:items-center" role="dialog" aria-label="Match found">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/30 p-4 sm:items-center" role="dialog" aria-modal="true" aria-label="Match found" onClick={(e) => e.target === e.currentTarget && setMatch(null)}>
           <div
             data-testid="match-found"
             data-party-id={match.partyId}
@@ -155,7 +162,7 @@ export function Toaster({ people }: { people: Directory }) {
               <div className="text-[20px] font-bold">{match.title}</div>
               <div className="text-[15px] text-[var(--color-ink-2)]">{match.venueName}</div>
               <div className="mt-5 flex gap-2">
-                <Link href={`/chat/${match.chatId}`} onClick={() => setMatch(null)} className="press flex-1 rounded-[6px] bg-[var(--color-pq)] px-4 py-2 text-center text-[15px] font-semibold text-white hover:opacity-90">
+                <Link ref={primary} href={`/chat/${match.chatId}`} onClick={() => setMatch(null)} className="press flex-1 rounded-[6px] bg-[var(--color-pq)] px-4 py-2 text-center text-[15px] font-semibold text-white hover:opacity-90">
                   Open group chat
                 </Link>
                 <Link href="/party" onClick={() => setMatch(null)} className="press flex-1 rounded-[6px] bg-[var(--color-btn-2)] px-4 py-2 text-center text-[15px] font-semibold hover:bg-[var(--color-btn-2-hover)]">

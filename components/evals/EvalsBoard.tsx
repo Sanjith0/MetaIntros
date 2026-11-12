@@ -46,7 +46,7 @@ export function EvalsBoard() {
           {busy ? "Running…" : "Run again"}
         </button>
       </div>
-      <div className="overflow-x-auto rounded-[12px] bg-white shadow-[var(--shadow-card)]">
+      <div className="overflow-x-auto rounded-[12px] bg-white shadow-[var(--shadow-card)]" role="region" aria-label="Results table" tabIndex={0}>
         <table className="w-full min-w-[720px] border-collapse text-left text-[14px]" data-testid="evals-table">
           <thead>
             <tr className="border-b border-[var(--color-divider)]">

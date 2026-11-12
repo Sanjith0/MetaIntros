@@ -18,6 +18,7 @@ export function ChatThread({
   pinned: pinnedInitial,
   people,
   hereFor = null,
+  retry = true,
 }: {
   chatId: string;
   viewerId: string;
@@ -26,6 +27,8 @@ export function ChatThread({
   people: People;
   /** Party id: shows an "I'm here" button until this person has arrived. */
   hereFor?: string | null;
+  /** F17: offer "Try again" when a message fails to send. */
+  retry?: boolean;
 }) {
   const [showHere, setShowHere] = useState(!!hereFor);
   const imHere = async () => {
@@ -36,6 +39,8 @@ export function ChatThread({
   const [pinned, setPinned] = useState(pinnedInitial);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
+  const composer = useRef<HTMLInputElement>(null);
   const end = useRef<HTMLDivElement>(null);
 
   useLiveEvents((e) => {
@@ -54,10 +59,14 @@ export function ChatThread({
     if (!text || sending) return;
     setSending(true);
     setDraft("");
-    const res = await fetch(`/api/chat/${chatId}/messages`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text }) });
-    if (res.ok) {
+    setFailed(null);
+    try {
+      const res = await fetch(`/api/chat/${chatId}/messages`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text }) });
+      if (!res.ok) throw new Error(String(res.status));
       const { message } = (await res.json()) as { message: ChatMessage };
       setMessages((xs) => (xs.some((x) => x.id === message.id) ? xs : [...xs, message]));
+    } catch {
+      setFailed(text);
     }
     setSending(false);
   };
@@ -76,7 +85,7 @@ export function ChatThread({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto bg-white px-3 py-4" data-testid="message-list">
+      <div className="flex-1 overflow-y-auto bg-white px-3 py-4" data-testid="message-list" role="log" aria-label="Messages" tabIndex={0}>
         <div className="mb-3 text-center text-[12px] text-[var(--color-ink-2)]">Today</div>
         {visible.map((m, i) => {
           const prev = visible[i - 1];
@@ -131,6 +140,23 @@ export function ChatThread({
         <div ref={end} />
       </div>
 
+      {failed && retry && (
+        <div className="flex items-center justify-end gap-2 border-t border-[var(--color-divider)] bg-white px-3 py-1.5 text-[13px]" role="alert" data-testid="send-failed">
+          <span className="max-w-[60%] truncate text-[var(--color-ink-2)]">“{failed}”</span>
+          <span className="font-semibold text-[var(--color-badge)]">Not sent.</span>
+          <button
+            className="font-semibold text-[var(--color-link)] hover:underline"
+            data-testid="send-retry"
+            onClick={() => {
+              setDraft(failed);
+              setFailed(null);
+              composer.current?.focus();
+            }}
+          >
+            Try again
+          </button>
+        </div>
+      )}
       {showHere && (
         <div className="flex justify-center border-t border-[var(--color-divider)] bg-white pt-2">
           <button data-testid="chat-im-here" onClick={imHere} className="press rounded-full bg-[var(--color-pq-soft)] px-4 py-1.5 text-[14px] font-semibold text-[var(--color-pq)]">
@@ -147,6 +173,7 @@ export function ChatThread({
       >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[22px] font-light text-[var(--color-accent)]">+</span>
         <input
+          ref={composer}
           data-testid="composer"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
