@@ -2,8 +2,10 @@
 import { onPartyConfirmed } from "./pipeline";
 import { createSquadChat } from "./squadChat";
 import { postHostWelcome } from "./host";
+import { generateTalkCards } from "./talkCards";
 
 onPartyConfirmed(async (partyId) => {
   await createSquadChat(partyId);
   await postHostWelcome(partyId);
+  await generateTalkCards(partyId);
 });

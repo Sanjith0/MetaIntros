@@ -29,7 +29,7 @@ describe("agent trace", () => {
       expect(agents.slice(0, 2)).toEqual(["party_formation", "event_selection"]);
       expect(agents).toContain("host");
       expect(t.some((s) => s.kind === "safety_check" && s.agent === "party_formation")).toBe(true);
-      expect(t.filter((s) => s.kind === "decision" && s.agent !== "host")).toHaveLength(2);
+      expect(t.filter((s) => s.kind === "decision" && ["party_formation", "event_selection"].includes(s.agent))).toHaveLength(2);
       expect(t.every((s) => s.summary.length > 0)).toBe(true);
     }
   });
