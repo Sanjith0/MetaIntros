@@ -26,6 +26,7 @@ import { CantMakeIt } from "@/components/party/CantMakeIt";
 import { closestFit } from "@/lib/server/closest";
 import { hasDropped } from "@/lib/server/refill";
 import { autoForgetDue } from "@/lib/server/forget";
+import { planB } from "@/lib/server/planb";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
@@ -76,6 +77,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
   const noMatch = flag("NO_MATCH") ? noMatchView(v.party.id, viewer) : null;
   const story = flag("AGENT_STORY") ? agentStory(v.party.id, viewer) : null;
   const friend = flag("TELL_A_FRIEND") ? friendMessage(v.party.id, viewer) : null;
+  const backup = planB(v.party.id);
   const closest = flag("CLOSEST_FIT") && noMatch && !noMatch.requeued ? closestFit(v.party.id, viewer) : null;
   const waiting = noMatch?.requeued ? queueStatus(viewer) : null;
 
@@ -103,6 +105,11 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
                 <div className="text-[15px] text-[var(--color-ink-2)]">
                   {plan.venueName} · {price(plan.priceUsd)} · locked by {v.party.lockedBy === "signatures" ? "all five signatures" : "code, after three rounds"}
                 </div>
+                {backup && (
+                  <div className="mt-1.5 text-[14px] text-[var(--color-ink-2)]" data-testid="plan-b">
+                    <span className="font-semibold text-[var(--color-ink)]">Plan B</span>, if it doesn&apos;t work out: {backup.title} · {backup.when} · {backup.venueName}. It fits everyone&apos;s rules too.
+                  </div>
+                )}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Link href={`/chat/${v.party.chatId}`} data-testid="open-party-chat" className="press flex h-9 items-center gap-1.5 rounded-[6px] bg-[var(--color-pq)] px-3 text-[15px] font-semibold text-white">
                     <IconChat size={18} /> Group chat

@@ -9,6 +9,7 @@ import { runTableTalk, type TableOptions, type TableResult } from "./table";
 import { pairKey } from "@/lib/graph";
 import { flag } from "@/lib/flags";
 import { chatExpiry } from "@/lib/server/clock";
+import { planB, planBLine } from "@/lib/server/planb";
 
 export interface RunOptions extends TableOptions {}
 
@@ -80,6 +81,9 @@ export function finalize(partyId: string, table: TableResult, pairs: PairResult[
     "pinned",
     [plan.id],
   );
+  // F53: plan B, from code, right under the plan.
+  const backup = planB(party.id);
+  if (backup) postMessage(chatId, null, planBLine(plan.title, backup), "system", [backup.planId]);
   const ids = party.memberIds;
   ids.forEach((from, i) => {
     const to = ids[(i + 1) % ids.length]!;

@@ -110,6 +110,8 @@ const DEFAULTS = {
   QUEUE_PULSE: true,
   /** F52: big text on the projector for large rooms (B, or ?big=1). */
   STAGE_BIG: true,
+  /** F53: plan B: at the lock, code also names the next-best plan that fits everyone, on the party card and pinned in the chat. */
+  PLAN_B: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
