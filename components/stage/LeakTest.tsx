@@ -109,7 +109,7 @@ export function LeakTest({ partyId, members }: { partyId: string | null; members
                   className="mt-1 block w-full resize-none rounded-[8px] bg-white/10 p-2.5 text-[15px] font-normal text-white placeholder:text-white/40"
                 />
               </label>
-              <button onClick={run} disabled={busy || !text.trim()} data-testid="leak-run" className="rounded-[6px] bg-violet-600 px-4 py-2 text-[14px] font-semibold hover:bg-violet-500 disabled:opacity-50">
+              <button onClick={run} disabled={busy || !text.trim()} data-testid="leak-run" className="rounded-[6px] bg-violet-700 px-4 py-2 text-[14px] font-semibold hover:bg-violet-700 disabled:opacity-50">
                 {busy ? "Checking…" : "Send it to the table"}
               </button>
               {result && (

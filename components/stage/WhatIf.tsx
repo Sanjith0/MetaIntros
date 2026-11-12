@@ -115,7 +115,7 @@ export function WhatIf({ partyId, locked }: { partyId: string | null; locked: bo
                           aria-pressed={on}
                           data-testid={`whatif-rule-${m.id}-${r.id}`}
                           title={`“${r.words}”`}
-                          className={`rounded-full px-3 py-1 text-[13px] font-semibold ring-1 ${on ? "bg-violet-600 text-white ring-violet-400 line-through" : "bg-white/5 text-white/85 ring-white/15 hover:bg-white/10"}`}
+                          className={`rounded-full px-3 py-1 text-[13px] font-semibold ring-1 ${on ? "bg-violet-700 text-white ring-violet-400 line-through" : "bg-white/5 text-white/85 ring-white/15 hover:bg-white/10"}`}
                         >
                           {r.label}
                         </button>
@@ -124,7 +124,7 @@ export function WhatIf({ partyId, locked }: { partyId: string | null; locked: bo
                   </li>
                 ))}
               </ul>
-              <button onClick={run} disabled={busy || picked.size === 0} data-testid="whatif-run" className="rounded-[6px] bg-violet-600 px-4 py-2 text-[14px] font-semibold hover:bg-violet-500 disabled:opacity-50">
+              <button onClick={run} disabled={busy || picked.size === 0} data-testid="whatif-run" className="rounded-[6px] bg-violet-700 px-4 py-2 text-[14px] font-semibold hover:bg-violet-700 disabled:opacity-50">
                 {busy ? "Running five agents in a sandbox…" : picked.size ? `Run it without ${picked.size === 1 ? "this rule" : `these ${picked.size} rules`}` : "Pick a rule to take away"}
               </button>
               {error && <div className="text-[14px] text-red-200">{error}</div>}

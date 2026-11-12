@@ -15,8 +15,12 @@ export interface Caption {
 
 const planIn = (body: string) => body.split(":")[0]!.replace(/^(SIGN|CONCEDE|HOLD|ACCEPT|REJECT) /, "").trim();
 
-export function captionFor(t: Trace, nameOf: (id: string) => string, planOf: (id: string) => string | undefined = () => undefined): Caption | null {
+/** Kinds a public screen may caption: what code decided about plans, never what one person's agent did. */
+const PUBLIC_KINDS = new Set(["formed", "open", "rogue", "unavailable", "leading", "tally", "locked", "nomatch"]);
+
+export function captionFor(t: Trace, nameOf: (id: string) => string, planOf: (id: string) => string | undefined = () => undefined, publicOnly = false): Caption | null {
   const k = t.meta?.kind;
+  if (publicOnly && !(k && PUBLIC_KINDS.has(k))) return null;
   const who = t.actorId ? nameOf(t.actorId) : "";
   switch (k) {
     case "formed":
@@ -63,10 +67,15 @@ export function captionFor(t: Trace, nameOf: (id: string) => string, planOf: (id
   return null;
 }
 
+/** F41: what a public screen may list: code's rows about plans. No agent's line, no pair talk, no private lane. */
+export function roomRows(traces: Trace[]): Trace[] {
+  return traces.filter((t) => t.lane === "shared" && t.actorId === null && t.conversation !== "pair");
+}
+
 /** The caption for the latest captioned moment up to `pos`. */
-export function captionAt(traces: Trace[], pos: number, nameOf: (id: string) => string, planOf?: (id: string) => string | undefined): Caption | null {
+export function captionAt(traces: Trace[], pos: number, nameOf: (id: string) => string, planOf?: (id: string) => string | undefined, publicOnly = false): Caption | null {
   for (let i = Math.min(pos, traces.length) - 1; i >= 0; i--) {
-    const c = captionFor(traces[i]!, nameOf, planOf);
+    const c = captionFor(traces[i]!, nameOf, planOf, publicOnly);
     if (c) return c;
   }
   return null;

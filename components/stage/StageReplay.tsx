@@ -6,7 +6,7 @@ import { Avatar } from "@/components/Avatar";
 import { LeakTest } from "@/components/stage/LeakTest";
 import { WhatIf } from "@/components/stage/WhatIf";
 import { boardAt, replayDelay } from "@/lib/stage/board";
-import { captionAt } from "@/lib/stage/captions";
+import { captionAt, roomRows as roomRowsOf } from "@/lib/stage/captions";
 import type { StageView } from "@/lib/server/views";
 
 const CONVO: Record<Trace["conversation"], [string, string]> = {
@@ -46,7 +46,7 @@ function ContextChip({ t, onOpen }: { t: Trace; onOpen: () => void }) {
       data-actor={t.actorId}
       data-round={t.meta?.round}
       title="Open the exact prompt this agent got"
-      className={`rounded px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide underline-offset-2 hover:underline ${clean ? "bg-emerald-400/15 text-emerald-200" : "bg-red-500 text-white"}`}
+      className={`rounded px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide underline-offset-2 hover:underline ${clean ? "bg-emerald-400/15 text-emerald-200" : "bg-red-700 text-white"}`}
     >
       {clean ? `own brief only ✓ · ${(c.chars / 1000).toFixed(1)}k chars` : `held ${c.others} of someone else's words`}
     </button>
@@ -100,13 +100,27 @@ export function StageReplay({
   whatIf = false,
   pinned: pinnedAtLoad = null,
   captions = false,
+  publicScreen = false,
+  publicAtLoad = false,
 }: {
   initial: StageView;
   leakTest?: boolean;
   whatIf?: boolean;
   pinned?: string | null;
   captions?: boolean;
+  /** F41: offer public screen mode, and whether the page opened in it. */
+  publicScreen?: boolean;
+  publicAtLoad?: boolean;
 }) {
+  const [pub, setPub] = useState(publicScreen && publicAtLoad);
+  const togglePublic = () => {
+    const next = !pub;
+    setPub(next);
+    const url = new URL(window.location.href);
+    if (next) url.searchParams.set("screen", "public");
+    else url.searchParams.delete("screen");
+    window.history.replaceState(null, "", url);
+  };
   const [prompt, setPrompt] = useState<PromptView | null>(null);
   const openPrompt = async (t: Trace) => {
     if (!t.actorId || !t.meta?.round) return;
@@ -232,7 +246,9 @@ export function StageReplay({
   const recorded = view.traces.find((t) => t.meta?.source === "recorded" && t.meta.note) ?? view.traces.find((t) => t.meta?.source === "recorded");
 
   const noMatch = visible.some((t) => t.meta?.kind === "nomatch");
-  const caption = captions ? captionAt(view.traces, pos, (id) => members[id]?.firstName ?? id, (id) => view.plans.find((p) => p.id === id)?.title) : null;
+  const caption = captions ? captionAt(view.traces, pos, (id) => members[id]?.firstName ?? id, (id) => view.plans.find((p) => p.id === id)?.title, pub) : null;
+  // What the room may see: code's rows about plans. No agent's line, no pair talk, no private lane.
+  const roomRows = roomRowsOf(visible);
   const rogue = view.traces.some((t) => t.meta?.kind === "rogue");
   const status = board.locked ? "Locked" : noMatch ? "No match" : board.round >= 1 ? `Round ${board.round}` : total ? "Forming" : "Waiting";
   const planTitle = (id: string | null) => view.plans.find((p) => p.id === id)?.title ?? "";
@@ -310,7 +326,7 @@ export function StageReplay({
           {status}
         </span>
         <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
-          <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-600 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-500">
+          <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-700 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-700">
             Start demo party
           </button>
           {parties.length > 1 && (
@@ -334,8 +350,19 @@ export function StageReplay({
               </select>
             </label>
           )}
-          {leakTest && <LeakTest partyId={view.partyId} members={view.members} />}
-          {whatIf && <WhatIf partyId={view.partyId} locked={view.traces.some((t) => t.meta?.kind === "locked")} />}
+          {publicScreen && (
+            <button
+              onClick={togglePublic}
+              aria-pressed={pub}
+              data-testid="public-toggle"
+              title="Hide everything personal: for a screen the whole room can see"
+              className={`rounded-[6px] px-3 py-1.5 text-[13px] font-semibold ring-1 ${pub ? "bg-emerald-700 text-white ring-emerald-300" : "bg-white/10 text-white ring-white/20 hover:bg-white/20"}`}
+            >
+              {pub ? "Public screen: on" : "Public screen"}
+            </button>
+          )}
+          {leakTest && !pub && <LeakTest partyId={view.partyId} members={view.members} />}
+          {whatIf && !pub && <WhatIf partyId={view.partyId} locked={view.traces.some((t) => t.meta?.kind === "locked")} />}
           <span className="whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/60 sm:text-[11px]">Hackathon prototype, not Facebook</span>
         </div>
       </header>
@@ -394,7 +421,7 @@ export function StageReplay({
             setPlaying(false);
             setLive(true);
           }}
-          className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-bold uppercase tracking-wide ${live ? "bg-red-500 text-white" : "bg-white/10 text-white/70 hover:bg-white/20"}`}
+          className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-bold uppercase tracking-wide ${live ? "bg-red-700 text-white" : "bg-white/10 text-white/70 hover:bg-white/20"}`}
         >
           <span className={`h-2 w-2 rounded-full ${live ? "animate-pulse bg-white" : "bg-white/50"}`} /> Live
         </button>
@@ -413,7 +440,7 @@ export function StageReplay({
                   key={p.id}
                   data-state={lock ? "locked" : out ? "unavailable" : lead ? "leading" : "open"}
                   className={`rounded-full px-3 py-1.5 text-[14px] font-semibold transition-colors ${
-                    lock ? "match-pop bg-emerald-500 text-white" : out ? "bg-red-500/15 text-red-300 line-through decoration-red-400" : lead ? "bg-sky-400/20 text-sky-200 ring-1 ring-sky-300/60" : "bg-white/10 text-white/80"
+                    lock ? "match-pop bg-emerald-700 text-white" : out ? "bg-red-500/15 text-red-300 line-through decoration-red-400" : lead ? "bg-sky-400/20 text-sky-200 ring-1 ring-sky-300/60" : "bg-white/10 text-white/80"
                   }`}
                 >
                   {lock ? "🔒 " : ""}
@@ -423,6 +450,20 @@ export function StageReplay({
               );
             })}
           </ul>
+          {pub ? (
+            <div className="flex items-center gap-3" data-testid="signatures" data-public="true">
+              <span className="text-[12px] font-semibold uppercase tracking-wide text-white/50">Signatures</span>
+              <span className="flex gap-1.5" aria-hidden>
+                {view.members.map((m, i) => {
+                  const sig = board.signatures[m.id];
+                  return <span key={i} className={`h-4 w-4 rounded-full ${sig === "signed" || sig === "conceded" ? "bg-emerald-400" : sig === "holding" ? "bg-amber-400" : "bg-white/15"}`} />;
+                })}
+              </span>
+              <span className="text-[15px] font-semibold" data-testid="signature-count">
+                {Object.values(board.signatures).filter((x) => x === "signed" || x === "conceded").length} of {view.members.length} signed
+              </span>
+            </div>
+          ) : (
           <div className="flex flex-wrap items-center gap-3" data-testid="signatures">
             <span className="w-full text-[12px] font-semibold uppercase tracking-wide text-white/50 sm:w-auto">{board.leading ? `Signatures on ${planTitle(board.locked ?? board.leading)}` : "Signatures"}</span>
             {view.members.map((m) => {
@@ -440,10 +481,11 @@ export function StageReplay({
               );
             })}
           </div>
+          )}
         </div>
       )}
 
-      {Object.keys(latency).length > 0 && (
+      {Object.keys(latency).length > 0 && !pub && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-2 sm:px-6" data-testid="latency-strip">
           <span className="text-[12px] font-semibold uppercase tracking-wide text-white/50">Agent latency</span>
           {view.members.map((m) => (
@@ -465,6 +507,28 @@ export function StageReplay({
 
       {total === 0 ? (
         <div className="flex flex-1 items-center justify-center text-[20px] text-white/50">Waiting for a party to form…</div>
+      ) : pub ? (
+        <div className="grid grid-cols-1 gap-4 p-3 sm:p-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[2fr_1fr]" data-testid="stage-public">
+          <section className="flex flex-col rounded-[14px] bg-white/[0.03] ring-1 ring-white/10 lg:min-h-0">
+            <div className="border-b border-white/10 px-4 py-3">
+              <div className="text-[18px] font-bold">The table, as the room sees it</div>
+              <div className="text-[13px] text-white/50">What code decided about the plans. No reasons, no names, no one&apos;s words.</div>
+            </div>
+            <ul tabIndex={0} aria-label="Public column" className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-3 lg:max-h-none lg:min-h-0 lg:flex-1">
+              {roomRows.map((t) => (
+                <li key={t.id} className={`rounded-[10px] p-3 text-[16px] ring-1 ${t.tone === "reject" ? "bg-red-500/10 text-red-100 ring-red-500/30" : t.tone === "lock" || t.tone === "sign" ? "bg-emerald-400/10 text-emerald-100 ring-emerald-400/30" : "bg-white/[0.04] text-white/90 ring-white/[0.06]"}`}>
+                  {t.body}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section className="rounded-[14px] bg-white/[0.03] p-4 text-[15px] text-white/80 ring-1 ring-white/10">
+            <div className="text-[18px] font-bold text-white">Private, on each phone</div>
+            <p className="mt-1">
+              Five agents, each seeing only its own person. Their reasons, and everyone&apos;s rules, stay on each person&apos;s own phone. This screen shows nothing personal.
+            </p>
+          </section>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 p-3 sm:p-4 lg:min-h-0 lg:flex-1 lg:grid-cols-2">
           <section className="flex flex-col rounded-[14px] bg-white/[0.03] ring-1 ring-white/10 lg:min-h-0">

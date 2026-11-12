@@ -86,6 +86,8 @@ const DEFAULTS = {
   AGENT_MEMORY: true,
   /** F40: /me, "Your data": everything Party Queue holds about you, for you only, with where to change it and a JSON download. */
   MY_DATA: true,
+  /** F41: public screen mode for /stage: what the room may see (plans, a signature count, code events, captions without names). No reasons, no names, no lines. */
+  PUBLIC_SCREEN: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

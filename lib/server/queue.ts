@@ -1,6 +1,7 @@
 import type { CandidatePlan, Party, QueueEntry } from "@/contracts";
 import { EVENT_TAGS } from "@/fixtures";
 import { buildBrief } from "@/lib/agents/brief";
+import { dayLabel } from "@/lib/format";
 import { withMemory } from "./memory";
 import { runParty } from "@/lib/agents/orchestrator";
 import { eligibleToQueue, formParty, bucketKey, nightOf, PARTY_SIZE, type Candidate } from "@/lib/queue/formation";
@@ -204,7 +205,7 @@ async function tryForm(mustInclude: string | undefined, startTalk: boolean): Pro
   s.parties.set(party.id, party);
   for (const m of formed.members) m.entry.status = "forming";
 
-  trace(party.id, "shared", "formation", null, "Party formed", `Five people near ${event.landmark} on ${event.date}. Every member shares a mutual friend or a small Group with someone here.`, { meta: { kind: "formed" } });
+  trace(party.id, "shared", "formation", null, "Party formed", `Five people near ${event.landmark} on ${dayLabel(event.date)}. Every member shares a mutual friend or a small Group with someone here.`, { meta: { kind: "formed" } });
   trace(
     party.id,
     "private",
