@@ -105,3 +105,8 @@ Recorded fallback is labeled as recorded.
 - Agent "background conversations with people" was reframed as agent-to-agent pre-chat (P2) for responsibility reasons.
 - 18+ only.
 - Model calls go through one wrapper with timeout + fallback; there's a mock mode when there's no key.
+- Crewmates' chat messages are scripted or model-simulated and labeled "simulated" in the UI. This is a single-device demo, and real multi-device sync is P2.
+- Demo state lives in memory. `POST /api/reset` resets it, and restarting the server wipes crews.
+- Model IDs default to `muse-spark-1.3` / `muse-ember`. These are guesses, so confirm them with `scripts/smoke-muse.mjs`.
+- Queue → crew formation starts automatically once at least 2× crew size are nearby and the count has been stable for 1.5 s. "▶ Demo: fill queue" makes this happen on cue.
+- Meetup time = max(everyone's free-from, start − 90 min), capped at start − 45 min. Code enforces it even when the model picks the time.
