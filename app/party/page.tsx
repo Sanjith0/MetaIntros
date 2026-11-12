@@ -24,12 +24,14 @@ import { friendMessage } from "@/lib/server/tellfriend";
 import { TellFriend } from "@/components/party/TellFriend";
 import { CantMakeIt } from "@/components/party/CantMakeIt";
 import { hasDropped } from "@/lib/server/refill";
+import { autoForgetDue } from "@/lib/server/forget";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
 
 export default async function PartyPage({ searchParams }: { searchParams: Promise<{ left?: string; cantmake?: string }> }) {
   const { left, cantmake } = await searchParams;
+  autoForgetDue(); // F43: a night that is over forgets itself
   const viewer = await currentViewerId();
   const v = memberPartyViewForViewer(viewer);
   const s = store();

@@ -1,4 +1,5 @@
 import { flag } from "@/lib/flags";
+import { chatExpiry, demoNow } from "./clock";
 import { profile, store } from "./store";
 
 /**
@@ -127,3 +128,54 @@ export function forgetNight(partyId: string, userId: string): ForgetResult {
 }
 
 export const isForgotten = (partyId: string, userId: string) => store().forgotten.has(`${partyId}:${userId}`);
+
+/* ----------------------- F43: forget by default ----------------------- */
+
+/** "Sun 10 AM", in Pacific time where the demo night happens. */
+export function pacificLabel(iso: string): string {
+  const pt = new Date(Date.parse(iso) - 8 * 3600_000);
+  const h = pt.getUTCHours();
+  const m = pt.getUTCMinutes();
+  return `${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][pt.getUTCDay()]} ${h % 12 === 0 ? 12 : h % 12}${m ? `:${String(m).padStart(2, "0")}` : ""} ${h >= 12 ? "PM" : "AM"}`;
+}
+
+/** When a party's private data goes: when its chat closes (12 hours after the event). */
+export function forgetAt(partyId: string): string | null {
+  const s = store();
+  const party = s.parties.get(partyId);
+  if (!party || party.status !== "locked" || !party.planId) return null;
+  const chat = party.chatId ? s.chats.get(party.chatId) : undefined;
+  if (chat?.expiresAt) return chat.expiresAt;
+  const plan = s.plans.get(party.planId)!;
+  return chatExpiry(plan.date, plan.start, plan.end);
+}
+
+/** Delete every member's private data from parties whose night is over, except for anyone who chose to keep it. */
+export function autoForgetDue(now: number = demoNow()): number {
+  if (!flag("AUTO_FORGET") || !flag("FORGET_ME")) return 0;
+  const s = store();
+  let n = 0;
+  for (const party of s.parties.values()) {
+    const at = forgetAt(party.id);
+    if (!at || now < Date.parse(at)) continue;
+    for (const id of party.memberIds) {
+      const k = `${party.id}:${id}`;
+      if (s.forgotten.has(k) || s.keepNight.has(k)) continue;
+      forgetNight(party.id, id);
+      s.autoForgotten.add(k);
+      n++;
+    }
+  }
+  return n;
+}
+
+export function setKeepNight(partyId: string, userId: string, keep: boolean) {
+  const party = store().parties.get(partyId);
+  if (!party || !party.memberIds.includes(userId)) throw new Error("Not your party.");
+  const k = `${partyId}:${userId}`;
+  if (keep) store().keepNight.add(k);
+  else store().keepNight.delete(k);
+}
+
+export const keepsNight = (partyId: string, userId: string) => store().keepNight.has(`${partyId}:${userId}`);
+export const wasAutoForgotten = (partyId: string, userId: string) => store().autoForgotten.has(`${partyId}:${userId}`);

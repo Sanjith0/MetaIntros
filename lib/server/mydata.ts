@@ -55,7 +55,8 @@ export function myData(userId: string): { userId: string; name: string; sections
         const v = s.verdicts.filter((x) => x.partyId === p.id && x.ownerId === userId).length;
         const prompts = [...s.prompts.keys()].filter((k) => k.startsWith(`${p.id}:${userId}:`)).length;
         const forgotten = s.forgotten.has(`${p.id}:${userId}`);
-        return `${title(p.planId)} (${p.status}): ${forgotten ? "your private data was forgotten" : `${v} private agent decisions, ${prompts} prompts, ${s.receipts.has(`${p.id}:${userId}`) ? "a receipt" : "no receipt"}`}`;
+        const auto = s.autoForgotten.has(`${p.id}:${userId}`);
+        return `${title(p.planId)} (${p.status}): ${auto ? "your private data was deleted automatically after the night" : forgotten ? "your private data was forgotten" : `${v} private agent decisions, ${prompts} prompts, ${s.receipts.has(`${p.id}:${userId}`) ? "a receipt" : "no receipt"}`}`;
       }),
     },
     {

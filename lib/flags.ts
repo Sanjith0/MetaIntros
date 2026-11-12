@@ -90,6 +90,8 @@ const DEFAULTS = {
   PUBLIC_SCREEN: true,
   /** F42: "Can't make it" after the lock: the seat is refilled from the queue by someone whose own rules pass the plan; nobody is told who left. */
   SEAT_REFILL: true,
+  /** F43: private data from a night is deleted automatically when the party chat closes, unless you choose to keep it. */
+  AUTO_FORGET: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

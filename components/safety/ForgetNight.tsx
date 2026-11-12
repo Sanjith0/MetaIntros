@@ -14,7 +14,12 @@ const WHERE: Record<string, string> = {
 };
 
 /** "Forget my night": a two-step delete, then the scan's result in plain words. */
-export function ForgetNight({ partyId, title, done }: { partyId: string; title: string; done: boolean }) {
+export function ForgetNight({ partyId, title, done, auto = null }: { partyId: string; title: string; done: boolean; auto?: { at: string; keep: boolean; happened: boolean } | null }) {
+  const [keep, setKeep] = useState(auto?.keep ?? false);
+  const toggleKeep = async () => {
+    const r = await fetch("/api/forget/keep", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ partyId, keep: !keep }) });
+    if (r.ok) setKeep(!keep);
+  };
   const router = useRouter();
   const [step, setStep] = useState<"idle" | "confirm" | "busy">("idle");
   const [result, setResult] = useState<ForgetResult | null>(null);
@@ -62,7 +67,9 @@ export function ForgetNight({ partyId, title, done }: { partyId: string; title: 
   if (done) {
     return (
       <p className="mt-2 text-[14px] text-[var(--color-ink-2)]" data-testid="forget-done">
-        You asked Party Queue to forget your sentence, rules and reasons from {title}. They&apos;re gone.
+        {auto?.happened
+          ? `Your sentence, rules and reasons from ${title} were deleted automatically after the night. They're gone.`
+          : `You asked Party Queue to forget your sentence, rules and reasons from ${title}. They're gone.`}
       </p>
     );
   }
@@ -72,6 +79,20 @@ export function ForgetNight({ partyId, title, done }: { partyId: string; title: 
         Deletes what only you and your agent had from {title}: your sentence and rules, your agent&apos;s private reasons, the exact prompts, code&apos;s checks and your receipt. Kept: what you
         chose to share (your approved lines, your chat messages), the plan and your RSVP.
       </p>
+      {auto && (
+        <div className="rounded-[8px] bg-[var(--color-wash)] px-3 py-2 text-[14px]" data-testid="forget-auto">
+          {keep ? (
+            <>You chose to keep it after the night.</>
+          ) : (
+            <>
+              Otherwise it&apos;s deleted automatically when your party chat closes, <b>{auto.at}</b>.
+            </>
+          )}{" "}
+          <button onClick={toggleKeep} data-testid="forget-keep" className="font-semibold text-[var(--color-link)] hover:underline">
+            {keep ? "Delete it automatically after all" : "Keep it instead"}
+          </button>
+        </div>
+      )}
       {step === "idle" && (
         <button onClick={() => setStep("confirm")} data-testid="forget-start" className="press rounded-[6px] bg-[var(--color-btn-2)] px-3 py-2 text-[15px] font-semibold">
           Forget my night

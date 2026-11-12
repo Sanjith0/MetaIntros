@@ -69,6 +69,7 @@ flowchart TB
 | A no-match blames nobody: the event can't carry a reason or a name, and the same five never re-form | `contracts/events.ts` (strict `PartyNoMatchPayload`), `lib/server/nomatch.ts`, `lib/queue/formation.ts` (`avoid`) | `tests/unit/nomatch.test.ts` |
 | Every card and opener can say which approved facts it came from, without ids or an unnamed third person | `lib/server/provenance.ts` | `tests/unit/provenance.test.ts` |
 | "Forget my night" deletes your private data, then a scan of every stored value proves it | `lib/server/forget.ts` (`scanStore`) | `tests/unit/forget.test.ts` |
+| Private data from a night is deleted by default when its chat closes, unless its owner keeps it | `lib/server/forget.ts` (`autoForgetDue`) | `tests/unit/autoforget.test.ts` (a store-wide scan finds none of the five's words) |
 | Sandbox runs ("What if", preflight) never touch live state or spend a real model call | `lib/server/store.ts` (`runIsolated`), `model/client.ts` (`withMockModel`) | `tests/unit/whatif.test.ts`, `tests/unit/preflight.test.ts` |
 
 ## Modules

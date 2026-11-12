@@ -72,6 +72,9 @@ export interface Store {
   memory: Map<string, { tag: string; weight: number; from: string }[]>;
   /** F42: people who can't make a locked plan and weren't replaced: `${partyId}:${userId}`. */
   dropped: Set<string>;
+  /** F43: `${partyId}:${userId}` who chose to keep their private data after the night, and who had it deleted automatically. */
+  keepNight: Set<string>;
+  autoForgotten: Set<string>;
   /** Every agent turn's source and latency (for receipts and the stage). */
   agentCalls: { partyId: string; ownerId: string; round: number; source: string; ms: number; note: string | null }[];
   events_log: PQEvent[];
@@ -121,6 +124,8 @@ function fresh(): Store {
     door: new Map(),
     memory: new Map(),
     dropped: new Set(),
+    keepNight: new Set(),
+    autoForgotten: new Set(),
     operator: { fastForward: new Set(), forceLock: new Set(), cancelled: new Set() },
     events_log: [],
     seq: 0,

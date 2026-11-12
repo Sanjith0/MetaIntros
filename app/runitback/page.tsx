@@ -9,12 +9,14 @@ import { dayLabel } from "@/lib/format";
 import { MemoryCard } from "@/components/after/MemoryCard";
 import { LABEL, memoryOf, suggestions } from "@/lib/server/memory";
 import { currentViewerId } from "@/lib/server/viewer";
+import { autoForgetDue } from "@/lib/server/forget";
 
 export const metadata: Metadata = { title: "Run it back" };
 export const dynamic = "force-dynamic";
 
 export default async function RunItBackPage() {
   const viewer = await currentViewerId();
+  autoForgetDue(); // F43: a night that is over forgets itself
   const party = partyForViewer(viewer);
   const plan = party?.planId ? store().plans.get(party.planId) : undefined;
   const view = party ? runItBackView(party.id, viewer) : null;

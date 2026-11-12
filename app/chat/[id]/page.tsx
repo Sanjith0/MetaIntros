@@ -10,6 +10,7 @@ import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 import { flag } from "@/lib/flags";
 import { explainSources } from "@/lib/server/provenance";
+import { autoForgetDue } from "@/lib/server/forget";
 
 function closesLabel(iso: string): string {
   const d = new Date(iso);
@@ -24,6 +25,7 @@ export const metadata: Metadata = { title: "Chats" };
 export const dynamic = "force-dynamic";
 
 export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
+  autoForgetDue(); // F43
   const { id } = await params;
   const viewer = await currentViewerId();
   const view = chatView(id, viewer);

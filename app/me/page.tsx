@@ -4,12 +4,14 @@ import { notFound } from "next/navigation";
 import { flag } from "@/lib/flags";
 import { myData } from "@/lib/server/mydata";
 import { currentViewerId } from "@/lib/server/viewer";
+import { autoForgetDue } from "@/lib/server/forget";
 
 export const metadata: Metadata = { title: "Your data" };
 export const dynamic = "force-dynamic";
 
 export default async function MyDataPage() {
   if (!flag("MY_DATA")) notFound();
+  autoForgetDue(); // F43: a night that is over forgets itself
   const viewer = await currentViewerId();
   const d = myData(viewer);
   return (

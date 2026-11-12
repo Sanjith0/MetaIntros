@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { clockOffset, demoNow, setDemoNow } from "@/lib/server/clock";
 import { store } from "@/lib/server/store";
+import { autoForgetDue } from "@/lib/server/forget";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export async function POST(req: Request) {
     const expiries = [...store().chats.values()].map((c) => c.expiresAt).filter((x): x is string => !!x).sort();
     const target = expiries.at(-1) ?? "2026-11-15T18:00:00.000Z";
     setDemoNow(new Date(Date.parse(target) + 60_000).toISOString());
+    autoForgetDue();
   }
   return NextResponse.json({ now: new Date(demoNow()).toISOString(), offsetMs: clockOffset() });
 }

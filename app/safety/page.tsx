@@ -5,13 +5,14 @@ import { IconCheck } from "@/components/icons";
 import { LeaveParty } from "@/components/party/LeaveParty";
 import { SafetyPeople } from "@/components/safety/SafetyPeople";
 import { ForgetNight } from "@/components/safety/ForgetNight";
-import { isForgotten } from "@/lib/server/forget";
+import { forgetAt, isForgotten, keepsNight, pacificLabel, wasAutoForgotten } from "@/lib/server/forget";
 import { flag } from "@/lib/flags";
 import { queueStatus } from "@/lib/server/queue";
 import { partyPeople } from "@/lib/server/safety";
 import { partyForViewer } from "@/lib/server/social";
 import { profile, store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
+import { autoForgetDue } from "@/lib/server/forget";
 
 export const metadata: Metadata = { title: "Safety" };
 export const dynamic = "force-dynamic";
@@ -27,6 +28,7 @@ const ENFORCED = [
 
 export default async function SafetyPage() {
   if (!flag("SAFETY_PAGE")) notFound();
+  autoForgetDue(); // F43: a night that is over forgets itself
   const viewer = await currentViewerId();
   const me = profile(viewer);
   const people = partyPeople(viewer).map((id) => {
@@ -83,7 +85,16 @@ export default async function SafetyPage() {
       {flag("FORGET_ME") && party && (party.status === "locked" || party.status === "failed") && (
         <section className="rounded-[12px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="safety-forget">
           <h2 className="text-[17px] font-bold">Forget my night</h2>
-          <ForgetNight partyId={party.id} title={party.planId ? (store().plans.get(party.planId)?.title ?? "this party") : "this party"} done={isForgotten(party.id, viewer)} />
+          <ForgetNight
+            partyId={party.id}
+            title={party.planId ? (store().plans.get(party.planId)?.title ?? "this party") : "this party"}
+            done={isForgotten(party.id, viewer)}
+            auto={
+              flag("AUTO_FORGET") && forgetAt(party.id)
+                ? { at: pacificLabel(forgetAt(party.id)!), keep: keepsNight(party.id, viewer), happened: wasAutoForgotten(party.id, viewer) }
+                : null
+            }
+          />
         </section>
       )}
 
