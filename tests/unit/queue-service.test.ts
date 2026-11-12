@@ -33,6 +33,9 @@ describe("queue service (DB)", () => {
     expect(party.eventId).toBe("ev-indie-guild");
     expect(party.members).toHaveLength(6);
     expect(party.members.map((m) => m.userId)).not.toContain("p09"); // Me blocked p09
+    expect(party.rationale).toBeTruthy();
+    const trace = await prisma.agentTrace.findMany({ where: { partyId: party.id, agent: "party_formation" } });
+    expect(trace.length).toBeGreaterThanOrEqual(5);
     // spare simulated joiners were withdrawn
     expect(await prisma.queueEntry.count({ where: { status: "waiting" } })).toBe(0);
   });

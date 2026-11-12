@@ -11,10 +11,17 @@ import { dislikeTags } from "@/lib/profile/builder";
 import { publish } from "./bus";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
+import { writeTrace, type TraceStep } from "./trace";
+import { partyFormationAgent, templateRationale } from "@/lib/agents/partyFormation";
 
-export async function chooseCandidate(p: Proposal, _people: Map<string, Person>): Promise<Candidate | null> {
-  void _people;
-  return p.candidates[0] ?? null;
+const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
+const candKey = (c: Candidate) => [...c.entryIds].sort().join(",");
+
+/** Party Formation Agent picks among the engine's candidates (its trace is kept until the party exists). */
+export async function chooseCandidate(p: Proposal, people: Map<string, Person>): Promise<Candidate | null> {
+  const r = await partyFormationAgent(p, people);
+  pending.set(candKey(r.candidate), { steps: r.steps, rationale: r.rationale });
+  return r.candidate;
 }
 
 export function groupContext(members: Person[], cand: Candidate, center: { lat: number; lng: number }): GroupContext {
@@ -79,6 +86,10 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
     return party.id;
   }).catch(() => null);
   if (!partyId) return null;
+  const agentOut = pending.get(candKey(c));
+  pending.delete(candKey(c));
+  await prisma.party.update({ where: { id: partyId }, data: { rationale: agentOut?.rationale ?? templateRationale(c) } });
+  if (agentOut) await writeTrace(partyId, agentOut.steps);
 
   const choice = await eventChooser(members, c, p.bucketId, partyId).catch(() => null) ?? (await selectEventFallback(members, c, p.bucketId));
   const event = choice ? await prisma.event.findUnique({ where: { id: choice.eventId } }) : null;
