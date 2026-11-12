@@ -126,6 +126,21 @@ Found and fixed between F30 and F35: a caption cut "Open Studio: Clay and Tea" a
 (F33; titles now come from the plan id), and finished run-of-show beats faded with opacity
 failed contrast (F35).
 
+Checkpoint after F40 (14:15 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npm run test:e2e` (production build, cold) | 58 specs, `58 passed (5.4m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Unit | `npm test` | `Tests  224 passed (224)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 335/335 checks passed` (adds `door.update`) |
+| Demo video | `npm run video` | `saved shots/demo.webm (7531294 bytes, about 61 s)` |
+| CI | `gh run list --branch swarit-features --limit 3` | `success` for F39, F40 and the count fix |
+
+Found and fixed between F35 and F40: the 390 px spec said "every route" but had missed eight
+pages added after it was written (F40 adds them; all 19 fit), and on a phone the run-of-show
+header was crushed beside its clock (F40).
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 
