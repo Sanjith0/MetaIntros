@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo } from "./helpers";
+import { resetDemo, gotoReady } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -7,7 +7,7 @@ test.beforeEach(async ({ request }) => {
 });
 
 test("fast-forward archives the squad chat: read-only + stay-in-touch prompt", async ({ page }) => {
-  await page.goto("/queue/start?eventId=ev-boulder-social");
+  await gotoReady(page, "/queue/start?eventId=ev-boulder-social");
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-rwc-courthouse").click();
@@ -21,6 +21,6 @@ test("fast-forward archives the squad chat: read-only + stay-in-touch prompt", a
   await expect(page.getByTestId("stay-in-touch")).toBeVisible();
   await expect(page.getByTestId("composer")).toHaveCount(0);
   await expect(page.getByTestId("chat-thread")).toHaveAttribute("data-archived", "true");
-  await page.goto("/chats");
+  await gotoReady(page, "/chats");
   await expect(page.locator('[data-testid^="inbox-row-"][data-type="squad"]').getByTestId("squad-expiry")).toContainText("Archived");
 });

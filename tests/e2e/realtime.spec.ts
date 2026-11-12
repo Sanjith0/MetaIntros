@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo } from "./helpers";
+import { resetDemo, gotoReady } from "./helpers";
 
 test.beforeEach(async ({ request }) => resetDemo(request));
 
@@ -9,8 +9,8 @@ test("two clients see each other's messages live", async ({ browser }) => {
   const b = await ctxB.newPage();
   await b.request.post("/api/demo/login-as", { data: { userId: "p02" } });
 
-  await a.goto("/chats/chat-dm-p02");
-  await b.goto("/chats/chat-dm-p02");
+  await gotoReady(a, "/chats/chat-dm-p02");
+  await gotoReady(b, "/chats/chat-dm-p02");
   await expect(a.getByTestId("chat-thread")).toBeVisible();
   await expect(b.getByTestId("chat-thread")).toBeVisible();
   await a.waitForTimeout(500); // let both SSE streams connect

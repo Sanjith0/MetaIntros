@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo } from "./helpers";
+import { resetDemo, gotoReady } from "./helpers";
 
 test.beforeEach(async ({ request }) => resetDemo(request));
 
 test("friends tabs render seeded data; Queue Up tab starts empty", async ({ page }) => {
-  await page.goto("/friends");
+  await gotoReady(page, "/friends");
   await expect(page.getByTestId("friends-tab-friends")).toHaveAttribute("aria-selected", "true");
   await expect(page.getByTestId("friend-row")).toHaveCount(8);
 
@@ -16,7 +16,7 @@ test("friends tabs render seeded data; Queue Up tab starts empty", async ({ page
 });
 
 test("confirming a request adds a friend", async ({ page }) => {
-  await page.goto("/friends?tab=requests");
+  await gotoReady(page, "/friends?tab=requests");
   await page.getByTestId("request-confirm").click();
   await expect(page.getByText("No pending requests")).toBeVisible();
   await page.getByTestId("friends-tab-friends").click();

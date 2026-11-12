@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo } from "./helpers";
+import { resetDemo, gotoReady } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -9,7 +9,7 @@ test.beforeEach(async ({ request }) => {
 test("join from an event page (GPS) → queue fills → party found → squad banner on event", async ({ browser }) => {
   const ctx = await browser.newContext({ geolocation: { latitude: 37.4447, longitude: -122.1625 }, permissions: ["geolocation"] });
   const page = await ctx.newPage();
-  await page.goto("/events/ev-indie-guild");
+  await gotoReady(page, "/events/ev-indie-guild");
   await page.getByTestId("queue-up-button").click();
   await expect(page.getByTestId("queue-setup")).toBeVisible();
   await page.getByTestId("size-5").click();
@@ -48,13 +48,13 @@ test("join from an event page (GPS) → queue fills → party found → squad ba
   await page.getByTestId("view-event").click();
   await expect(page.getByTestId("squad-banner")).toBeVisible();
   await expect(page.getByTestId("squad-banner")).toContainText("Your squad is going");
-  await page.goto("/events");
+  await gotoReady(page, "/events");
   await expect(page.getByTestId("event-card-ev-indie-guild")).toContainText("Your squad is going");
   await ctx.close();
 });
 
 test("location denied → manual area picker → queue", async ({ page }) => {
-  await page.goto("/queue/start?mode=anything");
+  await gotoReady(page, "/queue/start?mode=anything");
   await page.getByTestId("find-squad").click();
   await expect(page.getByTestId("area-picker")).toBeVisible();
   await page.getByTestId("area-lm-stanford-oval").click();
@@ -70,13 +70,13 @@ test("live mode: three real people pick size 3 and land in the same party", asyn
   for (const name of ["Ana Live", "Ben Live", "Cy Live"]) {
     const ctx = await browser.newContext();
     const p = await ctx.newPage();
-    await p.goto("/join");
+    await gotoReady(p, "/join");
     await p.getByTestId("join-name").fill(name);
     await p.getByTestId("join-age-18-24").click();
     await p.getByTestId("join-gender-none").click();
     await p.getByTestId("join-sample").click();
     await expect(p).toHaveURL(/\/events/);
-    await p.goto("/queue/start?mode=anything");
+    await gotoReady(p, "/queue/start?mode=anything");
     await p.getByTestId("size-3").click();
     await p.getByTestId("choose-area").click();
     await p.getByTestId("area-lm-downtown-pa").click();

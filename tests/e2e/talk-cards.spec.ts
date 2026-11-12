@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo } from "./helpers";
+import { resetDemo, gotoReady } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -7,7 +7,7 @@ test.beforeEach(async ({ request }) => {
 });
 
 test("talk cards render for every party member, reachable from header + avatars", async ({ page }) => {
-  await page.goto("/queue/start?eventId=ev-indie-guild");
+  await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
   await page.getByTestId("size-5").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-downtown-pa").click();
