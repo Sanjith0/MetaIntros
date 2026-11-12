@@ -94,6 +94,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
                 : null)
             }
             friendGroups={flag("FRIEND_GROUP")}
+            widen={flag("WIDEN_SEARCH")}
             night={flag("NIGHT_QUEUE") ? { nearCount: candidatePlans(e.landmark, e.date).length, tonightCount: nightPlans(e.date).length } : null}
             initialStatus={
               active

@@ -83,6 +83,7 @@ export function QueueSheet({
   editable = false,
   memory = [],
   friendGroups = false,
+  widen = false,
 }: {
   eventId: string;
   landmark: string;
@@ -104,7 +105,21 @@ export function QueueSheet({
   memory?: { tag: string; label: string; from: string }[];
   /** F44: offer bringing up to three friends. */
   friendGroups?: boolean;
+  /** F49: offer widening to anywhere tonight while waiting. */
+  widen?: boolean;
 }) {
+  const [widenError, setWidenError] = useState<string | null>(null);
+  const widenSearch = async () => {
+    setWidenError(null);
+    const r = await fetch("/api/queue/widen", { method: "POST" });
+    const body = (await r.json()) as { error?: string; partyId?: string | null; status?: { inBucket: number; needed: number; entry: { scope?: "event" | "night" } } };
+    if (!r.ok) {
+      setWidenError(body.error ?? "Couldn't widen.");
+      return;
+    }
+    if (body.status) setStatus((st) => (st ? { ...st, scope: "night", inBucket: body.status!.inBucket, needed: body.status!.needed } : st));
+    if (body.partyId) setForming(body.partyId);
+  };
   const [groupPick, setGroupPick] = useState<string[]>([]);
   const [useMemory, setUseMemory] = useState(true);
   const [sentence, setSentence] = useState("");
@@ -259,6 +274,16 @@ export function QueueSheet({
                       .map((id) => standing?.others.find((o) => o.id === id)?.firstName ?? friends.find((f) => f.id === id)?.name.split(" ")[0] ?? "someone")
                       .join(" and ")} to join you`}
               </p>
+            )}
+            {widen && night && status!.scope !== "night" && status!.inBucket < 5 && !status!.duo && !status!.group && (
+              <div className="mx-auto mt-3 max-w-[420px] rounded-[8px] bg-[var(--color-pq-soft)] px-3 py-2 text-left text-[14px]" data-testid="widen">
+                Only {status!.inBucket} of 5 near {status!.landmark} so far.{" "}
+                <button onClick={widenSearch} data-testid="widen-go" className="font-semibold text-[var(--color-link)] hover:underline">
+                  Widen to anywhere tonight ({night.tonightCount} events)
+                </button>{" "}
+                and keep your place.
+                {widenError && <span className="block text-[13px] text-[#a8132d]">{widenError}</span>}
+              </div>
             )}
             {editable && (
               <div className="mx-auto mt-3 max-w-[420px] text-left" data-testid="queue-sentence">

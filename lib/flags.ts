@@ -102,6 +102,8 @@ const DEFAULTS = {
   STAGE_KEYS: true,
   /** F48: the lock as a moment on the projector: a MATCH FOUND splash, with how fast the phones showed it when they report. */
   LOCK_SPLASH: true,
+  /** F49: while waiting near one place with too few people, widen to anywhere tonight in one tap and keep your place. */
+  WIDEN_SEARCH: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

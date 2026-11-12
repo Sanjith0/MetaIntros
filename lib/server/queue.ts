@@ -192,6 +192,26 @@ export async function reform(startTalk = true): Promise<string | null> {
 
 export const setKey = (ids: string[]) => [...ids].sort().join(",");
 
+/**
+ * F49: widen the search while you wait. Your entry switches from "near this
+ * place" to "anywhere tonight" (the evening's events across the city); its
+ * join time, and so your place in line, stays. Code tries to form a party
+ * with you at once.
+ */
+export async function widenToNight(userId: string, startTalk = true): Promise<{ partyId: string | null }> {
+  if (!flag("WIDEN_SEARCH") || !flag("NIGHT_QUEUE")) throw new Error("Widening is turned off.");
+  const s = store();
+  const entry = [...s.queue].reverse().find((e) => e.userId === userId && e.status === "waiting");
+  if (!entry) throw new Error("You can widen your search while you're waiting.");
+  if (entry.scope === "night") throw new Error("You're already queued for anywhere tonight.");
+  if (entry.duoWith || entry.groupOf) throw new Error("You're queuing together with others; leave and rejoin to change where.");
+  const event = entry.eventId ? s.events.get(entry.eventId) : undefined;
+  if (!event) throw new Error("unknown event");
+  entry.scope = "night";
+  entry.window = nightWindow(event.date);
+  return { partyId: await tryForm(userId, startTalk) };
+}
+
 async function tryForm(mustInclude: string | undefined, startTalk: boolean): Promise<string | null> {
   const s = store();
   const cands: Candidate[] = s.queue.filter((e) => e.status === "waiting").map((entry) => ({ entry, profile: profile(entry.userId) }));
