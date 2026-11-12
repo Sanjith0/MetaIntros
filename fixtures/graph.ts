@@ -13,6 +13,8 @@ export const GROUPS: Group[] = [
   { id: "grp-runners", name: "Lake Loop Runners", size: 199 },
   { id: "grp-big-climbing", name: "Climbing Everywhere", size: 200 },
   { id: "grp-sf-nightlife", name: "SF Events and Nightlife", size: 12000 },
+  // Everyone who joins through the fair QR is in this Group: their bridge to each other.
+  { id: "grp-fair", name: "Fair guests tonight", size: 150 },
 ];
 
 /** Undirected friendships. The five demo members are not friends with

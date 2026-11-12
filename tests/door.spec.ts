@@ -1,23 +1,8 @@
-import { expect, test, type APIRequestContext } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import fs from "node:fs";
+import { lockedParty } from "./helpers";
 
 /* M5 proof: posting the fixture frame shows Dev's card on Maya's /door. */
-
-export async function lockedParty(request: APIRequestContext): Promise<string> {
-  await request.post("/api/demo/reset");
-  const start = await request.post("/api/demo/start", { data: { mode: "all" } });
-  const { partyId } = (await start.json()) as { partyId: string };
-  await expect
-    .poll(
-      async () => {
-        const r = await request.get("/api/party", { headers: { cookie: "pq_viewer=maya" } });
-        return ((await r.json()) as { view: { party: { status: string } } | null }).view?.party.status;
-      },
-      { timeout: 90_000, intervals: [500] },
-    )
-    .toBe("locked");
-  return partyId;
-}
 
 test("door: the fixture frame shows Dev's card on Maya's /door", async ({ page, context, baseURL, request }) => {
   test.setTimeout(150_000);

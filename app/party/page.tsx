@@ -78,6 +78,9 @@ export default async function PartyPage() {
                   <Link href="/door" className="press flex h-9 items-center gap-1.5 rounded-[6px] bg-[var(--color-btn-2)] px-3 text-[15px] font-semibold">
                     <IconDoor size={18} /> At the door
                   </Link>
+                  <Link href="/runitback" data-testid="open-runitback" className="press flex h-9 items-center gap-1.5 rounded-[6px] bg-[var(--color-btn-2)] px-3 text-[15px] font-semibold">
+                    Run it back
+                  </Link>
                 </div>
               </>
             ) : (
