@@ -7,9 +7,346 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum-like string fields are validated in code by lib/domain/enums.ts (SQLite has no native enums).
+
 /// Key/value runtime settings (demo mode, fill mode, clock offset, AI cache toggle).
 model AppSetting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String
+  avatarColor    String   @default("#1877f2")
+  avatarUrl      String?
+  age            Int?
+  /// "13-15" | "16-17" | "18-24" | "25+"
+  ageBand        String
+  /// "woman" | "man" | "nonbinary" | null
+  gender         String?
+  womenOnlyParty Boolean  @default(false)
+  isMe           Boolean  @default(false)
+  isSimulated    Boolean  @default(true)
+  isLive         Boolean  @default(false)
+  homeLat        Float?
+  homeLng        Float?
+  neighborhood   String?
+  /// "seed" | "gps" | "manual"
+  locationSource String   @default("seed")
+  /// Seed cluster label (debug/tests only; never shown to users)
+  cluster        String?
+  /// Raw Graph-API-shaped payload this user's profile was built from
+  rawGraph       Json?
+  createdAt      DateTime @default(now())
+
+  tasteProfile     TasteProfile?
+  availability     Availability[]
+  friendshipsA     Friendship[]    @relation("FriendshipA")
+  friendshipsB     Friendship[]    @relation("FriendshipB")
+  requestsSent     FriendRequest[] @relation("RequestFrom")
+  requestsReceived FriendRequest[] @relation("RequestTo")
+  blocksMade       Block[]         @relation("Blocker")
+  blocksReceived   Block[]         @relation("Blocked")
+  rsvps            EventRsvp[]
+  queueEntries     QueueEntry[]
+  partyMemberships PartyMember[]
+  chatMemberships  ChatMember[]
+  messages         ChatMessage[]
+  talkCardsOwned   TalkCard[]      @relation("CardOwner")
+  talkCardsAbout   TalkCard[]      @relation("CardSubject")
+  sessions         DeviceSession[]
+}
+
+model TasteProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// [{ name, category, source }]
+  likes        Json
+  /// [{ name, category, source }]
+  dislikes     Json
+  groups       Json
+  music        Json
+  eventHistory Json
+  /// normalized interest tags, e.g. ["climbing","indie-music"]
+  interestTags Json
+  /// number[]
+  embedding    Json
+  /// "small-group" | "big-crowd" | "active" | "chill" ...
+  socialStyle  String
+  updatedAt    DateTime @updatedAt
+}
+
+model Availability {
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 0 = Sunday … 6 = Saturday
+  dayOfWeek Int
+  /// minutes from midnight
+  startMin  Int
+  endMin    Int
+
+  @@index([userId])
+}
+
+model Friendship {
+  id           String   @id @default(cuid())
+  /// Normalized so userAId < userBId
+  userAId      String
+  userBId      String
+  userA        User     @relation("FriendshipA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB        User     @relation("FriendshipB", fields: [userBId], references: [id], onDelete: Cascade)
+  /// "existing" | "queue_up"
+  source       String   @default("existing")
+  metAtEventId String?
+  metAtEvent   Event?   @relation(fields: [metAtEventId], references: [id], onDelete: SetNull)
+  /// Top shared interest surfaced when met through Queue Up
+  sharedNote   String?
+  createdAt    DateTime @default(now())
+
+  @@unique([userAId, userBId])
+}
+
+model FriendRequest {
+  id        String   @id @default(cuid())
+  fromId    String
+  toId      String
+  from      User     @relation("RequestFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to        User     @relation("RequestTo", fields: [toId], references: [id], onDelete: Cascade)
+  /// "pending" | "accepted" | "declined"
+  status    String   @default("pending")
+  partyId   String?
+  party     Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([fromId, toId])
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  blocker   User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked   User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+}
+
+model Landmark {
+  id          String       @id
+  name        String
+  city        String
+  lat         Float
+  lng         Float
+  description String?
+  events      Event[]
+  queue       QueueEntry[]
+  parties     Party[]
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  /// string[]
+  tags          Json
+  startsAt      DateTime
+  endsAt        DateTime
+  venueName     String
+  venueAddress  String
+  lat           Float
+  lng           Float
+  isPublicVenue Boolean   @default(true)
+  capacity      Int
+  coverColor    String    @default("#1877f2")
+  coverPattern  String    @default("dots")
+  hostName      String
+  landmarkId    String?
+  landmark      Landmark? @relation(fields: [landmarkId], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now())
+
+  rsvps        EventRsvp[]
+  queueEntries QueueEntry[]
+  parties      Party[]
+  chats        Chat[]
+  friendships  Friendship[]
+}
+
+model EventRsvp {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// "interested" | "going"
+  status    String
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+}
+
+model QueueEntry {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// null = "anything this weekend"
+  eventId          String?
+  event            Event?    @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  targetPartySize  Int       @default(6)
+  lat              Float
+  lng              Float
+  bucketLandmarkId String
+  bucketLandmark   Landmark  @relation(fields: [bucketLandmarkId], references: [id])
+  /// "waiting" | "matched" | "left"
+  status           String    @default("waiting")
+  joinedAt         DateTime  @default(now())
+  matchedAt        DateTime?
+  partyId          String?
+  party            Party?    @relation(fields: [partyId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+}
+
+model Party {
+  id         String   @id @default(cuid())
+  eventId    String?
+  event      Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  landmarkId String
+  landmark   Landmark @relation(fields: [landmarkId], references: [id])
+  targetSize Int
+  ageBand    String
+  womenOnly  Boolean  @default(false)
+  /// "forming" | "confirmed" | "completed" | "cancelled"
+  status     String   @default("forming")
+  cohesion   Float?
+  rationale  String?
+  createdAt  DateTime @default(now())
+
+  members        PartyMember[]
+  queueEntries   QueueEntry[]
+  chat           Chat?
+  talkCards      TalkCard[]
+  preChats       PreChat[]
+  traces         AgentTrace[]
+  friendRequests FriendRequest[]
+}
+
+model PartyMember {
+  id          String    @id @default(cuid())
+  partyId     String
+  userId      String
+  party       Party     @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt    DateTime  @default(now())
+  checkedInAt DateTime?
+  photoOptIn  Boolean   @default(false)
+  photoUrl    String?
+
+  @@unique([partyId, userId])
+}
+
+model Chat {
+  id            String    @id @default(cuid())
+  /// "direct" | "group" | "squad"
+  type          String
+  title         String?
+  partyId       String?   @unique
+  party         Party?    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  eventId       String?
+  event         Event?    @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  expiresAt     DateTime?
+  archived      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  lastMessageAt DateTime  @default(now())
+
+  members  ChatMember[]
+  messages ChatMessage[]
+}
+
+model ChatMember {
+  id         String   @id @default(cuid())
+  chatId     String
+  userId     String
+  chat       Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastReadAt DateTime @default(now())
+
+  @@unique([chatId, userId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  /// null for AI host / system messages
+  senderId  String?
+  sender    User?    @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  /// "user" | "host" | "system"
+  kind      String   @default("user")
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([chatId, createdAt])
+}
+
+model TalkCard {
+  id        String   @id @default(cuid())
+  partyId   String
+  ownerId   String
+  subjectId String
+  party     Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  owner     User     @relation("CardOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  subject   User     @relation("CardSubject", fields: [subjectId], references: [id], onDelete: Cascade)
+  /// { claims: [{ text, source }], openers: string[], pattern?: {...} }
+  content   Json
+  createdAt DateTime @default(now())
+
+  @@unique([partyId, ownerId, subjectId])
+}
+
+model PreChat {
+  id         String   @id @default(cuid())
+  partyId    String
+  party      Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  userAId    String
+  userBId    String
+  /// [{ speaker: "A" | "B", text }]
+  transcript Json
+  /// string[]
+  sparks     Json
+  simulated  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@unique([partyId, userAId, userBId])
+}
+
+model AgentTrace {
+  id        String   @id @default(cuid())
+  partyId   String?
+  party     Party?   @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  /// "party_formation" | "event_selection" | "host" | "talk_cards" ...
+  agent     String
+  stepIndex Int
+  /// "tool_call" | "reasoning" | "decision" | "safety_check"
+  kind      String
+  toolName  String?
+  input     Json?
+  output    Json?
+  summary   String
+  createdAt DateTime @default(now())
+
+  @@index([partyId, stepIndex])
+}
+
+model DeviceSession {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
 }
