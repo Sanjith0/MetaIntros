@@ -62,7 +62,7 @@ export async function respondToRequest(userId: string, requestId: string, accept
   }
   const [a, b] = await Promise.all([subject(r.fromId), subject(r.toId)]);
   if (!a || !b || !friendAllowed(a, b)) return { ok: false as const, error: "not allowed" };
-  const f = await createFriendship(r.fromId, r.toId, r.party ? { eventId: r.party.eventId, partyId: r.party.id, sharedNote: await sharedNoteFor(r.party.id, r.toId, r.fromId) } : undefined);
+  const f = await createFriendship(r.fromId, r.toId, r.party ? { eventId: r.party.eventId, partyId: r.party.id, sharedNote: await sharedNoteFor(r.party.id, r.fromId, r.toId) } : undefined);
   await prisma.friendRequest.update({ where: { id: r.id }, data: { status: "accepted" } });
   await prisma.friendRequest.updateMany({ where: { fromId: r.toId, toId: r.fromId, status: "pending" }, data: { status: "accepted" } });
   return { ok: true as const, friendship: f };
