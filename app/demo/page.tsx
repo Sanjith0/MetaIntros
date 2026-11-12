@@ -34,6 +34,11 @@ const SCRIPT = [
   "Add squad as friends → Met through Queue Up",
 ];
 
+function fmtOffset(ms: number) {
+  const h = Math.round(ms / 3_600_000);
+  return h >= 24 ? `${Math.floor(h / 24)}d ${h % 24}h` : `${h}h`;
+}
+
 export default function DemoPage() {
   const [s, setS] = useState<Status | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -67,6 +72,17 @@ export default function DemoPage() {
         <button type="button" data-testid="demo-kick" onClick={() => act("kick", "/api/demo/kick-live")}
           className="flex items-center justify-center gap-1.5 rounded-xl bg-white/10 py-3 text-sm font-semibold"><UserX size={16} /> Kick live users ({s?.liveUsers ?? 0})</button>
       </section>
+
+      {s && s.clockOffsetMs > 60_000 && (
+        <section className="mt-4 rounded-xl bg-amber-400/15 p-3 text-sm text-amber-100 ring-1 ring-amber-300/40" data-testid="clock-warning">
+          <p>
+            <b>Demo clock is {fmtOffset(s.clockOffsetMs)} ahead</b> (from Fast-forward). Seeded events may already be over, so
+            &ldquo;any event&rdquo; queues can&apos;t find one. Reset the clock (or Reset &amp; reseed) before the next run.
+          </p>
+          <button type="button" data-testid="clock-reset" onClick={() => act("clock", "/api/demo/clock")}
+            className="mt-2 w-full rounded-lg bg-white py-2 font-bold text-[#3b0f7a]">{busy === "clock" ? "Resetting…" : "Reset clock to now"}</button>
+        </section>
+      )}
 
       <section className="mt-5">
         <h2 className="flex items-center gap-1.5 text-sm font-bold"><Users size={16} /> Who fills the queue?</h2>
