@@ -25,6 +25,11 @@ test("talk cards render for every party member, reachable from header + avatars"
     expect(await c.getByTestId("card-openers").locator("li").count()).toBeGreaterThanOrEqual(2);
   }
   await expect(page.getByTestId("card-position")).toHaveText("1 of 4");
+  // companion pre-chats are clearly labeled as simulations
+  const pre = cards.first().getByTestId("prechat");
+  await expect(pre.getByTestId("prechat-label")).toHaveText("AI simulation");
+  await pre.locator("summary").click();
+  await expect(pre).toContainText("not real messages");
 
   // deep link from a member avatar opens that member's card
   await page.goBack();

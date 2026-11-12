@@ -2,13 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, CalendarCheck, Copy, Heart, MessageSquareQuote, Sparkles, Users, Zap } from "lucide-react";
+import { ArrowLeft, Bot, CalendarCheck, Copy, Heart, MessageSquareQuote, Sparkles, Users, Zap } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import type { CardContent, ClaimKind } from "@/lib/cards/claims";
 
+interface PreChat {
+  meIsA: boolean;
+  transcript: { speaker: "A" | "B"; text: string }[];
+  sparks: string[];
+  simulated: boolean;
+}
 interface Card {
   subject: { id: string; name: string; avatarColor: string };
   content: CardContent;
+  preChat?: PreChat | null;
 }
 
 const KIND_ICON: Record<ClaimKind, typeof Heart> = { shared_interest: Heart, mutual_friends: Users, event_overlap: CalendarCheck, pattern: Zap, spark: Sparkles };
@@ -94,6 +101,28 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
                     ))}
                   </ul>
                 </div>
+                {c.preChat && (
+                  <details className="rounded-xl border border-dashed border-[#c4b5fd] bg-[#faf8ff] p-2" data-testid="prechat">
+                    <summary className="flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-queue-glow">
+                      <Bot size={15} /> Companion pre-chat
+                      <span className="ml-auto rounded bg-[#ede9fe] px-1.5 text-[10px] font-bold uppercase tracking-wide" data-testid="prechat-label">AI simulation</span>
+                    </summary>
+                    <p className="mt-1 text-[11px] text-fb-muted">Simulated by your companion AIs using only your two profiles — these are not real messages.</p>
+                    <ul className="mt-1.5 space-y-1">
+                      {c.preChat.transcript.map((t, i) => {
+                        const mine = (t.speaker === "A") === c.preChat!.meIsA;
+                        return (
+                          <li key={i} className={`flex ${mine ? "justify-end" : ""}`}>
+                            <span className={`max-w-[80%] rounded-xl px-2 py-1 text-xs italic ${mine ? "bg-[#ddd6fe]" : "bg-white ring-1 ring-[#e9e3ff]"}`}>
+                              <span className="not-italic font-semibold">{mine ? "Your AI" : `${c.subject.name.split(" ")[0]}'s AI`}: </span>{t.text}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <p className="mt-1.5 text-xs"><Sparkles size={12} className="mr-1 inline text-queue-glow" />Sparks: {c.preChat.sparks.join(" · ")}</p>
+                  </details>
+                )}
                 <p className="text-[10px] leading-snug text-fb-muted">AI-assisted · every fact cites the Facebook data it came from · politics, religion, health &amp; sexuality are never shown</p>
               </div>
             </div>

@@ -5,6 +5,7 @@ import { getTalkCards } from "@/lib/server/talkCards";
 import { validateCard, type CardSubject } from "@/lib/cards/claims";
 import { loadPeople } from "@/lib/profile/load";
 import { TalkCardDeck } from "@/components/cards/TalkCardDeck";
+import { getPreChatsFor } from "@/lib/server/preChats";
 
 export default async function CardsPage({ params, searchParams }: { params: Promise<{ partyId: string }>; searchParams: Promise<{ member?: string }> }) {
   const { partyId } = await params;
@@ -18,5 +19,7 @@ export default async function CardsPage({ params, searchParams }: { params: Prom
   const cards = (await getTalkCards(partyId, me)).map((c) => ({ ...c, content: validateCard(c.content, subjects) }));
   const order = party.members.map((m) => m.userId);
   cards.sort((a, b) => order.indexOf(a.subject.id) - order.indexOf(b.subject.id));
-  return <TalkCardDeck cards={cards} meId={me} initialMember={member ?? null} chatId={party.chat?.id ?? null} eventTitle={party.event?.title ?? ""} />;
+  const pre = await getPreChatsFor(partyId, me);
+  const withPre = cards.map((c) => ({ ...c, preChat: pre.find((p) => p.otherId === c.subject.id) ?? null }));
+  return <TalkCardDeck cards={withPre} meId={me} initialMember={member ?? null} chatId={party.chat?.id ?? null} eventTitle={party.event?.title ?? ""} />;
 }
