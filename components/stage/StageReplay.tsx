@@ -102,6 +102,8 @@ export function StageReplay({
   captions = false,
   publicScreen = false,
   publicAtLoad = false,
+  locked = false,
+  follow = null,
 }: {
   initial: StageView;
   leakTest?: boolean;
@@ -111,8 +113,13 @@ export function StageReplay({
   /** F41: offer public screen mode, and whether the page opened in it. */
   publicScreen?: boolean;
   publicAtLoad?: boolean;
+  /** F46: opened as the room's view: public is enforced, and this page only ever receives sanitized data. */
+  locked?: boolean;
+  /** F46: a QR to the room's view, shown on the public screen. */
+  follow?: { url: string; svg: string } | null;
 }) {
-  const [pub, setPub] = useState(publicScreen && publicAtLoad);
+  const [pub, setPub] = useState(locked || (publicScreen && publicAtLoad));
+  const q = locked ? "&public=1" : "";
   const togglePublic = () => {
     const next = !pub;
     setPub(next);
@@ -146,7 +153,7 @@ export function StageReplay({
   const pinnedRef = useRef<string | null>(pinnedAtLoad);
   const [parties, setParties] = useState(initial.parties ?? []);
   const loadParty = async (id: string | null) => {
-    const fresh = (await (await fetch(id ? `/api/stage?party=${id}` : "/api/stage", { cache: "no-store" })).json()) as StageView;
+    const fresh = (await (await fetch(id ? `/api/stage?party=${id}${q}` : `/api/stage${locked ? "?public=1" : ""}`, { cache: "no-store" })).json()) as StageView;
     fresh.plans ??= [];
     partyRef.current = fresh.partyId;
     setView(fresh);
@@ -183,13 +190,13 @@ export function StageReplay({
 
   // Live: follow new traces as they arrive.
   useEffect(() => {
-    const es = new EventSource("/api/stream?stage=1");
+    const es = new EventSource(locked ? "/api/stream?stage=public" : "/api/stream?stage=1");
     es.addEventListener("trace", async (msg) => {
       const t = JSON.parse((msg as MessageEvent).data) as Trace;
       // Pinned to another party: keep the list fresh, but stay put.
       if (pinnedRef.current && t.partyId !== pinnedRef.current) {
         if (t.meta?.kind === "formed" || t.meta?.kind === "locked" || t.meta?.kind === "nomatch") {
-          void fetch("/api/stage?party=" + pinnedRef.current, { cache: "no-store" })
+          void fetch("/api/stage?party=" + pinnedRef.current + q, { cache: "no-store" })
             .then((r) => r.json())
             .then((v: StageView) => v.parties && setParties(v.parties));
         }
@@ -198,7 +205,7 @@ export function StageReplay({
       // A new party (or the same id after a demo reset) starts a fresh board.
       if (t.partyId !== partyRef.current || t.meta?.kind === "formed") {
         partyRef.current = t.partyId;
-        const fresh = (await (await fetch(`/api/stage?party=${t.partyId}`)).json()) as StageView;
+        const fresh = (await (await fetch(`/api/stage?party=${t.partyId}${q}`)).json()) as StageView;
         fresh.plans ??= [];
         setView(fresh);
         if (fresh.parties) setParties(fresh.parties);
@@ -326,9 +333,11 @@ export function StageReplay({
           {status}
         </span>
         <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
-          <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-700 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-700">
-            Start demo party
-          </button>
+          {!locked && (
+            <button onClick={startDemo} data-testid="stage-start" className="rounded-[6px] bg-violet-700 px-3 py-1.5 text-[13px] font-semibold hover:bg-violet-800">
+              Start demo party
+            </button>
+          )}
           {parties.length > 1 && (
             <label className="flex items-center gap-1.5 text-[12px] font-semibold text-white/70">
               <span className="sr-only sm:not-sr-only">Party</span>
@@ -350,7 +359,7 @@ export function StageReplay({
               </select>
             </label>
           )}
-          {publicScreen && (
+          {publicScreen && !locked && (
             <button
               onClick={togglePublic}
               aria-pressed={pub}
@@ -506,7 +515,21 @@ export function StageReplay({
       )}
 
       {total === 0 ? (
-        <div className="flex flex-1 items-center justify-center text-[20px] text-white/50">Waiting for a party to form…</div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 p-4 text-[20px] text-white/50">
+          Waiting for a party to form…
+          {pub && follow && (
+            <div className="flex items-center gap-3 text-left" data-testid="follow-qr">
+              <div className="w-[160px] shrink-0 rounded-[8px] bg-white p-1.5" role="img" aria-label="QR code to follow along" dangerouslySetInnerHTML={{ __html: follow.svg }} />
+              <div className="min-w-0 max-w-[320px]">
+                <div className="text-[18px] font-bold text-white">Follow along on your phone</div>
+                <div className="text-[14px] text-white/70">The same room view. Nothing personal is ever sent to it.</div>
+                <div className="mt-1 break-all font-mono text-[12px] text-white/60" data-testid="follow-url">
+                  {follow.url}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       ) : pub ? (
         <div className="grid grid-cols-1 gap-4 p-3 sm:p-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[2fr_1fr]" data-testid="stage-public">
           <section className="flex flex-col rounded-[14px] bg-white/[0.03] ring-1 ring-white/10 lg:min-h-0">
@@ -527,6 +550,18 @@ export function StageReplay({
             <p className="mt-1">
               Five agents, each seeing only its own person. Their reasons, and everyone&apos;s rules, stay on each person&apos;s own phone. This screen shows nothing personal.
             </p>
+            {follow && (
+              <div className="mt-4 flex items-center gap-3" data-testid="follow-qr">
+                <div className="w-[132px] shrink-0 rounded-[8px] bg-white p-1.5" role="img" aria-label="QR code to follow along" dangerouslySetInnerHTML={{ __html: follow.svg }} />
+                <div className="min-w-0">
+                  <div className="text-[16px] font-bold text-white">Follow along on your phone</div>
+                  <div className="text-[13px] text-white/70">The same room view. Nothing personal is ever sent to it.</div>
+                  <div className="mt-1 break-all font-mono text-[12px] text-white/60" data-testid="follow-url">
+                    {follow.url}
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         </div>
       ) : (

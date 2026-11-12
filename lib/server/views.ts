@@ -4,6 +4,7 @@ import { person, partyForViewer, type Person } from "./social";
 import { store } from "./store";
 import { flag } from "@/lib/flags";
 import { dayLabel } from "@/lib/format";
+import { publicTraces, seatId } from "@/lib/stage/public";
 
 /**
  * What a party member may see. Built only from public table lines, the
@@ -77,6 +78,18 @@ export function stageParties(): StageParty[] {
     const day = ev ? dayLabel(ev.date).split(",")[0] : "";
     return { id: p.id, label: `${day} · ${ev?.landmark ?? "?"} · ${word[p.status] ?? p.status}`, status: p.status };
   });
+}
+
+/** F46: the stage for anyone in the room. Anonymous seats, code's rows, decisions without words. */
+export function publicStageView(partyId?: string): StageView {
+  const v = stageView(partyId);
+  const party = v.partyId ? store().parties.get(v.partyId) : undefined;
+  if (!party) return v;
+  return {
+    ...v,
+    members: party.memberIds.map((id, i) => ({ id: seatId(party.memberIds, id), name: `Seat ${i + 1}`, firstName: `Seat ${i + 1}`, hue: 260 })),
+    traces: publicTraces(v.traces, party.memberIds),
+  };
 }
 
 export function stageView(partyId?: string): StageView {

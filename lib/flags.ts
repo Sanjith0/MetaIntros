@@ -96,6 +96,8 @@ const DEFAULTS = {
   FRIEND_GROUP: true,
   /** F45: when nothing there fits your own rules, the smallest change that would open a plan, told only to you. */
   CLOSEST_FIT: true,
+  /** F46: follow along: /stage?screen=public is enforced on the server (anonymous seats, no words) and the projector shows a QR to it. */
+  FOLLOW_ALONG: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

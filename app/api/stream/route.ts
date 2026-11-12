@@ -3,6 +3,8 @@ import { onTrace } from "@/lib/server/trace";
 import { connect, connectScreen } from "@/lib/server/phones";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
+import { flag } from "@/lib/flags";
+import { publicTrace, seatId } from "@/lib/stage/public";
 import type { PQEvent } from "@/contracts";
 
 export const dynamic = "force-dynamic";
@@ -13,9 +15,11 @@ export const runtime = "nodejs";
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const stage = url.searchParams.get("stage") === "1";
+  // F46: a phone in the room following along: sanitized traces only, and no bus events at all.
+  const publicStage = url.searchParams.get("stage") === "public" && flag("FOLLOW_ALONG");
   // An observer (operator screen) hears nothing personal and is not counted as a connected phone.
   const observer = url.searchParams.get("observer") === "1";
-  const userId = stage || observer ? undefined : await currentViewerId();
+  const userId = stage || observer || publicStage ? undefined : await currentViewerId();
   const since = Number(url.searchParams.get("since") ?? "NaN");
   const enc = new TextEncoder();
 
@@ -34,7 +38,7 @@ export async function GET(req: Request) {
       ctrl.enqueue(enc.encode(`retry: 1000\nevent: hello\ndata: ${JSON.stringify({ seq: store().seq, userId: userId ?? null, now: Date.now() })}\n\n`));
       const disconnect = userId ? connect(userId) : stage ? connectScreen("stage") : () => {};
       if (Number.isFinite(since)) store().events_log.filter((e) => e.seq > since).forEach(send);
-      const off = subscribe(send);
+      const off = publicStage ? () => {} : subscribe(send);
       // Only the projector hears traces, including the private lane.
       const offTrace = stage
         ? onTrace((t) => {
@@ -44,7 +48,18 @@ export async function GET(req: Request) {
               cleanup();
             }
           })
-        : () => {};
+        : publicStage
+          ? onTrace((t) => {
+              const party = store().parties.get(t.partyId);
+              const safe = party ? publicTrace(t, (id) => seatId(party.memberIds, id)) : null;
+              if (!safe) return;
+              try {
+                ctrl.enqueue(enc.encode(`event: trace\ndata: ${JSON.stringify(safe)}\n\n`));
+              } catch {
+                cleanup();
+              }
+            })
+          : () => {};
       const ping = setInterval(() => {
         try {
           ctrl.enqueue(enc.encode(`: ping\n\n`));
