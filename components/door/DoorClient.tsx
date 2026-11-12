@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { Card } from "@/contracts";
+import { WhyLine } from "@/components/party/WhyLine";
+import type { SourceItem } from "@/lib/stage/provenance";
 import { Avatar } from "@/components/Avatar";
 import { IconCheck, IconDoor, IconSparkle } from "@/components/icons";
 import { useLiveEvents } from "@/components/live/LiveProvider";
@@ -30,7 +32,7 @@ export function DoorClient({
   partyId: string;
   viewerId: string;
   members: Member[];
-  cards: Card[];
+  cards: (Card & { why?: SourceItem[] })[];
   initialSpotted: string | null;
   initialMethod?: string;
   cameraOn?: boolean;
@@ -114,7 +116,7 @@ export function DoorClient({
                   “{card.opener}”
                 </div>
               </div>
-              <div className="text-[11px] text-[var(--color-ink-2)]">Built from approved facts: {card.sourceIds.join(", ")}</div>
+              {card.why ? <WhyLine items={card.why} testid="door-why" /> : <div className="text-[11px] text-[var(--color-ink-2)]">Built from approved facts: {card.sourceIds.join(", ")}</div>}
             </div>
           </div>
         ) : (

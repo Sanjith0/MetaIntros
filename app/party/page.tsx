@@ -16,6 +16,8 @@ import { currentViewerId } from "@/lib/server/viewer";
 import { memberPartyViewForViewer } from "@/lib/server/views";
 import { queueStatus } from "@/lib/server/queue";
 import { noMatchView } from "@/lib/server/nomatch";
+import { explainSources } from "@/lib/server/provenance";
+import { WhyLine } from "@/components/party/WhyLine";
 
 export const metadata: Metadata = { title: "Your party" };
 export const dynamic = "force-dynamic";
@@ -155,6 +157,7 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
                       <div className="mt-1 rounded-[8px] bg-[var(--color-pq-soft)] px-2.5 py-1.5 text-[13px]">
                         <span className="font-semibold text-[var(--color-pq)]">Say: </span>
                         {c.opener}
+                        {flag("WHY_LINE") && <WhyLine items={explainSources(c.sourceIds, viewer, v.party.id)} testid={`why-${m.id}`} />}
                       </div>
                     )}
                   </div>

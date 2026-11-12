@@ -50,6 +50,8 @@ const DEFAULTS = {
   WHAT_IF: true,
   /** F22: when no plan fits all five, everyone goes back to the front of the queue, nobody is blamed, and the same five never re-form. */
   NO_MATCH: true,
+  /** F23: "Why this?" under every card and opener: the approved facts it was written from, in plain words. */
+  WHY_LINE: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

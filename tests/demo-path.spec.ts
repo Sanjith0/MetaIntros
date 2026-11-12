@@ -59,7 +59,7 @@ test("demo path: five phones, one MATCH FOUND", async ({ browser, baseURL, reque
   await maya.page.getByRole("link", { name: "See your party" }).click();
   await expect(maya.page.getByTestId("party-card")).toBeVisible();
   await expect(maya.page.getByTestId("party-plan-title")).toHaveText("Dolores Night Market");
-  await expect(maya.page.getByTestId("party-members").locator("li")).toHaveCount(4);
+  await expect(maya.page.getByTestId("party-members").locator(":scope > li")).toHaveCount(4);
   await maya.page.screenshot({ path: "shots/m4-party.png", animations: "disabled" });
 
   // The Event page shows the RSVP with 5 Going.
