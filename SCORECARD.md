@@ -112,6 +112,20 @@ into the fresh store (F27; a unit test now resets mid-talk); `/queue` treated a 
 still forming, so nobody could queue for another night (F26); the projector flickered between
 two parties talking at once (F28).
 
+Checkpoint after F35 (13:45 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npm run test:e2e` (production build, cold) | 53 specs, `53 passed (4.7m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Unit | `npm test` | `Tests  208 passed (208)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 333/333 checks passed` |
+| Demo video | `npm run video` | `saved shots/demo.webm (7263638 bytes, about 61 s)`; ends on the projector with the leak blocked and the caption "Leak test: the verifier blocked it. Nothing reached a phone." |
+
+Found and fixed between F30 and F35: a caption cut "Open Studio: Clay and Tea" at its colon
+(F33; titles now come from the plan id), and finished run-of-show beats faded with opacity
+failed contrast (F35).
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 
