@@ -4,7 +4,10 @@
  */
 import { prisma } from "@/lib/db";
 import { toJson } from "@/lib/json";
-import { pairKey, runRoom, sparksFor, type RoomParty } from "@/lib/companion/room";
+import { pairKey, runRoom, sparksFor, type LiveEvent, type RoomParty } from "@/lib/companion/room";
+import { buildRecap, type Recap } from "@/lib/companion/recap";
+import type { TableRow, Verdict } from "@/lib/companion/orchestrator";
+import type { ThreadMsg } from "@/lib/companion/rounds";
 import type { QueueContext } from "@/lib/companion/brief";
 import { groupCohesion } from "@/lib/match/cohesion";
 import { makePairScorer } from "@/lib/match/compat";
@@ -24,6 +27,23 @@ export interface PendingRoom {
   userIds: string[];
   party: RoomParty;
   preChats: { a: string; b: string; transcript: { speaker: "A" | "B"; text: string }[]; sparks: string[] }[];
+  /** what each member gets to see about how the squad was decided */
+  recaps: Map<string, Recap>;
+}
+
+/** A room as it happens, for the people in it to watch (see liveViewFor). In memory only. */
+export interface LiveRoom {
+  id: string;
+  userIds: Set<string>;
+  startedAt: number;
+  stage: string;
+  note: string;
+  circles: { id: string; theme: string; members: string[] }[];
+  lines: ThreadMsg[];
+  notes: Map<string, Map<string, Verdict>>;
+  deep: Set<string>;
+  proposals: TableRow[];
+  groups: Map<string, { members: string[]; lines: { from: string; say: string }[]; ok?: boolean }>;
 }
 
 interface State {
@@ -33,9 +53,10 @@ interface State {
   failed: Map<string, string[][]>;
   /** room signatures that ended with nothing to commit → their entry ids */
   settled: Map<string, Set<string>>;
+  live: LiveRoom[];
 }
 const g = globalThis as unknown as { __quRooms?: State };
-const state = () => (g.__quRooms ??= { pending: new Map(), failed: new Map(), settled: new Map() });
+const state = () => (g.__quRooms ??= { pending: new Map(), failed: new Map(), settled: new Map(), live: [] });
 
 const candKey = (c: Pick<Candidate, "entryIds">) => [...c.entryIds].sort().join(",");
 
@@ -111,15 +132,26 @@ export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Ma
   const event = eventId ? await prisma.event.findUnique({ where: { id: eventId }, select: { title: true } }) : null;
   const ctx: QueueContext = { mode: anchor.mode ?? "events", eventTitle: event?.title ?? null, targetSize: anchor.targetSize };
 
+  const notes = new Map(
+    (await prisma.queueEntry.findMany({ where: { id: { in: room.map((r) => r.entryId) } }, select: { userId: true, tonight: true } }))
+      .filter((e) => e.tonight)
+      .map((e) => [e.userId, e.tonight!] as const),
+  );
   const row = await prisma.matchRoom.create({ data: { signature, anchorUserId: anchor.userId, userIds: wrap(userIds), stage: "briefing", note: "Companions are reading their people's profiles" } });
-  const announce = (stage: string, note: string) => publish("queue", { type: "stage", stage, note }, real);
+  const watch: LiveRoom = { id: row.id, userIds: new Set(userIds), startedAt: Date.now(), stage: row.stage, note: row.note, circles: [], lines: [], notes: new Map(), deep: new Set(), proposals: [], groups: new Map() };
+  s.live = [watch, ...s.live].slice(0, 20);
+  const announce = (stage: string, note: string) => {
+    watch.stage = stage;
+    watch.note = note;
+    publish("queue", { type: "stage", stage, note }, real);
+  };
   announce(row.stage, row.note);
   try {
     // A brief costs a model call only when a real person is in the room.
     const canMeet = await feasibility(anchor, room, people);
     let ruledOut = 0;
     const feasible = canMeet && ((members: string[]) => (canMeet(members) ? true : (ruledOut++, false)));
-    const briefs = await ensureBriefs(userIds.map((u) => people.get(u)!), ctx, () => real.length > 0);
+    const briefs = await ensureBriefs(userIds.map((u) => people.get(u)!), ctx, () => real.length > 0, notes);
     const result = await runRoom({
       ids: userIds,
       people,
@@ -130,6 +162,7 @@ export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Ma
       priority: real.length ? real : [anchor.userId],
       onlyPriority: true,
       feasible,
+      onLive: (e) => record(watch, e),
       onStage: async (stage, note) => {
         if (stage === "done" || stage === "waiting") return;
         await prisma.matchRoom.update({ where: { id: row.id }, data: { stage, note } });
@@ -158,7 +191,8 @@ export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Ma
           preChats.push({ a, b, transcript: thread.map((m) => ({ speaker: m.from === a ? ("A" as const) : ("B" as const), text: m.say })), sparks: sparksFor(a, b, result) });
         }
       }
-      s.pending.set(candKey(c), { signature, userIds: members, party, preChats });
+      const recaps = new Map(members.map((m) => [m, buildRecap(m, party, result, people, userIds)]));
+      s.pending.set(candKey(c), { signature, userIds: members, party, preChats, recaps });
       return c;
     });
 
@@ -188,4 +222,104 @@ export async function roomStageFor(userId: string): Promise<{ stage: string; not
     select: { stage: true, note: true },
   });
   return row;
+}
+
+function record(w: LiveRoom, e: LiveEvent) {
+  switch (e.type) {
+    case "circle":
+      w.circles.push({ id: e.circleId, theme: e.theme, members: e.members });
+      break;
+    case "line":
+      w.lines.push(e.line);
+      break;
+    case "notes": {
+      const m = w.notes.get(e.from) ?? new Map<string, Verdict>();
+      for (const [about, v] of e.notes) m.set(about, v);
+      w.notes.set(e.from, m);
+      break;
+    }
+    case "deep":
+      for (const [a, b] of e.pairs) w.deep.add(pairKey(a, b));
+      break;
+    case "proposal":
+      w.proposals.push(e.row);
+      break;
+    case "table":
+      w.proposals = [...w.proposals.filter((p) => !e.rows.some((r) => r.id === p.id)), ...e.rows];
+      break;
+    case "group": {
+      const gr = w.groups.get(e.groupId) ?? { members: e.members, lines: [] };
+      gr.lines.push(e.line);
+      w.groups.set(e.groupId, gr);
+      break;
+    }
+    case "groupDone": {
+      const gr = w.groups.get(e.groupId) ?? { members: e.members, lines: [] };
+      gr.ok = e.ok;
+      w.groups.set(e.groupId, gr);
+      break;
+    }
+  }
+}
+
+export interface LiveView {
+  stage: string;
+  note: string;
+  roomSize: number;
+  circle: { theme: string; size: number } | null;
+  people: Record<string, { name: string; avatarColor: string }>;
+  conversations: {
+    with: string;
+    deep: boolean;
+    /** this person's own Companion's notes on them (never theirs on you) */
+    notes: Verdict | null;
+    lines: { from: "me" | "them"; kind: ThreadMsg["kind"]; say: string; blocked: boolean }[];
+  }[];
+  /** squads proposed that include this person */
+  proposals: { by: string; members: string[]; line: string; backers: number }[];
+  /** group conversations this person was part of */
+  groups: { members: string[]; lines: { from: string; say: string }[]; status: "talking" | "agreed" | "didnt_work" }[];
+}
+
+/**
+ * The latest room this person is in, as they are allowed to see it: only conversations their own
+ * Companion was part of, only their own Companion's notes, and proposals and group conversations
+ * that include them. A squad that didn't work out never says whose Companion declined.
+ */
+export async function liveViewFor(userId: string): Promise<LiveView | null> {
+  const w = state().live.find((r) => r.userIds.has(userId));
+  if (!w) return null;
+  const byOther = new Map<string, LiveView["conversations"][number]["lines"]>();
+  for (const l of w.lines) {
+    if (l.from !== userId && l.to !== userId) continue;
+    const other = l.from === userId ? l.to : l.from;
+    byOther.set(other, [...(byOther.get(other) ?? []), { from: l.from === userId ? "me" : "them", kind: l.kind, say: l.say, blocked: l.blocked }]);
+  }
+  const mine = w.notes.get(userId);
+  const order = (k: ThreadMsg["kind"]) => ["intro", "ask", "answer", "followup", "close"].indexOf(k);
+  const conversations = [...byOther.entries()]
+    .map(([other, lines]) => ({
+      with: other,
+      deep: w.deep.has(pairKey(userId, other)),
+      notes: mine?.get(other) ?? null,
+      lines: [...lines].sort((a, b) => order(a.kind) - order(b.kind) || Number(a.from === "them") - Number(b.from === "them")),
+    }))
+    .sort((a, b) => Number(b.deep) - Number(a.deep) || (b.notes?.score ?? -1) - (a.notes?.score ?? -1) || a.with.localeCompare(b.with));
+  const proposals = w.proposals.filter((p) => p.members.includes(userId)).map((p) => ({ by: p.by, members: p.members, line: p.line, backers: p.backers.length }));
+  const groups = [...w.groups.values()]
+    .filter((gr) => gr.members.includes(userId))
+    .map((gr) => ({ members: gr.members, lines: gr.lines, status: gr.ok === undefined ? ("talking" as const) : gr.ok ? ("agreed" as const) : ("didnt_work" as const) }));
+  const circle = w.circles.find((c) => c.members.includes(userId));
+  const ids = [...new Set([userId, ...conversations.map((c) => c.with), ...proposals.flatMap((p) => p.members), ...groups.flatMap((gr) => gr.members)])];
+  const users = await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, avatarColor: true } });
+  return {
+    stage: w.stage,
+    note: w.note,
+    roomSize: w.userIds.size,
+    circle: circle ? { theme: circle.theme, size: circle.members.length } : null,
+    people: Object.fromEntries(users.map((u) => [u.id, { name: u.name, avatarColor: u.avatarColor }])),
+    conversations,
+    proposals,
+    groups,
+  };
 }

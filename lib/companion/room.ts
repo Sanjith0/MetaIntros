@@ -33,7 +33,23 @@ export interface RoomInput {
   /** can this group actually meet? Checked by code before a squad is formed. */
   feasible?: (members: string[]) => boolean;
   onStage?: (s: Stage, note: string) => void | Promise<void>;
+  onLive?: (e: LiveEvent) => void;
 }
+
+/**
+ * What happens in a room, as it happens: each Companion line the moment its Muse call returns,
+ * each Companion's private notes, proposals, and group-conversation lines. Consumers decide who
+ * may see what (a person sees only their own Companion's conversations and notes).
+ */
+export type LiveEvent =
+  | { type: "circle"; circleId: string; theme: string; members: string[] }
+  | { type: "line"; line: ThreadMsg }
+  | { type: "notes"; from: string; notes: [string, Verdict][]; picks?: string[] }
+  | { type: "deep"; pairs: [string, string][] }
+  | { type: "proposal"; row: TableRow }
+  | { type: "table"; circleId: string; rows: TableRow[] }
+  | { type: "group"; groupId: string; members: string[]; line: { from: string; say: string } }
+  | { type: "groupDone"; groupId: string; members: string[]; ok: boolean };
 
 export interface RoomParty {
   members: string[];
@@ -73,6 +89,14 @@ export function sparksFor(a: string, b: string, r: Pick<RoomResult, "verdicts">)
 export async function runRoom(input: RoomInput): Promise<RoomResult> {
   const { people, briefs, targetSize } = input;
   const ids = [...new Set(input.ids)].sort();
+  const live = (e: LiveEvent) => {
+    try {
+      input.onLive?.(e);
+    } catch {
+      /* a viewer must never break a room */
+    }
+  };
+  const asLine = (from: string, to: string, kind: ThreadMsg["kind"], m: Msg): ThreadMsg => ({ from, to, kind, say: m.say, cites: m.cites, blocked: m.blocked });
   const stage = async (s: Stage, note: string) => {
     await input.onStage?.(s, note);
   };
@@ -118,6 +142,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
   type CS = (typeof circles)[number];
 
   // ── round 1: everyone in the circle ──
+  for (const cs of circles) live({ type: "circle", circleId: cs.circle.id, theme: cs.circle.theme, members: cs.members });
   await stage("mingling", "Companions are introducing their people and asking each other questions");
   const intro = (id: string): Msg => {
     const v = views.get(id)!;
@@ -131,15 +156,24 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     for (const [a, b] of cs.pairs) {
       post(a, b, "intro", intro(a));
       post(b, a, "intro", intro(b));
+      live({ type: "line", line: asLine(a, b, "intro", intro(a)) });
+      live({ type: "line", line: asLine(b, a, "intro", intro(b)) });
     }
-    const asks = await Promise.all(cs.active.map((m) => askRound(cs.ctx(m), cs.introsFor(m))));
+    const asks = await Promise.all(cs.active.map((m) => askRound(cs.ctx(m), cs.introsFor(m)).then((r) => {
+      for (const [to, msg] of r.asks) live({ type: "line", line: asLine(m, to, "ask", msg) });
+      return r;
+    })));
     asks.forEach((r) => count(r.source));
     const askOf = new Map(cs.active.map((m, i) => [m, asks[i].asks]));
     for (const [a, b] of cs.pairs) {
       post(a, b, "ask", askOf.get(a)!.get(b)!);
       post(b, a, "ask", askOf.get(b)!.get(a)!);
     }
-    const answers = await Promise.all(cs.active.map((m) => answerRound(cs.ctx(m), cs.introsFor(m), new Map(cs.partners(m).map((p) => [p, askOf.get(p)!.get(m)!.say])))));
+    const answers = await Promise.all(cs.active.map((m) => answerRound(cs.ctx(m), cs.introsFor(m), new Map(cs.partners(m).map((p) => [p, askOf.get(p)!.get(m)!.say]))).then((r) => {
+      for (const [to, msg] of r.answers) live({ type: "line", line: asLine(m, to, "answer", msg) });
+      live({ type: "notes", from: m, notes: [...r.verdicts], picks: r.picks });
+      return r;
+    })));
     answers.forEach((r) => count(r.source));
     cs.active.forEach((m, i) => {
       for (const [about, v] of answers[i].verdicts) verdicts.get(m)!.set(about, v);
@@ -158,14 +192,23 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     cs.deep = deepPairs(cs.picks, verdicts, cs.members, people);
     const deepWith = (m: string) => cs.deep.filter((p) => p.includes(m)).map((p) => (p[0] === m ? p[1] : p[0]));
     const threadsFor = (m: string) => new Map(deepWith(m).map((p) => [p, threads.get(pairKey(m, p))!]));
-    const follow = await Promise.all(cs.active.map((m) => followUpRound(cs.ctx(m), threadsFor(m))));
+    live({ type: "deep", pairs: cs.deep });
+    const follow = await Promise.all(cs.active.map((m) => followUpRound(cs.ctx(m), threadsFor(m)).then((r) => {
+      for (const [to, msg] of r.says) live({ type: "line", line: asLine(m, to, "followup", msg) });
+      return r;
+    })));
     follow.forEach((r) => count(r.source));
     const fOf = new Map(cs.active.map((m, i) => [m, follow[i].says]));
     for (const [a, b] of cs.deep) {
       post(a, b, "followup", fOf.get(a)!.get(b)!);
       post(b, a, "followup", fOf.get(b)!.get(a)!);
     }
-    const close = await Promise.all(cs.active.map((m) => closeRound(cs.ctx(m), threadsFor(m), cs.members, verdicts.get(m)!, targetSize)));
+    const close = await Promise.all(cs.active.map((m) => closeRound(cs.ctx(m), threadsFor(m), cs.members, verdicts.get(m)!, targetSize).then((r) => {
+      for (const [to, msg] of r.says) live({ type: "line", line: asLine(m, to, "close", msg) });
+      if (r.verdicts.size) live({ type: "notes", from: m, notes: [...r.verdicts] });
+      live({ type: "proposal", row: { id: `prop-${m}`, by: m, members: r.proposal.members, line: r.proposal.line.say, backers: [] } });
+      return r;
+    })));
     close.forEach((r) => count(r.source));
     const cOf = new Map(cs.active.map((m, i) => [m, close[i]]));
     for (const [a, b] of cs.deep) {
@@ -192,6 +235,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
       else if (r.action === "amend" && r.members) cs.table.push({ id: `amend-${m}`, by: m, members: r.members, line: r.line.say, backers: [] });
     });
     cs.want = wanted(cs.table, responses);
+    live({ type: "table", circleId: cs.circle.id, rows: cs.table.map((r) => ({ ...r, backers: [...r.backers] })) });
   }));
 
   // ── Orchestrator forms squads; each squad's Companions talk as a group and sign off ──
@@ -205,14 +249,23 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
       groupStage = true;
       await stage("group", "Each proposed squad's Companions are talking it over");
     }
-    const speak = await Promise.all(members.map((m) => groupSpeak(cs.ctx(m), members, cs.introsFor(m, members.filter((x) => x !== m)), verdicts.get(m)!)));
+    const groupId = `${cs.circle.id}:${members.join(",")}`;
+    const speak = await Promise.all(members.map((m) => groupSpeak(cs.ctx(m), members, cs.introsFor(m, members.filter((x) => x !== m)), verdicts.get(m)!).then((r) => {
+      live({ type: "group", groupId, members, line: { from: m, say: r.line.say } });
+      return r;
+    })));
     speak.forEach((r) => count(r.source));
     const lines = members.map((m, i) => ({ from: m, say: speak[i].line.say }));
-    const respond = await Promise.all(members.map((m) => groupRespond(cs.ctx(m), members, lines, verdicts.get(m)!)));
+    const respond = await Promise.all(members.map((m) => groupRespond(cs.ctx(m), members, lines, verdicts.get(m)!).then((r) => {
+      live({ type: "group", groupId, members, line: { from: m, say: r.line.say } });
+      return r;
+    })));
     respond.forEach((r) => count(r.source));
     blocked += [...speak, ...respond].filter((r) => r.line.blocked).length;
+    const ok = respond.every((r) => r.decision !== "no") && validateParty(members.map((m) => people.get(m)!)).ok;
+    live({ type: "groupDone", groupId, members, ok });
     return {
-      ok: respond.every((r) => r.decision !== "no") && validateParty(members.map((m) => people.get(m)!)).ok,
+      ok,
       groupChat: [...lines, ...members.map((m, i) => ({ from: m, say: respond[i].line.say }))],
       needs: respond.map((r) => r.need).filter(Boolean),
     };

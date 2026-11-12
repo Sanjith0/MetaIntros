@@ -15,6 +15,7 @@ import { sweepExpiredChats } from "./expiry";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { nowMs } from "@/lib/clock";
+import { cleanNote } from "@/lib/companion/brief";
 
 // ───────────────────────── join / leave ─────────────────────────
 
@@ -28,18 +29,22 @@ export interface JoinInput {
   lng?: number;
   /** manual area pick */
   landmarkId?: string;
+  /** "What do you want tonight?" (optional; only the person's own Companion sees it) */
+  tonight?: string | null;
   locationSource: "gps" | "manual" | "seed";
 }
 
 export type JoinResult =
   | { ok: true; entryId: string; bucketId: string; bucketName: string }
-  | { ok: false; error: "too_far" | "bad_size" | "private_event" | "no_event" | "no_location" | "bad_mode"; nearest?: string };
+  | { ok: false; error: "too_far" | "bad_size" | "private_event" | "no_event" | "no_location" | "bad_mode" | "sensitive_tonight"; nearest?: string };
 
 export async function joinQueue(userId: string, input: JoinInput): Promise<JoinResult> {
   if (!PartySize.safeParse(input.targetSize).success) return { ok: false, error: "bad_size" };
   const mode: QueueMode = input.mode ?? "events";
   if (mode !== "events" && mode !== "hangout") return { ok: false, error: "bad_mode" };
   if (mode === "hangout" && input.eventId) return { ok: false, error: "bad_mode" }; // hangouts are new, never an existing event
+  const tonight = cleanNote(input.tonight);
+  if (tonight === "sensitive") return { ok: false, error: "sensitive_tonight" };
   if (input.eventId) {
     const ev = await prisma.event.findUnique({ where: { id: input.eventId } });
     if (!ev || ev.kind !== "event") return { ok: false, error: "no_event" }; // can't queue into another squad's hangout
@@ -60,7 +65,7 @@ export async function joinQueue(userId: string, input: JoinInput): Promise<JoinR
 
   await prisma.queueEntry.updateMany({ where: { userId, status: "waiting" }, data: { status: "left" } });
   const entry = await prisma.queueEntry.create({
-    data: { userId, mode, eventId: input.eventId, targetPartySize: input.targetSize, lat: lat!, lng: lng!, bucketLandmarkId: bucket.id },
+    data: { userId, mode, eventId: input.eventId, targetPartySize: input.targetSize, lat: lat!, lng: lng!, bucketLandmarkId: bucket.id, tonight },
   });
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
   if (!user.isSimulated) {

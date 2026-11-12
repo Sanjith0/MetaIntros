@@ -137,6 +137,10 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
     markFailed(room); // don't let the same room propose this exact group again
     return { partyId: null, reason: "no_event" };
   }
+  // What each member gets to see about how the squad was decided (saved before anyone sees "Party found").
+  if (room?.recaps.size) {
+    await prisma.companionRecap.createMany({ data: [...room.recaps].map(([userId, recap]) => ({ partyId, userId, data: toJson(recap) })) });
+  }
   await prisma.party.update({ where: { id: partyId }, data: { eventId: event.id, status: "confirmed" } });
   // The Companions' conversations between squad members feed the talk cards and the cards screen.
   if (room?.preChats.length) {

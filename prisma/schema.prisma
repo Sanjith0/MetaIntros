@@ -213,6 +213,8 @@ model QueueEntry {
   matchedAt        DateTime?
   partyId          String?
   party            Party?    @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  /// "What do you want tonight?" in the person's own words. Only their own Companion sees it.
+  tonight          String?
 
   @@index([status])
 }
@@ -239,6 +241,7 @@ model Party {
   preChats       PreChat[]
   traces         AgentTrace[]
   friendRequests FriendRequest[]
+  recaps         CompanionRecap[]
 }
 
 model PartyMember {
@@ -384,4 +387,16 @@ model MatchRoom {
   updatedAt    DateTime @updatedAt
 
   @@index([anchorUserId])
+}
+
+/// What one member sees about how their squad was decided: their conversations, their own
+/// Companion's notes, the group conversation, and the similarity-score comparison.
+model CompanionRecap {
+  id      String @id @default(cuid())
+  partyId String
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  userId  String
+  data    Json
+
+  @@unique([partyId, userId])
 }

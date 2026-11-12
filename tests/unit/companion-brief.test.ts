@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { mockProvider } from "@/lib/ai";
-import { buildBrief, openView, privateTexts, sourceFacts, templateBrief } from "@/lib/companion/brief";
+import { buildBrief, cleanNote, openView, privateTexts, sourceFacts, templateBrief } from "@/lib/companion/brief";
 import { resolveSource } from "@/lib/cards/claims";
 import { seedDatabase } from "@/lib/seed/seed";
 import { getBriefFor, setShare } from "@/lib/server/briefs";
@@ -61,6 +61,18 @@ describe("companion brief", () => {
     mockProvider().reset();
     expect((await buildBrief(me, ctx, { useModel: false })).source).toBe("template");
     expect(mockProvider().calls).toHaveLength(0);
+  });
+
+  it("the person's own note for tonight stays with their own Companion", () => {
+    const note = "first night out since moving, not drinking";
+    const b = templateBrief(me, { ...ctx, note });
+    expect(b.tonight.note).toBe(note);
+    expect(JSON.stringify(openView(b))).not.toContain("not drinking");
+    expect(privateTexts(b)).toContain(note);
+    expect(templateBrief(me, ctx).tonight).not.toHaveProperty("note");
+    expect(cleanNote("  somewhere   quiet  ")).toBe("somewhere quiet");
+    expect(cleanNote("")).toBeNull();
+    expect(cleanNote("my therapist says go out more")).toBe("sensitive");
   });
 
   it("a brief that guesses a gender from a name is replaced by the template", async () => {

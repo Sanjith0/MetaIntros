@@ -244,3 +244,29 @@ Two more adaptations:
 - Up to 4 picks and 5 deep partners per Companion.
 - Deliberation is one round; the Orchestrator revises once after a veto.
 - Icebreaker cards come from code, using the verdicts.
+
+## Companions on the phone (added 2026-11-12)
+
+Goal: the Companions are something a person watches and uses on their own phone, and the app
+shows plainly why Companions talking beats ranking people by profile-vector similarity.
+The Orchestrator stays in the "How we matched you" panel.
+
+1. **"Your Companion is talking" (queue screen).** While a room runs, the phone shows a live feed
+   of the conversations its own Companion is in: intros, the question it asked each person, their
+   answers, deep dives, the squads proposed with you, and the squad's group conversation. Each
+   line appears as that Companion's Muse call returns. A person also sees their own Companion's
+   private notes (score, would enjoy, concerns). Nobody sees another person's notes, and a decline
+   is never attributed.
+2. **"How your Companions decided" (Party found).** Open by default: each squadmate's full
+   conversation, the group conversation, and that every Companion signed off. Saved per person when
+   the squad forms (a `CompanionRecap` row), so it survives a reload.
+3. **"The numbers vs your Companion."** The similarity matcher's picks (the original compatibility
+   score: profile-vector cosine plus interest overlap, availability and mutual friends) beside the
+   squad the Companions chose. Each difference is explained only from the person's own Companion's
+   notes. No extra model calls; works in cache mode.
+4. **"What do you want tonight?"** An optional sentence on the queue setup screen, stored on the
+   queue entry. Only that person's Companion sees it, as `in_their_own_words`; it is never shown to
+   other Companions, and a line that repeats it verbatim is blocked. Sensitive text is refused.
+   It is added to the prompt only when present, so cached runs without it still replay.
+
+Prompts for runs without a sentence are unchanged, so the warmed cache stays valid.

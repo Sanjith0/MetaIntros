@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 export async function resetDb() {
   await prisma.$transaction([
     prisma.agentTrace.deleteMany(),
+    prisma.companionRecap.deleteMany(),
     prisma.matchRoom.deleteMany(),
     prisma.companionBrief.deleteMany(),
     prisma.preChat.deleteMany(),

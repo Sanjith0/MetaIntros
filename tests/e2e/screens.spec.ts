@@ -37,6 +37,10 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
   await expect.poll(() => page.getByTestId("trace-step").count(), { timeout: 15_000 }).toBeGreaterThanOrEqual(8);
   await shot(page, "18-party-found-trace");
+  await page.getByTestId("squad-decision").scrollIntoViewIfNeeded();
+  await shot(page, "26-squad-decision");
+  await page.getByTestId("numbers-vs-companion").scrollIntoViewIfNeeded();
+  await shot(page, "27-numbers-vs-companion");
   await page.getByTestId("open-squad-chat").click();
   await expect(page.getByTestId("msg-host").first()).toBeVisible();
   await shot(page, "19-squad-chat");

@@ -4,7 +4,7 @@ import { mockProvider } from "@/lib/ai";
 import { seedDatabase } from "@/lib/seed/seed";
 import { agentEventChooser, setEventChooser } from "@/lib/server/pipeline";
 import { getQueueStatus, joinQueue, leaveQueue, tick } from "@/lib/server/queue";
-import { resetRooms } from "@/lib/server/rooms";
+import { liveViewFor, resetRooms } from "@/lib/server/rooms";
 import { setSetting } from "@/lib/server/settings";
 import { getTalkCards } from "@/lib/server/talkCards";
 import { getTrace } from "@/lib/server/trace";
@@ -136,6 +136,52 @@ describe("Companion engine in the queue", () => {
     expect(party.members.map((m) => m.userId)).toContain("p01");
     expect(party.event?.kind).toBe("hangout");
     expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(0); // nothing was formed and then dropped
+  });
+
+  it("each member gets a saved recap, readable only by that member", async () => {
+    await join(4);
+    await wait(300);
+    await tick();
+    const party = await confirmed();
+    const recaps = await prisma.companionRecap.findMany({ where: { partyId: party.id } });
+    expect(recaps.map((r) => r.userId).sort()).toEqual(party.members.map((m) => m.userId).sort());
+    const mine = recaps.find((r) => r.userId === "p01")!.data as { squad: { id: string; thread: unknown[] }[]; numbers: { similarityPick: unknown[] } };
+    expect(mine.squad).toHaveLength(3);
+    expect(mine.squad.every((s) => s.thread.length >= 6)).toBe(true);
+    expect(mine.numbers.similarityPick).toHaveLength(3);
+  });
+
+  it("the live view shows a person only their own Companion's conversations and notes", async () => {
+    const seen: (Awaited<ReturnType<typeof liveViewFor>>)[] = [];
+    mockProvider().on("companion_followup", async () => {
+      if (!seen.length) seen.push(await liveViewFor("p01"));
+      return JSON.stringify({ says: {} });
+    });
+    await join(4);
+    await wait(300);
+    await tick();
+    const v = seen[0]!;
+    expect(v.stage).toBe("deep");
+    expect(v.conversations.length).toBe(11); // everyone else in the room of 12
+    for (const c of v.conversations) {
+      expect(c.with).not.toBe("p01");
+      expect(c.lines.slice(0, 2).map((l) => l.kind)).toEqual(["intro", "intro"]);
+      expect(c.notes).not.toBeNull();
+    }
+    expect(v.people["p01"]).toBeTruthy();
+    expect(await liveViewFor("nobody")).toBeNull();
+  });
+
+  it("the tonight note is stored, reaches only the owner's Companion, and sensitive notes are refused", async () => {
+    expect(await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual", tonight: "my therapist said go out more" })).toMatchObject({ ok: false, error: "sensitive_tonight" });
+    await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual", tonight: "  not drinking, want somewhere quiet  " });
+    expect((await prisma.queueEntry.findFirstOrThrow({ where: { userId: "p01", status: "waiting" } })).tonight).toBe("not drinking, want somewhere quiet");
+    await wait(300);
+    await tick();
+    const companionCalls = mockProvider().calls.filter((c) => c.task.startsWith("companion_") && c.task !== "companion_brief");
+    const withNote = companionCalls.filter((c) => c.messages[1].content.includes("not drinking, want somewhere quiet"));
+    expect(withNote.length).toBeGreaterThan(0);
+    for (const c of withNote) expect(JSON.parse(c.messages[1].content).your_brief.ownerId).toBe("p01");
   });
 
   it("a room of only simulated people spends no model calls", async () => {

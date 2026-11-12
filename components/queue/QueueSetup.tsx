@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CalendarDays, Crosshair, Lock, MapPin, ShieldCheck, Sparkles, Swords, Users } from "lucide-react";
+import { CalendarDays, Crosshair, Lock, MapPin, MessageSquareText, ShieldCheck, Sparkles, Swords, Users } from "lucide-react";
 
 type Mode = "events" | "hangout";
 
@@ -36,18 +36,20 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: P
   const [loc, setLoc] = useState<LocState>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [tonight, setTonight] = useState("");
 
   const join = async (body: Record<string, unknown>) => {
     setBusy(true);
     setError(null);
     const r = await fetch("/api/queue/join", {
       method: "POST",
-      body: JSON.stringify({ mode, eventId: mode === "events" ? event?.id ?? null : null, targetSize: size, ...body }),
+      body: JSON.stringify({ mode, eventId: mode === "events" ? event?.id ?? null : null, targetSize: size, tonight: tonight.trim() || null, ...body }),
     });
     const j = await r.json();
     if (j.ok) return router.push("/queue");
     setBusy(false);
     if (j.error === "too_far") setLoc({ kind: "manual", reason: "You look far from our Queue Up areas. Pick where you'll meet:" });
+    else if (j.error === "sensitive_tonight") setError("Keep it to plans and vibe: your note can't mention health, religion, politics or sexuality.");
     else setError(j.error === "private_event" ? "Queue Up is only for public venues." : "Couldn't join the queue. Try again.");
   };
 
@@ -105,6 +107,13 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: P
             <p className="mt-1 text-xs text-[#c7d2fe]">You&apos;ll only match with people who picked the same size.</p>
           </section>
 
+          <section className="mt-6">
+            <label htmlFor="tonight" className="flex items-center gap-1.5 text-sm font-semibold"><MessageSquareText size={16} /> What do you want tonight? <span className="font-normal text-[#c7d2fe]">(optional)</span></label>
+            <textarea id="tonight" data-testid="tonight" value={tonight} onChange={(e) => setTonight(e.target.value.slice(0, 200))} rows={2}
+              placeholder="e.g. first night out since moving, not drinking, somewhere I can actually talk"
+              className="mt-2 w-full resize-none rounded-xl bg-white/10 p-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#a855f7]" />
+            <p className="mt-1 flex items-center gap-1 text-[11px] text-[#c7d2fe]"><Lock size={11} /> Only your Companion reads this. It uses it to judge who fits, and never repeats it.</p>
+          </section>
           {loc.kind !== "manual" && (
             <button type="button" disabled={busy || loc.kind === "locating"} onClick={findSquad} data-testid="find-squad"
               className="queue-shimmer mt-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#22d3ee] via-[#6366f1] to-[#a855f7] py-4 text-xl font-extrabold shadow-[0_0_30px_rgba(99,102,241,.7)] disabled:opacity-70">

@@ -51,6 +51,24 @@ describe("companion rounds", () => {
     expect(prompt).not.toContain('"source"');
   });
 
+  it("the note reaches only the owner's own prompt, and only when there is one", async () => {
+    mockProvider().on("companion_ask", () => JSON.stringify({ asks: {} }));
+    await rounds.askRound(ctx(), intros);
+    expect(mockProvider().calls[0].messages[1].content).not.toContain("in_their_own_words");
+    const withNote = templateBrief(people.get(me)!, { ...qctx, note: "want somewhere quiet to talk" });
+    await rounds.askRound(ctx({ brief: withNote }), intros);
+    const u = JSON.parse(mockProvider().calls[1].messages[1].content);
+    expect(u.in_their_own_words.text).toBe("want somewhere quiet to talk");
+    expect(JSON.stringify(u.your_brief)).not.toContain("quiet to talk");
+  });
+
+  it("a reply that repeats the person's own note word for word is blocked", async () => {
+    const note = "want somewhere quiet to talk";
+    mockProvider().on("companion_ask", () => JSON.stringify({ asks: { [others[0]]: { say: `They said they ${note}. Yours?`, cites: [] } } }));
+    const out = await rounds.askRound(ctx({ brief: templateBrief(people.get(me)!, { ...qctx, note }) }), intros);
+    expect(out.asks.get(others[0])!.blocked).toBe(true);
+  });
+
   it("answerRound gives a clamped verdict per person and at most 4 picks", async () => {
     mockProvider().on("companion_answer", () => JSON.stringify({ answers: {}, verdicts: Object.fromEntries(others.map((o) => [o, { score: 400, wouldEnjoy: ["Both go to church"], opener: "Hi" }])), picks: [me, ...others] }));
     const out = await rounds.answerRound(ctx(), intros, new Map(others.map((o) => [o, "What would they do?"])));

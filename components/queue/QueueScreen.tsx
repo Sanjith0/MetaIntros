@@ -7,6 +7,8 @@ import { Avatar } from "@/components/Avatar";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { fmtDuration, fmtEventWhen } from "@/lib/format";
 import { MatchTracePanel } from "@/components/trace/MatchTracePanel";
+import { CompanionFeed } from "@/components/companion/CompanionFeed";
+import { SquadDecision } from "@/components/companion/SquadDecision";
 
 interface Status {
   state: "idle" | "waiting" | "matched";
@@ -150,6 +152,7 @@ export function QueueScreen() {
           );
         })}
       </ul>
+      <CompanionFeed meId={users[0]?.id} />
     </div>
   );
 }
@@ -214,6 +217,7 @@ function PartyFound({ party }: { party: Party }) {
           <p className="flex items-center gap-1.5 text-sm text-[#ddd6fe]"><MapPin size={14} /> {party.event.venueName}</p>
         </div>
       )}
+      <SquadDecision partyId={party.id} />
       <MatchTracePanel partyId={party.id} dark />
       <div className="mt-5 grid grid-cols-2 gap-2">
         {party.chat && (

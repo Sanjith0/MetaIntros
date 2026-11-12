@@ -11,6 +11,7 @@ const Body = z.object({
   lng: z.number().optional(),
   landmarkId: z.string().optional(),
   locationSource: z.enum(["gps", "manual", "seed"]).default("manual"),
+  tonight: z.string().max(400).nullable().optional(),
 });
 
 export async function POST(req: Request) {

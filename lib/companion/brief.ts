@@ -32,7 +32,8 @@ export interface Brief {
   /** first name only */
   name: string;
   facts: Fact[];
-  tonight: { hopingFor: string; energy: SocialStyle };
+  /** `note` is the person's own words for tonight: only their own Companion ever sees it. */
+  tonight: { hopingFor: string; energy: SocialStyle; note?: string };
   /** how the person communicates, described in the third person */
   communication: string;
   lightsUp: string[];
@@ -43,6 +44,8 @@ export interface QueueContext {
   mode: QueueMode;
   eventTitle: string | null;
   targetSize: number;
+  /** "What do you want tonight?" in the person's own words (optional) */
+  note?: string | null;
 }
 
 /** The model-written part of a brief (stored so it is generated once per person). */
@@ -103,13 +106,25 @@ export function openView(b: Brief) {
       .filter((f) => f.share === "open")
       .slice(0, MAX_OPEN_FACTS)
       .map((f) => ({ id: f.id, kind: f.kind, text: f.text, share: f.share, ...(clean(f.depth) ? { depth: f.depth } : {}) })),
-    tonight: b.tonight,
+    tonight: { hopingFor: b.tonight.hopingFor, energy: b.tonight.energy }, // never the person's own note
     communication: clean(b.communication) ?? "",
   };
 }
 export type OpenView = ReturnType<typeof openView>;
 
-export const privateTexts = (b: Pick<Brief, "facts">) => b.facts.filter((f) => f.share === "private").map((f) => f.text);
+/** Text no other Companion may ever see or hear: private facts, and the person's own note for tonight. */
+export const privateTexts = (b: Pick<Brief, "facts"> & { tonight?: { note?: string } }) => [
+  ...b.facts.filter((f) => f.share === "private").map((f) => f.text),
+  ...(b.tonight?.note ? [b.tonight.note] : []),
+];
+
+/** Clean a "what do you want tonight" sentence: null if empty, "sensitive" if it touches a sensitive topic. */
+export function cleanNote(raw: unknown): string | null | "sensitive" {
+  if (typeof raw !== "string") return null;
+  const t = raw.replace(/\s+/g, " ").trim().slice(0, 200);
+  if (!t) return null;
+  return isSensitiveText(t) ? "sensitive" : t;
+}
 
 function hopingFor(ctx: QueueContext) {
   if (ctx.mode === "hangout") return `A new hangout with a squad of ${ctx.targetSize}`;
@@ -132,7 +147,7 @@ function assemble(p: Person, ctx: QueueContext, shares: Record<string, Share>, g
     ownerId: p.id,
     name: firstName(p),
     facts,
-    tonight: { hopingFor: hopingFor(ctx), energy: p.profile.socialStyle },
+    tonight: { hopingFor: hopingFor(ctx), energy: p.profile.socialStyle, ...(ctx.note ? { note: ctx.note } : {}) },
     communication: gen.communication,
     lightsUp: gen.lightsUp.filter((id) => ids.has(id)),
     source,

@@ -31,9 +31,9 @@ export async function getBriefFor(userId: string, ctx: QueueContext, useModel: b
 }
 
 /** Briefs for a whole room. `useModel(p)` says whose brief may spend a model call. */
-export async function ensureBriefs(people: Person[], ctx: QueueContext, useModel: (p: Person) => boolean): Promise<Map<string, Brief>> {
+export async function ensureBriefs(people: Person[], ctx: QueueContext, useModel: (p: Person) => boolean, notes: Map<string, string> = new Map()): Promise<Map<string, Brief>> {
   const rows = new Map((await prisma.companionBrief.findMany({ where: { userId: { in: people.map((p) => p.id) } } })).map((r) => [r.userId, r]));
-  const briefs = await Promise.all(people.map((p) => briefFor(p, ctx, rows.get(p.id), useModel(p))));
+  const briefs = await Promise.all(people.map((p) => briefFor(p, { ...ctx, note: notes.get(p.id) ?? null }, rows.get(p.id), useModel(p))));
   return new Map(briefs.map((b) => [b.ownerId, b]));
 }
 

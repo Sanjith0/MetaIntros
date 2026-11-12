@@ -26,14 +26,35 @@ test("the brief: what my Companion may share is mine to decide, and it sticks", 
   expect(after.facts[0].share).toBe("private");
 });
 
+test("a sensitive note for tonight is refused with a clear message", async ({ page }) => {
+  await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
+  await page.getByTestId("tonight").fill("my therapist says I should go out more");
+  await page.getByTestId("size-4").click();
+  await page.getByTestId("choose-area").click();
+  await page.getByTestId("area-lm-downtown-pa").click();
+  await expect(page.getByTestId("queue-error")).toContainText("can't mention health");
+});
+
 test("queueing runs the Companion engine: squad of the chosen size, visible trace, Companion conversations on the cards", async ({ page }) => {
   await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
   await expect(page.getByTestId("companion-note")).toBeVisible();
+  await page.getByTestId("tonight").fill("first night out since moving, somewhere I can actually talk");
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-downtown-pa").click();
   await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 40_000 });
   await expect(page.getByTestId("party-members").locator("li")).toHaveCount(4);
+
+  // The Companions are on the surface: every squadmate's conversation, the group talk, the sign-off.
+  const decision = page.getByTestId("squad-decision");
+  await expect(decision).toBeVisible({ timeout: 15_000 });
+  await expect(decision.getByTestId("decision-conversation")).toHaveCount(3);
+  expect(await decision.getByTestId("companion-line").count()).toBeGreaterThanOrEqual(6); // first conversation is open
+  await expect(decision.getByTestId("decision-signed")).toContainText("All 4 Companions said yes");
+  // …and the comparison with ranking people by similarity score.
+  const numbers = page.getByTestId("numbers-vs-companion");
+  await expect(numbers.getByTestId("similarity-pick")).toContainText("%");
+  await expect(numbers.getByTestId("companion-pick")).toBeVisible();
 
   const trace = page.getByTestId("trace-panel");
   await expect(trace.getByTestId("trace-step").first()).toBeVisible();

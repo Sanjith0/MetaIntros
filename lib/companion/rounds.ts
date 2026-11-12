@@ -150,7 +150,13 @@ function coerceVerdict(raw: unknown, fb: Verdict, topics: Set<string>): Verdict 
 const topicsFor = (c: RoundCtx, view: OpenView | undefined) => new Set([...c.brief.facts.filter((f) => f.share === "open").map((f) => f.id), ...(view?.facts.map((f) => f.id) ?? [])]);
 
 /** The brief as the model sees it. `source` is left out so prompts (and cache keys) don't depend on where a brief came from. */
-const forPrompt = (b: Brief) => ({ ownerId: b.ownerId, name: b.name, facts: b.facts, tonight: b.tonight, communication: b.communication, lightsUp: b.lightsUp });
+const forPrompt = (b: Brief) => ({ ownerId: b.ownerId, name: b.name, facts: b.facts, tonight: { hopingFor: b.tonight.hopingFor, energy: b.tonight.energy }, communication: b.communication, lightsUp: b.lightsUp });
+
+/** Only present when the person wrote something, so prompts (and cached replies) for everyone else are unchanged. */
+const ownWords = (b: Brief) =>
+  b.tonight.note
+    ? { in_their_own_words: { text: b.tonight.note, how_to_use: "Your person wrote this about tonight. Weigh it heavily when judging fit, and voice what it implies as a need. Never quote or paraphrase it closely to anyone, and never reveal the reason behind it." } }
+    : {};
 
 interface Attributed {
   id: string;
@@ -165,7 +171,7 @@ async function round<T>(c: RoundCtx, task: string, payload: Record<string, unkno
   const ai = await runAi({
     task,
     system: `${SYSTEM} ${instruction}`,
-    user: JSON.stringify({ you_represent: c.brief.name, your_brief: forPrompt(c.brief), ...payload }),
+    user: JSON.stringify({ you_represent: c.brief.name, your_brief: forPrompt(c.brief), ...ownWords(c.brief), ...payload }),
     schema,
     fallback: () => empty,
     maxTokens: Math.min(6000, 400 * Math.max(1, partners) + 400),
