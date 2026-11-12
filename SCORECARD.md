@@ -96,6 +96,22 @@ stuck in "forming" while the stage said they stayed in the queue (F22 fixes it a
 test), and the demo-path spec counted nested list items as party members once cards gained
 "Why this?" (it now counts direct members).
 
+Checkpoint after F30 (13:21 UTC):
+
+| Check | Command | Last lines |
+|---|---|---|
+| Every Playwright spec | `npm run test:e2e` (production build, cold) | 48 specs, `48 passed (4.3m)` |
+| Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` |
+| Unit | `npm test` | `Tests  190 passed (190)` |
+| Contracts | `npm run contract:check` | `contract:check PASS - 333/333 checks passed` |
+| Demo video | `npm run video` | `saved shots/demo.webm (7261951 bytes, about 61 s)`; MATCH FOUND 28.4s, Maya's secret 39.6s, door card with "Why this?" 46.2s, run it back 52.0s, Try to leak it blocked 56.7s |
+| Scale | `/evals` → At fair scale, 100 | 20 parties, 20 locked, 0 invalid plans, 0 leaks (100 members scanned), 0 real calls |
+
+Found and fixed between F25 and F30: "Reset everything" mid-talk let the old talk keep writing
+into the fresh store (F27; a unit test now resets mid-talk); `/queue` treated a locked party as
+still forming, so nobody could queue for another night (F26); the projector flickered between
+two parties talking at once (F28).
+
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
 build (three cold runs in a row green), and every route checked at 390 px (`tests/mobile.spec.ts`).
 
