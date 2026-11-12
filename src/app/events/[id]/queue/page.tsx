@@ -40,6 +40,8 @@ export default function QueuePage({ params }: { params: Promise<{ id: string }> 
     started.current = true;
     setPhase("forming");
     setNote(null);
+    setSteps([]);
+    setMembers([]);
     const res = await fetch("/api/crew/form", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -73,6 +75,7 @@ export default function QueuePage({ params }: { params: Promise<{ id: string }> 
         } else if (s.type === "error") {
           setNote(s.message);
           started.current = false;
+          lastCount.current = { n: lastCount.current.n, at: Date.now() + 8000 }; // back off before retrying
           setPhase("searching");
         }
       }
@@ -89,7 +92,7 @@ export default function QueuePage({ params }: { params: Promise<{ id: string }> 
       if (s.crewId && !started.current) startForming();
       const n = s.nearby.length;
       if (n !== lastCount.current.n) lastCount.current = { n, at: Date.now() };
-      const need = filters.current.crewSize * 2;
+      const need = filters.current.crewSize + 4;
       if (!started.current && n >= need && Date.now() - lastCount.current.at > 1500) startForming();
     };
     tick();
@@ -176,6 +179,16 @@ export default function QueuePage({ params }: { params: Promise<{ id: string }> 
               </li>
             ))}
           </ol>
+          {phase === "forming" && (
+            <div className="mt-3 flex items-center gap-2 text-[13px] text-white/60" data-testid="thinking">
+              <span className="flex gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-bounce" />
+                <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-bounce [animation-delay:150ms]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-bounce [animation-delay:300ms]" />
+              </span>
+              thinking
+            </div>
+          )}
 
           {phase === "found" && crew && (
             <Link href={`/crew/${crew.id}`} className="mt-6 h-12 rounded-xl bg-[#7ef9c9] text-[#0b0f1a] font-bold grid place-items-center pop-in" data-testid="view-crew">

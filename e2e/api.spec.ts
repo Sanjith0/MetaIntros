@@ -171,3 +171,12 @@ test("chat ignores messages from non-members", async ({ request }) => {
   const v = (await (await request.post(`/api/crew/${crew!.id}/chat`, { data: { userId: "ethan", text: "hi" } })).json()) as CrewView;
   expect(v.chat.some((m) => m.authorId === "ethan")).toBe(false);
 });
+
+test("parseTime accepts 24h and am/pm", async () => {
+  const { parseTime } = await import("../src/lib/time");
+  expect(parseTime("18:30")).toBe(1110);
+  expect(parseTime("6:30 PM")).toBe(1110);
+  expect(parseTime("6:30pm")).toBe(1110);
+  expect(parseTime("12:05 am")).toBe(5);
+  expect(parseTime("soon")).toBeNull();
+});

@@ -3,6 +3,7 @@
 import { EVENTS, LANDMARKS, VENUES, profileById } from "@/data/seed";
 import { fromMin, pretty, toMin, walkMinutes } from "@/lib/geo";
 import { museEnabled, museJson } from "@/lib/muse";
+import { parseTime } from "@/lib/time";
 import { hookSummary, pairScore, shared, tasteScore } from "@/lib/signals";
 import { crewFor, saveCrew, state, visibleQueue } from "@/lib/store";
 import type { Crew, FormStep, MeetupPlan, Profile, QueueFilters, Swap } from "@/lib/types";
@@ -11,6 +12,8 @@ const STEP_DELAY = Number(process.env.DEMO_STEP_DELAY_MS ?? 700);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const first = (id: string) => profileById(id)!.name;
+
+
 
 function passesFilters(seeker: Profile, cand: Profile, f: QueueFilters, candF: QueueFilters) {
   if (cand.age < 18) return false;
@@ -219,14 +222,24 @@ export async function* formCrew(eventId: string, seekerId: string, filters: Queu
       }),
     });
     const ids = new Set(shortlist.map((p) => p.id));
-    const ok =
-      res &&
-      Array.isArray(res.final) &&
-      res.final.length === size - 1 &&
-      new Set(res.final).size === size - 1 &&
-      res.final.every((id) => ids.has(id));
+    // Normalize: models sometimes include the seeker, repeat ids, or return names.
+    const byName = new Map(shortlist.map((p) => [p.name.toLowerCase(), p.id]));
+    const norm = (x: unknown) => {
+      const v = String(x ?? "").trim().toLowerCase();
+      return ids.has(v) ? v : byName.get(v) ?? null;
+    };
+    const picked = [...new Set((Array.isArray(res?.final) ? res!.final : []).map(norm).filter((x): x is string => !!x))];
+    // Tolerate an off-by-one: trim extras, or top up with the best remaining by taste.
+    const ok = picked.length >= size - 2;
     if (ok) {
-      final = res!.final!;
+      const outs = new Set((res!.swaps ?? []).map((sw) => norm(sw.out)));
+      const topUp = shortlist
+        .filter((p) => !picked.includes(p.id) && !outs.has(p.id) && toMin(p.freeFrom) <= eventStart - 45)
+        .map((p) => p.id);
+      final = [...picked, ...topUp].slice(0, size - 1);
+      res!.draft = (res!.draft ?? []).map(norm).filter((x): x is string => !!x);
+      res!.swaps = (res!.swaps ?? []).map((sw) => ({ ...sw, out: norm(sw.out) ?? "", in: norm(sw.in) ?? "" }));
+      if (res!.why) res!.why = Object.fromEntries(Object.entries(res!.why).map(([k, v]) => [norm(k) ?? k, v]));
       draft = (res!.draft ?? []).filter((id) => ids.has(id)).slice(0, size - 1);
       swaps = (res!.swaps ?? []).filter((s) => ids.has(s.in) && ids.has(s.out) && final.includes(s.in) && !final.includes(s.out));
       rationale = res!.rationale ?? "";
@@ -295,9 +308,10 @@ export async function* formCrew(eventId: string, seekerId: string, filters: Queu
       }),
     });
     const v = VENUES.find((x) => x.id === r?.venueId);
-    if (v && r?.time && /^\d{2}:\d{2}$/.test(r.time)) {
-      const t = Math.min(Math.max(toMin(r.time), latestFree), eventStart - 45);
-      plan = { venueId: v.id, time: fromMin(t), walkToEventMin: walkMinutes(v, ev), reasons: (r.reasons ?? fallbackPlan.reasons).slice(0, 4) };
+    const hhmm = parseTime(r?.time);
+    if (v && hhmm != null) {
+      const t = Math.min(Math.max(hhmm, latestFree), eventStart - 45);
+      plan = { venueId: v.id, time: fromMin(t), walkToEventMin: walkMinutes(v, ev), reasons: (r?.reasons ?? fallbackPlan.reasons).slice(0, 4) };
     }
   }
   const venue = VENUES.find((v) => v.id === plan.venueId)!;

@@ -48,3 +48,15 @@ test("leave crew from the crew page returns to the event", async ({ page, reques
   await expect(page).toHaveURL(/\/events\/pale-hour$/);
   await expect(page.getByTestId("join-crew")).toBeVisible();
 });
+
+test("queue UI forms an 8-person crew with the age filter", async ({ page, request }) => {
+  await request.post("/api/reset");
+  await page.goto("/events/pale-hour/crew");
+  await page.getByRole("button", { name: "8", exact: true }).click();
+  await page.getByText("Close to my age").click();
+  await page.getByTestId("find-crew").click();
+  await page.getByTestId("demo-fill").click();
+  await expect(page.getByTestId("crew-found")).toBeVisible({ timeout: 30_000 });
+  await page.getByTestId("view-crew").click();
+  await expect(page.getByText("8 people")).toBeVisible();
+});
