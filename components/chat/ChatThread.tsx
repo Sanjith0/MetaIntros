@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Bot, ChevronLeft, ChevronRight, Info, Lock, Pin } from "lucide-react";
 import { AiLabel, Avatar, Bubble, FacePile, SystemLine, type RunPos } from "@/components/fb";
+import { AiSourceLabel } from "@/components/ai/AiSource";
 import { Composer } from "@/components/fb/Composer";
 import { PrototypeLabel } from "@/components/fb/TopBar";
 import { chipClass } from "@/components/fb/Chip";
@@ -14,7 +15,7 @@ import { ArchivedPrompt } from "./ArchivedPrompt";
 import type { SquadHeaderInfo } from "@/lib/server/squadChat";
 
 interface U { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean }
-export interface ThreadMessage { id: string; body: string; kind: string; createdAt: string; senderId: string | null; sender: U | null; failed?: boolean }
+export interface ThreadMessage { id: string; body: string; kind: string; createdAt: string; senderId: string | null; sender: U | null; failed?: boolean; aiSource?: string | null }
 export interface ThreadChat {
   id: string;
   type: string;
@@ -168,8 +169,8 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
                 </span>
                 <span className="max-w-[75%]">
                   {startsRun && (
-                    <span className="mb-0.5 ml-3 flex items-center gap-1.5 text-[12px] text-muted">
-                      Queue Up host <AiLabel className="text-[12px]">AI</AiLabel>
+                    <span className="mb-0.5 ml-3 flex items-center gap-1.5 whitespace-nowrap text-[12px] text-muted">
+                      Queue Up host {m.aiSource ? <AiSourceLabel source={m.aiSource} className="text-[12px]" /> : <AiLabel className="text-[12px]">AI</AiLabel>}
                     </span>
                   )}
                   <Bubble mine={false} pos={pos}>{m.body}</Bubble>

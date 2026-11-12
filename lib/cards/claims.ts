@@ -20,6 +20,8 @@ export interface CardContent {
   claims: Claim[];
   openers: string[];
   generatedBy: "template" | "model";
+  /** who wrote the openers: "live" | "cache" | "mock" | "fallback" (see lib/ai/status) */
+  aiSource?: string;
   stripped?: number;
 }
 

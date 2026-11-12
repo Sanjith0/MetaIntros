@@ -5,6 +5,8 @@ import { ChevronRight, ListChecks, ShieldCheck, Sparkles, Wrench } from "lucide-
 import { AiLabel, IconCircle, ListRow } from "@/components/fb";
 import { Sheet } from "@/components/fb/Sheet";
 import { useLiveEvents } from "@/components/useLiveEvents";
+import { AiStatusNote } from "@/components/ai/AiSource";
+import { describeSource } from "@/lib/ai/status";
 
 interface Step {
   id: string;
@@ -24,13 +26,6 @@ const AGENT: Record<string, string> = {
   companion: "Pre-chats",
 };
 
-/** Where an AI line came from, in plain words (council: AI engineer). */
-const SOURCE: Record<string, string> = {
-  live: "Written by AI just now",
-  cache: "Saved AI response",
-  mock: "Test model",
-  fallback: "Template (AI unavailable)",
-};
 
 /**
  * "How we matched you", split honestly: what code checked, and what AI wrote (with its source).
@@ -60,8 +55,11 @@ export function TraceList({ partyId }: { partyId: string }) {
   );
 
   if (!steps) return <p className="px-4 py-6 text-center text-muted">Loading…</p>;
-  const ai = steps.filter((s) => s.kind === "reasoning");
-  const code = steps.filter((s) => s.kind !== "reasoning");
+  // A step belongs to the AI group when an AI call produced it (it records its source): the
+  // agents' picks, and also the host welcome, pre-chats and talk cards (decision steps).
+  const isAi = (s: Step) => s.kind === "reasoning" || (s.kind === "decision" && typeof s.output?.source === "string" && s.output.source !== "code");
+  const ai = steps.filter(isAi);
+  const code = steps.filter((s) => !isAi(s));
   return (
     <div data-testid="trace-steps" className="pb-2">
       <h3 className="px-4 pt-1 text-body font-semibold">Written by AI</h3>
@@ -72,7 +70,7 @@ export function TraceList({ partyId }: { partyId: string }) {
             <span className="min-w-0">
               <span className="block text-meta text-muted">{AGENT[s.agent] ?? s.agent}</span>
               <span className="block text-body">{s.summary}</span>
-              <AiLabel className="mt-0.5" testId="trace-source">{SOURCE[s.output?.source ?? ""] ?? "Written by AI"}</AiLabel>
+              <AiLabel className="mt-0.5" testId="trace-source">{describeSource(s.output?.source)?.label ?? "Written by AI"}</AiLabel>
             </span>
           </li>
         ))}
@@ -95,6 +93,9 @@ export function TraceList({ partyId }: { partyId: string }) {
       </ul>
       <p className="px-4 pt-2 text-meta text-muted">
         Code builds and safety-checks every option. AI chooses among options that already passed and explains the choice, then code checks the choice again.
+      </p>
+      <p className="px-4 pt-1" data-testid="trace-ai-status">
+        <AiStatusNote />
       </p>
     </div>
   );

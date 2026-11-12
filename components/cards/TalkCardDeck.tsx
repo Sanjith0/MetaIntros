@@ -3,15 +3,28 @@
 import { useEffect, useRef, useState } from "react";
 import { CalendarCheck, Copy, Shapes, Sparkles, Tag, Users } from "lucide-react";
 import { AiLabel, Avatar, Bubble, cn } from "@/components/fb";
+import { AiSourceLabel } from "@/components/ai/AiSource";
+
 import { TopBar } from "@/components/fb/TopBar";
 import { useToast } from "@/components/fb/Toast";
 import type { CardContent, ClaimKind } from "@/lib/cards/claims";
+
+/** Say who actually wrote the openers: a template is never presented as AI. */
+function openersLine(c: CardContent) {
+  const src = c.aiSource ?? (c.generatedBy === "template" ? "fallback" : undefined);
+  if (src === "fallback" || src === "template") return "Openers from a template built on the facts above (AI unavailable).";
+  if (src === "cache") return "Openers written by AI from the facts above (saved AI response).";
+  if (src === "live") return "Openers written by AI just now from the facts above.";
+  if (src === "mock") return "Openers from the test model, built on the facts above.";
+  return "Openers written by AI from the facts above.";
+}
 
 interface PreChat {
   meIsA: boolean;
   transcript: { speaker: "A" | "B"; text: string }[];
   sparks: string[];
   simulated: boolean;
+  source?: string | null;
 }
 interface Card {
   subject: { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean };
@@ -131,6 +144,7 @@ export function TalkCardDeck({ cards, meId, initialMember, partyId, eventTitle }
                       <span className="text-meta font-normal text-muted" data-testid="prechat-label">AI simulation</span>
                     </summary>
                     <p className="mt-1 text-meta text-muted">Simulated by AI from your two profiles only. These are not real messages.</p>
+                    <AiSourceLabel source={c.preChat.source} className="mt-1" />
                     <ul className="mt-2 space-y-1">
                       {c.preChat.transcript.map((t, i) => {
                         const mine = (t.speaker === "A") === c.preChat!.meIsA;
@@ -147,7 +161,7 @@ export function TalkCardDeck({ cards, meId, initialMember, partyId, eventTitle }
                     {c.preChat.sparks.length > 0 && <p className="mt-2 text-meta">Topics that came up: {c.preChat.sparks.join(", ")}</p>}
                   </details>
                 )}
-                <AiLabel className="leading-snug">Openers written by AI from the facts above. Politics, religion, health and sexuality are never used.</AiLabel>
+                <AiLabel className="leading-snug" testId="openers-source">{openersLine(c.content)} Politics, religion, health and sexuality are never used.</AiLabel>
               </div>
             </div>
           </article>

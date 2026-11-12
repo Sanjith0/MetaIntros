@@ -8,7 +8,7 @@ async function memberIds(chatId: string) {
 }
 
 /** Post a message. Archived chats are read-only (enforced here, not just in the UI). */
-export async function postMessage(chatId: string, senderId: string | null, body: string, kind: "user" | "host" | "system" = "user"): Promise<PostResult> {
+export async function postMessage(chatId: string, senderId: string | null, body: string, kind: "user" | "host" | "system" = "user", aiSource?: string): Promise<PostResult> {
   const text = body.trim().slice(0, 2000);
   if (!text) return { ok: false, error: "empty" };
   const chat = await prisma.chat.findUnique({ where: { id: chatId } });
@@ -16,7 +16,7 @@ export async function postMessage(chatId: string, senderId: string | null, body:
   if (chat.archived && kind === "user") return { ok: false, error: "archived" };
   const members = await memberIds(chatId);
   if (senderId && !members.includes(senderId)) return { ok: false, error: "not_member" };
-  const message = await prisma.chatMessage.create({ data: { chatId, senderId, kind, body: text } });
+  const message = await prisma.chatMessage.create({ data: { chatId, senderId, kind, body: text, aiSource: kind === "host" ? (aiSource ?? null) : null } });
   await prisma.chat.update({ where: { id: chatId }, data: { lastMessageAt: message.createdAt } });
   if (senderId) await prisma.chatMember.updateMany({ where: { chatId, userId: senderId }, data: { lastReadAt: message.createdAt } });
   const sender = senderId ? await prisma.user.findUnique({ where: { id: senderId }, select: { id: true, name: true, avatarColor: true, isSimulated: true, isLive: true } }) : null;

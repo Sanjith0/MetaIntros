@@ -347,6 +347,8 @@ model ChatMessage {
   /// "user" | "host" | "system"
   kind      String   @default("user")
   body      String
+  /// For AI host messages: "live" | "cache" | "mock" | "fallback" (who actually wrote it). null otherwise.
+  aiSource  String?
   createdAt DateTime @default(now())
 
   @@index([chatId, createdAt])
@@ -378,6 +380,8 @@ model PreChat {
   /// string[]
   sparks     Json
   simulated  Boolean  @default(true)
+  /// who wrote it: "live" | "cache" | "mock" | "fallback" | "template"
+  aiSource   String?
   createdAt  DateTime @default(now())
 
   @@unique([partyId, userAId, userBId])
