@@ -1,0 +1,11 @@
+{
+  "text": "{\"pairs\": [{\"owner\": \"live-c18097bc\", \"subject\": \"live-e31e0121\", \"openers\": [\"Hey Adi! Saw you're in Bay Area Climbers too — what's your bouldering style like? I'm always down to swap local crag beta.\", \"We both seem to be more hiking than karaoke for a night out — have you done any good hikes with Peninsula Hikers lately?\", \"Noticed you're in Palo Alto Founders too — are you working on something in startups right now?\"]}, {\"owner\": \"live-e31e0121\", \"subject\": \"live-c18097bc\", \"openers\": [\"Hey Eshanth! Saw you're in Bay Area Climbers too — do you mostly boulder? Would love to swap local crag beta.\", \"Looks like neither of us is picking karaoke for a night out — are you more of a Peninsula Hikers kind of weekend person too?\", \"I saw you follow Y Combinator — are you working on something in startups?\"]}]}",
+  "task": "talk_cards",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 304,
+    "completionTokens": 712
+  },
+  "savedAt": "2026-11-12T19:10:04.368Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\":\"Hey Eshanth and Adi! Welcome to your squad chat for Sunday Build Night at Belle Haven. The plan is to meet on Sun, Nov 22 · 10 AM at the front entrance of Belle Haven community makerspace. Looking forward to meeting you both!\",\"icebreaker\":\"Since you both share an interest in climbing, what's the most fun climbing spot or gym you've been to recently?\",\"interestTag\":\"climbing\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 271,
+    "completionTokens": 438
+  },
+  "savedAt": "2026-11-12T19:09:57.077Z"
+}
