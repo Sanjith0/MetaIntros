@@ -78,7 +78,7 @@ Checkpoint after F20 (12:13 UTC):
 | Eval | `npm run eval -- --mock` | `eval: 7/7 suites passed` (privacy 1428/1428) |
 | Unit | `npm test` | `Tests  148 passed (148)` |
 | Contracts | `npm run contract:check` | `contract:check PASS - 331/331 checks passed` |
-| Demo video | `npm run video` | `saved shots/demo.webm (7335438 bytes, about 62 s)`; Maya's phone as before (MATCH FOUND at 27.9s, Maya's secret at 40.3s), now ending on the projector: Try to leak it, Dev's agent types Maya's limits, blocked (57.2s) |
+| Demo video | `npm run video` | `saved shots/demo.webm (7335438 bytes, about 62 s)`; Maya's phone as before (run it back at 52.4s), now ending on the projector: Try to leak it, Dev's agent types Maya's limits, blocked (57.2s), end 61.7s |
 | CI | `gh run list --branch swarit-features --limit 3` | `success` for F18, F19, F20 |
 
 Fixes made before F2 at your request: the lockfile (CI `npm ci` now passes), e2e on a production
