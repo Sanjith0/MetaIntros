@@ -1,3 +1,16 @@
+/** Up to two initials from words that start with a letter ("Robin (fair guest)" -> "R"). */
+export function initialsOf(name: string): string {
+  const words = name
+    .replace(/\([^)]*\)/g, " ")
+    .split(/\s+/)
+    .filter((w) => /^\p{L}/u.test(w));
+  return words
+    .slice(0, 2)
+    .map((w) => w[0]!)
+    .join("")
+    .toUpperCase() || "?";
+}
+
 /** Coloured initials. No photos anywhere in the app. */
 export function Avatar({
   name,
@@ -12,12 +25,7 @@ export function Avatar({
   ring?: boolean;
   className?: string;
 }) {
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const initials = initialsOf(name);
   return (
     <span
       aria-hidden

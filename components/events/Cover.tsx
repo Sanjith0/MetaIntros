@@ -5,7 +5,9 @@ export function Cover({ hue, title, className = "", rounded = "" }: { hue: numbe
   const b = `hsl(${(hue + 40) % 360} 65% 42%)`;
   const c = `hsl(${(hue + 320) % 360} 80% 72%)`;
   const d = `hsl(${(hue + 180) % 360} 70% 70%)`;
-  const variant = (hue * 7 + title.length) % 3;
+  let h = 0;
+  for (const ch of title) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const variant = h % 3;
   return (
     <div
       role="img"
