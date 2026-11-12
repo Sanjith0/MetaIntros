@@ -247,4 +247,49 @@ The judges were a Facebook product lead for young adults, an AI engineer ("could
 
 ## 6. Build log
 
-*(Filled in as commits land.)*
+Each entry below says what landed, where it came from (source branch and commit), and how it was verified.
+
+### Phase 0: baseline (`07c066a`)
+
+- The `before` (main) and `template` (feat, swarit) screenshots were captured.
+- `pnpm db:seed` now reads `.env`.
+- Added `E2E_PORT` and `SCREENS_DIR` overrides.
+
+### Phase 1: matrix, council, `DESIGN.md`, `PRODUCT.md` (`1e89f67`)
+
+- `reference/` was copied from **swarit @ fd3df86**.
+
+### Phase 2a: server side of the shell (`2179e47`)
+
+- Notifications, the status card and the queue pulse.
+- The `/join` promise (24h deletion on real time, delete now, 18+), and sample-person flags in the payloads.
+- Verified: 171 unit tests green on this commit alone.
+
+**Where things came from:**
+
+- The notifications list idea comes from **swarit F58**, rebuilt on main's data.
+- The queue pulse comes from **swarit F51/F55**, counts only.
+- The 18+ rule comes from **feat and swarit**.
+
+### Phase 2b: the frontend (`63d1ad9`)
+
+- `components/fb/` primitives, the shell, and the hero path per §4.
+- The token guard test (`tests/unit/design-tokens.test.ts`).
+- e2e specs updated, with no tests deleted.
+
+**Where things came from:**
+
+- **feat @ 98b7a76:**
+  - the template: `ui.tsx` TopBar, TabBar, Card and Button, the tokens in `globals.css`, Events and the event page, `Post.tsx`, and the Home, Video and Notifications mocks;
+  - the `MiniMap` idea, redrawn from tokens in `FindYourParty.tsx`;
+  - the honest AI source labeling, adapted from `AiModeBadge` into the trace.
+- **swarit @ fd3df86:** `reference/` tokens and states, the prototype label and `noindex` rules, the pinned plan in chat, the skip link and "Not sent · Try again" (F17), and the "Sample person" honesty rule (from the council).
+
+### Rebase onto main `eddeb67`
+
+- Ported into the new UI:
+  - **ClockSync**, the global clock in the root layout;
+  - the global clock line on `/demo`;
+  - the **queue problem banner** with "Plan a new hangout instead";
+  - the chat expiry countdown on `nowMs()`.
+- Main's new expiry e2e test was kept; it now fast-forwards through the `/demo` API, because phone screens have no Demo buttons.
