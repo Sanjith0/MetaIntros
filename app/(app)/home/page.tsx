@@ -1,46 +1,44 @@
 import Link from "next/link";
-import { ChevronRight, Image as ImageIcon, Plus } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { TopBar } from "@/components/fb/TopBar";
-import { Avatar, FacePile, Stack } from "@/components/fb";
+import { FacePile, Stack } from "@/components/fb";
 import { EventCover } from "@/components/events/EventCover";
 import { DateLine } from "@/components/events/DateLine";
 import { Post } from "@/components/feed/Post";
+import { HomeTop } from "@/components/posts/HomeTop";
+import { RealPost } from "@/components/posts/RealPost";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/server/session";
 import { POSTS, STORIES } from "@/lib/mock/feed";
 import { friendQueueSummary } from "@/lib/server/friendQueues";
+import { listFeed, myAlbums } from "@/lib/server/posts";
+import { now as clockNow } from "@/lib/server/clock";
+import { timeAgo } from "@/lib/format";
 
-/** Home: a seeded mock feed. One post shares an event, which is how people reach Events from Home. */
+/**
+ * Home: real posts and stories (yours, and friends' shared with friends) lead; the seeded mock feed
+ * follows. One mock post shares an event, which is how people reach Events from Home.
+ */
 export default async function HomePage() {
   const me = await getCurrentUser();
-  const [shared, fq] = await Promise.all([
+  const now = await clockNow();
+  const [shared, fq, feed, albums] = await Promise.all([
     prisma.event.findMany({ where: { id: { in: POSTS.flatMap((p) => (p.eventId ? [p.eventId] : [])) } } }),
     friendQueueSummary(me.id),
+    listFeed(me.id, now),
+    myAlbums(me.id),
   ]);
+  const ago = (iso: string) => timeAgo(new Date(iso), now);
+  const stories = feed.stories.map((g) => ({
+    author: g.author,
+    mine: g.mine,
+    stories: g.frames.map((s) => ({ id: s.id, caption: s.caption, photos: s.photos, ago: ago(s.createdAt), event: s.event ? { title: s.event.title } : null, audience: s.audience, aiSource: s.aiSource, aiEdited: s.aiEdited })),
+  }));
   return (
     <div data-testid="home-page">
       <TopBar variant="home" />
       <Stack>
-        <div className="flex items-center gap-2 bg-surface px-4 py-2">
-          <Avatar name={me.name} color={me.avatarColor} size={40} />
-          <div className="flex h-10 flex-1 items-center rounded-full border border-divider px-4 text-body text-muted">What&apos;s on your mind?</div>
-          <ImageIcon size={24} className="text-positive" aria-label="Photo" />
-        </div>
-        <div className="no-scrollbar flex gap-2 overflow-x-auto bg-surface px-4 py-3">
-          <div className="flex h-44 w-24 shrink-0 flex-col overflow-hidden rounded-card border border-divider/70">
-            <div className="flex flex-1 items-center justify-center bg-wash"><Avatar name={me.name} color={me.avatarColor} size={48} /></div>
-            <div className="relative h-12 pt-5 text-center text-meta font-semibold">
-              <span className="absolute -top-4 left-1/2 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full bg-accent text-surface ring-4 ring-surface"><Plus size={16} strokeWidth={3} /></span>
-              Create story
-            </div>
-          </div>
-          {STORIES.map((s) => (
-            <EventCover key={s.id} color={s.color} pattern={s.pattern} label={`${s.name}'s story`} className="h-44 w-24 shrink-0 rounded-card">
-              <span className="absolute top-2 left-2"><Avatar name={s.name} color={s.color} size={32} className="ring-2 ring-accent" /></span>
-              <span className="absolute right-2 bottom-2 left-2 text-meta leading-tight font-semibold text-surface">{s.name}</span>
-            </EventCover>
-          ))}
-        </div>
+        <HomeTop me={{ name: me.name, avatarColor: me.avatarColor }} stories={stories} mockStories={STORIES} albums={albums} />
         {fq.count > 0 && fq.first && (
           <Link href="/events#friends-queuing" className="flex items-center gap-3 bg-surface px-4 py-3 hover:bg-press" data-testid="home-friend-queues">
             <FacePile people={fq.faces} size={36} max={3} />
@@ -55,6 +53,9 @@ export default async function HomePage() {
             <ChevronRight size={20} className="text-muted" aria-hidden />
           </Link>
         )}
+        {feed.posts.map((p) => (
+          <RealPost key={p.id} post={p} ago={ago(p.createdAt)} />
+        ))}
         {POSTS.map((p) => {
           const ev = shared.find((e) => e.id === p.eventId);
           return (

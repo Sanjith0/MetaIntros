@@ -12,7 +12,7 @@ export function LiveRefresher() {
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
   }, []);
-  useLiveEvents(["party", "friends", "chat-archived", "demo"], (topic, data) => {
+  useLiveEvents(["party", "friends", "chat-archived", "demo", "posts"], (topic, data) => {
     const type = (data as { type?: string })?.type;
     if (topic === "demo" && type !== "reset" && type !== "fast-forward") return;
     if (timer.current) clearTimeout(timer.current);
