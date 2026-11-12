@@ -8,9 +8,9 @@ export async function resetDemo(request: APIRequestContext) {
 export function trackConsoleErrors(page: Page) {
   const errors: string[] = [];
   page.on("console", (m) => {
-    if (m.type() === "error") errors.push(m.text());
+    if (m.type() === "error") errors.push(`${m.text()} @ ${new URL(page.url()).pathname}`);
   });
-  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("pageerror", (e) => errors.push(`${e.message} @ ${new URL(page.url()).pathname}`));
   return errors;
 }
 

@@ -1,10 +1,14 @@
+/** First letter of up to two words. Code-point aware: "Roommates 🏠" → "R" (never half an emoji). */
 export function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]!.toUpperCase())
-    .join("");
+  return (
+    name
+      .split(/\s+/)
+      .map((w) => w.match(/[\p{L}\p{N}]/u)?.[0])
+      .filter((c): c is string => Boolean(c))
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "?"
+  );
 }
 
 export function Avatar({
