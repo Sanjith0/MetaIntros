@@ -84,6 +84,8 @@ const DEFAULTS = {
   ADD_TO_CALENDAR: true,
   /** F39: your agent remembers, with your OK: after the night, how the plan was for you becomes a preference it suggests next time. About plans, never people. */
   AGENT_MEMORY: true,
+  /** F40: /me, "Your data": everything Party Queue holds about you, for you only, with where to change it and a JSON download. */
+  MY_DATA: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;

@@ -299,6 +299,11 @@ export default async function PartyPage({ searchParams }: { searchParams: Promis
             Safety: block, leave or report →
           </Link>
         )}
+        {flag("MY_DATA") && (
+          <Link href="/me" className="block rounded-[8px] bg-white p-3 text-[14px] font-semibold text-[var(--color-link)] shadow-[var(--shadow-card)]" data-testid="party-mydata-link">
+            Your data: everything we hold about you →
+          </Link>
+        )}
         {locked && (
           <section className="rounded-[8px] bg-white p-4 shadow-[var(--shadow-card)]">
             <h2 className="flex items-center gap-2 text-[15px] font-semibold">

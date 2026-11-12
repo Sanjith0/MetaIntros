@@ -44,6 +44,15 @@ test("every route fits a 390-pixel phone", async ({ browser, baseURL, request })
     ["/fair", "fair"],
     ["/fair?join=1", "fair-form"],
     ["/stage", "stage"],
+    // Added later: every page since, so "every route" stays true.
+    ["/door/glasses", "glasses"],
+    ["/safety", "safety"],
+    ["/how", "how"],
+    ["/me", "me"],
+    ["/demo", "demo"],
+    ["/phones", "phones"],
+    ["/evals", "evals"],
+    ["/fair/host", "fair-host"],
   ];
   const results: Record<string, { scrollWidth: number; wide: string[] }> = {};
   for (const [path, shot] of routes) results[path] = await check(page, path, shot);

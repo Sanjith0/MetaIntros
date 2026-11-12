@@ -47,7 +47,7 @@ export function RunOfShow() {
   return (
     <section className="mb-4 rounded-[12px] bg-white p-4 shadow-[var(--shadow-card)]" data-testid="run-of-show">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-[220px] flex-1">
           <h2 className="text-[17px] font-bold">Run of show</h2>
           <p className="text-[13px] text-[var(--color-ink-2)]">Nine beats to 5:00. Start the clock when you start talking.</p>
         </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { IconCalendar, IconChat, IconCheck, IconDoor, IconHome, IconSearch, IconSparkle, IconTicket, IconUsers } from "@/components/icons";
+import { flag } from "@/lib/flags";
 
 const CATEGORIES = ["Arts", "Crafts", "Food & drink", "Games", "Music & audio", "Nature", "Outdoors", "Science", "Social"];
 
@@ -34,6 +35,7 @@ export function EventsRail({ active = "home" }: { active?: "home" | "yours" | "p
       {row("fair", "/fair", "Fair QR join", <IconTicket size={20} />, true)}
       {row("stage", "/stage", "Stage (projector)", <IconChat size={20} />, true)}
       {row("safety", "/safety", "Safety", <IconCheck size={20} />, true)}
+      {flag("MY_DATA") && row("me", "/me", "Your data", <IconUsers size={20} />, true)}
       {row("how", "/how", "How it works", <IconSparkle size={20} />, true)}
       <div className="mx-2 my-2 border-t border-[var(--color-divider)]" />
       <div className="px-2 pb-1 text-[17px] font-semibold">Categories</div>

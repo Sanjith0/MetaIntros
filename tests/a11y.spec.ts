@@ -4,7 +4,7 @@ import { lockedParty } from "./helpers";
 
 /* F17: no serious or critical accessibility violations on any main route (axe-core), on a phone and on a laptop. */
 
-const ROUTES = ["/events", "/event/evt-night-market", "/queue?event=evt-rooftop", "/party", "/chat", "/door", "/door/glasses", "/runitback", "/fair", "/fair?join=1", "/safety", "/stage", "/demo", "/phones", "/evals", "/fair/host", "/how"];
+const ROUTES = ["/events", "/event/evt-night-market", "/queue?event=evt-rooftop", "/party", "/chat", "/door", "/door/glasses", "/runitback", "/fair", "/fair?join=1", "/safety", "/stage", "/demo", "/phones", "/evals", "/fair/host", "/how", "/me"];
 
 for (const [label, viewport] of [
   ["phone", { width: 390, height: 844 }],
