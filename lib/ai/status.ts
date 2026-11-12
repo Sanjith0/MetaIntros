@@ -1,9 +1,9 @@
 /**
  * Honest AI labels. Pure (no node imports) so client components can use the same wording.
  *
- * Rules: we only say "live" when the app is actually set to call Muse with a key and recent
- * calls aren't failing; replayed (cached) Muse output is labeled "replay"; anything produced
- * by templates or code is labeled as such, never as Muse.
+ * Rules: we only say "live" when the app is actually set to call AI with a key and recent
+ * calls aren't failing; replayed (cached) AI output is labeled "replay"; anything produced
+ * by templates or code is labeled as such, never as AI.
  */
 import type { AiMode, AiSource } from "./types";
 
@@ -19,7 +19,7 @@ export interface AiStatus {
   mode: AiMode;
   model: string;
   hasKey: boolean;
-  /** live Muse calls in flight */
+  /** live AI calls in flight */
   pending: number;
   /** counts by source over the recent window */
   recent: Record<AiSource, number>;
@@ -45,27 +45,27 @@ export function summarizeAi(i: { mode: AiMode; hasKey: boolean; model: string; l
   const base = { mode: i.mode, model: i.model, hasKey: i.hasKey, pending: i.pending ?? 0, recent, lastError: lastFail?.error ?? null };
   const tally = `Last ${window.length} calls: ${recent.live} live, ${recent.cache} replayed, ${recent.fallback} template fallbacks.`;
 
-  if (i.mode === "mock") return { ...base, state: "mock", label: "Mock AI", detail: "Test mode: a scripted mock stands in for Muse. No real model calls." };
+  if (i.mode === "mock") return { ...base, state: "mock", label: "AI: test model", detail: "Test mode: a scripted test model stands in for AI. No real model calls." };
 
   if (i.mode === "cache") {
     if (window.length > 0 && recent.cache === 0 && recent.fallback > 0)
-      return { ...base, state: "offline", label: "Templates", detail: `Offline mode and nothing matched the saved Muse outputs, so agents used deterministic templates. ${tally}` };
+      return { ...base, state: "offline", label: "AI off: templates only", detail: `Offline mode and nothing matched the saved AI responses, so templates were used. ${tally}` };
     return {
       ...base,
       state: "replay",
-      label: "Muse replay",
-      detail: `Offline mode: agents replay outputs ${i.model} produced earlier (saved cache), no live calls.${recent.fallback ? " Cache misses used templates." : ""}${window.length ? ` ${tally}` : ""}`,
+      label: "AI: saved responses (offline)",
+      detail: `Offline mode: saved responses ${i.model} wrote earlier are replayed, no live calls.${recent.fallback ? " Cache misses used templates." : ""}${window.length ? ` ${tally}` : ""}`,
     };
   }
 
   // live mode
-  if (!i.hasKey) return { ...base, state: "offline", label: "Muse offline", detail: "Live mode is on but no MODEL_API_KEY is set: saved replays and templates only." };
+  if (!i.hasKey) return { ...base, state: "offline", label: "AI off: no key", detail: "Live mode is on but no MODEL_API_KEY is set: saved responses and templates only." };
   if (recentFail)
-    return { ...base, state: "degraded", label: "Muse ⚠ fallback", detail: `Recent Muse calls failed (${recentFail.error ?? "unknown error"}); those agents used templates. ${tally}` };
+    return { ...base, state: "degraded", label: "AI failing: using templates", detail: `Recent AI calls failed (${recentFail.error ?? "unknown error"}); those agents used templates. ${tally}` };
   return {
     ...base,
     state: "live",
-    label: "Muse live",
+    label: "AI: live",
     detail: `Live: agents call ${i.model} on anything not already in the saved cache.${window.length ? ` ${tally}` : ""}`,
   };
 }
@@ -76,7 +76,7 @@ export function combineSources(sources: AgentSource[]): AgentSource {
   if (uniq.length === 0) return "code";
   if (uniq.length === 1) return uniq[0];
   const muse = uniq.filter((x) => x === "live" || x === "cache");
-  // never round up: live + replay is labeled replay, anything without Muse is not called Muse
+  // never round up: live + replay is labeled replay, anything without AI is not called AI
   if (muse.length === uniq.length) return "cache";
   if (muse.length) return "mixed";
   if (uniq.includes("mock")) return "mock";
@@ -85,28 +85,27 @@ export function combineSources(sources: AgentSource[]): AgentSource {
 
 export interface SourceLabel {
   label: string;
-  /** visual tone; "muse" tones only for output a Muse model actually wrote */
-  tone: "live" | "replay" | "mock" | "template" | "mixed";
   detail: string;
-  /** true when a Muse model produced this output (now or earlier) */
-  muse: boolean;
+  /** true when a model wrote this output (now, or earlier and saved) */
+  ai: boolean;
 }
 
 export function describeSource(source: string | null | undefined): SourceLabel | null {
   switch (source) {
     case "live":
-      return { label: "Muse · live", tone: "live", muse: true, detail: "Written by a live Muse call just now." };
+      return { label: "Written by AI just now", ai: true, detail: "Written by a live AI call just now." };
     case "cache":
-      return { label: "Muse · replay", tone: "replay", muse: true, detail: "Muse wrote this earlier; replayed from the saved cache (offline demo mode)." };
+      return { label: "Saved AI response", ai: true, detail: "AI wrote this earlier; replayed from saved responses (offline demo mode)." };
     case "mock":
-      return { label: "Mock AI", tone: "mock", muse: false, detail: "Scripted mock (test mode), not a real model." };
+      return { label: "Test model", ai: false, detail: "Scripted test model, not a real AI." };
     case "fallback":
+      return { label: "Template (AI unavailable)", ai: false, detail: "No AI output was available or it failed a check, so a template was used." };
     case "template":
-      return { label: "Template", tone: "template", muse: false, detail: "No model output was available or it failed a check, so a deterministic template was used." };
+      return { label: "Template", ai: false, detail: "Written from a template; no AI was used." };
     case "code":
-      return { label: "Rules", tone: "template", muse: false, detail: "A deterministic check in code (scoring, safety rules), not a model." };
+      return { label: "Checked by code", ai: false, detail: "A check in code (scoring, safety rules), not AI." };
     case "mixed":
-      return { label: "Muse · mixed", tone: "mixed", muse: true, detail: "Part of this came from Muse (live or replayed) and part from templates or code." };
+      return { label: "Partly AI, partly template", ai: true, detail: "Part of this was written by AI (live or saved) and part from templates." };
     default:
       return null;
   }

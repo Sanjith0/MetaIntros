@@ -3,8 +3,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { SignupInput } from "@/lib/signup";
 import { AgeBand, Gender } from "@/lib/domain/enums";
-import { createLiveUser, createSampleLiveUser } from "@/lib/server/signup";
-import { SESSION_COOKIE } from "@/lib/server/session";
+import { createLiveUser, createSampleLiveUser, deleteLiveUser, isAdultBand, sweepExpiredSignups } from "@/lib/server/signup";
+import { getCurrentUserId, SESSION_COOKIE } from "@/lib/server/session";
 import { publish } from "@/lib/server/bus";
 
 const SampleInput = z
@@ -13,6 +13,8 @@ const SampleInput = z
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
+  await sweepExpiredSignups(prisma);
+  if (body?.ageBand && !isAdultBand(body.ageBand)) return NextResponse.json({ error: "Queue Up is for people 18 and over." }, { status: 400 });
   let result;
   if (body?.sample) {
     const p = SampleInput.safeParse(body);
@@ -29,9 +31,18 @@ export async function POST(req: Request) {
   return res;
 }
 
-/** Sign out (back to the presenter's "Me"). */
-export async function DELETE() {
-  const res = NextResponse.json({ ok: true });
+/**
+ * Sign out (back to the presenter's "Me"). With ?forget=1, a live sign-up is deleted right away
+ * ("Delete my demo data" on Profile), as /join promises.
+ */
+export async function DELETE(req: Request) {
+  let deleted = false;
+  if (new URL(req.url).searchParams.get("forget") === "1") {
+    const id = await getCurrentUserId();
+    deleted = await deleteLiveUser(prisma, id);
+    if (deleted) publish("demo", { type: "kick" });
+  }
+  const res = NextResponse.json({ ok: true, deleted });
   res.cookies.delete(SESSION_COOKIE);
   return res;
 }

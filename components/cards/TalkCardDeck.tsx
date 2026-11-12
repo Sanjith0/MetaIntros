@@ -1,11 +1,23 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Bot, CalendarCheck, Copy, Heart, MessageSquareQuote, Sparkles, Users, Zap } from "lucide-react";
-import { Avatar } from "@/components/Avatar";
+import { CalendarCheck, Copy, Shapes, Sparkles, Tag, Users } from "lucide-react";
+import { AiLabel, Avatar, Bubble, cn } from "@/components/fb";
+import { AiSourceLabel } from "@/components/ai/AiSource";
+
+import { TopBar } from "@/components/fb/TopBar";
+import { useToast } from "@/components/fb/Toast";
 import type { CardContent, ClaimKind } from "@/lib/cards/claims";
-import { AiSourceBadge, AiStatusBadge } from "@/components/ai/AiBadges";
+
+/** Say who actually wrote the openers: a template is never presented as AI. */
+function openersLine(c: CardContent) {
+  const src = c.aiSource ?? (c.generatedBy === "template" ? "fallback" : undefined);
+  if (src === "fallback" || src === "template") return "Openers from a template built on the facts above (AI unavailable).";
+  if (src === "cache") return "Openers written by AI from the facts above (saved AI response).";
+  if (src === "live") return "Openers written by AI just now from the facts above.";
+  if (src === "mock") return "Openers from the test model, built on the facts above.";
+  return "Openers written by AI from the facts above.";
+}
 
 interface PreChat {
   meIsA: boolean;
@@ -15,12 +27,12 @@ interface PreChat {
   source?: string | null;
 }
 interface Card {
-  subject: { id: string; name: string; avatarColor: string };
+  subject: { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean };
   content: CardContent;
   preChat?: PreChat | null;
 }
 
-const KIND_ICON: Record<ClaimKind, typeof Heart> = { shared_interest: Heart, mutual_friends: Users, event_overlap: CalendarCheck, pattern: Zap, spark: Sparkles };
+const KIND_ICON: Record<ClaimKind, typeof Tag> = { shared_interest: Tag, mutual_friends: Users, event_overlap: CalendarCheck, pattern: Shapes, spark: Sparkles };
 
 function humanSource(src: string, meId: string) {
   if (src === "mutualFriends") return "mutual friends";
@@ -31,10 +43,13 @@ function humanSource(src: string, meId: string) {
   return `${uid === meId ? "your" : "their"} ${name}`;
 }
 
-export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }: { cards: Card[]; meId: string; initialMember: string | null; chatId: string | null; eventTitle: string }) {
+const first = (n: string) => n.split(" ")[0];
+
+/** Talk cards: one card per squadmate, with the facts each line came from and suggested openers. */
+export function TalkCardDeck({ cards, meId, initialMember, partyId, eventTitle }: { cards: Card[]; meId: string; initialMember: string | null; partyId: string; eventTitle: string }) {
   const strip = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const [copied, setCopied] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     const i = Math.max(0, cards.findIndex((c) => c.subject.id === initialMember));
@@ -50,98 +65,109 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
   const go = (i: number) => strip.current?.scrollTo({ left: i * strip.current.clientWidth, behavior: "smooth" });
 
   return (
-    <div data-testid="talk-cards" className="min-h-[80dvh] bg-gradient-to-b from-[#f3f0ff] to-fb-bg pb-6">
-      <div className="flex items-center gap-2 px-3 py-2">
-        {chatId && <Link href={`/chats/${chatId}`} aria-label="Back to squad chat"><ArrowLeft size={22} /></Link>}
-        <div>
-          <h1 className="font-bold leading-tight">Talk cards</h1>
-          <p className="text-xs text-fb-muted">{eventTitle} · swipe through your squad</p>
+    <div data-testid="talk-cards" className="pb-4">
+      <TopBar back={`/squad/${partyId}`} title="Talk cards" />
+      <div className="bg-surface px-4 pt-2 pb-3">
+        <p className="text-meta text-muted">{eventTitle} · what you have in common with each person</p>
+        <div className="no-scrollbar mt-2 flex gap-3 overflow-x-auto" role="tablist" aria-label="Squad members">
+          {cards.map((c, i) => (
+            <button key={c.subject.id} type="button" role="tab" aria-selected={i === active} onClick={() => go(i)} className="flex w-14 shrink-0 flex-col items-center gap-1">
+              <Avatar name={c.subject.name} color={c.subject.avatarColor} size={44} className={cn(i === active && "ring-2 ring-accent ring-offset-2 ring-offset-surface")} />
+              <span className={cn("w-full truncate text-center text-meta", i === active ? "font-semibold text-ink" : "text-muted")}>{first(c.subject.name)}</span>
+            </button>
+          ))}
         </div>
-        <AiStatusBadge className="ml-auto" />
       </div>
-      <div ref={strip} onScroll={onScroll} className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none]" data-testid="card-strip">
+
+      <div ref={strip} onScroll={onScroll} className="no-scrollbar mt-2 flex snap-x snap-mandatory overflow-x-auto" data-testid="card-strip">
         {cards.map((c) => (
           <article key={c.subject.id} className="w-full shrink-0 snap-center px-3" data-testid={`talk-card-${c.subject.id}`}>
-            <div className="overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-[#e9e3ff]">
-              <div className="flex items-center gap-3 bg-gradient-to-r from-[#1877f2] to-[#9333ea] p-4 text-white">
-                <Avatar name={c.subject.name} color={c.subject.avatarColor} size={60} ring />
-                <div>
-                  <p className="text-xs uppercase tracking-wider opacity-80">You &amp;</p>
-                  <p className="text-xl font-extrabold leading-tight">{c.subject.name}</p>
+            <div className="overflow-hidden rounded-card bg-surface shadow-card">
+              <div className="flex items-center gap-3 border-b border-divider/60 p-4">
+                <Avatar name={c.subject.name} color={c.subject.avatarColor} size={56} />
+                <div className="min-w-0">
+                  <p className="text-meta text-muted">You and</p>
+                  <p className="truncate text-headline font-bold">{c.subject.name}</p>
+                  {c.subject.isSimulated && !c.subject.isLive && <p className="text-meta text-muted">Sample person</p>}
                 </div>
               </div>
-              <div className="space-y-3 p-4">
-                <ul className="space-y-2" data-testid="card-claims">
-                  {c.content.claims.map((cl, i) => {
-                    const Icon = KIND_ICON[cl.kind] ?? Heart;
-                    return (
-                      <li key={i} className="flex gap-2" data-testid="claim" data-kind={cl.kind}>
-                        <Icon size={18} className="mt-0.5 shrink-0 text-queue-glow" />
-                        <span>
-                          <span className="block leading-snug">{cl.text}</span>
-                          <span className="mt-0.5 flex flex-wrap gap-1">
-                            {cl.sources.map((s) => (
-                              <span key={s} className="rounded bg-fb-bg px-1.5 text-[10px] text-fb-muted" data-testid="claim-source">{humanSource(s, meId)}</span>
-                            ))}
+              <div className="space-y-4 p-4">
+                <section>
+                  <h3 className="text-body font-semibold">What you have in common</h3>
+                  <ul className="mt-2 space-y-3" data-testid="card-claims">
+                    {c.content.claims.map((cl, i) => {
+                      const Icon = KIND_ICON[cl.kind] ?? Tag;
+                      return (
+                        <li key={i} className="flex gap-3" data-testid="claim" data-kind={cl.kind}>
+                          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-control" aria-hidden>
+                            <Icon size={16} />
                           </span>
-                        </span>
-                      </li>
-                    );
-                  })}
-                  {c.content.claims.length === 0 && <li className="text-sm text-fb-muted">You&apos;ll find out together 🙂</li>}
-                </ul>
-                <div>
-                  <p className="mb-1 flex items-center gap-1.5 text-sm font-bold"><MessageSquareQuote size={16} /> Try opening with
-                    <span className="ml-auto" data-testid="openers-source"><AiSourceBadge source={c.content.aiSource ?? (c.content.generatedBy === "template" ? "template" : null)} /></span>
-                  </p>
-                  <ul className="space-y-1.5" data-testid="card-openers">
+                          <span className="min-w-0">
+                            <span className="block text-body">{cl.text}</span>
+                            <span className="block text-meta text-muted">
+                              From{" "}
+                              {cl.sources.map((s, j) => (
+                                <span key={s} data-testid="claim-source">{j > 0 ? ", " : ""}{humanSource(s, meId)}</span>
+                              ))}
+                            </span>
+                          </span>
+                        </li>
+                      );
+                    })}
+                    {c.content.claims.length === 0 && <li className="text-body text-muted">Nothing on file yet. You&apos;ll find out together.</li>}
+                  </ul>
+                </section>
+                <section>
+                  <h3 className="text-body font-semibold">Try opening with</h3>
+                  <ul className="mt-2 divide-y divide-divider/60 rounded-card bg-wash" data-testid="card-openers">
                     {c.content.openers.map((o) => (
                       <li key={o}>
-                        <button type="button" onClick={() => { navigator.clipboard?.writeText(o).catch(() => {}); setCopied(o); }}
-                          className="flex w-full items-center justify-between gap-2 rounded-xl bg-[#f3f0ff] px-3 py-2 text-left text-sm">
-                          <span>“{o}”</span>
-                          <Copy size={14} className={`shrink-0 ${copied === o ? "text-emerald-500" : "text-fb-muted"}`} />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard?.writeText(o).catch(() => {});
+                            toast("Copied. Paste it in your squad chat.");
+                          }}
+                          className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-body hover:bg-press"
+                        >
+                          <span>{o}</span>
+                          <Copy size={16} className="shrink-0 text-muted" aria-label="Copy" />
                         </button>
                       </li>
                     ))}
                   </ul>
-                </div>
+                </section>
                 {c.preChat && (
-                  <details className="rounded-xl border border-dashed border-[#c4b5fd] bg-[#faf8ff] p-2" data-testid="prechat">
-                    <summary className="flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-queue-glow">
-                      <Bot size={15} /> Companion pre-chat
-                      <AiSourceBadge source={c.preChat.source} />
-                      <span className="ml-auto rounded bg-[#ede9fe] px-1.5 text-[10px] font-bold uppercase tracking-wide" data-testid="prechat-label">AI simulation</span>
+                  <details className="rounded-card bg-wash p-3" data-testid="prechat">
+                    <summary className="flex cursor-pointer items-center justify-between gap-2 text-body font-semibold">
+                      Companion pre-chat
+                      <span className="text-meta font-normal text-muted" data-testid="prechat-label">AI simulation</span>
                     </summary>
-                    <p className="mt-1 text-[11px] text-fb-muted">Simulated by your companion AIs using only your two profiles — these are not real messages.</p>
-                    <ul className="mt-1.5 space-y-1">
+                    <p className="mt-1 text-meta text-muted">Simulated by AI from your two profiles only. These are not real messages.</p>
+                    <AiSourceLabel source={c.preChat.source} className="mt-1" />
+                    <ul className="mt-2 space-y-1">
                       {c.preChat.transcript.map((t, i) => {
                         const mine = (t.speaker === "A") === c.preChat!.meIsA;
                         return (
-                          <li key={i} className={`flex ${mine ? "justify-end" : ""}`}>
-                            <span className={`max-w-[80%] rounded-xl px-2 py-1 text-xs italic ${mine ? "bg-[#ddd6fe]" : "bg-white ring-1 ring-[#e9e3ff]"}`}>
-                              <span className="not-italic font-semibold">{mine ? "Your AI" : `${c.subject.name.split(" ")[0]}'s AI`}: </span>{t.text}
+                          <li key={i} className={cn("flex", mine && "justify-end")}>
+                            <span className="max-w-[85%]">
+                              <span className={cn("mb-0.5 block text-[12px] text-muted", mine && "text-right")}>{mine ? "Your AI" : `${first(c.subject.name)}'s AI`}</span>
+                              <Bubble mine={mine}>{t.text}</Bubble>
                             </span>
                           </li>
                         );
                       })}
                     </ul>
-                    <p className="mt-1.5 text-xs"><Sparkles size={12} className="mr-1 inline text-queue-glow" />Sparks: {c.preChat.sparks.join(" · ")}</p>
+                    {c.preChat.sparks.length > 0 && <p className="mt-2 text-meta">Topics that came up: {c.preChat.sparks.join(", ")}</p>}
                   </details>
                 )}
-                <p className="text-[10px] leading-snug text-fb-muted">AI-assisted · every fact cites the Facebook data it came from · politics, religion, health &amp; sexuality are never shown</p>
+                <AiLabel className="leading-snug" testId="openers-source">{openersLine(c.content)} Politics, religion, health and sexuality are never used.</AiLabel>
               </div>
             </div>
           </article>
         ))}
       </div>
-      <div className="mt-3 flex items-center justify-center gap-1.5" data-testid="card-dots">
-        {cards.map((c, i) => (
-          <button key={c.subject.id} type="button" aria-label={`Card ${i + 1}`} onClick={() => go(i)}
-            className={`h-2 rounded-full transition-all ${i === active ? "w-6 bg-queue-glow" : "w-2 bg-[#c4b5fd]"}`} />
-        ))}
-      </div>
-      <p className="mt-1 text-center text-xs text-fb-muted" data-testid="card-position">{cards.length ? `${active + 1} of ${cards.length}` : "No cards yet"}</p>
+      <p className="mt-3 text-center text-meta text-muted" data-testid="card-position">{cards.length ? `${active + 1} of ${cards.length}` : "No cards yet"}</p>
     </div>
   );
 }

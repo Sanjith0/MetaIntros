@@ -39,7 +39,7 @@ export async function postHostWelcome(partyId: string) {
   // re-check after the (possibly slow) model call
   if (await prisma.chatMessage.count({ where: { chatId: chat.id, kind: "host" } })) return;
   await postMessage(chat.id, null, w.value.welcome, "host", w.source);
-  await postMessage(chat.id, null, `🎲 Icebreaker: ${w.value.icebreaker}`, "host", w.source);
+  await postMessage(chat.id, null, `Icebreaker: ${w.value.icebreaker}`, "host", w.source);
   await writeTrace(partyId, [
     { agent: "host", kind: "decision", output: { interestTag: w.value.interestTag, source: w.source }, summary: `Posted welcome + icebreaker about ${label(w.value.interestTag).toLowerCase() || "the weekend"} (shared by ${ctx.shared.find((s) => s.tag === w.value.interestTag)?.count ?? 0} members)` },
   ]);

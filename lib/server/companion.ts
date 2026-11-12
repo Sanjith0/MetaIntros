@@ -47,6 +47,6 @@ export async function simulateArrivals(partyId: string, delayMs = 2500) {
 }
 
 export async function arrivals(partyId: string) {
-  const ms = await prisma.partyMember.findMany({ where: { partyId }, include: { user: { select: { id: true, name: true, avatarColor: true } } }, orderBy: { joinedAt: "asc" } });
+  const ms = await prisma.partyMember.findMany({ where: { partyId }, include: { user: { select: { id: true, name: true, avatarColor: true, isSimulated: true, isLive: true } } }, orderBy: { joinedAt: "asc" } });
   return ms.map((m) => ({ ...m.user, checkedInAt: m.checkedInAt?.toISOString() ?? null, photoUrl: m.photoOptIn ? m.photoUrl : null }));
 }

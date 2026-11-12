@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CalendarDays, MapPin, MessageCircle, Radar, Sparkles, X } from "lucide-react";
-import { Avatar } from "@/components/Avatar";
+import { CalendarDays, Check, DoorOpen, EyeOff, MapPinned, ShieldCheck } from "lucide-react";
+import { Avatar, Button, ButtonLink, Card, IconCircle, ListRow, Section, Stack } from "@/components/fb";
+import { TopBar } from "@/components/fb/TopBar";
 import { useLiveEvents } from "@/components/useLiveEvents";
-import { fmtDuration, fmtEventWhen } from "@/lib/format";
-import { MatchTracePanel } from "@/components/trace/MatchTracePanel";
-import { AiStatusBadge } from "@/components/ai/AiBadges";
-import { MuseWeighing } from "@/components/ai/MuseWeighing";
+import { EventCover } from "@/components/events/EventCover";
+import { DateLine } from "@/components/events/DateLine";
+import { TraceRow } from "@/components/trace/TraceList";
+import { fmtDuration } from "@/lib/format";
 
 interface Status {
   state: "idle" | "waiting" | "matched";
@@ -17,6 +19,7 @@ interface Status {
   eventId?: string | null;
   bucketName?: string;
   bucketId?: string;
+  /** set by the queue when it can't form a squad yet (main c75421b) */
   problem?: "no_events" | "event_started" | "no_fit";
   waitedMs?: number;
   found?: number;
@@ -26,22 +29,22 @@ interface Status {
 
 interface Party {
   id: string;
-  cohesion: number | null;
-  rationale: string | null;
-  members: { user: { id: string; name: string; avatarColor: string } }[];
-  event: { id: string; title: string; startsAt: string; venueName: string; kind?: string; description?: string } | null;
+  members: { user: { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean } }[];
+  event: { id: string; title: string; startsAt: string; venueName: string; kind?: string; description?: string; coverColor?: string; coverPattern?: string } | null;
   landmark: { name: string };
   chat: { id: string } | null;
 }
 
-export function QueueScreen() {
+const first = (n: string) => n.split(" ")[0];
+
+export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: string | null }) {
   const [status, setStatus] = useState<Status | null>(null);
   const [party, setParty] = useState<Party | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const base = useRef<{ at: number; waited: number } | null>(null);
 
   const refresh = useCallback(async () => {
-    const s: Status = await fetch("/api/queue/status").then((r) => r.json()).catch(() => null);
+    const s: Status | null = await fetch("/api/queue/status").then((r) => r.json()).catch(() => null);
     if (!s) return;
     setStatus(s);
     if (s.state === "waiting" && s.waitedMs != null && !base.current) base.current = { at: Date.now(), waited: s.waitedMs };
@@ -68,71 +71,82 @@ export function QueueScreen() {
     if (!party) refresh();
   });
 
-  if (party) return <PartyFound party={party} />;
-  if (!status) return <div className="min-h-[80dvh] bg-[#0b1640]" />;
+  if (party) return <SquadFound party={party} meId={meId} />;
+  if (!status)
+    return (
+      <div aria-busy="true">
+        <TopBar back="/events" title="Finding your squad" />
+      </div>
+    );
   if (status.state === "idle")
     return (
-      <div className="p-6 text-center" data-testid="queue-idle">
-        <p>You&apos;re not in a queue.</p>
-        <Link href="/events" className="mt-2 inline-block font-semibold text-fb-blue">Browse events</Link>
+      <div data-testid="queue-idle">
+        <TopBar back="/events" title="Queue Up" />
+        <Section className="py-8 text-center">
+          <p className="text-body">You&apos;re not in a queue.</p>
+          <ButtonLink href="/events" className="mt-3">Browse events</ButtonLink>
+        </Section>
       </div>
     );
 
-  const n = status.targetSize ?? 6;
+  const n = status.targetSize ?? 5;
   const found = Math.min(status.found ?? 1, n);
   const users = status.foundUsers ?? [];
-  const widening = elapsed > 16_000 ? "Expanding search to nearby areas…" : elapsed > 8_000 ? "Widening the match…" : "Looking for your best matches…";
+  const widening = elapsed > 16_000 ? "Looking in nearby areas too" : elapsed > 8_000 ? "Widening the search a little" : "Looking for people you'd get along with";
+  const kind = status.mode === "hangout" ? "New hangout" : status.eventId ? eventTitle ?? "This event" : "Any event this weekend";
 
   return (
-    <div data-testid="queue-screen" className="relative min-h-[80dvh] overflow-hidden bg-gradient-to-b from-[#0b1640] via-[#1b1464] to-[#2a0f5c] px-4 pb-8 pt-6 text-white">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#a5b4fc]" data-testid="queue-kind">
-          {status.mode === "hangout" ? "New hangout" : status.eventId ? "This event" : "Any event"} queue · {status.bucketName}
-        </p>
-        <button type="button" data-testid="leave-queue" aria-label="Leave queue"
-          onClick={async () => { await fetch("/api/queue/leave", { method: "POST" }); window.location.href = "/events"; }}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10"><X size={16} /></button>
-      </div>
+    <div data-testid="queue-screen">
+      <TopBar back="/events" title="Finding your squad" />
+      <Stack>
+        <Section>
+          <div className="flex items-center gap-3" data-testid="queue-kind">
+            <IconCircle tone="on">{status.mode === "hangout" ? <MapPinned size={18} /> : <CalendarDays size={18} />}</IconCircle>
+            <span className="min-w-0">
+              <span className="block truncate text-body font-semibold">{kind}</span>
+              <span className="block text-meta text-muted">Near {status.bucketName} · squad of {n}</span>
+            </span>
+          </div>
+          <p className="mt-4 text-center text-timer font-bold tabular-nums" data-testid="queue-timer" aria-label={`Waiting ${fmtDuration(elapsed)}`}>
+            {fmtDuration(elapsed)}
+          </p>
+          <p className="text-center text-meta text-muted" aria-live="polite">{widening}</p>
 
-      <div className="relative mx-auto mt-6 flex h-56 w-56 items-center justify-center">
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="absolute inset-0 rounded-full border-2 border-[#818cf8]/60" style={{ animation: `qu-ping 2.4s ${i * 0.8}s cubic-bezier(0,0,.2,1) infinite` }} />
-        ))}
-        <span className="absolute inset-6 rounded-full bg-[radial-gradient(circle,rgba(99,102,241,.45),transparent_70%)]" />
-        <div className="relative text-center">
-          <Radar className="mx-auto animate-pulse text-[#a5b4fc]" size={28} />
-          <p className="mt-1 font-mono text-4xl font-black tabular-nums" data-testid="queue-timer">{fmtDuration(elapsed)}</p>
-          <p className="text-xs text-[#c7d2fe]">{widening}</p>
-        </div>
-      </div>
-
-      <div className="mt-2 flex flex-col items-center gap-1.5" data-testid="queue-ai">
-        <AiStatusBadge />
-        <MuseWeighing dark />
-      </div>
-
-      {status.problem && <QueueProblemBanner status={status} />}
-
-      <p className="mt-6 text-center text-lg font-extrabold" data-testid="players-found">
-        Players found: <span className="text-[#67e8f9]">{found}</span>/{n}
-      </p>
-      <ul className="mx-auto mt-4 flex max-w-xs flex-wrap justify-center gap-3" data-testid="player-slots">
-        {Array.from({ length: n }).map((_, i) => {
-          const u = users[i];
-          return (
-            <li key={u?.id ?? `empty-${i}`} className="flex w-14 flex-col items-center gap-1">
-              {u ? (
-                <span className="animate-[qu-pop_.4s_ease-out] rounded-full shadow-[0_0_16px_rgba(103,232,249,.7)]" data-testid="player-filled">
-                  <Avatar name={u.name} color={u.avatarColor} size={52} />
-                </span>
-              ) : (
-                <span className="h-[52px] w-[52px] animate-pulse rounded-full border-2 border-dashed border-white/30" data-testid="player-empty" />
-              )}
-              <span className="w-full truncate text-center text-[10px] text-[#c7d2fe]">{u ? (i === 0 ? "You" : u.name.split(" ")[0]) : "…"}</span>
-            </li>
-          );
-        })}
-      </ul>
+          <p className="mt-5 text-body font-semibold" data-testid="players-found">
+            {found} of {n} found
+          </p>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-control" role="progressbar" aria-valuemin={0} aria-valuemax={n} aria-valuenow={found} aria-label="Squad found so far">
+            <div className="h-full rounded-full bg-accent transition-[width] duration-300" style={{ width: `${(found / n) * 100}%` }} />
+          </div>
+          <ul className="mt-4 flex justify-between gap-2" data-testid="player-slots">
+            {Array.from({ length: n }).map((_, i) => {
+              const u = users[i];
+              return (
+                <li key={u?.id ?? `empty-${i}`} className="flex w-12 flex-col items-center gap-1">
+                  {u ? (
+                    <span className="animate-slot-in" data-testid="player-filled">
+                      <Avatar name={i === 0 ? u.name : "Someone nearby"} color={u.avatarColor} size={48} blurred={i !== 0} />
+                    </span>
+                  ) : (
+                    <span className="h-12 w-12 rounded-full border-2 border-dashed border-divider" data-testid="player-empty" aria-label="Open spot" />
+                  )}
+                  <span className="w-full truncate text-center text-[11px] text-muted">{u ? (i === 0 ? "You" : "Found") : ""}</span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-3 text-meta text-muted">You&apos;ll see who they are once your squad is ready.</p>
+          {status.problem && <QueueProblem status={status} />}
+        </Section>
+        <Section flush title="While you wait">
+          <ListRow leading={<IconCircle><EyeOff size={18} /></IconCircle>} title="Nobody sees you yet" subtitle="Your squad sees your first name once it's ready." />
+          <ListRow leading={<IconCircle><ShieldCheck size={18} /></IconCircle>} title="Public places only" subtitle="Squads meet at the event's front entrance." />
+          <ListRow leading={<IconCircle><DoorOpen size={18} /></IconCircle>} title="Leave any time" subtitle="Nobody is told why." />
+          <div className="px-4 pt-2">
+            <LeaveQueue />
+          </div>
+        </Section>
+      </Stack>
     </div>
   );
 }
@@ -143,10 +157,14 @@ const PROBLEM_TEXT: Record<NonNullable<Status["problem"]>, string> = {
   no_fit: "We found people, but no event works for everyone's free time and tastes yet. We'll keep trying.",
 };
 
-function QueueProblemBanner({ status }: { status: Status }) {
+/** Why the queue can't form a squad yet, with one way forward (from main's queue no-fit handling). */
+function QueueProblem({ status }: { status: Status }) {
   const [busy, setBusy] = useState(false);
   const hangout = status.mode === "hangout";
-  const text = hangout && status.problem === "no_fit" ? "We found people, but no public spot near all of you works for everyone's free time yet. We'll keep trying." : PROBLEM_TEXT[status.problem!];
+  const text =
+    hangout && status.problem === "no_fit"
+      ? "We found people, but no public spot near all of you works for everyone's free time yet. We'll keep trying."
+      : PROBLEM_TEXT[status.problem!];
   const switchToHangout = async () => {
     setBusy(true);
     await fetch("/api/queue/join", {
@@ -156,61 +174,110 @@ function QueueProblemBanner({ status }: { status: Status }) {
     window.location.href = "/queue";
   };
   return (
-    <div className="mt-5 rounded-xl bg-amber-400/15 p-3 text-sm text-amber-100 ring-1 ring-amber-300/40" data-testid="queue-problem" data-problem={status.problem}>
-      <p>{text}</p>
+    <div role="status" className="mt-3 rounded-card bg-wash p-3" data-testid="queue-problem" data-problem={status.problem}>
+      <p className="text-body">{text}</p>
       {!hangout && (
-        <button type="button" disabled={busy} onClick={switchToHangout} data-testid="switch-to-hangout"
-          className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-white py-2 font-bold text-[#3b0f7a] disabled:opacity-60">
-          <Sparkles size={15} /> Plan a new hangout instead
-        </button>
+        <Button block className="mt-2" disabled={busy} onClick={switchToHangout} data-testid="switch-to-hangout" icon={<MapPinned size={16} />}>
+          Plan a new hangout instead
+        </Button>
       )}
     </div>
   );
 }
 
-function PartyFound({ party }: { party: Party }) {
+function LeaveQueue() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
   return (
-    <div data-testid="party-found" className="relative min-h-[80dvh] overflow-hidden bg-gradient-to-b from-[#0b1640] via-[#3b0f7a] to-[#6d28d9] px-4 pb-8 pt-8 text-white">
-      <div className="pointer-events-none absolute inset-0">
-        {Array.from({ length: 18 }).map((_, i) => (
-          <span key={i} className="absolute h-2 w-2 rounded-sm" style={{ left: `${(i * 37) % 100}%`, top: -10, background: ["#67e8f9", "#f0abfc", "#fde047", "#86efac"][i % 4], animation: `qu-fall ${2 + (i % 5) * 0.4}s ${(i % 7) * 0.15}s ease-in forwards` }} />
-        ))}
-      </div>
-      <p className="text-center text-xs font-semibold uppercase tracking-[0.3em] text-[#c4b5fd]">Match complete</p>
-      <div className="mt-1 flex justify-center"><AiStatusBadge /></div>
-      <h1 className="mt-1 animate-[qu-pop_.5s_ease-out] text-center text-4xl font-black drop-shadow-[0_0_20px_rgba(168,85,247,.9)]">Party found!</h1>
-      <ul className="mt-6 flex flex-wrap justify-center gap-3" data-testid="party-members">
-        {party.members.map((m) => (
-          <li key={m.user.id} className="flex w-16 flex-col items-center gap-1">
-            <Avatar name={m.user.name} color={m.user.avatarColor} size={56} ring />
-            <span className="w-full truncate text-center text-xs">{m.user.name.split(" ")[0]}</span>
-          </li>
-        ))}
-      </ul>
-      {party.event && (
-        <div className="mt-6 rounded-2xl bg-white/10 p-4 backdrop-blur" data-testid="party-event">
-          <p className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#c4b5fd]">
-            <Sparkles size={14} /> {party.event.kind === "hangout" ? "New hangout planned for your squad" : "Your squad is going to"}
+    <Button
+      block
+      data-testid="leave-queue"
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        await fetch("/api/queue/leave", { method: "POST" }).catch(() => {});
+        router.push("/events");
+        router.refresh();
+      }}
+    >
+      Leave queue
+    </Button>
+  );
+}
+
+/** The one loud moment, drawn in Facebook's materials: a check that scales in once, people popping in. */
+function SquadFound({ party, meId }: { party: Party; meId: string }) {
+  const hangout = party.event?.kind === "hangout";
+  const others = party.members.filter((m) => m.user.id !== meId);
+  const hasSample = party.members.some((m) => m.user.isSimulated && !m.user.isLive && m.user.id !== meId);
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => heading.current?.focus(), []);
+  return (
+    <div data-testid="party-found">
+      <TopBar back="/events" title="Your squad" />
+      <Stack>
+        <Section className="pt-6 pb-4 text-center">
+          <span className="relative mx-auto flex h-[88px] w-[88px] items-center justify-center">
+            <span aria-hidden className="absolute inset-0 animate-ring-once rounded-full border-2 border-accent" />
+            <span className="flex h-[88px] w-[88px] animate-check-in items-center justify-center rounded-full bg-accent text-surface">
+              <Check size={48} strokeWidth={3} aria-hidden />
+            </span>
+          </span>
+          <h1 ref={heading} tabIndex={-1} className="mt-4 text-page font-bold outline-none">Your squad is ready</h1>
+          <p className="mt-1 text-body text-muted">
+            {party.members.length} people{party.event ? (hangout ? " · a new hangout, just for you" : ` going to ${party.event.title} together`) : ""}
           </p>
-          <p className="mt-1 text-lg font-bold" data-testid="party-event-title">{party.event.title}</p>
-          {party.event.kind === "hangout" && party.event.description && <p className="text-sm text-[#ddd6fe]">{party.event.description}</p>}
-          <p className="flex items-center gap-1.5 text-sm text-[#ddd6fe]"><CalendarDays size={14} /> {fmtEventWhen(new Date(party.event.startsAt))}</p>
-          <p className="flex items-center gap-1.5 text-sm text-[#ddd6fe]"><MapPin size={14} /> {party.event.venueName}</p>
-        </div>
-      )}
-      <MatchTracePanel partyId={party.id} dark />
-      <div className="mt-5 grid grid-cols-2 gap-2">
-        {party.chat && (
-          <Link href={`/chats/${party.chat.id}`} data-testid="open-squad-chat" className="flex items-center justify-center gap-1.5 rounded-xl bg-white py-3 font-bold text-[#5b21b6]">
-            <MessageCircle size={18} /> Squad chat
-          </Link>
-        )}
+          <ul className="mt-5 flex justify-center gap-2" data-testid="party-members">
+            {party.members.map((m, i) => (
+              <li key={m.user.id} className="flex w-14 animate-slot-in flex-col items-center gap-1" style={{ animationDelay: `${300 + i * 90}ms` }}>
+                <Avatar name={m.user.name} color={m.user.avatarColor} size={48} />
+                <span className="w-full truncate text-center text-meta">{m.user.id === meId ? "You" : first(m.user.name)}</span>
+                {m.user.isSimulated && !m.user.isLive && m.user.id !== meId && <span className="text-[11px] text-muted" data-testid="sample-tag">Sample</span>}
+              </li>
+            ))}
+          </ul>
+          {hasSample && <p className="mt-2 text-meta text-muted">Sample people are simulated so the demo works with a small crowd.</p>}
+        </Section>
+
         {party.event && (
-          <Link href={`/events/${party.event.id}`} data-testid="view-event" className={`flex items-center justify-center gap-1.5 rounded-xl bg-white/15 py-3 font-bold ${party.chat ? "" : "col-span-2"}`}>
-            <CalendarDays size={18} /> {party.event.kind === "hangout" ? "View plan" : "View event"}
-          </Link>
+          <Section>
+            <Card testId="party-event">
+              <Link href={`/events/${party.event.id}`} data-testid="view-event" className="block">
+                {party.event.coverColor && <EventCover color={party.event.coverColor} pattern={party.event.coverPattern ?? "dots"} height={72} />}
+                <div className="p-3">
+                  <DateLine start={new Date(party.event.startsAt)} />
+                  <p className="text-title font-semibold" data-testid="party-event-title">{party.event.title}</p>
+                  <p className="text-meta text-muted">{party.event.venueName}</p>
+                  {hangout && party.event.description && (
+                    <p className="mt-1 flex items-start gap-1.5 text-meta text-muted">
+                      <MapPinned size={14} className="mt-px shrink-0" aria-hidden /> {party.event.description}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            </Card>
+          </Section>
         )}
-      </div>
+
+        <div className="bg-surface">
+          <TraceRow partyId={party.id} />
+        </div>
+
+        <Section>
+          {party.chat ? (
+            <ButtonLink href={`/chats/${party.chat.id}`} variant="primary" size="lg" block data-testid="open-squad-chat">
+              Open squad chat
+            </ButtonLink>
+          ) : (
+            <ButtonLink href={`/squad/${party.id}`} variant="primary" size="lg" block>
+              See your squad
+            </ButtonLink>
+          )}
+          <p className="mt-2 text-center text-meta text-muted">
+            {others.length} {others.length === 1 ? "person" : "people"} will see your first name and what you have in common. Leave any time.
+          </p>
+        </Section>
+      </Stack>
     </div>
   );
 }

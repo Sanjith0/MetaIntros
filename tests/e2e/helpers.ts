@@ -14,15 +14,22 @@ export function trackConsoleErrors(page: Page) {
   return errors;
 }
 
-/** Navigate and wait until React has hydrated (clicks before hydration are silently lost). */
+/**
+ * Ready = React has hydrated (clicks before hydration are silently lost) AND streamed page segments have been
+ * swapped in (the root marker can fire while a page is still a hidden `<div id="S:0">`, which would make
+ * every test id appear twice for a moment).
+ */
+const isReady = () => document.documentElement.dataset.hydrated === "1" && !document.querySelector('div[hidden][id^="S:"]');
+
+/** Navigate and wait until the page is ready. */
 export async function gotoReady(page: Page, url: string) {
   let res = await page.goto(url);
   if (res && res.status() >= 500) res = await page.goto(url); // one retry for transient dev-server errors
-  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "1");
+  await page.waitForFunction(isReady);
   return res;
 }
 
 export async function reloadReady(page: Page) {
   await page.reload();
-  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "1");
+  await page.waitForFunction(isReady);
 }

@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3100;
+// E2E_PORT overrides the default when 3100 is taken on your machine.
+const PORT = Number(process.env.E2E_PORT ?? 3100);
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -25,6 +26,6 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
     // NETWORK_DISABLED: every E2E run doubles as an offline (Wi-Fi died) run
-    env: { DATABASE_URL: "file:./e2e.db", PORT: String(PORT), AI_MODE: "cache", NETWORK_DISABLED: "1" },
+    env: { DATABASE_URL: "file:./e2e.db", PORT: String(PORT), E2E_PORT: String(PORT), AI_MODE: "cache", NETWORK_DISABLED: "1" },
   },
 });

@@ -4,9 +4,11 @@
 
 | Queue | Where you start it | What you get |
 |---|---|---|
-| **This event** | **Queue Up** on an event page | A squad for that event |
-| **Any event** | "Queue Up for any event this weekend" on Events | A squad, plus an existing event you'll all like |
-| **New hangout** | "Plan a hangout with a new squad" on Events | A squad, plus a brand-new hangout at a public spot near all of you, at a time you're all free |
+| **This event** | "Find a squad to go with" on an event page | A squad for that event |
+| **Any event** | Events tab → "Go with a squad" → *For any event this weekend* | A squad, plus an existing event you'll all like |
+| **New hangout** | Events tab → "Go with a squad" → *For a new hangout* | A squad, plus a brand-new hangout at a public spot near all of you, at a time you're all free |
+
+The phone UI reads as the Facebook mobile app with Queue Up as a native layer in the Events tab (see `DESIGN.md`, `PRODUCT.md`). It's a hackathon prototype: no Meta logos or fonts, a "Hackathon prototype, not Facebook" label on every screen, `noindex`, seeded data only.
 
 Hangout queuers only ever match other hangout queuers. Inside the existing-events queue, "any event" queuers can join someone who queued from a specific event, and then go to that event. Two different specific events never mix.
 
@@ -14,7 +16,7 @@ Whichever queue you pick, Queue Up then:
 
 1. Builds your taste profile from your (mocked) Facebook data.
 2. Queues you with nearby people, like a ranked game queue.
-3. Forms a compatible **squad** of 2–8 strangers. An AI agent picks the event, or plans the hangout.
+3. Forms a compatible **squad** of 4–6 strangers (the engine supports 2–8; the UI offers 4, 5 or 6). An AI agent picks the event, or plans the hangout.
 4. Opens a temporary squad chat with an **AI host**.
 5. Gives you **talk cards**: grounded icebreakers for each squadmate.
 6. Helps you find each other at the venue.
@@ -22,7 +24,7 @@ Whichever queue you pick, Queue Up then:
 
 Built for Meta's *Closer Together AI Hackathon*. The model behind every LLM call is **Muse** (Meta Model API).
 
-![screens](docs/screens/18-party-found-trace.png)
+![screens](docs/screens/after/21-squad-found.png)
 
 ---
 
@@ -160,8 +162,9 @@ flowchart LR
 | `lib/ai` | the single model interface |
 | `lib/server` | DB services (queue, pipeline, chats, host, expiry, friending, demo) |
 | `app/` | UI and API routes |
-| `tests/unit` | Vitest (168 tests) |
-| `tests/e2e` | Playwright (24 tests, iPhone viewport, production build, network disabled) |
+| `components/fb` | Facebook-style primitives (TopBar, TabBar, Sheet, ListRow, Bubble…) on the tokens in `app/globals.css` |
+| `tests/unit` | Vitest (`pnpm test`; includes a design-token guard) |
+| `tests/e2e` | Playwright (iPhone viewport, production build, network disabled; `E2E_PORT` if 3100 is taken) |
 
 ---
 
@@ -171,8 +174,8 @@ flowchart LR
 |---|---|
 | **AI integration** | Five agents behind one Muse adapter. **Party Formation Agent** reviews engine candidates with tools and writes a rationale. **Event Selection Agent** picks from code-verified events, with runner-ups and reasons. **AI host** writes a welcome plus an icebreaker grounded in a real shared interest, then replies to @mentions. **Talk Cards Agent** writes openers from source-cited facts. **Companion pre-chats** are two-profile simulations that surface sparks. The streaming **"How we matched you"** trace makes the agents' reasoning visible. |
 | **Product thinking & user impact** | Going alone is the barrier, so the squad is the product. Safety is designed in from the first screen. Party size works like a game mode. Expiring chats keep it low-pressure. Mutual-consent friending turns one night into lasting connections. "Met through Queue Up" closes the loop inside Facebook. Live sign-up plus Live/Mixed modes show it working with real people in the room. |
-| **Execution & demo** | `/demo` panel: one-click reset, fill modes, QR join, AI cache toggle, live queue view. The full 10-step script is an automated E2E that runs in about 30s. It also runs with the network disabled. iPhone screenshots of every screen are in `docs/screens/`. |
-| **Originality & cohesion** | A Valorant-style queue, with widening search, a player counter and "Party found!", mapped onto real-world social anxiety. It looks native to Facebook Events, Chats and Friends. One data model runs from Graph-shaped data through to the friendship edge, with the event recorded on it. |
+| **Execution & demo** | `/demo` panel: one-click reset, fill modes, QR join, AI cache toggle, live queue view. The full 10-step script is an automated E2E that runs in about 30s. It also runs with the network disabled. iPhone screenshots of every screen are in `docs/screens/after/` (before the Facebook-shell rework: `docs/screens/before/`). |
+| **Originality & cohesion** | A game-style queue (timer, slots filling, widening search, one loud "Your squad is ready" moment) drawn in Facebook's own materials, mapped onto real-world social anxiety. It reads as native Facebook Events, Messenger and Friends. One data model runs from Graph-shaped data through to the friendship edge, with the event recorded on it. |
 
 ---
 

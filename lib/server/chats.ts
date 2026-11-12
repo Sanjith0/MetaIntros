@@ -12,7 +12,7 @@ export interface InboxRow {
   unread: number;
   archived: boolean;
   expiresAt: Date | null;
-  event: { id: string; title: string; startsAt: Date; endsAt: Date } | null;
+  event: { id: string; title: string; startsAt: Date; endsAt: Date; coverColor: string } | null;
 }
 
 /** Inbox ordering: active squad chats pinned on top, then most-recent activity. */
@@ -29,7 +29,7 @@ export async function listInbox(userId: string): Promise<InboxRow[]> {
         include: {
           members: { include: { user: { select: { id: true, name: true, avatarColor: true } } } },
           messages: { orderBy: { createdAt: "desc" }, take: 1, include: { sender: { select: { name: true } } } },
-          event: { select: { id: true, title: true, startsAt: true, endsAt: true } },
+          event: { select: { id: true, title: true, startsAt: true, endsAt: true, coverColor: true } },
         },
       },
     },
@@ -47,10 +47,10 @@ export async function listInbox(userId: string): Promise<InboxRow[]> {
       id: c.id,
       type: c.type,
       title,
-      avatar: c.type === "direct" && others[0] ? { name: others[0].name, color: others[0].avatarColor } : { name: title, color: c.type === "squad" ? "#7c3aed" : "#65676b" },
+      avatar: c.type === "direct" && others[0] ? { name: others[0].name, color: others[0].avatarColor } : { name: title, color: c.event?.coverColor ?? "#65676b" },
       members: c.members.map((x) => x.user),
       lastMessage: last?.body ?? null,
-      lastSender: last ? (last.senderId === userId ? "You" : last.kind === "host" ? "Queue Up Host" : (last.sender?.name.split(" ")[0] ?? null)) : null,
+      lastSender: last ? (last.senderId === userId ? "You" : last.kind === "host" ? "Host (AI)" : (last.sender?.name.split(" ")[0] ?? null)) : null,
       lastMessageAt: c.lastMessageAt,
       unread,
       archived: c.archived,
@@ -67,8 +67,8 @@ export async function getChatForUser(userId: string, chatId: string) {
   return prisma.chat.findUnique({
     where: { id: chatId },
     include: {
-      members: { include: { user: { select: { id: true, name: true, avatarColor: true } } } },
-      messages: { orderBy: { createdAt: "asc" }, include: { sender: { select: { id: true, name: true, avatarColor: true } } } },
+      members: { include: { user: { select: { id: true, name: true, avatarColor: true, isSimulated: true, isLive: true } } } },
+      messages: { orderBy: { createdAt: "asc" }, include: { sender: { select: { id: true, name: true, avatarColor: true, isSimulated: true, isLive: true } } } },
       event: true,
       party: { include: { landmark: true, members: { include: { user: { select: { id: true, name: true, avatarColor: true } } } } } },
     },

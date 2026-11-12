@@ -34,15 +34,15 @@ describe("AI host", () => {
     expect(host).toHaveLength(2);
     expect(host[0].body).toMatch(/Indie Night/);
     expect(host[0].body).toMatch(/The Guild Theatre/);
-    expect(host.filter((m) => m.body.startsWith("🎲 Icebreaker")).length).toBe(1);
-    // every host message records who wrote it, so the chat can badge it honestly
+    expect(host.filter((m) => m.body.startsWith("Icebreaker")).length).toBe(1);
+    // every host message records who wrote it, so the chat can label its source honestly
     for (const m of host) expect(["mock", "fallback"]).toContain(m.aiSource);
   });
 
   it("the icebreaker references a real interest that ≥2 squad members share", async () => {
     const { chatId } = await formSquad();
     const ctx = (await hostContext(chatId))!;
-    const ice = (await prisma.chatMessage.findFirstOrThrow({ where: { chatId, body: { startsWith: "🎲" } } })).body.toLowerCase();
+    const ice = (await prisma.chatMessage.findFirstOrThrow({ where: { chatId, body: { startsWith: "Icebreaker:" } } })).body.toLowerCase();
     const sharedLabels = ctx.shared.filter((s) => s.count >= 2).map((s) => label(s.tag).toLowerCase());
     expect(sharedLabels.some((l) => ice.includes(l))).toBe(true);
   });

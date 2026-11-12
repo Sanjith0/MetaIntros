@@ -1,15 +1,18 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
+import { Button, Section } from "@/components/fb";
+import { PrototypeLabel } from "@/components/fb/TopBar";
 
 export default function AppError({ reset }: { error: Error; reset: () => void }) {
   return (
-    <div className="m-3 rounded-xl bg-white p-6 text-center shadow-sm" data-testid="error-state">
-      <p className="text-lg font-bold">Something went wrong</p>
-      <p className="mt-1 text-sm text-fb-muted">Your squad is safe — this screen just failed to load.</p>
-      <button type="button" onClick={reset} className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-fb-blue px-4 py-2 font-semibold text-white">
-        <RefreshCw size={16} /> Try again
-      </button>
+    <div data-testid="error-state">
+      <PrototypeLabel />
+      <Section className="mt-2 py-8 text-center">
+        <p className="text-headline font-bold">Something went wrong</p>
+        <p className="mt-1 text-body text-muted">Your squad is fine. This screen just didn&apos;t load.</p>
+        <Button className="mt-4" onClick={reset} icon={<RefreshCw size={16} />}>Try again</Button>
+      </Section>
     </div>
   );
 }

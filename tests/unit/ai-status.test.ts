@@ -11,13 +11,13 @@ describe("AI status badge (truthful labels)", () => {
   it("mock mode never claims Muse", () => {
     const s = summarizeAi({ ...base, mode: "mock", log: log("mock", "mock") });
     expect(s.state).toBe("mock");
-    expect(s.label).not.toMatch(/Muse/);
+    expect(s.label).toBe("AI: test model");
   });
 
   it("cache mode is labeled replay, never live", () => {
     const s = summarizeAi({ ...base, mode: "cache", log: log("cache", "cache", "fallback") });
     expect(s.state).toBe("replay");
-    expect(s.label).toBe("Muse replay");
+    expect(s.label).toBe("AI: saved responses (offline)");
     expect(s.label).not.toMatch(/live/i);
     expect(s.detail).toMatch(/Cache misses used templates/);
     expect(s.recent).toEqual({ live: 0, cache: 2, mock: 0, fallback: 1 });
@@ -26,7 +26,7 @@ describe("AI status badge (truthful labels)", () => {
   it("cache mode with only misses says templates, not Muse", () => {
     const s = summarizeAi({ ...base, mode: "cache", log: log("fallback", "fallback") });
     expect(s.state).toBe("offline");
-    expect(s.label).toBe("Templates");
+    expect(s.label).toBe("AI off: templates only");
   });
 
   it("live mode without a key is offline", () => {
@@ -39,7 +39,7 @@ describe("AI status badge (truthful labels)", () => {
     expect(bad.detail).toMatch(/all providers failed/);
     const ok = summarizeAi({ ...base, mode: "live", log: log("fallback", "live", "live", "live", "live", "live") });
     expect(ok.state).toBe("live");
-    expect(ok.label).toBe("Muse live");
+    expect(ok.label).toBe("AI: live");
   });
 
   it("combining sources never rounds up", () => {
@@ -51,10 +51,12 @@ describe("AI status badge (truthful labels)", () => {
     expect(combineSources([])).toBe("code");
   });
 
-  it("per-output labels only say Muse when a Muse model wrote it", () => {
-    expect(describeSource("live")).toMatchObject({ label: "Muse · live", muse: true });
-    expect(describeSource("cache")).toMatchObject({ label: "Muse · replay", muse: true });
-    for (const s of ["fallback", "template", "mock", "code"]) expect(describeSource(s)?.muse, s).toBe(false);
+  it("per-output labels say AI only when a model wrote it, in plain words", () => {
+    expect(describeSource("live")).toMatchObject({ label: "Written by AI just now", ai: true });
+    expect(describeSource("cache")).toMatchObject({ label: "Saved AI response", ai: true });
+    expect(describeSource("fallback")?.label).toBe("Template (AI unavailable)");
+    for (const s of ["fallback", "template", "mock", "code"]) expect(describeSource(s)?.ai, s).toBe(false);
+    for (const s of ["live", "cache", "mock", "fallback", "template", "code", "mixed"]) expect(describeSource(s)?.label, s).not.toMatch(/Muse/);
     expect(describeSource(undefined)).toBeNull();
   });
 

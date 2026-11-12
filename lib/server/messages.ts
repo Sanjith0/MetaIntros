@@ -19,7 +19,7 @@ export async function postMessage(chatId: string, senderId: string | null, body:
   const message = await prisma.chatMessage.create({ data: { chatId, senderId, kind, body: text, aiSource: kind === "host" ? (aiSource ?? null) : null } });
   await prisma.chat.update({ where: { id: chatId }, data: { lastMessageAt: message.createdAt } });
   if (senderId) await prisma.chatMember.updateMany({ where: { chatId, userId: senderId }, data: { lastReadAt: message.createdAt } });
-  const sender = senderId ? await prisma.user.findUnique({ where: { id: senderId }, select: { id: true, name: true, avatarColor: true } }) : null;
+  const sender = senderId ? await prisma.user.findUnique({ where: { id: senderId }, select: { id: true, name: true, avatarColor: true, isSimulated: true, isLive: true } }) : null;
   publish("chat", { chatId, message: { ...message, sender } }, members);
   publish("badges", {}, members.filter((m) => m !== senderId));
   return { ok: true, message };

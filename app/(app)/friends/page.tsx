@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { Sparkles } from "lucide-react";
-import { Avatar } from "@/components/Avatar";
+import { UserPlus, Users } from "lucide-react";
+import { TopBar } from "@/components/fb/TopBar";
+import { Avatar, Badge, Button, ChipLink, ChipRow, IconCircle, ListRow, Section, Stack } from "@/components/fb";
 import { FriendRequestActions } from "@/components/FriendRequestActions";
 import { listFriends, listQueueUpFriends, listRequests, listSuggestions } from "@/lib/server/friends";
 import { getCurrentUserId } from "@/lib/server/session";
@@ -19,93 +19,97 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
   const counts = { friends: friends.length, requests: requests.incoming.length, queueup: queueUp.length };
 
   return (
-    <div data-testid="friends-page" className="min-h-[60dvh] bg-white px-4 pt-3">
-      <h1 className="text-2xl font-bold">Friends</h1>
-      <div className="mt-2 flex gap-2 overflow-x-auto" role="tablist">
-        {TABS.map((t) => (
-          <Link key={t.id} href={`/friends?tab=${t.id}`} role="tab" aria-selected={t.id === tab} data-testid={`friends-tab-${t.id}`}
-            className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold ${t.id === tab ? "bg-[#e7f3ff] text-fb-blue" : "bg-fb-bg"}`}>
-            {t.label}
-            {counts[t.id] > 0 && t.id !== "friends" && <span className="ml-1 rounded-full bg-[#e41e3f] px-1.5 text-xs text-white">{counts[t.id]}</span>}
-          </Link>
-        ))}
-      </div>
-
-      {tab === "friends" && suggestions.length > 0 && (
-        <section className="mt-3" data-testid="suggestions">
-          <h2 className="text-sm font-bold">People you may know</h2>
-          <ul className="mt-2 flex gap-2 overflow-x-auto pb-1">
-            {suggestions.map((s) => (
-              <li key={s.id} className="w-28 shrink-0 rounded-xl bg-fb-bg p-2 text-center" data-testid="suggestion">
-                <Avatar name={s.user.name} color={s.user.avatarColor} size={56} className="mx-auto" />
-                <p className="mt-1 truncate text-sm font-semibold">{s.user.name}</p>
-                <p className="text-[11px] text-fb-muted">{s.squadmate ? "From your squad" : `${s.mutual} mutual`}</p>
-              </li>
+    <div data-testid="friends-page">
+      <TopBar title="Friends" />
+      <Stack>
+        <div className="bg-surface px-4 pt-1 pb-3">
+          <ChipRow label="Friends sections">
+            {TABS.map((t) => (
+              <ChipLink key={t.id} href={`/friends?tab=${t.id}`} on={t.id === tab} data-testid={`friends-tab-${t.id}`} scroll={false}>
+                {t.label}
+                {counts[t.id] > 0 && t.id !== "friends" && <Badge count={counts[t.id]} className="ml-0.5 ring-0" />}
+              </ChipLink>
             ))}
-          </ul>
-        </section>
-      )}
+          </ChipRow>
+        </div>
 
-      {tab === "friends" && (
-        <ul className="mt-3 divide-y divide-fb-bg" data-testid="friends-list">
-          <li className="pb-2 text-sm text-fb-muted">{friends.length} friends</li>
-          {friends.map((f) => (
-            <li key={f.id} className="flex items-center gap-3 py-2" data-testid="friend-row">
-              <Avatar name={f.name} color={f.avatarColor} size={52} />
-              <span>
-                <span className="block font-semibold">{f.name}</span>
-                <span className="block text-sm text-fb-muted">{f.mutual} mutual friends · {f.neighborhood}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+        {tab === "friends" && suggestions.length > 0 && (
+          <Section title="People you may know" testId="suggestions">
+            <ul className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+              {suggestions.map((s) => (
+                <li key={s.id} className="w-36 shrink-0 overflow-hidden rounded-card bg-surface shadow-card" data-testid="suggestion">
+                  <div className="flex justify-center bg-wash py-4">
+                    <Avatar name={s.user.name} color={s.user.avatarColor} size={72} />
+                  </div>
+                  <div className="p-2">
+                    <p className="truncate text-body font-semibold">{s.user.name}</p>
+                    <p className="truncate text-meta text-muted">{s.squadmate ? "From your squad" : `${s.mutual} mutual friends`}</p>
+                    <Button variant="on" size="sm" block className="mt-2" icon={<UserPlus size={14} />}>Add friend</Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
 
-      {tab === "requests" && (
-        <ul className="mt-3 space-y-3" data-testid="requests-list">
-          {requests.incoming.length === 0 && requests.outgoing.length === 0 && <li className="py-8 text-center text-fb-muted">No pending requests</li>}
-          {requests.incoming.map((r) => (
-            <li key={r.id} className="flex items-center gap-3" data-testid="request-row">
-              <Avatar name={r.from.name} color={r.from.avatarColor} size={64} />
-              <span className="flex-1">
-                <span className="block font-semibold">{r.from.name}</span>
-                {r.partyId && <span className="block text-xs text-queue-glow">From your Queue Up squad</span>}
-                <FriendRequestActions requestId={r.id} />
-              </span>
-            </li>
-          ))}
-          {requests.outgoing.map((r) => (
-            <li key={r.id} className="flex items-center gap-3 opacity-80" data-testid="outgoing-request-row">
-              <Avatar name={r.to.name} color={r.to.avatarColor} size={48} />
-              <span className="flex-1">
-                <span className="block font-semibold">{r.to.name}</span>
-                <span className="block text-sm text-fb-muted">Request sent · waiting for them to accept</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+        {tab === "friends" && (
+          <Section flush title={`${friends.length} friends`} className="pb-4">
+            <ul data-testid="friends-list">
+              {friends.map((f) => (
+                <li key={f.id} data-testid="friend-row">
+                  <ListRow leading={<Avatar name={f.name} color={f.avatarColor} size={56} />} title={f.name} subtitle={`${f.mutual} mutual friends${f.neighborhood ? ` · ${f.neighborhood}` : ""}`} />
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
 
-      {tab === "queueup" && (
-        <ul className="mt-3 space-y-3" data-testid="queueup-list">
-          {queueUp.length === 0 && (
-            <li className="rounded-xl bg-fb-bg p-6 text-center text-fb-muted" data-testid="queueup-empty">
-              <Sparkles className="mx-auto mb-2 text-queue-glow" />
-              People you meet through a Queue Up squad will show up here.
-            </li>
-          )}
-          {queueUp.map((q) => (
-            <li key={q.id} className="flex items-center gap-3 rounded-xl border border-[#e9e3ff] bg-gradient-to-r from-[#f6f3ff] to-white p-3" data-testid="queueup-row">
-              <Avatar name={q.friend.name} color={q.friend.avatarColor} size={56} />
-              <span>
-                <span className="block font-semibold">{q.friend.name}</span>
-                {q.event && <span className="block text-sm text-fb-muted" data-testid="met-at">Met at {q.event.title}</span>}
-                {q.sharedNote && <span className="block text-sm text-queue-glow" data-testid="shared-note">You both love {q.sharedNote}</span>}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+        {tab === "requests" && (
+          <Section flush title="Friend requests" className="pb-4">
+            <ul data-testid="requests-list">
+              {requests.incoming.length === 0 && requests.outgoing.length === 0 && <li className="px-4 py-8 text-center text-muted">No pending requests</li>}
+              {requests.incoming.map((r) => (
+                <li key={r.id} className="flex items-start gap-3 px-4 py-2" data-testid="request-row">
+                  <Avatar name={r.from.name} color={r.from.avatarColor} size={72} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-body font-semibold">{r.from.name}</span>
+                    {r.partyId && <span className="block text-meta text-muted">From your Queue Up squad</span>}
+                    <FriendRequestActions requestId={r.id} />
+                  </span>
+                </li>
+              ))}
+              {requests.outgoing.map((r) => (
+                <li key={r.id} data-testid="outgoing-request-row">
+                  <ListRow leading={<Avatar name={r.to.name} color={r.to.avatarColor} size={56} />} title={r.to.name} subtitle="Request sent" />
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+
+        {tab === "queueup" && (
+          <Section flush title="Met through Queue Up" className="pb-4">
+            <ul data-testid="queueup-list">
+              {queueUp.length === 0 && (
+                <li className="flex flex-col items-center px-6 py-8 text-center text-muted" data-testid="queueup-empty">
+                  <IconCircle size={48}><Users size={22} /></IconCircle>
+                  <span className="mt-2">People you meet through a squad and both add will show up here.</span>
+                </li>
+              )}
+              {queueUp.map((q) => (
+                <li key={q.id} data-testid="queueup-row">
+                  <ListRow
+                    leading={<Avatar name={q.friend.name} color={q.friend.avatarColor} size={56} />}
+                    title={q.friend.name}
+                    subtitle={q.event ? <span data-testid="met-at">Met through Queue Up · {q.event.title}</span> : "Met through Queue Up"}
+                    meta={q.sharedNote ? <span data-testid="shared-note">You both love {q.sharedNote}</span> : undefined}
+                  />
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+      </Stack>
     </div>
   );
 }

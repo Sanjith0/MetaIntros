@@ -1,12 +1,17 @@
-import Link from "next/link";
+import { Link2Off } from "lucide-react";
+import { ButtonLink, IconCircle } from "@/components/fb";
+import { PrototypeLabel } from "@/components/fb/TopBar";
 
 export default function NotFound() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center bg-fb-bg p-6 text-center" data-testid="not-found">
-      <p className="text-[34px] font-bold tracking-tight text-fb-blue" style={{ letterSpacing: "-0.04em" }}>facebook</p>
-      <p className="mt-4 text-lg font-bold">This content isn&apos;t available</p>
-      <p className="mt-1 text-sm text-fb-muted">It may have expired (squad chats disappear 24h after the event) or you don&apos;t have access.</p>
-      <Link href="/events" className="mt-4 rounded-lg bg-fb-blue px-4 py-2 font-semibold text-white">Go to Events</Link>
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col bg-wash" data-testid="not-found">
+      <PrototypeLabel />
+      <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+        <IconCircle size={64}><Link2Off size={28} /></IconCircle>
+        <h1 className="mt-4 text-headline font-bold">This content isn&apos;t available</h1>
+        <p className="mt-1 text-body text-muted">It may have ended (squad chats close 24 hours after the event), or it&apos;s only visible to its squad.</p>
+        <ButtonLink href="/events" variant="primary" className="mt-5">Go to Events</ButtonLink>
+      </div>
     </main>
   );
 }

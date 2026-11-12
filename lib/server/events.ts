@@ -8,7 +8,7 @@ import { worldWeekendStartMs } from "@/lib/clock";
 export type FeedTab = "foryou" | "nearby" | "weekend";
 export const FEED_TABS: { id: FeedTab; label: string }[] = [
   { id: "foryou", label: "For you" },
-  { id: "nearby", label: "Nearby" },
+  { id: "nearby", label: "Local" },
   { id: "weekend", label: "This weekend" },
 ];
 export const NEARBY_KM = 6;

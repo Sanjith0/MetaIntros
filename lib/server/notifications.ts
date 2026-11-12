@@ -1,0 +1,105 @@
+import { prisma } from "@/lib/db";
+import { fmtEventWhen } from "@/lib/format";
+
+/**
+ * The Notifications tab, derived from data Queue Up already keeps (no new table): squads formed, chats
+ * that ended, friend requests, friendships made through Queue Up, and upcoming events you're interested in.
+ */
+export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder";
+
+export interface NotificationItem {
+  id: string;
+  kind: NotificationKind;
+  /** the person or thing pictured */
+  avatar: { name: string; color: string };
+  /** text with the subject's name first; `bold` is the leading name to emphasise */
+  bold: string;
+  text: string;
+  href: string;
+  at: Date;
+}
+
+const DAY = 24 * 3600_000;
+
+export async function listNotifications(userId: string, now: Date): Promise<NotificationItem[]> {
+  const [memberships, requests, friendships, rsvps] = await Promise.all([
+    prisma.partyMember.findMany({
+      where: { userId, party: { status: { in: ["confirmed", "completed"] } } },
+      include: { party: { include: { event: true, chat: { select: { id: true, archived: true, expiresAt: true } }, members: true } } },
+    }),
+    prisma.friendRequest.findMany({ where: { toId: userId, status: "pending" }, include: { from: true } }),
+    prisma.friendship.findMany({
+      where: { source: "queue_up", OR: [{ userAId: userId }, { userBId: userId }] },
+      include: { userA: true, userB: true, metAtEvent: true },
+    }),
+    prisma.eventRsvp.findMany({
+      where: { userId, status: { in: ["interested", "going"] }, event: { kind: "event", startsAt: { gt: now, lt: new Date(now.getTime() + 3 * DAY) } } },
+      include: { event: true },
+    }),
+  ]);
+
+  const out: NotificationItem[] = [];
+  for (const m of memberships) {
+    const p = m.party;
+    if (!p.event) continue;
+    out.push({
+      id: `squad-${p.id}`,
+      kind: "squad",
+      avatar: { name: "Queue Up", color: p.event.coverColor },
+      bold: "Your squad is ready.",
+      text: `${p.members.length} people are going to ${p.event.title} together.`,
+      href: `/squad/${p.id}`,
+      at: p.createdAt,
+    });
+    if (p.chat?.archived) {
+      out.push({
+        id: `ended-${p.id}`,
+        kind: "chat_ended",
+        avatar: { name: "Queue Up", color: p.event.coverColor },
+        bold: "Your squad chat has ended.",
+        text: "Add the people you'd like to see again. You only become friends if you both say yes.",
+        href: `/squad/${p.id}/connect`,
+        at: p.chat.expiresAt ?? p.event.endsAt,
+      });
+    }
+  }
+  for (const r of requests) {
+    out.push({
+      id: `req-${r.id}`,
+      kind: "request",
+      avatar: { name: r.from.name, color: r.from.avatarColor },
+      bold: r.from.name,
+      text: r.partyId ? "sent you a friend request. You met through Queue Up." : "sent you a friend request.",
+      href: "/friends?tab=requests",
+      at: r.createdAt,
+    });
+  }
+  for (const f of friendships) {
+    const other = f.userAId === userId ? f.userB : f.userA;
+    out.push({
+      id: `met-${f.id}`,
+      kind: "met",
+      avatar: { name: other.name, color: other.avatarColor },
+      bold: other.name,
+      text: f.metAtEvent ? `and you are now friends. You met at ${f.metAtEvent.title}.` : "and you are now friends.",
+      href: "/friends?tab=queueup",
+      at: f.createdAt,
+    });
+  }
+  for (const r of rsvps) {
+    out.push({
+      id: `rem-${r.id}`,
+      kind: "reminder",
+      avatar: { name: r.event.title, color: r.event.coverColor },
+      bold: r.event.title,
+      text: `is coming up ${fmtEventWhen(r.event.startsAt)}.`,
+      href: `/events/${r.event.id}`,
+      at: new Date(Math.min(now.getTime(), r.event.startsAt.getTime() - 2 * DAY)),
+    });
+  }
+  return out.sort((a, b) => b.at.getTime() - a.at.getTime());
+}
+
+export function unreadCount(items: NotificationItem[], seenAt: Date) {
+  return items.filter((n) => n.at > seenAt && n.kind !== "reminder").length;
+}
