@@ -74,3 +74,18 @@ describe("why this line (F23)", () => {
     expect(explainSources(["plan-evt-night-market"], "maya", pid)[0]!.text).toBe("Your party's plan: Dolores Night Market.");
   });
 });
+
+describe("why this, in the chat (F32)", () => {
+  it("is on by default, and the pinned plan and all five openers in the party chat explain fully", async () => {
+    expect(flag("CHAT_WHY")).toBe(true);
+    process.env.PQ_PACE_MS = "0";
+    const pid = await locked();
+    const s = store();
+    const chatId = s.parties.get(pid)!.chatId!;
+    const msgs = s.messages.filter((m) => m.chatId === chatId && (m.kind === "opener" || m.kind === "pinned") && m.sourceIds.length);
+    expect(msgs.filter((m) => m.kind === "opener")).toHaveLength(5);
+    const pinned = msgs.find((m) => m.kind === "pinned")!;
+    expect(explainSources(pinned.sourceIds, "maya", pid)).toEqual([{ kind: "plan", text: "Your party's plan: Dolores Night Market.", ok: true }]);
+    for (const m of msgs) for (const it of explainSources(m.sourceIds, "maya", pid)) expect(it.ok, m.text).toBe(true);
+  });
+});

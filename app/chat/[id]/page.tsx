@@ -9,6 +9,7 @@ import { chatsFor, chatView } from "@/lib/server/social";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 import { flag } from "@/lib/flags";
+import { explainSources } from "@/lib/server/provenance";
 
 function closesLabel(iso: string): string {
   const d = new Date(iso);
@@ -101,6 +102,13 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
             people={people}
             hereFor={canPing ? view.chat.partyId : null}
             retry={flag("UX_STATES")}
+            why={
+              flag("CHAT_WHY") && view.chat.partyId
+                ? Object.fromEntries(
+                    view.messages.filter((m) => (m.kind === "opener" || m.kind === "pinned") && m.sourceIds.length).map((m) => [m.id, explainSources(m.sourceIds, viewer, view.chat.partyId!)]),
+                  )
+                : {}
+            }
           />
         )}
       </section>

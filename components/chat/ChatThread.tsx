@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "@/contracts";
 import { Avatar } from "@/components/Avatar";
 import { IconPin, IconSend, IconSparkle } from "@/components/icons";
 import { useLiveEvents } from "@/components/live/LiveProvider";
+import { WhyLine } from "@/components/party/WhyLine";
+import type { SourceItem } from "@/lib/stage/provenance";
 import { chatTime } from "@/lib/format";
 
 type People = Record<string, { name: string; firstName: string; hue: number }>;
@@ -19,6 +21,7 @@ export function ChatThread({
   people,
   hereFor = null,
   retry = true,
+  why = {},
 }: {
   chatId: string;
   viewerId: string;
@@ -29,6 +32,8 @@ export function ChatThread({
   hereFor?: string | null;
   /** F17: offer "Try again" when a message fails to send. */
   retry?: boolean;
+  /** F32: where each machine-written message came from, by message id. */
+  why?: Record<string, SourceItem[]>;
 }) {
   const [showHere, setShowHere] = useState(!!hereFor);
   const imHere = async () => {
@@ -100,6 +105,11 @@ export function ChatThread({
                     </span>
                   )}
                   {m.text}
+                  {why[m.id] && (
+                    <div className="text-left">
+                      <WhyLine items={why[m.id]!} testid={`why-${m.id}`} />
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -112,7 +122,8 @@ export function ChatThread({
             ? `rounded-[18px] ${firstOfRun ? "" : "rounded-tr-[4px]"} ${lastOfRun ? "" : "rounded-br-[4px]"}`
             : `rounded-[18px] ${firstOfRun ? "" : "rounded-tl-[4px]"} ${lastOfRun ? "" : "rounded-bl-[4px]"}`;
           return (
-            <div key={m.id} data-testid={m.kind === "opener" ? "opener-message" : "message"} className={`flex items-end gap-2 ${firstOfRun ? "mt-2" : "mt-[2px]"} ${mine ? "justify-end" : ""}`}>
+            <Fragment key={m.id}>
+            <div data-testid={m.kind === "opener" ? "opener-message" : "message"} data-message-id={m.id} className={`flex items-end gap-2 ${firstOfRun ? "mt-2" : "mt-[2px]"} ${mine ? "justify-end" : ""}`}>
               {!mine && <span className="w-7 shrink-0">{lastOfRun && who && <Avatar name={who.name} hue={who.hue} size={28} />}</span>}
               <div className={`flex max-w-[65%] flex-col ${mine ? "items-end" : "items-start"}`}>
                 {!mine && firstOfRun && who && <span className="mb-0.5 ml-3 text-[12px] text-[var(--color-ink-2)]">{who.firstName}</span>}
@@ -134,7 +145,16 @@ export function ChatThread({
                   {m.text}
                 </div>
               </div>
-            </div>
+              </div>
+              {/* Below the row, so the avatar stays beside the bubble. */}
+              {why[m.id] && (
+                <div className={`mt-0.5 flex ${mine ? "justify-end pr-3" : "pl-12"}`}>
+                  <div className={`max-w-[75%] ${mine ? "text-right [&>details>div]:text-left" : ""}`}>
+                    <WhyLine items={why[m.id]!} testid={`why-${m.id}`} />
+                  </div>
+                </div>
+              )}
+            </Fragment>
           );
         })}
         <div ref={end} />

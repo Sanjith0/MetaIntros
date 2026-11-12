@@ -68,6 +68,8 @@ const DEFAULTS = {
   SCALE_TEST: true,
   /** F31: "How your agent did it" in your receipt: a private, round-by-round story of your own agent's moves. */
   AGENT_STORY: true,
+  /** F32: "Why this?" in the group chat too, under each suggested opener and the pinned plan. */
+  CHAT_WHY: true,
 } as const satisfies Record<string, boolean>;
 
 export type FlagName = keyof typeof DEFAULTS;
