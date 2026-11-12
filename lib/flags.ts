@@ -9,6 +9,8 @@ const DEFAULTS = {
   STAGE_SCRUBBER: true,
   /** F2: on your own phone, your private rules and receipt next to a computed "what the party knows" column. */
   SECRET_PANEL: true,
+  /** F3: real phones on the local network: QR join links, presence, server-clock acks, vibration. */
+  REAL_PHONES: true,
 } as const;
 
 export type FlagName = keyof typeof DEFAULTS;

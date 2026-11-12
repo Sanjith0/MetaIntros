@@ -50,6 +50,8 @@ export interface Store {
   spotted: Spotted[];
   picks: RunItBackPick[];
   mutuals: MutualPair[];
+  /** When each phone showed MATCH FOUND (server clock). */
+  acks: { userId: string; partyId: string; shownAt: number; lagMs: number; sound: string; vibrate: string }[];
   events_log: PQEvent[];
   seq: number;
   idSeq: number;
@@ -82,6 +84,7 @@ function fresh(): Store {
     spotted: [],
     picks: [],
     mutuals: [],
+    acks: [],
     events_log: [],
     seq: 0,
     idSeq: 0,

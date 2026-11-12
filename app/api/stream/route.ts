@@ -1,5 +1,6 @@
 import { subscribe, visibleTo } from "@/lib/server/bus";
 import { onTrace } from "@/lib/server/trace";
+import { connect } from "@/lib/server/phones";
 import { store } from "@/lib/server/store";
 import { currentViewerId } from "@/lib/server/viewer";
 import type { PQEvent } from "@/contracts";
@@ -12,7 +13,9 @@ export const runtime = "nodejs";
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const stage = url.searchParams.get("stage") === "1";
-  const userId = stage ? undefined : await currentViewerId();
+  // An observer (operator screen) hears nothing personal and is not counted as a connected phone.
+  const observer = url.searchParams.get("observer") === "1";
+  const userId = stage || observer ? undefined : await currentViewerId();
   const since = Number(url.searchParams.get("since") ?? "NaN");
   const enc = new TextEncoder();
 
@@ -27,7 +30,9 @@ export async function GET(req: Request) {
           cleanup();
         }
       };
-      ctrl.enqueue(enc.encode(`retry: 1000\nevent: hello\ndata: ${JSON.stringify({ seq: store().seq, userId: userId ?? null })}\n\n`));
+      // The hello carries the server clock so phones can report lag in server time.
+      ctrl.enqueue(enc.encode(`retry: 1000\nevent: hello\ndata: ${JSON.stringify({ seq: store().seq, userId: userId ?? null, now: Date.now() })}\n\n`));
+      const disconnect = userId ? connect(userId) : () => {};
       if (Number.isFinite(since)) store().events_log.filter((e) => e.seq > since).forEach(send);
       const off = subscribe(send);
       // Only the projector hears traces, including the private lane.
@@ -50,6 +55,7 @@ export async function GET(req: Request) {
       cleanup = () => {
         off();
         offTrace();
+        disconnect();
         clearInterval(ping);
       };
       req.signal.addEventListener("abort", () => {

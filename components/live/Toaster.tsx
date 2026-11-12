@@ -7,7 +7,7 @@ import type { PayloadOf } from "@/contracts";
 import { Avatar } from "@/components/Avatar";
 import { IconClose, IconSparkle } from "@/components/icons";
 import { useLive, useLiveEvents } from "./LiveProvider";
-import { playChime } from "./sound";
+import { playChime, vibrate } from "./sound";
 
 export type Directory = Record<string, { name: string; firstName: string; hue: number }>;
 
@@ -23,11 +23,11 @@ interface Toast {
 /** Notification toasts (bottom-left, as in the reference) plus the
  *  MATCH FOUND sheet, which is our layer and plays a chime. */
 export function Toaster({ people }: { people: Directory }) {
-  const { viewerId } = useLive();
+  const { viewerId, serverNow } = useLive();
   const pathname = usePathname();
   const router = useRouter();
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [match, setMatch] = useState<(PayloadOf<"match.found"> & { shownAt: number; sound: string }) | null>(null);
+  const [match, setMatch] = useState<(PayloadOf<"match.found"> & { shownAt: number; sound: string; vibrate: string }) | null>(null);
 
   const push = (t: Toast) => {
     setToasts((xs) => [...xs.filter((x) => x.id !== t.id), t].slice(-4));
@@ -38,9 +38,18 @@ export function Toaster({ people }: { people: Directory }) {
     if (pathname?.startsWith("/stage")) return; // the projector never shows a member's notifications
     switch (e.type) {
       case "match.found": {
-        const shownAt = Date.now();
-        setMatch({ ...e.payload, shownAt, sound: "pending" });
-        playChime().then((sound) => setMatch((m) => (m ? { ...m, sound } : m)));
+        const shownAt = serverNow(); // server clock, so phones with drifting clocks still report true lag
+        const buzz = vibrate();
+        const payload = e.payload;
+        setMatch({ ...payload, shownAt, sound: "pending", vibrate: buzz });
+        playChime().then((sound) => {
+          setMatch((m) => (m ? { ...m, sound } : m));
+          fetch("/api/phones/ack", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ partyId: payload.partyId, shownAt, sound, vibrate: buzz }),
+          }).catch(() => {});
+        });
         router.refresh();
         break;
       }
@@ -113,6 +122,7 @@ export function Toaster({ people }: { people: Directory }) {
             data-locked-at={match.lockedAt}
             data-shown-at={match.shownAt}
             data-sound={match.sound}
+            data-vibrate={match.vibrate}
             className="match-pop w-full max-w-[420px] overflow-hidden rounded-[12px] bg-white shadow-[var(--shadow-elevated)]"
           >
             <div className="bg-gradient-to-br from-[var(--color-pq)] to-[var(--color-pq-2)] px-6 pb-5 pt-6 text-white">
