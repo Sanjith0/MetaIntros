@@ -396,7 +396,7 @@ was written, so inferred values stay inferred until a new capture supports a cha
 
 - Only through a pull request labelled `contract-change` (and `design`), because every interface
   pull request builds on it.
-- Before opening it, ask every open pull request that touches `app/` or `components/`:
+- When you open it, ask every open pull request that touches `app/` or `components/`, linking it:
   `scripts/board ask --to '#N' --read "<the DESIGN.md diff>" --default "<what happens to their
   screens if they don't answer>" "<question>"`.
 - Change a token value only when a new capture supports it, and update its [seen]/[inferred] label
