@@ -1,34 +1,94 @@
-# Queue Up — go to events with a squad, not alone
+<p align="center">
+  <img src="docs/readme/hero.svg" alt="Queue Up: go to events with a squad, not alone. AI Companions powered by Muse match you into a squad for Facebook Events and plan the hangout." width="100%">
+</p>
 
-**Queue Up** is a feature inside Facebook Events. It has three ways in, which run as separate queues:
+<p align="center">
+  <img alt="Muse Model API" src="https://img.shields.io/badge/AI-Muse%20Model%20API-0866ff?style=flat-square&labelColor=050505&logo=meta&logoColor=white">
+  <img alt="Next.js 15" src="https://img.shields.io/badge/Next.js-15-0866ff?style=flat-square&labelColor=050505&logo=nextdotjs&logoColor=white">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19-0866ff?style=flat-square&labelColor=050505&logo=react&logoColor=white">
+  <img alt="Tailwind CSS 4" src="https://img.shields.io/badge/Tailwind-4-0866ff?style=flat-square&labelColor=050505&logo=tailwindcss&logoColor=white">
+  <img alt="Prisma and SQLite" src="https://img.shields.io/badge/Prisma-SQLite-0866ff?style=flat-square&labelColor=050505&logo=prisma&logoColor=white">
+  <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-0866ff?style=flat-square&labelColor=050505&logo=expo&logoColor=white">
+  <img alt="Tests: Vitest and Playwright" src="https://img.shields.io/badge/tests-Vitest%20%2B%20Playwright-31a24c?style=flat-square&labelColor=050505&logo=vitest&logoColor=white">
+</p>
 
-| Queue | Where you start it | What you get |
-|---|---|---|
-| **This event** | "Find a squad to go with" on an event page | A squad for that event |
-| **Any event** | Events tab → "Go with a squad" → *For any event this weekend* | A squad, plus an existing event you'll all like |
-| **New hangout** | Events tab → "Go with a squad" → *For a new hangout* | A squad, plus a brand-new hangout at a public spot near all of you, at a time you're all free |
+<p align="center">
+  <a href="#quick-start"><b>Quick start</b></a> &nbsp;·&nbsp;
+  <a href="#live-demo-with-judges-phones"><b>Live demo</b></a> &nbsp;·&nbsp;
+  <a href="#how-a-squad-forms"><b>How a squad forms</b></a> &nbsp;·&nbsp;
+  <a href="#safety-and-privacy-by-design"><b>Safety</b></a> &nbsp;·&nbsp;
+  <a href="#the-mobile-app-with-glance"><b>Mobile app</b></a>
+</p>
 
-The phone UI reads as the Facebook mobile app with Queue Up as a native layer in the Events tab (see `DESIGN.md`, `PRODUCT.md`). It's a hackathon prototype: no Meta logos or fonts, a "Hackathon prototype, not Facebook" label on every screen, `noindex`, seeded data only.
+<br>
 
-Hangout queuers only ever match other hangout queuers. Inside the existing-events queue, "any event" queuers can join someone who queued from a specific event, and then go to that event. Two different specific events never mix.
+**Queue Up** is a feature inside Facebook Events for everyone who skips an event because nobody they know is going. You queue like a ranked game, and AI Companions powered by **Muse** match you into a small **squad** of people near you who'll get along. The squad gets a short-lived chat with an **AI host**, **talk cards** to break the ice, help to **find each other** at the venue, and a way to stay friends afterwards if both people want to.
 
-Whichever queue you pick, Queue Up then:
+Built for Meta's *Closer Together AI Hackathon*. It's a prototype with seeded data only: no Meta logos or fonts, a "Hackathon prototype, not Facebook" label on every screen, `noindex`, and it never calls, scrapes or logs in to Facebook.
 
-1. Builds your taste profile from your (mocked) Facebook data.
-2. Queues you with nearby people, like a ranked game queue.
-3. Forms a compatible **squad** of 4–6 strangers (the engine supports 2–8; the UI offers 4, 5 or 6). An AI agent picks the event, or plans the hangout.
-4. Opens a temporary squad chat with an **AI host**.
-5. Gives you **talk cards**: grounded icebreakers for each squadmate.
-6. Helps you find each other at the venue.
-7. After the event, lets you add each other as friends, but only if both of you say yes.
+<br>
 
-Built for Meta's *Closer Together AI Hackathon*. The model behind every LLM call is **Muse** (Meta Model API).
-
-![screens](docs/screens/after/21-squad-found.png)
+<table>
+  <tr>
+    <td align="center" width="20%"><img src="docs/screens/after/20-queue-filling.png" alt="Queue filling with a widening search" width="140"><br><sub><b>Slots fill like a game queue</b></sub></td>
+    <td align="center" width="20%"><img src="docs/screens/after/21-squad-found.png" alt="Your squad is ready" width="140"><br><sub><b>Your squad is ready</b></sub></td>
+    <td align="center" width="20%"><img src="docs/screens/after/23-squad-chat.png" alt="Squad chat with the AI host" width="140"><br><sub><b>Squad chat with an AI host</b></sub></td>
+    <td align="center" width="20%"><img src="docs/screens/after/25-talk-cards.png" alt="Talk cards for each squadmate" width="140"><br><sub><b>Talk cards</b></sub></td>
+    <td align="center" width="20%"><img src="docs/screens/after/29-connect.png" alt="Add each other as friends after the event" width="140"><br><sub><b>Stay in touch</b></sub></td>
+  </tr>
+</table>
 
 ---
 
-## Setup
+## <img src="docs/readme/icons/queue.svg" width="32" align="center" alt=""> &nbsp;Three ways in
+
+Each way in runs as its own queue.
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <img src="docs/readme/icons/calendar.svg" width="40" alt=""><br>
+      <b>This event</b><br>
+      <sub>Start from "Find a squad to go with" on an event page. You get a squad for that event.</sub>
+    </td>
+    <td width="33%" valign="top">
+      <img src="docs/readme/icons/people.svg" width="40" alt=""><br>
+      <b>Any event this weekend</b><br>
+      <sub>Events tab, then "Go with a squad". You get a squad, plus an existing event you'll all like.</sub>
+    </td>
+    <td width="33%" valign="top">
+      <img src="docs/readme/icons/map.svg" width="40" alt=""><br>
+      <b>New hangout</b><br>
+      <sub>Events tab, then "Go with a squad". You get a squad, plus a brand-new hangout at a public spot near all of you, at a time you're all free.</sub>
+    </td>
+  </tr>
+</table>
+
+Hangout queuers only ever match other hangout queuers. Inside the existing-events queue, "any event" queuers can join someone who queued from a specific event and go to that event. Two different specific events never mix.
+
+## <img src="docs/readme/icons/play.svg" width="32" align="center" alt=""> &nbsp;What happens next
+
+<table>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/readme/icons/chip.svg" width="28" align="left" alt="">&nbsp;<b>Taste profile.</b> Built from your (mocked) Facebook data.</td>
+    <td width="50%" valign="top"><img src="docs/readme/icons/queue.svg" width="28" align="left" alt="">&nbsp;<b>Queue.</b> You queue with nearby people, like a ranked game queue.</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/readme/icons/people.svg" width="28" align="left" alt="">&nbsp;<b>Squad.</b> Your Companion helps form a compatible squad of 4 to 6 strangers (the engine supports 2 to 8). An AI agent picks the event, or plans the hangout.</td>
+    <td valign="top"><img src="docs/readme/icons/chat.svg" width="28" align="left" alt="">&nbsp;<b>Squad chat.</b> A temporary chat opens with an <b>AI host</b> who breaks the ice.</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/readme/icons/cards.svg" width="28" align="left" alt="">&nbsp;<b>Talk cards.</b> Grounded openers for each squadmate, every claim cited.</td>
+    <td valign="top"><img src="docs/readme/icons/pin.svg" width="28" align="left" alt="">&nbsp;<b>Find each other.</b> Meet at the venue with check-ins and an opt-in "find me" photo.</td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="top"><img src="docs/readme/icons/handshake.svg" width="28" align="left" alt="">&nbsp;<b>Stay in touch.</b> After the event, add each other as friends, only if both of you say yes. The friendship is marked "Met through Queue Up".</td>
+  </tr>
+</table>
+
+---
+
+## <img src="docs/readme/icons/terminal.svg" width="32" align="center" alt=""> &nbsp;Quick start
 
 ```bash
 pnpm install                 # Node 20+, pnpm 10
@@ -78,7 +138,35 @@ The app runs on a single clock: real time plus a demo offset that only ever move
 
 ---
 
-## Architecture
+## <img src="docs/readme/icons/phone.svg" width="32" align="center" alt=""> &nbsp;The mobile app, with Glance
+
+<p align="center">
+  <img src="docs/readme/expo-app.png" alt="The Expo app: your squad is ready, the squad chat with the AI host, and joining with Glance" width="88%">
+</p>
+
+[`mobile/`](mobile/) is an Expo (SDK 58) app that carries every Queue Up screen across and has **Glance** built in. It talks to the Queue Up server through `/api/m/*`, and its web build can be deployed to Vercel with `mobile/scripts/deploy-vercel.sh`, which forwards `/api` and `/images` to a running Queue Up server.
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/readme/icons/glasses.svg" width="40" alt=""><br>
+      <b>Glance</b><br>
+      <sub>Meet in person and keep the conversation, not just the contact. LIVE Camera recognizes squadmates who opted in, a two-hand gesture finishes the conversation, and both people get the same Muse-written recap inside a shared chat. A separate SwiftUI client uses Ray-Ban Meta glasses as the camera.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/readme/icons/terminal.svg" width="40" alt=""><br>
+      <b>Run it</b><br>
+      <sub><code>cd mobile && npm ci && npm run web</code> starts the labelled sample walkthrough. Setup, the live backend, the iPhone app and the glasses build are in <a href="mobile/README.md">mobile/README.md</a>.</sub>
+    </td>
+  </tr>
+</table>
+
+---
+
+## <img src="docs/readme/icons/chip.svg" width="32" align="center" alt=""> &nbsp;How a squad forms
+
+<details>
+<summary><b>Architecture diagram</b></summary>
 
 ```mermaid
 flowchart LR
@@ -148,7 +236,12 @@ flowchart LR
   API --> BUS
 ```
 
-**Pipeline when a squad forms:**
+</details>
+
+Every person in the queue gets a **Companion**, a Muse agent that knows only its own person. Companions talk to each other in small circles, propose squads, deliberate and sign off, and an **Orchestrator** forms squads from the people they chose. Code checks every line they write and re-checks every squad for safety. Then the **Event Selection Agent** or **Hangout Planner Agent** picks where to go, the **AI host** opens the squad chat, and the **Talk Cards Agent** writes the openers. Every step streams to the "How we matched you" panel.
+
+<details>
+<summary><b>The full pipeline, step by step</b></summary>
 
 1. **The room.** Code gathers everyone in the queue who could be matched with you: same queue and event, same squad size, within the search radius, allowed by the safety rules (up to 30 people).
 2. **The Companion engine decides who goes together** (`lib/companion`). Every person has a **Companion** agent that knows only its own person:
@@ -173,7 +266,10 @@ flowchart LR
 7. The **Companions' conversations** between squadmates feed the **talk cards** and are shown on the cards screen, labeled as AI.
 8. Every step is written to `AgentTrace` and streamed to the "How we matched you" panel.
 
-**Code map:**
+</details>
+
+<details>
+<summary><b>Code map</b></summary>
 
 | path | what |
 |---|---|
@@ -186,23 +282,38 @@ flowchart LR
 | `lib/server` | DB services (queue, pipeline, chats, host, expiry, friending, demo) |
 | `app/` | UI and API routes |
 | `components/fb` | Facebook-style primitives (TopBar, TabBar, Sheet, ListRow, Bubble…) on the tokens in `app/globals.css` |
+| `mobile/` | the Expo app with Glance built in (see [mobile/README.md](mobile/README.md)) |
 | `tests/unit` | Vitest (`pnpm test`; includes a design-token guard) |
 | `tests/e2e` | Playwright (iPhone viewport, production build, network disabled; `E2E_PORT` if 3100 is taken) |
 
----
-
-## How it maps to the rubric
-
-| Criterion | Where it shows |
-|---|---|
-| **AI integration** | A multi-agent **Companion engine** plus four single-call agents, all behind one Muse adapter. Every person has a **Companion** that talks to the others in its circle, proposes a squad, deliberates and signs off; an **Orchestrator** draws the circles and forms the squads; code checks every line and re-checks every squad. **Event Selection Agent** picks from code-verified events, with runner-ups and reasons. **AI host** writes a welcome plus an icebreaker grounded in a real shared interest, then replies to @mentions. **Talk Cards Agent** writes openers from source-cited facts. The streaming **"How we matched you"** trace makes the agents' reasoning visible. |
-| **Product thinking & user impact** | Going alone is the barrier, so the squad is the product. Safety is designed in from the first screen. Party size works like a game mode. Expiring chats keep it low-pressure. Mutual-consent friending turns one night into lasting connections. "Met through Queue Up" closes the loop inside Facebook. Live sign-up plus Live/Mixed modes show it working with real people in the room. |
-| **Execution & demo** | `/demo` panel: one-click reset, fill modes, QR join, AI cache toggle, live queue view. The full 10-step script is an automated E2E that runs in about 30s. It also runs with the network disabled. iPhone screenshots of every screen are in `docs/screens/after/` (before the Facebook-shell rework: `docs/screens/before/`). |
-| **Originality & cohesion** | A game-style queue (timer, slots filling, widening search, one loud "Your squad is ready" moment) drawn in Facebook's own materials, mapped onto real-world social anxiety. It reads as native Facebook Events, Messenger and Friends. One data model runs from Graph-shaped data through to the friendship edge, with the event recorded on it. |
+</details>
 
 ---
 
-## Safety & privacy by design
+## <img src="docs/readme/icons/trophy.svg" width="32" align="center" alt=""> &nbsp;How it maps to the rubric
+
+<table>
+  <tr>
+    <td width="30%" valign="top"><img src="docs/readme/icons/chip.svg" width="28" align="left" alt="">&nbsp;<b>AI integration</b></td>
+    <td valign="top">A multi-agent <b>Companion engine</b> plus four single-call agents, all behind one Muse adapter. Every person has a <b>Companion</b> that talks to the others in its circle, proposes a squad, deliberates and signs off; an <b>Orchestrator</b> draws the circles and forms the squads; code checks every line and re-checks every squad. The <b>Event Selection Agent</b> picks from code-verified events, with runner-ups and reasons. The <b>AI host</b> writes a welcome plus an icebreaker grounded in a real shared interest, then replies to @mentions. The <b>Talk Cards Agent</b> writes openers from source-cited facts. The streaming <b>"How we matched you"</b> trace makes the agents' reasoning visible.</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/readme/icons/people.svg" width="28" align="left" alt="">&nbsp;<b>Product thinking and user impact</b></td>
+    <td valign="top">Going alone is the barrier, so the squad is the product. Safety is designed in from the first screen. Party size works like a game mode. Expiring chats keep it low-pressure. Mutual-consent friending turns one night into lasting connections. "Met through Queue Up" closes the loop inside Facebook. Live sign-up plus Live and Mixed modes show it working with real people in the room.</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/readme/icons/play.svg" width="28" align="left" alt="">&nbsp;<b>Execution and demo</b></td>
+    <td valign="top">The <code>/demo</code> panel: one-click reset, fill modes, QR join, AI cache toggle, live queue view. The full 10-step script is an automated E2E that runs in about 30s, with the network disabled. iPhone screenshots of every screen are in <a href="docs/screens/after/"><code>docs/screens/after/</code></a> (before the Facebook-shell rework: <a href="docs/screens/before/"><code>docs/screens/before/</code></a>).</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/readme/icons/queue.svg" width="28" align="left" alt="">&nbsp;<b>Originality and cohesion</b></td>
+    <td valign="top">A game-style queue (timer, slots filling, widening search, one loud "Your squad is ready" moment) drawn in Facebook's own materials, mapped onto real-world social anxiety. It reads as native Facebook Events, Messenger and Friends. One data model runs from Graph-shaped data through to the friendship edge, with the event recorded on it.</td>
+  </tr>
+</table>
+
+---
+
+## <img src="docs/readme/icons/shield.svg" width="32" align="center" alt=""> &nbsp;Safety and privacy by design
 
 All of these are enforced **in code**, with property-based tests. An agent can propose; code decides.
 
@@ -225,7 +336,7 @@ All of these are enforced **in code**, with property-based tests. An agent can p
 
 ---
 
-## Testing
+## <img src="docs/readme/icons/flask.svg" width="32" align="center" alt=""> &nbsp;Testing
 
 ```bash
 pnpm test        # typecheck + lint + Vitest (unit, integration, property-based)
@@ -234,23 +345,9 @@ pnpm test:all
 ```
 
 - **Property-based tests (fast-check).** Random queues, including minors, women-only users, blocks, every party size and every fill mode, always satisfy the safety invariants. That includes when a malicious agent picks the group. Event picks are always public, inside everyone's free time, and free of anything a member dislikes.
-- **E2E coverage:**
-  - every tab
-  - feed filtering
-  - live sign-up on two phones
-  - GPS and manual queueing
-  - a 3-person live party
-  - realtime chat between two clients
-  - squad chat with badges
-  - host welcome
-  - talk cards
-  - check-ins and photo privacy
-  - expiry
-  - friending
-  - the full scripted demo
-  - the screenshot sweep
+- **E2E coverage:** every tab, feed filtering, live sign-up on two phones, GPS and manual queueing, a 3-person live party, realtime chat between two clients, squad chat with badges, host welcome, talk cards, check-ins and photo privacy, expiry, friending, the full scripted demo, and the screenshot sweep.
 
-## Synthetic data
+## <img src="docs/readme/icons/database.svg" width="32" align="center" alt=""> &nbsp;Synthetic data
 
 There is no real Facebook data. `scripts/gen-personas.ts` deterministically generates 80 Graph-API-shaped personas aged 18–30 around Menlo Park, Palo Alto, Stanford and Redwood City:
 
@@ -260,3 +357,10 @@ There is no real Facebook data. `scripts/gen-personas.ts` deterministically gene
 - Seeded blocks.
 
 `MockGraphSource` can be swapped for a real Graph API client.
+
+<br>
+
+<p align="center">
+  <sub>Hackathon prototype, not Facebook. Built for Meta's Closer Together AI Hackathon, November 2026.<br>
+  Design rules: <a href="DESIGN.md">DESIGN.md</a> · Words and voice: <a href="PRODUCT.md">PRODUCT.md</a> · Working here: <a href="AGENTS.md">AGENTS.md</a></sub>
+</p>
