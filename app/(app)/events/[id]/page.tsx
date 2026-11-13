@@ -16,6 +16,8 @@ import { getCurrentUserId } from "@/lib/server/session";
 import { now } from "@/lib/server/clock";
 import { getStatusCard } from "@/lib/server/status";
 import { pulseLine, queuePulse } from "@/lib/server/pulse";
+import { GlanceJoin } from "@/components/glance/GlanceJoin";
+import { glanceJoinUrl } from "@/lib/glance";
 
 function DetailRow({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -41,6 +43,8 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
     getCurrentUser(),
   ]);
   const friendsGoing = e.friendRsvps.filter((f) => f.status === "going").length;
+  // Hangouts are private to a squad, so they are never offered to another app.
+  const glanceHref = hangout ? null : glanceJoinUrl({ id: e.id, title: e.title, venueName: e.venueName }, me.name);
 
   return (
     <div data-testid="event-detail">
@@ -92,6 +96,8 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
         )}
 
         {!hangout && <FriendQueues queues={friendQueues} variant="list" nowMs={t.getTime()} eventTitle={e.title} />}
+
+        {glanceHref && <GlanceJoin href={glanceHref} />}
 
         <Section title="Details">
           <ul>
