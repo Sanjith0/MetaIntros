@@ -64,6 +64,8 @@ export default function GlanceEmbed() {
           : HAS_HOTSPOT ? 'the glasses connected, but their video link did not start. Video goes over the glasses\' Wi-Fi: check Wi-Fi is on, keep the glasses close, and retry'
           : 'the glasses connected, but their video link did not start. Video goes over the glasses\' Wi-Fi, which this build of Link cannot join without Apple\'s Hotspot permission (needs a paid Apple developer team; see mobile/docs/GLASSES.md)';
         run(`window.__linkGlassesStatus = ${JSON.stringify(status)}`);
+        // While the camera starts, the page shows each step the glasses report ("Looking for your glasses…", "Trying again (2 of 3)…").
+        run(`window.__glanceGlassesCamera && window.__glanceGlassesCamera.status && window.__glanceGlassesCamera.status(${JSON.stringify(state.status)})`);
       }),
       glasses.addListener('onFailure', ({ message }) => run(`window.__glanceGlassesCamera && window.__glanceGlassesCamera.failed(${JSON.stringify(message)})`)),
       glasses.addListener('onPause', ({ paused }) => run(`window.__glanceGlassesCamera && window.__glanceGlassesCamera.paused && window.__glanceGlassesCamera.paused(${paused ? 'true' : 'false'})`)),
