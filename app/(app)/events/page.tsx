@@ -9,7 +9,8 @@ import { getCurrentUser } from "@/lib/server/session";
 import { FEED_TABS, getFeed, type FeedTab } from "@/lib/server/events";
 import { getCurrentUserId } from "@/lib/server/session";
 import { now } from "@/lib/server/clock";
-import { squadEventIds } from "@/lib/server/squads";
+import { listActiveSquads, squadEventIds } from "@/lib/server/squads";
+import { MySquads } from "@/components/queueup/MySquads";
 import { getStatusCard } from "@/lib/server/status";
 import { pulseLine, queuePulse } from "@/lib/server/pulse";
 import { prisma } from "@/lib/db";
@@ -19,7 +20,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
   const tab = (FEED_TABS.some((t) => t.id === sp.tab) ? sp.tab : "foryou") as FeedTab;
   const userId = await getCurrentUserId();
   const t = await now();
-  const [feed, squads, card, pulse, upcoming, landmarks, friendQueues, me] = await Promise.all([
+  const [feed, squads, card, pulse, upcoming, landmarks, friendQueues, me, mySquads] = await Promise.all([
     getFeed(userId, tab, t),
     squadEventIds(userId),
     getStatusCard(userId, t),
@@ -28,7 +29,14 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
     prisma.landmark.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, city: true } }),
     listFriendQueues(userId),
     getCurrentUser(),
+    listActiveSquads(userId),
   ]);
+  // Queuing again would replace a queue you're in or skip a ready check, so the entry waits until those are done.
+  // With a squad on, it stays (grey): you can be in more than one squad.
+  const showEntry = !card || card.state === "ready" || card.state === "venue" || card.state === "after";
+  // The status card shows one squad; list them all when it can't cover every squad you're in.
+  const carded = card && "partyId" in card && card.state !== "accept" ? card.partyId : null;
+  const showSquads = mySquads.some((s) => s.partyId !== carded);
   // "An event you pick": public events, the ones you're interested in first (Jordan's story).
   const pickable = upcoming
     .filter((e) => e.isPublicVenue)
@@ -52,9 +60,18 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
         </div>
 
         {card && <StatusCard card={card} />}
-        {/* Before/at the event the squad card is the one thing to do; once it's over, you can queue again. */}
-        {(!card || card.state === "after") && (
-          <QueueEntry pulse={pulseLine(pulse)} events={pickable} landmarks={landmarks} shareDefault={me.queueVisibility === "friends"} again={card?.state === "after"} autoOpen={sp.queue === "1"} />
+        {showSquads && <MySquads squads={mySquads} />}
+        {/* The squad card keeps the one primary action; under it, queuing for another squad is grey. */}
+        {showEntry && (
+          <QueueEntry
+            pulse={pulseLine(pulse)}
+            events={pickable}
+            landmarks={landmarks}
+            shareDefault={me.queueVisibility === "friends"}
+            again={card?.state === "after"}
+            also={card?.state === "ready" || card?.state === "venue"}
+            autoOpen={sp.queue === "1"}
+          />
         )}
 
         <FriendQueues queues={friendQueues} nowMs={t.getTime()} />
