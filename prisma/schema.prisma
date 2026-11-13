@@ -35,10 +35,6 @@ model User {
   neighborhood   String?
   /// "seed" | "gps" | "manual"
   locationSource String   @default("seed")
-  /// "off" | "friends": whether friends can see the queues you're in (opt-in, default off)
-  queueVisibility        String    @default("off")
-  /// set the first time we asked, so the queue setup prompt shows once
-  queueVisibilityAskedAt DateTime?
   /// Seed cluster label (debug/tests only; never shown to users)
   cluster        String?
   /// Raw Graph-API-shaped payload this user's profile was built from
@@ -216,12 +212,6 @@ model QueueEntry {
   matchedAt        DateTime?
   partyId          String?
   party            Party?    @relation(fields: [partyId], references: [id], onDelete: SetNull)
-  /// snapshot at join: friends can see this queue (see lib/match/queueVisibility.ts)
-  visibleToFriends Boolean   @default(false)
-  /// set when you joined from a friend's "Queue up too"
-  viaFriendId      String?
-  /// demo only: a seeded friend's entry the matcher skips until a real person joins the same queue
-  parked           Boolean   @default(false)
 
   @@index([status])
 }

@@ -13,7 +13,6 @@ const Body = z.object({
   lng: z.number().optional(),
   landmarkId: z.string().optional(),
   locationSource: z.enum(["gps", "manual", "seed"]).default("manual"),
-  visibleToFriends: z.boolean().optional(),
 });
 
 export async function POST(req: Request) {

@@ -55,7 +55,3 @@ export function normalizePair(a: string, b: string): [string, string] {
   if (a === b) throw new Error("Cannot pair a user with themselves");
   return a < b ? [a, b] : [b, a];
 }
-
-/** Who can see the queues you're in. Opt-in: "off" until you turn it on. */
-export const QueueVisibility = z.enum(["off", "friends"]);
-export type QueueVisibility = z.infer<typeof QueueVisibility>;

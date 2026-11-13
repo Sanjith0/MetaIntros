@@ -26,7 +26,7 @@ test("badges appear for new activity and clear when the tab is opened", async ({
   await expect(page.getByTestId("badge-chats")).toBeVisible();
   await expect(page.getByTestId("badge-friends")).toHaveText("1");
 
-  await expect(page.getByTestId("badge-notifications")).toHaveText("4"); // the pending friend request + 3 friends queuing
+  await expect(page.getByTestId("badge-notifications")).toHaveText("1"); // the pending friend request
   await page.getByTestId("open-chats").click();
   await expect(page.getByTestId("chats-page")).toBeVisible();
   await page.getByTestId("tab-notifications").click();

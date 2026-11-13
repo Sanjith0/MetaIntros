@@ -2,7 +2,6 @@ import { Briefcase, MapPin, Pencil, Users } from "lucide-react";
 import { TopBar } from "@/components/fb/TopBar";
 import { Avatar, Button, ListRow, IconCircle, Section, Stack } from "@/components/fb";
 import { DeleteMe } from "@/components/profile/DeleteMe";
-import { QueueVisibilityToggle } from "@/components/profile/QueueVisibilityToggle";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/server/session";
 import { VOCAB_BY_TAG } from "@/lib/graph/vocabulary";
@@ -34,9 +33,6 @@ export default async function ProfilePage() {
           <ListRow leading={<IconCircle><MapPin size={18} /></IconCircle>} title={`Lives in ${me.neighborhood ?? "the Bay Area"}`} />
           <ListRow leading={<IconCircle><Briefcase size={18} /></IconCircle>} title={`Age ${me.ageBand}`} />
           <ListRow leading={<IconCircle><Users size={18} /></IconCircle>} title={`${squads} Queue Up squad${squads === 1 ? "" : "s"}`} href="/friends?tab=queueup" />
-        </Section>
-        <Section title="Queue Up privacy" flush>
-          <QueueVisibilityToggle initial={me.queueVisibility === "friends"} />
         </Section>
         <Section title="Interests">
           <ul className="flex flex-wrap gap-2">
