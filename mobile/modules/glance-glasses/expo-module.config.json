@@ -1,0 +1,8 @@
+{
+  "platforms": ["apple"],
+  "apple": {
+    "modules": ["GlanceGlassesModule"],
+    "appDelegateSubscribers": ["GlanceGlassesAppDelegate"],
+    "podspecPath": ["ios/GlanceGlasses.podspec"]
+  }
+}
