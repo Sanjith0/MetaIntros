@@ -62,36 +62,17 @@ export async function partyFormationAgent(p: Proposal, people: Map<string, Perso
     return r;
   });
 
-  // Queue with friends: name who came together (only added when someone did, so solo prompts are unchanged).
-  const cameWith = (c: Candidate, u: string) => {
-    const g = c.cameTogether?.[u];
-    return g ? c.userIds.filter((x) => x !== u && c.cameTogether?.[x] === g).map((x) => firstName(people.get(x)!)) : [];
-  };
   const options = p.candidates.map((c, i) => ({
     group: letter(i),
-    members: c.userIds
-      .map((u) => ({ ...publicProfile(people.get(u)!), u }))
-      .map(({ name, topInterests, socialStyle, u }) => ({ name, topInterests, socialStyle, ...(c.cameTogether?.[u] ? { cameWith: cameWith(c, u) } : {}) })),
+    members: c.userIds.map((u) => publicProfile(people.get(u)!)).map(({ name, topInterests, socialStyle }) => ({ name, topInterests, socialStyle })),
     score: scored[i],
     safe: safety[i].ok,
   }));
-  const friends = p.candidates[0]?.cameTogether ? [...new Set(Object.keys(p.candidates[0].cameTogether))] : [];
-  if (friends.length) {
-    steps.push({
-      agent: AGENT, kind: "tool_call", toolName: "keepFriendsTogether", input: { friends },
-      output: { friends: friends.map((u) => firstName(people.get(u)!)), openSlots: p.targetSize - friends.length },
-      summary: `Kept ${friends.map((u) => firstName(people.get(u)!)).join(" and ")} together (they queued as friends); looked for ${p.targetSize - friends.length} new ${p.targetSize - friends.length === 1 ? "person" : "people"} who fit all of them`,
-    });
-  }
 
   const ai = await runAi({
     task: "party_formation",
     system:
-      "You are the Party Formation Agent inside Facebook Events' Queue Up feature. You pick which candidate group of strangers should go to an event together. Prefer groups where everyone has something in common with everyone else (high weakest-pair score) over a high average. Never pick a group marked safe=false. Never mention or infer politics, religion, health or sexuality." +
-      (friends.length
-        ? " Members with a cameWith list queued together as friends and stay together in every option; judge how well the new people fit the friends and each other, and avoid options where a new person has little in common with anyone."
-        : "") +
-      " Reply with JSON only: {\"choice\": <index of group, 0-based>, \"rationale\": \"<max 2 friendly sentences addressed to the group, citing concrete shared interests>\"}.",
+      "You are the Party Formation Agent inside Facebook Events' Queue Up feature. You pick which candidate group of strangers should go to an event together. Prefer groups where everyone has something in common with everyone else (high weakest-pair score) over a high average. Never pick a group marked safe=false. Never mention or infer politics, religion, health or sexuality. Reply with JSON only: {\"choice\": <index of group, 0-based>, \"rationale\": \"<max 2 friendly sentences addressed to the group, citing concrete shared interests>\"}.",
     user: JSON.stringify({ partySize: p.targetSize, candidates: options }),
     schema: Decision,
     fallback: () => ({ choice: 0, rationale: templateRationale(p.candidates[0]) }),

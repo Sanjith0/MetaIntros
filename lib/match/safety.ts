@@ -2,7 +2,7 @@
  * Hard safety rules. These are enforced in code and are NEVER relaxed by search widening,
  * and are re-checked after any LLM agent proposes a group or event.
  */
-import { MAX_PARTY_SIZE, MIN_PARTY_SIZE, matchBand } from "@/lib/domain/enums";
+import { MAX_PARTY_SIZE, MIN_PARTY_SIZE } from "@/lib/domain/enums";
 
 export interface SafetySubject {
   id: string;
@@ -28,7 +28,7 @@ export type Violation =
 /** Can these two people ever be in the same party? */
 export function pairAllowed(a: SafetySubject, b: SafetySubject): boolean {
   if (a.id === b.id) return false;
-  if (matchBand(a.ageBand) !== matchBand(b.ageBand)) return false; // minors never with adults; all adults (18+) are one group
+  if (a.ageBand !== b.ageBand) return false; // minors never with adults; bands never mix
   if (a.blocked.has(b.id) || b.blocked.has(a.id)) return false;
   if (a.womenOnlyParty && b.gender !== "woman") return false;
   if (b.womenOnlyParty && a.gender !== "woman") return false;
@@ -46,7 +46,7 @@ export function validateParty(members: SafetySubject[], event?: VenueLike | null
     if (ids.has(m.id)) v.push({ rule: "duplicate", detail: `${m.id} appears twice` });
     ids.add(m.id);
   }
-  const bands = new Set(members.map((m) => matchBand(m.ageBand)));
+  const bands = new Set(members.map((m) => m.ageBand));
   if (bands.size > 1) v.push({ rule: "age_band", detail: `mixed age bands: ${[...bands].sort().join(", ")}` });
   if (members.some((m) => m.womenOnlyParty)) {
     const notWomen = members.filter((m) => m.gender !== "woman");

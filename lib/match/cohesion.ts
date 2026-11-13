@@ -21,25 +21,13 @@ const FULL_WINDOW_MIN = 180;
 
 type Scorer = (a: CompatInput, b: CompatInput) => CompatResult;
 
-/**
- * Cohesion of a candidate group of 2–8. Penalizes outliers via the min pairwise term.
- *
- * `cameTogether` maps a member id to the id of the friends they queued with (queue with friends).
- * Pairs that came together are skipped in the pairwise terms: they picked each other, so their
- * own overlap must never hold their squad back. Every pair across that line still counts, so each
- * newcomer has to fit every friend. Shared tags and time windows still use everyone.
- */
-export function groupCohesion(members: CompatInput[], score: Scorer = compatibility, cameTogether?: Map<string, string>): CohesionResult {
+/** Cohesion of a candidate group of 2–8. Penalizes outliers via the min pairwise term. */
+export function groupCohesion(members: CompatInput[], score: Scorer = compatibility): CohesionResult {
   if (members.length < 2) throw new Error("A group needs at least 2 members");
-  const together = (a: string, b: string) => {
-    const ga = cameTogether?.get(a);
-    return ga != null && ga === cameTogether?.get(b);
-  };
   const per = new Map<string, number[]>(members.map((m) => [m.id, []]));
   let sum = 0, n = 0, min = 1;
   for (let i = 0; i < members.length; i++) {
     for (let j = i + 1; j < members.length; j++) {
-      if (together(members[i].id, members[j].id)) continue;
       const s = score(members[i], members[j]).score;
       sum += s;
       n++;
@@ -48,10 +36,9 @@ export function groupCohesion(members: CompatInput[], score: Scorer = compatibil
       per.get(members[j].id)!.push(s);
     }
   }
-  // Everyone came together (no newcomer): nothing to judge pairwise, so the pair terms are neutral.
-  const avg = n ? sum / n : 1;
+  const avg = sum / n;
   const weakest = [...per.entries()]
-    .map(([id, xs]) => [id, xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 1] as const)
+    .map(([id, xs]) => [id, xs.reduce((a, b) => a + b, 0) / xs.length] as const)
     .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))[0][0];
 
   const sharedWindows = commonWindows(members.map((m) => m.profile.availability));

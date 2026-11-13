@@ -72,7 +72,7 @@ export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {})
       // children first
       for (const m of [
         "agentTrace", "preChat", "talkCard", "chatMessage", "chatMember", "chat", "friendRequest",
-        "partyMember", "queueEntry", "queueGroupMember", "queueGroup", "party", "eventRsvp", "friendship", "event", "landmark", "block",
+        "partyMember", "queueEntry", "party", "eventRsvp", "friendship", "event", "landmark", "block",
         "availability", "tasteProfile", "deviceSession", "user", "appSetting",
       ] as const) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

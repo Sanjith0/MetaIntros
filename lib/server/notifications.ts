@@ -1,13 +1,12 @@
 import { prisma } from "@/lib/db";
 import { fmtEventWhen } from "@/lib/format";
 import { listFriendQueues } from "./friendQueues";
-import { pendingInvites } from "./queueGroups";
 
 /**
  * The Notifications tab, derived from data Queue Up already keeps (no new table): squads formed, chats
  * that ended, friend requests, friendships made through Queue Up, and upcoming events you're interested in.
  */
-export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue" | "queue_invite";
+export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue";
 
 export interface NotificationItem {
   id: string;
@@ -42,20 +41,6 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
   ]);
 
   const out: NotificationItem[] = [];
-  // Queue with friends: open invites to queue together.
-  for (const inv of await pendingInvites(userId)) {
-    const ev = inv.group.eventId ? await prisma.event.findUnique({ where: { id: inv.group.eventId }, select: { title: true } }) : null;
-    const what = inv.group.mode === "hangout" ? "a new hangout" : ev ? ev.title : "an event this weekend";
-    out.push({
-      id: `qinv-${inv.id}`,
-      kind: "queue_invite",
-      avatar: { name: inv.group.host.name, color: inv.group.host.avatarColor },
-      bold: inv.group.host.name,
-      text: `wants to find a squad with you for ${what}.`,
-      href: `/queue/friends/${inv.groupId}`,
-      at: inv.invitedAt,
-    });
-  }
   for (const m of memberships) {
     const p = m.party;
     if (!p.event) continue;
