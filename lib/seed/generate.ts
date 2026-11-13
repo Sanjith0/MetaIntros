@@ -5,6 +5,7 @@
 import { VOCAB_BY_TAG, type VocabEntry } from "@/lib/graph/vocabulary";
 import type { AvailabilityBlock, GraphUser } from "@/lib/graph/schema";
 import EVENTS_JSON from "@/data/seed/events.json";
+import PEOPLE_JSON from "@/data/seed/people.json";
 import { hashString, mulberry32, pick, randInt, sample, type Rng } from "@/lib/rng";
 
 export const ME_ID = "p01";
@@ -72,6 +73,19 @@ const FIRST_W = ["Maya", "Priya", "Sofia", "Emma", "Aisha", "Hana", "Chloe", "Zo
 const FIRST_M = ["Ethan", "Arjun", "Diego", "Noah", "Kenji", "Omar", "Lucas", "Mateo", "Ben", "Ravi", "Leo", "Sam", "Daniel", "Marcus", "Theo", "Ivan", "Jonah", "Kai", "Andre", "Felix", "Hugo", "Tomás", "Nikhil", "Owen", "Elijah", "Malik", "Rafael", "Wes", "Jin", "Caleb", "Aaron", "Dev", "Gabe", "Isaac", "Luis", "Milo", "Nate", "Oscar", "Reza", "Simon"];
 const FIRST_NB = ["River", "Avery", "Rowan", "Sage", "Quinn", "Ari", "Emerson", "Remy"];
 const LAST = ["Chen", "Patel", "Garcia", "Kim", "Nguyen", "Okafor", "Silva", "Cohen", "Tanaka", "Haddad", "Müller", "Rossi", "Kowalski", "Singh", "Martinez", "Johnson", "Park", "Ali", "Lopez", "Wong", "Novak", "Ibrahim", "Sato", "Reyes", "Brooks", "Shah", "Andersen", "Moreau", "Costa", "Yamamoto", "Hughes", "Mensah", "Dubois", "Rahman", "Ortiz", "Bauer", "Ferreira", "Lindqvist", "Adeyemi", "Castillo"];
+/** Hand-written fictional people, one per persona id. Names here replace the random draw. */
+export interface PersonSheet {
+  gender: "female" | "male" | "custom";
+  first: string;
+  last: string;
+  about: string;
+  work: string;
+  hometown: string;
+  traits: string[];
+  voice: string;
+}
+export const PEOPLE = PEOPLE_JSON as Record<string, PersonSheet>;
+
 const COLORS = ["#1877f2", "#e41e3f", "#f7b928", "#45bd62", "#7c3aed", "#f02849", "#2abba7", "#ff6f00", "#8b5cf6", "#0ea5e9", "#d946ef", "#14b8a6"];
 
 export interface GeneratedSeed {
@@ -193,6 +207,16 @@ export function generateAll(seed = 20261113): GeneratedSeed {
     });
   }
 
+  // Every persona is a hand-written person (data/seed/people.json). The random name draw above still
+  // runs so the RNG stream, and with it every like, friend and RSVP, stays exactly as it was.
+  for (const d of drafts) {
+    const p = PEOPLE[d.id];
+    if (!p) throw new Error(`data/seed/people.json has no entry for ${d.id}`);
+    if (p.gender !== d.gender) throw new Error(`data/seed/people.json: ${d.id} is ${d.gender}, not ${p.gender}`);
+    d.first = p.first;
+    d.last = p.last;
+  }
+
   // Plant sensitive likes on 8 personas (2 in indie-climb so the demo party exercises the filter).
   const sensitiveTags = ["sensitive-politics", "sensitive-religion", "sensitive-health", "sensitive-sexuality"];
   const plant = ["p03", "p06", "p18", "p25", "p33", "p41", "p52", "p60"];
@@ -290,6 +314,8 @@ export function generateAll(seed = 20261113): GeneratedSeed {
       x_not_interested: { data: notInterested },
       x_availability: { data: d.avail },
       x_preferences: { women_only_party: d.womenOnly },
+      about: PEOPLE[d.id].about,
+      x_profile: { work: PEOPLE[d.id].work, hometown: PEOPLE[d.id].hometown, traits: PEOPLE[d.id].traits, voice: PEOPLE[d.id].voice },
       x_cluster: d.cluster,
     };
   });

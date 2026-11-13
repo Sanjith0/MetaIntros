@@ -57,6 +57,19 @@ export const GraphUser = z.object({
   x_not_interested: edge(GraphPage),
   x_availability: edge(AvailabilityBlock),
   x_preferences: z.object({ women_only_party: z.boolean() }),
+  /** The person's own intro line (Graph `about`). Optional: live sign-ups have none. */
+  about: z.string().optional(),
+  /** Mock extension: profile details a person fills in on Facebook, plus how they come across. */
+  x_profile: z
+    .object({
+      work: z.string(),
+      hometown: z.string(),
+      /** three short personality words */
+      traits: z.array(z.string()),
+      /** how they talk and socialise, third person, no gendered pronouns */
+      voice: z.string(),
+    })
+    .optional(),
   /** Seed-only label used by tests; never shown in UI. */
   x_cluster: z.string().optional(),
 });

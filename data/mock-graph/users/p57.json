@@ -1,8 +1,8 @@
 {
   "id": "p57",
-  "name": "Aaron Castillo",
+  "name": "Aaron Mitchell",
   "first_name": "Aaron",
-  "last_name": "Castillo",
+  "last_name": "Mitchell",
   "birthday": "06/12/2001",
   "gender": "male",
   "location": {
@@ -112,15 +112,15 @@
       },
       {
         "id": "p54",
-        "name": "Owen Lindqvist"
+        "name": "Nils Lindqvist"
       },
       {
         "id": "p61",
-        "name": "Milo Chen"
+        "name": "Milo Brennan"
       },
       {
         "id": "p71",
-        "name": "Freya Sato"
+        "name": "Aiko Mori"
       }
     ],
     "summary": {
@@ -159,6 +159,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Hardware hacker, Hard Fork listener, occasional camper.",
+  "x_profile": {
+    "work": "Robotics engineer",
+    "hometown": "Pittsburgh, Pennsylvania",
+    "traits": [
+      "tinkerer",
+      "friendly",
+      "understated"
+    ],
+    "voice": "Aaron is understated and friendly, and lights up describing something they built."
   },
   "x_cluster": "builders"
 }

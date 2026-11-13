@@ -1,8 +1,8 @@
 {
   "id": "p53",
-  "name": "Nate Kim",
-  "first_name": "Nate",
-  "last_name": "Kim",
+  "name": "Tyler Han",
+  "first_name": "Tyler",
+  "last_name": "Han",
   "birthday": "06/01/2001",
   "gender": "male",
   "location": {
@@ -150,11 +150,11 @@
     "data": [
       {
         "id": "p32",
-        "name": "Noor Johnson"
+        "name": "Noor Siddiqui"
       },
       {
         "id": "p34",
-        "name": "Jade Sato"
+        "name": "Jade Okafor"
       },
       {
         "id": "p39",
@@ -166,7 +166,7 @@
       },
       {
         "id": "p62",
-        "name": "Reza Ibrahim"
+        "name": "Yusuf Ibrahim"
       }
     ],
     "summary": {
@@ -210,6 +210,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Growth by day, pickleball by night. Lenny's Newsletter on Sundays.",
+  "x_profile": {
+    "work": "Growth analyst",
+    "hometown": "Torrance, California",
+    "traits": [
+      "social",
+      "competitive",
+      "organised"
+    ],
+    "voice": "Tyler is social and competitive, and recruits everyone to pickleball."
   },
   "x_cluster": "builders"
 }

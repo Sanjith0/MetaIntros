@@ -1,8 +1,8 @@
 {
   "id": "p49",
-  "name": "Valeria Kim",
+  "name": "Valeria Ruiz",
   "first_name": "Valeria",
-  "last_name": "Kim",
+  "last_name": "Ruiz",
   "birthday": "06/07/1996",
   "gender": "female",
   "location": {
@@ -126,15 +126,15 @@
     "data": [
       {
         "id": "p15",
-        "name": "Ravi Mensah"
+        "name": "Kwame Mensah"
       },
       {
         "id": "p34",
-        "name": "Jade Sato"
+        "name": "Jade Okafor"
       },
       {
         "id": "p43",
-        "name": "Emma Patel"
+        "name": "Emma Lindgren"
       },
       {
         "id": "p45",
@@ -171,6 +171,17 @@
   },
   "x_preferences": {
     "women_only_party": true
+  },
+  "about": "Trails at sunrise, coffee after. Merlin keeps a list of every bird I've heard.",
+  "x_profile": {
+    "work": "Veterinarian",
+    "hometown": "Bogotá, Colombia",
+    "traits": [
+      "warm",
+      "practical",
+      "early riser"
+    ],
+    "voice": "Valeria is warm and practical, and tells great animal stories."
   },
   "x_cluster": "hike-photo"
 }

@@ -26,6 +26,7 @@ import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { HANGOUT_SPOTS, hangoutHorizon } from "./hangout";
 import { publish } from "./bus";
+import { personaFrom } from "@/lib/profile/persona";
 
 export interface PendingRoom {
   signature: string;
@@ -424,29 +425,27 @@ export async function liveViewFor(userId: string): Promise<LiveView | null> {
   const checkIn = checkInFor(userId);
   const offered = checkIn?.picks ? [...checkIn.picks.picks, ...checkIn.picks.others].map((p) => p.id) : checkIn?.signoff?.members ?? [];
   const ids = [...new Set([userId, ...conversations.map((c) => c.with), ...proposals.flatMap((p) => p.members), ...groups.flatMap((gr) => gr.members), ...offered])];
-  const users = await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, avatarColor: true } });
-  // Until the squad is ready, nobody sees who else is in the queue (DESIGN: "Nobody sees you yet").
-  // Everyone except you and the people you queued together with is "Person A", "Person B"…, with a
-  // blurred avatar, and their first names are swapped out of the Companions' lines too.
+  const users = await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, avatarColor: true, age: true, rawGraph: true } });
+  // Until the squad is ready, nobody sees who else is in the queue in full (DESIGN: "Nobody sees you yet").
+  // Everyone except you and the people you queued together with shows as a first name, age and their
+  // own intro line, with a blurred avatar: enough to know who your Companion is talking to, but no
+  // last name or face until everyone is in.
   const mates = new Set((w.together.get(userId) ? [...w.together].filter(([, g]) => g === w.together.get(userId)).map(([u]) => u) : []).concat(userId));
-  const order2 = [...ids.filter((id) => !mates.has(id))].sort((x, y) => conversations.findIndex((c) => c.with === x) - conversations.findIndex((c) => c.with === y) || x.localeCompare(y));
-  const alias = new Map(order2.map((id, i) => [id, `Person ${String.fromCharCode(65 + (i % 26))}${i >= 26 ? Math.floor(i / 26) : ""}`]));
-  const firstNames = users.filter((u) => alias.has(u.id)).map((u) => ({ re: new RegExp(`\\b${u.name.split(" ")[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "g"), to: alias.get(u.id)! }));
-  const scrub = (t: string) => firstNames.reduce((acc, f) => acc.replace(f.re, f.to), t);
-  const scrubNotes = (n: Verdict | null) => (n ? { ...n, wouldEnjoy: n.wouldEnjoy.map(scrub), concerns: n.concerns.map(scrub), needs: n.needs.map(scrub), opener: scrub(n.opener) } : n);
+  const profileOf = (u: (typeof users)[number]) => {
+    const p = personaFrom(u.rawGraph);
+    return { ...(u.age ? { age: u.age } : {}), ...(p.about ? { about: p.about } : {}), ...(p.traits.length ? { traits: p.traits } : {}) };
+  };
   return {
     stage: w.stage,
     note: w.note,
     roomSize: w.userIds.size,
     circle: circle ? { theme: circle.theme, size: circle.members.length } : null,
-    people: Object.fromEntries(users.map((u) => [u.id, alias.has(u.id) ? { name: alias.get(u.id)!, avatarColor: u.avatarColor, anonymous: true } : { name: u.name, avatarColor: u.avatarColor }])),
-    conversations: conversations.map((c) => ({ ...c, notes: scrubNotes(c.notes), lines: c.lines.map((l) => ({ ...l, say: scrub(l.say) })) })),
-    proposals: proposals.map((p) => ({ ...p, line: scrub(p.line) })),
-    groups: groups.map((g) => ({ ...g, lines: g.lines.map((l) => ({ ...l, say: scrub(l.say) })) })),
-    checkIn: checkIn && {
-      ...checkIn,
-      ...(checkIn.picks ? { picks: { ...checkIn.picks, picks: checkIn.picks.picks.map((p) => ({ ...p, why: scrub(p.why) })) } } : {}),
-      ...(checkIn.signoff ? { signoff: { ...checkIn.signoff, companionSaid: scrub(checkIn.signoff.companionSaid), groupLines: checkIn.signoff.groupLines.map((l) => ({ ...l, say: scrub(l.say) })) } } : {}),
-    },
+    people: Object.fromEntries(
+      users.map((u) => [u.id, mates.has(u.id) ? { name: u.name, avatarColor: u.avatarColor, ...profileOf(u) } : { name: u.name.split(" ")[0], avatarColor: u.avatarColor, anonymous: true, ...profileOf(u) }]),
+    ),
+    conversations,
+    proposals,
+    groups,
+    checkIn,
   };
 }

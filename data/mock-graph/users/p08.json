@@ -1,8 +1,8 @@
 {
   "id": "p08",
-  "name": "Jin Costa",
-  "first_name": "Jin",
-  "last_name": "Costa",
+  "name": "Hiro Tanaka",
+  "first_name": "Hiro",
+  "last_name": "Tanaka",
   "birthday": "06/01/2002",
   "gender": "male",
   "location": {
@@ -145,15 +145,15 @@
       },
       {
         "id": "p14",
-        "name": "Ben Patel"
+        "name": "Arjun Patel"
       },
       {
         "id": "p27",
-        "name": "Leo Andersen"
+        "name": "Søren Andersen"
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       }
     ],
     "summary": {
@@ -191,6 +191,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "PhD student by day, crimps and cooking by night. Generous with Letterboxd stars.",
+  "x_profile": {
+    "work": "PhD student, materials science",
+    "hometown": "Osaka, Japan",
+    "traits": [
+      "gentle",
+      "nerdy",
+      "generous"
+    ],
+    "voice": "Hiro is soft-spoken, full of recommendations and always offers to share food."
   },
   "x_cluster": "indie-climb"
 }

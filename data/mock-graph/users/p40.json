@@ -1,8 +1,8 @@
 {
   "id": "p40",
-  "name": "Owen Sato",
+  "name": "Owen Fletcher",
   "first_name": "Owen",
-  "last_name": "Sato",
+  "last_name": "Fletcher",
   "birthday": "06/13/1996",
   "gender": "male",
   "location": {
@@ -153,19 +153,19 @@
       },
       {
         "id": "p18",
-        "name": "Jin Shah"
+        "name": "Rohan Shah"
       },
       {
         "id": "p38",
-        "name": "Nadia Adeyemi"
+        "name": "Nadia Okoro"
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       },
       {
         "id": "p60",
-        "name": "Aisha Müller"
+        "name": "Hana Weber"
       }
     ],
     "summary": {
@@ -204,6 +204,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Birding at dawn, 35mm in the afternoon, Serious Eats recipes at night.",
+  "x_profile": {
+    "work": "Park ranger",
+    "hometown": "Bozeman, Montana",
+    "traits": [
+      "patient",
+      "quiet",
+      "knowledgeable"
+    ],
+    "voice": "Owen is quiet and patient, knows every bird call and shares facts gently."
   },
   "x_cluster": "hike-photo"
 }

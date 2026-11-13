@@ -146,7 +146,7 @@
       },
       {
         "id": "p08",
-        "name": "Jin Costa"
+        "name": "Hiro Tanaka"
       },
       {
         "id": "p11",
@@ -154,7 +154,7 @@
       },
       {
         "id": "p12",
-        "name": "Gabe Chen"
+        "name": "Gabe Kahale"
       },
       {
         "id": "p13",
@@ -162,19 +162,19 @@
       },
       {
         "id": "p14",
-        "name": "Ben Patel"
+        "name": "Arjun Patel"
       },
       {
         "id": "p15",
-        "name": "Ravi Mensah"
+        "name": "Kwame Mensah"
       },
       {
         "id": "p22",
-        "name": "Kai Rossi"
+        "name": "Kenji Nakamura"
       },
       {
         "id": "p29",
-        "name": "Ava Sato"
+        "name": "Mei Sato"
       }
     ],
     "summary": {
@@ -207,6 +207,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Climbing gym regular. Will drag you to a basement show, then an A24 movie.",
+  "x_profile": {
+    "work": "Lab tech at a biotech startup",
+    "hometown": "Portland, Oregon",
+    "traits": [
+      "outgoing",
+      "funny",
+      "the organiser"
+    ],
+    "voice": "Freya starts the group chat, talks fast and keeps a running joke going all night."
   },
   "x_cluster": "indie-climb"
 }

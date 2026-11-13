@@ -169,11 +169,11 @@
       },
       {
         "id": "p30",
-        "name": "Diego Cohen"
+        "name": "Diego Ramírez"
       },
       {
         "id": "p31",
-        "name": "Isaac Moreau"
+        "name": "Isaac Wright"
       }
     ],
     "summary": {
@@ -206,6 +206,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Chasing a Boston qualifier. Cycling, CIM, cappuccinos.",
+  "x_profile": {
+    "work": "Financial analyst",
+    "hometown": "Prague, Czech Republic",
+    "traits": [
+      "driven",
+      "dry",
+      "loyal"
+    ],
+    "voice": "Oscar is driven and to the point, with a dry, understated humour."
   },
   "x_cluster": "run-coffee"
 }

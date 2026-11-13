@@ -1,7 +1,7 @@
 {
   "id": "p14",
-  "name": "Ben Patel",
-  "first_name": "Ben",
+  "name": "Arjun Patel",
+  "first_name": "Arjun",
   "last_name": "Patel",
   "birthday": "06/22/2004",
   "gender": "male",
@@ -156,7 +156,7 @@
       },
       {
         "id": "p08",
-        "name": "Jin Costa"
+        "name": "Hiro Tanaka"
       },
       {
         "id": "p09",
@@ -164,7 +164,7 @@
       },
       {
         "id": "p12",
-        "name": "Gabe Chen"
+        "name": "Gabe Kahale"
       },
       {
         "id": "p17",
@@ -172,7 +172,7 @@
       },
       {
         "id": "p74",
-        "name": "Isabel Ibrahim"
+        "name": "Isabel Moreno"
       }
     ],
     "summary": {
@@ -211,6 +211,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Coffee snob, climber, crate digger. Philz vs Blue Bottle debates welcome.",
+  "x_profile": {
+    "work": "Data analyst",
+    "hometown": "Edison, New Jersey",
+    "traits": [
+      "sociable",
+      "competitive",
+      "pun-prone"
+    ],
+    "voice": "Arjun loves a friendly debate, makes terrible puns and keeps the conversation moving."
   },
   "x_cluster": "indie-climb"
 }

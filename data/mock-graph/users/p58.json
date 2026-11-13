@@ -1,8 +1,8 @@
 {
   "id": "p58",
-  "name": "Kai Patel",
+  "name": "Kai Mehta",
   "first_name": "Kai",
-  "last_name": "Patel",
+  "last_name": "Mehta",
   "birthday": "06/22/2001",
   "gender": "male",
   "location": {
@@ -114,7 +114,7 @@
     "data": [
       {
         "id": "p18",
-        "name": "Jin Shah"
+        "name": "Rohan Shah"
       },
       {
         "id": "p39",
@@ -122,31 +122,31 @@
       },
       {
         "id": "p51",
-        "name": "Ethan Novak"
+        "name": "Ethan Walsh"
       },
       {
         "id": "p54",
-        "name": "Owen Lindqvist"
+        "name": "Nils Lindqvist"
       },
       {
         "id": "p55",
-        "name": "Kiara Chen"
+        "name": "Grace Lin"
       },
       {
         "id": "p56",
-        "name": "Noor Adeyemi"
+        "name": "Amara Obi"
       },
       {
         "id": "p64",
-        "name": "Zoe Chen"
+        "name": "Lily Zhou"
       },
       {
         "id": "p69",
-        "name": "Ivan Hughes"
+        "name": "Callum Reid"
       },
       {
         "id": "p78",
-        "name": "Zoe Park"
+        "name": "Maya Jeon"
       }
     ],
     "summary": {
@@ -184,6 +184,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "ML researcher who plays pickleball and rewatches Ghibli films.",
+  "x_profile": {
+    "work": "ML researcher",
+    "hometown": "Pune, India",
+    "traits": [
+      "gentle",
+      "curious",
+      "funny"
+    ],
+    "voice": "Kai is gentle and funny, and mixes research papers and anime in the same story."
   },
   "x_cluster": "builders"
 }

@@ -1,8 +1,8 @@
 {
   "id": "p38",
-  "name": "Nadia Adeyemi",
+  "name": "Nadia Okoro",
   "first_name": "Nadia",
-  "last_name": "Adeyemi",
+  "last_name": "Okoro",
   "birthday": "06/04/2004",
   "gender": "female",
   "location": {
@@ -161,15 +161,15 @@
     "data": [
       {
         "id": "p32",
-        "name": "Noor Johnson"
+        "name": "Noor Siddiqui"
       },
       {
         "id": "p33",
-        "name": "Caleb Wong"
+        "name": "Caleb Turner"
       },
       {
         "id": "p40",
-        "name": "Owen Sato"
+        "name": "Owen Fletcher"
       },
       {
         "id": "p45",
@@ -206,6 +206,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Hoka loyalist. Run club and dog spotting. I always say yes to brunch.",
+  "x_profile": {
+    "work": "Marketing coordinator",
+    "hometown": "Lagos, Nigeria",
+    "traits": [
+      "warm",
+      "outgoing",
+      "spontaneous"
+    ],
+    "voice": "Nadia is warm and spontaneous, and invites everyone to brunch afterwards."
   },
   "x_cluster": "run-coffee"
 }

@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import type { SocialStyle, SourcedItem, TasteProfileData, WeightedTag } from "./builder";
+import { personaFrom, type Persona } from "./persona";
 
 export interface Person {
   id: string;
@@ -12,6 +13,8 @@ export interface Person {
   isSimulated: boolean;
   isLive: boolean;
   avatarColor: string;
+  /** intro, work, hometown, personality: empty for live sign-ups; optional for hand-built test people */
+  persona?: Persona;
   profile: TasteProfileData;
   friends: Set<string>;
   blocked: Set<string>; // either direction
@@ -46,6 +49,7 @@ export async function loadPeople(prisma: PrismaClient, ids?: string[]): Promise<
       isSimulated: u.isSimulated,
       isLive: u.isLive,
       avatarColor: u.avatarColor,
+      persona: personaFrom(u.rawGraph),
       friends: new Set(),
       blocked: new Set(),
       profile: {

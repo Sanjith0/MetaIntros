@@ -21,8 +21,8 @@ interface View {
   note?: string;
   roomSize?: number;
   circle?: { theme: string; size: number } | null;
-  /** before a squad is ready, everyone but you is "Person A", "Person B"… with a blurred avatar */
-  people?: Record<string, { name: string; avatarColor: string; anonymous?: boolean }>;
+  /** before a squad is ready, everyone but you shows as a first name, age and intro, with a blurred avatar */
+  people?: Record<string, { name: string; avatarColor: string; anonymous?: boolean; age?: number; about?: string; traits?: string[] }>;
   conversations?: { with: string; deep: boolean; notes: Notes | null; lines: ThreadLine[] }[];
   proposals?: { by: string; members: string[]; line: string; backers: number }[];
   groups?: { members: string[]; lines: { from: string; say: string }[]; status: "talking" | "agreed" | "didnt_work" }[];
@@ -30,6 +30,19 @@ interface View {
 }
 
 const first = (n?: string) => (n ?? "Someone").split(" ")[0];
+
+/** Who this Companion speaks for: first name, age, their own intro line and a few personality words. */
+function PersonIntro({ person }: { person?: NonNullable<View["people"]>[string] }) {
+  if (!person?.about && !person?.traits?.length) return null;
+  return (
+    <div className="rounded-card bg-wash p-2.5" data-testid="feed-person">
+      <p className="text-meta font-semibold text-muted">
+        {first(person.name)}{person.age ? `, ${person.age}` : ""}{person.traits?.length ? ` · ${person.traits.join(", ")}` : ""}
+      </p>
+      {person.about && <p className="mt-0.5 text-body">&ldquo;{person.about}&rdquo;</p>}
+    </div>
+  );
+}
 
 /**
  * "Your Companion is talking": the conversations the current user's Companion is having while the
@@ -98,6 +111,7 @@ export function CompanionFeed({ meId }: { meId?: string }) {
               </button>
               {isOpen && (
                 <div className="space-y-2 pb-3">
+                  <PersonIntro person={people[c.with]} />
                   <CompanionThread lines={c.lines} otherName={name(c.with)} />
                   {c.notes && (
                     <div className="rounded-card bg-wash p-2.5 text-body" data-testid="feed-notes">

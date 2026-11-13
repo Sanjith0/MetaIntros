@@ -1,8 +1,8 @@
 {
   "id": "p24",
-  "name": "Ivan Mensah",
+  "name": "Ivan Petrov",
   "first_name": "Ivan",
-  "last_name": "Mensah",
+  "last_name": "Petrov",
   "birthday": "06/06/2003",
   "gender": "male",
   "location": {
@@ -119,11 +119,11 @@
     "data": [
       {
         "id": "p16",
-        "name": "Elena Shah"
+        "name": "Elena Vasquez"
       },
       {
         "id": "p18",
-        "name": "Jin Shah"
+        "name": "Rohan Shah"
       },
       {
         "id": "p20",
@@ -131,11 +131,11 @@
       },
       {
         "id": "p23",
-        "name": "Marcus Kim"
+        "name": "Marcus Bell"
       },
       {
         "id": "p55",
-        "name": "Kiara Chen"
+        "name": "Grace Lin"
       },
       {
         "id": "p73",
@@ -177,6 +177,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Stardew farmer, chess player, D&D rogue. Tea over coffee.",
+  "x_profile": {
+    "work": "QA tester at a game studio",
+    "hometown": "Sofia, Bulgaria",
+    "traits": [
+      "reserved",
+      "clever",
+      "loyal"
+    ],
+    "voice": "Ivan says little at first, then drops perfectly timed one-liners."
   },
   "x_cluster": "games-anime"
 }

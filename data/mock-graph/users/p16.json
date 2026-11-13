@@ -1,8 +1,8 @@
 {
   "id": "p16",
-  "name": "Elena Shah",
+  "name": "Elena Vasquez",
   "first_name": "Elena",
-  "last_name": "Shah",
+  "last_name": "Vasquez",
   "birthday": "06/01/2007",
   "gender": "female",
   "location": {
@@ -150,19 +150,19 @@
     "data": [
       {
         "id": "p21",
-        "name": "Omar Nguyen"
+        "name": "Omar Haddad"
       },
       {
         "id": "p22",
-        "name": "Kai Rossi"
+        "name": "Kenji Nakamura"
       },
       {
         "id": "p24",
-        "name": "Ivan Mensah"
+        "name": "Ivan Petrov"
       },
       {
         "id": "p25",
-        "name": "Ivan Castillo"
+        "name": "Luis Castillo"
       }
     ],
     "summary": {
@@ -195,6 +195,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Ramen and Stardew. Currently rewatching Frieren for the third time.",
+  "x_profile": {
+    "work": "Computer science student",
+    "hometown": "San Diego, California",
+    "traits": [
+      "cosy",
+      "sweet",
+      "introverted"
+    ],
+    "voice": "Elena is soft-spoken, loves cosy plans and sends a lot of emoji once comfortable."
   },
   "x_cluster": "games-anime"
 }

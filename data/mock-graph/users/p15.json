@@ -1,7 +1,7 @@
 {
   "id": "p15",
-  "name": "Ravi Mensah",
-  "first_name": "Ravi",
+  "name": "Kwame Mensah",
+  "first_name": "Kwame",
   "last_name": "Mensah",
   "birthday": "06/23/2004",
   "gender": "male",
@@ -151,7 +151,7 @@
       },
       {
         "id": "p12",
-        "name": "Gabe Chen"
+        "name": "Gabe Kahale"
       },
       {
         "id": "p13",
@@ -159,7 +159,7 @@
       },
       {
         "id": "p49",
-        "name": "Valeria Kim"
+        "name": "Valeria Ruiz"
       }
     ],
     "summary": {
@@ -197,6 +197,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "An indie playlist for every mood. Weekend hikes, weekday lattes.",
+  "x_profile": {
+    "work": "Nursing student",
+    "hometown": "Accra, Ghana",
+    "traits": [
+      "calm",
+      "caring",
+      "quick-witted"
+    ],
+    "voice": "Kwame is calm and warm, checks everyone's okay and has a quick, dry wit."
   },
   "x_cluster": "indie-climb"
 }

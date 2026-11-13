@@ -1,8 +1,8 @@
 {
   "id": "p72",
-  "name": "Anika Patel",
+  "name": "Anika Desai",
   "first_name": "Anika",
-  "last_name": "Patel",
+  "last_name": "Desai",
   "birthday": "06/03/1998",
   "gender": "female",
   "location": {
@@ -118,7 +118,7 @@
       },
       {
         "id": "p67",
-        "name": "Rosa Ferreira"
+        "name": "Camila Souza"
       }
     ],
     "summary": {
@@ -162,6 +162,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Tartine, ramen, karaoke and Cantor Arts Center. In that order.",
+  "x_profile": {
+    "work": "Education grad student",
+    "hometown": "Toronto, Canada",
+    "traits": [
+      "witty",
+      "social",
+      "curious"
+    ],
+    "voice": "Anika is witty and social, and keeps the conversation lively."
   },
   "x_cluster": "food"
 }

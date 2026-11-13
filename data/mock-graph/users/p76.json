@@ -1,8 +1,8 @@
 {
   "id": "p76",
-  "name": "Priya Bauer",
+  "name": "Priya Nair",
   "first_name": "Priya",
-  "last_name": "Bauer",
+  "last_name": "Nair",
   "birthday": "06/28/2004",
   "gender": "female",
   "location": {
@@ -126,7 +126,7 @@
     "data": [
       {
         "id": "p22",
-        "name": "Kai Rossi"
+        "name": "Kenji Nakamura"
       },
       {
         "id": "p26",
@@ -134,11 +134,11 @@
       },
       {
         "id": "p51",
-        "name": "Ethan Novak"
+        "name": "Ethan Walsh"
       },
       {
         "id": "p77",
-        "name": "Aisha Andersen"
+        "name": "Zara Holm"
       }
     ],
     "summary": {
@@ -171,6 +171,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Bikes, birds, 35mm and SFJAZZ. A quiet Sunday kind of person.",
+  "x_profile": {
+    "work": "Music student",
+    "hometown": "Bangalore, India",
+    "traits": [
+      "quiet",
+      "artistic",
+      "kind"
+    ],
+    "voice": "Priya is quiet and kind, with a deep love of jazz."
   },
   "x_cluster": "bridge"
 }

@@ -1,8 +1,8 @@
 {
   "id": "p34",
-  "name": "Jade Sato",
+  "name": "Jade Okafor",
   "first_name": "Jade",
-  "last_name": "Sato",
+  "last_name": "Okafor",
   "birthday": "06/09/1997",
   "gender": "female",
   "location": {
@@ -154,15 +154,15 @@
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       },
       {
         "id": "p49",
-        "name": "Valeria Kim"
+        "name": "Valeria Ruiz"
       },
       {
         "id": "p53",
-        "name": "Nate Kim"
+        "name": "Tyler Han"
       }
     ],
     "summary": {
@@ -206,6 +206,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "November Project regular, dog-spotting enthusiast, Hard Fork listener.",
+  "x_profile": {
+    "work": "Software engineer",
+    "hometown": "Dallas, Texas",
+    "traits": [
+      "bubbly",
+      "witty",
+      "early bird"
+    ],
+    "voice": "Jade is bubbly and quick, narrates every dog sighting and is up before everyone else."
   },
   "x_cluster": "run-coffee"
 }

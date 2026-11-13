@@ -1,7 +1,7 @@
 {
   "id": "p62",
-  "name": "Reza Ibrahim",
-  "first_name": "Reza",
+  "name": "Yusuf Ibrahim",
+  "first_name": "Yusuf",
   "last_name": "Ibrahim",
   "birthday": "06/16/1998",
   "gender": "male",
@@ -130,19 +130,19 @@
       },
       {
         "id": "p18",
-        "name": "Jin Shah"
+        "name": "Rohan Shah"
       },
       {
         "id": "p53",
-        "name": "Nate Kim"
+        "name": "Tyler Han"
       },
       {
         "id": "p64",
-        "name": "Zoe Chen"
+        "name": "Lily Zhou"
       },
       {
         "id": "p67",
-        "name": "Rosa Ferreira"
+        "name": "Camila Souza"
       }
     ],
     "summary": {
@@ -181,6 +181,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Ramen ranker, Criterion collector, SFMOMA member.",
+  "x_profile": {
+    "work": "Line cook",
+    "hometown": "Cairo, Egypt",
+    "traits": [
+      "passionate",
+      "opinionated",
+      "generous"
+    ],
+    "voice": "Yusuf is passionate about food and film, and has a ranked list for everything."
   },
   "x_cluster": "food"
 }

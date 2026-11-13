@@ -1,8 +1,8 @@
 {
   "id": "p28",
-  "name": "Julia Mensah",
+  "name": "Julia Hart",
   "first_name": "Julia",
-  "last_name": "Mensah",
+  "last_name": "Hart",
   "birthday": "06/10/2004",
   "gender": "female",
   "location": {
@@ -136,19 +136,19 @@
       },
       {
         "id": "p36",
-        "name": "Ben Müller"
+        "name": "Ben Fischer"
       },
       {
         "id": "p43",
-        "name": "Emma Patel"
+        "name": "Emma Lindgren"
       },
       {
         "id": "p48",
-        "name": "Hugo Andersen"
+        "name": "Hugo Laurent"
       },
       {
         "id": "p77",
-        "name": "Aisha Andersen"
+        "name": "Zara Holm"
       }
     ],
     "summary": {
@@ -181,6 +181,17 @@
   },
   "x_preferences": {
     "women_only_party": true
+  },
+  "about": "Training for marathon number three. Will run for pastries.",
+  "x_profile": {
+    "work": "Kinesiology student",
+    "hometown": "Boulder, Colorado",
+    "traits": [
+      "disciplined",
+      "upbeat",
+      "early riser"
+    ],
+    "voice": "Julia is upbeat and motivating, and talks splits and pastries in the same breath."
   },
   "x_cluster": "run-coffee"
 }

@@ -1,7 +1,7 @@
 {
   "id": "p54",
-  "name": "Owen Lindqvist",
-  "first_name": "Owen",
+  "name": "Nils Lindqvist",
+  "first_name": "Nils",
   "last_name": "Lindqvist",
   "birthday": "06/12/1998",
   "gender": "male",
@@ -145,31 +145,31 @@
       },
       {
         "id": "p56",
-        "name": "Noor Adeyemi"
+        "name": "Amara Obi"
       },
       {
         "id": "p57",
-        "name": "Aaron Castillo"
+        "name": "Aaron Mitchell"
       },
       {
         "id": "p58",
-        "name": "Kai Patel"
+        "name": "Kai Mehta"
       },
       {
         "id": "p60",
-        "name": "Aisha Müller"
+        "name": "Hana Weber"
       },
       {
         "id": "p61",
-        "name": "Milo Chen"
+        "name": "Milo Brennan"
       },
       {
         "id": "p69",
-        "name": "Ivan Hughes"
+        "name": "Callum Reid"
       },
       {
         "id": "p79",
-        "name": "Leila Johnson"
+        "name": "Leila Karimi"
       }
     ],
     "summary": {
@@ -207,6 +207,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Designer turned engineer. Hackathon veteran, twelve and counting.",
+  "x_profile": {
+    "work": "Design engineer",
+    "hometown": "Gothenburg, Sweden",
+    "traits": [
+      "calm",
+      "generous",
+      "nerdy"
+    ],
+    "voice": "Nils is calm and generous with advice, a natural mentor."
   },
   "x_cluster": "builders"
 }

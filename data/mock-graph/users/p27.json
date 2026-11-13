@@ -1,7 +1,7 @@
 {
   "id": "p27",
-  "name": "Leo Andersen",
-  "first_name": "Leo",
+  "name": "Søren Andersen",
+  "first_name": "Søren",
   "last_name": "Andersen",
   "birthday": "06/05/2002",
   "gender": "male",
@@ -138,11 +138,11 @@
     "data": [
       {
         "id": "p08",
-        "name": "Jin Costa"
+        "name": "Hiro Tanaka"
       },
       {
         "id": "p18",
-        "name": "Jin Shah"
+        "name": "Rohan Shah"
       },
       {
         "id": "p19",
@@ -184,6 +184,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Hades, Wingspan and Ghibli. I'll bring the board game.",
+  "x_profile": {
+    "work": "Illustrator",
+    "hometown": "Copenhagen, Denmark",
+    "traits": [
+      "gentle",
+      "artistic",
+      "curious"
+    ],
+    "voice": "Søren is gentle and curious, doodles while talking and asks everyone about their favourite games."
   },
   "x_cluster": "games-anime"
 }

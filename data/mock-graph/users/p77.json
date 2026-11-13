@@ -1,8 +1,8 @@
 {
   "id": "p77",
-  "name": "Aisha Andersen",
-  "first_name": "Aisha",
-  "last_name": "Andersen",
+  "name": "Zara Holm",
+  "first_name": "Zara",
+  "last_name": "Holm",
   "birthday": "06/25/2007",
   "gender": "female",
   "location": {
@@ -124,23 +124,23 @@
       },
       {
         "id": "p28",
-        "name": "Julia Mensah"
+        "name": "Julia Hart"
       },
       {
         "id": "p75",
-        "name": "Ivy Costa"
+        "name": "Ivy Lam"
       },
       {
         "id": "p76",
-        "name": "Priya Bauer"
+        "name": "Priya Nair"
       },
       {
         "id": "p78",
-        "name": "Zoe Park"
+        "name": "Maya Jeon"
       },
       {
         "id": "p80",
-        "name": "Mira Rahman"
+        "name": "Farah Rahman"
       }
     ],
     "summary": {
@@ -173,6 +173,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Hackathons, marathons, NBA. I like being busy.",
+  "x_profile": {
+    "work": "Engineering student",
+    "hometown": "Oslo, Norway",
+    "traits": [
+      "driven",
+      "sporty",
+      "upbeat"
+    ],
+    "voice": "Zara is driven and upbeat, and is always training for something."
   },
   "x_cluster": "bridge"
 }

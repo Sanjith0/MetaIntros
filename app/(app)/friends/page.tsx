@@ -67,7 +67,7 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
                       queueOf.get(f.id) ? (
                         <span className="font-semibold text-link" data-testid="friend-queue-status">{queueOf.get(f.id)!.label}</span>
                       ) : (
-                        `${f.mutual} mutual friends${f.neighborhood ? ` · ${f.neighborhood}` : ""}`
+                        [f.work, `${f.mutual} mutual friends`, f.neighborhood].filter(Boolean).join(" · ")
                       )
                     }
                   />

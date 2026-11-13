@@ -1,8 +1,8 @@
 {
   "id": "p78",
-  "name": "Zoe Park",
-  "first_name": "Zoe",
-  "last_name": "Park",
+  "name": "Maya Jeon",
+  "first_name": "Maya",
+  "last_name": "Jeon",
   "birthday": "06/10/2001",
   "gender": "female",
   "location": {
@@ -133,27 +133,27 @@
       },
       {
         "id": "p22",
-        "name": "Kai Rossi"
+        "name": "Kenji Nakamura"
       },
       {
         "id": "p25",
-        "name": "Ivan Castillo"
+        "name": "Luis Castillo"
       },
       {
         "id": "p58",
-        "name": "Kai Patel"
+        "name": "Kai Mehta"
       },
       {
         "id": "p77",
-        "name": "Aisha Andersen"
+        "name": "Zara Holm"
       },
       {
         "id": "p79",
-        "name": "Leila Johnson"
+        "name": "Leila Karimi"
       },
       {
         "id": "p80",
-        "name": "Mira Rahman"
+        "name": "Farah Rahman"
       }
     ],
     "summary": {
@@ -186,6 +186,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Cyclist, coffee crawler, gig goer, dog spotter.",
+  "x_profile": {
+    "work": "Pediatric nurse",
+    "hometown": "Seoul, South Korea",
+    "traits": [
+      "sunny",
+      "social",
+      "adventurous"
+    ],
+    "voice": "Maya is sunny and social, and is up for almost any plan."
   },
   "x_cluster": "bridge"
 }

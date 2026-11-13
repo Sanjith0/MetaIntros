@@ -143,39 +143,39 @@
     "data": [
       {
         "id": "p14",
-        "name": "Ben Patel"
+        "name": "Arjun Patel"
       },
       {
         "id": "p18",
-        "name": "Jin Shah"
+        "name": "Rohan Shah"
       },
       {
         "id": "p22",
-        "name": "Kai Rossi"
+        "name": "Kenji Nakamura"
       },
       {
         "id": "p23",
-        "name": "Marcus Kim"
+        "name": "Marcus Bell"
       },
       {
         "id": "p54",
-        "name": "Owen Lindqvist"
+        "name": "Nils Lindqvist"
       },
       {
         "id": "p56",
-        "name": "Noor Adeyemi"
+        "name": "Amara Obi"
       },
       {
         "id": "p62",
-        "name": "Reza Ibrahim"
+        "name": "Yusuf Ibrahim"
       },
       {
         "id": "p70",
-        "name": "Dev Johnson"
+        "name": "Dev Malhotra"
       },
       {
         "id": "p79",
-        "name": "Leila Johnson"
+        "name": "Leila Karimi"
       }
     ],
     "summary": {
@@ -213,6 +213,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Valorant grinder, karaoke menace, trivia night captain.",
+  "x_profile": {
+    "work": "Community college student",
+    "hometown": "Daly City, California",
+    "traits": [
+      "competitive",
+      "loud",
+      "loyal"
+    ],
+    "voice": "Nate is high energy, trash-talks playfully and is fiercely loyal to the team."
   },
   "x_cluster": "games-anime"
 }

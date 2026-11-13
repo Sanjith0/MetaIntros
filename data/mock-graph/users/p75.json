@@ -1,8 +1,8 @@
 {
   "id": "p75",
-  "name": "Ivy Costa",
+  "name": "Ivy Lam",
   "first_name": "Ivy",
-  "last_name": "Costa",
+  "last_name": "Lam",
   "birthday": "06/05/2000",
   "gender": "female",
   "location": {
@@ -142,15 +142,15 @@
       },
       {
         "id": "p70",
-        "name": "Dev Johnson"
+        "name": "Dev Malhotra"
       },
       {
         "id": "p77",
-        "name": "Aisha Andersen"
+        "name": "Zara Holm"
       },
       {
         "id": "p79",
-        "name": "Leila Johnson"
+        "name": "Leila Karimi"
       }
     ],
     "summary": {
@@ -183,6 +183,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Designer who games. Warriors fan. Stardew and D&D on weekends.",
+  "x_profile": {
+    "work": "UX designer at a game studio",
+    "hometown": "Hong Kong",
+    "traits": [
+      "creative",
+      "competitive",
+      "friendly"
+    ],
+    "voice": "Ivy is creative and friendly, and switches between design talk and gaming banter."
   },
   "x_cluster": "bridge"
 }

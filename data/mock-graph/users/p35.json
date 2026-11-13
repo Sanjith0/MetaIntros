@@ -1,8 +1,8 @@
 {
   "id": "p35",
-  "name": "Malik Moreau",
+  "name": "Malik Johnson",
   "first_name": "Malik",
-  "last_name": "Moreau",
+  "last_name": "Johnson",
   "birthday": "06/09/2001",
   "gender": "male",
   "location": {
@@ -137,7 +137,7 @@
     "data": [
       {
         "id": "p43",
-        "name": "Emma Patel"
+        "name": "Emma Lindgren"
       }
     ],
     "summary": {
@@ -181,6 +181,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Yoga, marathons and farmers market Sundays. Balance, mostly.",
+  "x_profile": {
+    "work": "Personal trainer",
+    "hometown": "Baltimore, Maryland",
+    "traits": [
+      "chill",
+      "encouraging",
+      "grounded"
+    ],
+    "voice": "Malik is grounded and encouraging, the friend who tells you that you can do it."
   },
   "x_cluster": "run-coffee"
 }

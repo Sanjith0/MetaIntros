@@ -1,8 +1,8 @@
 {
   "id": "p61",
-  "name": "Milo Chen",
+  "name": "Milo Brennan",
   "first_name": "Milo",
-  "last_name": "Chen",
+  "last_name": "Brennan",
   "birthday": "06/11/2000",
   "gender": "male",
   "location": {
@@ -156,7 +156,7 @@
     "data": [
       {
         "id": "p32",
-        "name": "Noor Johnson"
+        "name": "Noor Siddiqui"
       },
       {
         "id": "p52",
@@ -164,15 +164,15 @@
       },
       {
         "id": "p54",
-        "name": "Owen Lindqvist"
+        "name": "Nils Lindqvist"
       },
       {
         "id": "p57",
-        "name": "Aaron Castillo"
+        "name": "Aaron Mitchell"
       },
       {
         "id": "p70",
-        "name": "Dev Johnson"
+        "name": "Dev Malhotra"
       }
     ],
     "summary": {
@@ -216,6 +216,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "TechCrunch, hackathons, Two Minute Papers. Philz Mint Mojito loyalist.",
+  "x_profile": {
+    "work": "Developer advocate",
+    "hometown": "Dublin, Ireland",
+    "traits": [
+      "charming",
+      "talkative",
+      "upbeat"
+    ],
+    "voice": "Milo is charming and talkative, the one who introduces everyone to everyone."
   },
   "x_cluster": "builders"
 }

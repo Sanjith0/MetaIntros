@@ -1,8 +1,8 @@
 {
   "id": "p43",
-  "name": "Emma Patel",
+  "name": "Emma Lindgren",
   "first_name": "Emma",
-  "last_name": "Patel",
+  "last_name": "Lindgren",
   "birthday": "06/24/1998",
   "gender": "female",
   "location": {
@@ -144,11 +144,11 @@
     "data": [
       {
         "id": "p28",
-        "name": "Julia Mensah"
+        "name": "Julia Hart"
       },
       {
         "id": "p35",
-        "name": "Malik Moreau"
+        "name": "Malik Johnson"
       },
       {
         "id": "p39",
@@ -156,15 +156,15 @@
       },
       {
         "id": "p42",
-        "name": "Felix Brooks"
+        "name": "Felix Grant"
       },
       {
         "id": "p48",
-        "name": "Hugo Andersen"
+        "name": "Hugo Laurent"
       },
       {
         "id": "p49",
-        "name": "Valeria Kim"
+        "name": "Valeria Ruiz"
       },
       {
         "id": "p52",
@@ -196,6 +196,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Unsplash contributor. Redwoods, birds and long golden-hour walks.",
+  "x_profile": {
+    "work": "Graphic designer",
+    "hometown": "Stockholm, Sweden",
+    "traits": [
+      "calm",
+      "creative",
+      "warm"
+    ],
+    "voice": "Emma is calm and creative, a great listener who asks to see everyone's photos."
   },
   "x_cluster": "hike-photo"
 }

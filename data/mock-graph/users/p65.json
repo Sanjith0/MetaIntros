@@ -1,8 +1,8 @@
 {
   "id": "p65",
-  "name": "Emerson Shah",
+  "name": "Emerson Gray",
   "first_name": "Emerson",
-  "last_name": "Shah",
+  "last_name": "Gray",
   "birthday": "06/15/2002",
   "gender": "custom",
   "location": {
@@ -143,11 +143,11 @@
     "data": [
       {
         "id": "p31",
-        "name": "Isaac Moreau"
+        "name": "Isaac Wright"
       },
       {
         "id": "p69",
-        "name": "Ivan Hughes"
+        "name": "Callum Reid"
       }
     ],
     "summary": {
@@ -185,6 +185,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Karaoke, Tartine, thrifting. I'll sing a Smule duet with you.",
+  "x_profile": {
+    "work": "Social media manager",
+    "hometown": "Philadelphia, Pennsylvania",
+    "traits": [
+      "extroverted",
+      "funny",
+      "dramatic"
+    ],
+    "voice": "Emerson is extroverted and funny, and always the first to suggest karaoke."
   },
   "x_cluster": "food"
 }

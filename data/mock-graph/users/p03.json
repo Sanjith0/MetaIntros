@@ -192,11 +192,11 @@
       },
       {
         "id": "p66",
-        "name": "Julia Chen"
+        "name": "Sofia Alvarez"
       },
       {
         "id": "p78",
-        "name": "Zoe Park"
+        "name": "Maya Jeon"
       }
     ],
     "summary": {
@@ -240,6 +240,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Shooting 35mm at every gig. Projecting the same V4 for three months now.",
+  "x_profile": {
+    "work": "Photography student",
+    "hometown": "Fullerton, California",
+    "traits": [
+      "observant",
+      "dry humour",
+      "patient"
+    ],
+    "voice": "Zoe is quiet in big groups but sharp and funny one on one, and notices details everyone else misses."
   },
   "x_cluster": "indie-climb"
 }

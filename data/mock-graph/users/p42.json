@@ -1,8 +1,8 @@
 {
   "id": "p42",
-  "name": "Felix Brooks",
+  "name": "Felix Grant",
   "first_name": "Felix",
-  "last_name": "Brooks",
+  "last_name": "Grant",
   "birthday": "06/25/2002",
   "gender": "male",
   "location": {
@@ -144,15 +144,15 @@
     "data": [
       {
         "id": "p41",
-        "name": "Rafael Nguyen"
+        "name": "Rafael Torres"
       },
       {
         "id": "p43",
-        "name": "Emma Patel"
+        "name": "Emma Lindgren"
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       }
     ],
     "summary": {
@@ -185,6 +185,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Audubon, Fujifilm, national parks passport. Slow hikes, lots of photos.",
+  "x_profile": {
+    "work": "Geology PhD student",
+    "hometown": "Asheville, North Carolina",
+    "traits": [
+      "curious",
+      "nerdy",
+      "gentle"
+    ],
+    "voice": "Felix is curious and gentle, and stops every few minutes on a hike to look at a rock."
   },
   "x_cluster": "hike-photo"
 }

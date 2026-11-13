@@ -1,8 +1,8 @@
 {
   "id": "p21",
-  "name": "Omar Nguyen",
+  "name": "Omar Haddad",
   "first_name": "Omar",
-  "last_name": "Nguyen",
+  "last_name": "Haddad",
   "birthday": "06/27/2004",
   "gender": "male",
   "location": {
@@ -161,7 +161,7 @@
     "data": [
       {
         "id": "p16",
-        "name": "Elena Shah"
+        "name": "Elena Vasquez"
       },
       {
         "id": "p20",
@@ -169,7 +169,7 @@
       },
       {
         "id": "p23",
-        "name": "Marcus Kim"
+        "name": "Marcus Bell"
       },
       {
         "id": "p26",
@@ -177,7 +177,7 @@
       },
       {
         "id": "p41",
-        "name": "Rafael Nguyen"
+        "name": "Rafael Torres"
       }
     ],
     "summary": {
@@ -215,6 +215,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Catan, One Piece, Jujutsu Kaisen. Looking for a regular game night.",
+  "x_profile": {
+    "work": "IT support specialist",
+    "hometown": "Dearborn, Michigan",
+    "traits": [
+      "friendly",
+      "reliable",
+      "goofy"
+    ],
+    "voice": "Omar is easygoing and reliable, quotes anime constantly and always brings snacks."
   },
   "x_cluster": "games-anime"
 }

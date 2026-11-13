@@ -1,4 +1,5 @@
-import { Briefcase, MapPin, Pencil, Users } from "lucide-react";
+import { Briefcase, Cake, Home, MapPin, Pencil, Users } from "lucide-react";
+import { personaFrom } from "@/lib/profile/persona";
 import { TopBar } from "@/components/fb/TopBar";
 import { Avatar, Button, ListRow, IconCircle, Section, Stack } from "@/components/fb";
 import { DeleteMe } from "@/components/profile/DeleteMe";
@@ -16,6 +17,7 @@ export default async function ProfilePage() {
     prisma.friendship.count({ where: { OR: [{ userAId: me.id }, { userBId: me.id }] } }),
     prisma.partyMember.count({ where: { userId: me.id, party: { status: { in: ["confirmed", "completed"] } } } }),
   ]);
+  const persona = personaFrom(me.rawGraph);
   const tags = ((tp?.interestTags ?? []) as { tag: string }[]).slice(0, 10);
   const brief = await getBriefFor(me.id, { mode: "events", eventTitle: null, targetSize: 6 }, false);
   return (
@@ -28,14 +30,17 @@ export default async function ProfilePage() {
             <Avatar name={me.name} color={me.avatarColor} size={104} ring className="ring-4" />
             <h1 className="mt-2 text-page font-bold" data-testid="header-avatar-name">{me.name}</h1>
             <p className="text-body text-muted">{friends} friends</p>
+            {persona.about && <p className="mt-2 text-body" data-testid="profile-about">{persona.about}</p>}
             <div className="mt-3 flex gap-2">
               <Button className="flex-1" icon={<Pencil size={16} />}>Edit profile</Button>
             </div>
           </div>
         </section>
         <Section title="Details" flush>
+          {persona.work && <ListRow leading={<IconCircle><Briefcase size={18} /></IconCircle>} title={persona.work} />}
           <ListRow leading={<IconCircle><MapPin size={18} /></IconCircle>} title={`Lives in ${me.neighborhood ?? "the Bay Area"}`} />
-          <ListRow leading={<IconCircle><Briefcase size={18} /></IconCircle>} title={`Age ${me.ageBand}`} />
+          {persona.hometown && <ListRow leading={<IconCircle><Home size={18} /></IconCircle>} title={`From ${persona.hometown}`} />}
+          <ListRow leading={<IconCircle><Cake size={18} /></IconCircle>} title={`Age ${me.ageBand}`} />
           <ListRow leading={<IconCircle><Users size={18} /></IconCircle>} title={`${squads} Queue Up squad${squads === 1 ? "" : "s"}`} href="/friends?tab=queueup" />
         </Section>
         <Section title="Queue Up privacy" flush>

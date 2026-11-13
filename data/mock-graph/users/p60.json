@@ -1,8 +1,8 @@
 {
   "id": "p60",
-  "name": "Aisha Müller",
-  "first_name": "Aisha",
-  "last_name": "Müller",
+  "name": "Hana Weber",
+  "first_name": "Hana",
+  "last_name": "Weber",
   "birthday": "06/08/2003",
   "gender": "female",
   "location": {
@@ -173,19 +173,19 @@
     "data": [
       {
         "id": "p33",
-        "name": "Caleb Wong"
+        "name": "Caleb Turner"
       },
       {
         "id": "p40",
-        "name": "Owen Sato"
+        "name": "Owen Fletcher"
       },
       {
         "id": "p51",
-        "name": "Ethan Novak"
+        "name": "Ethan Walsh"
       },
       {
         "id": "p54",
-        "name": "Owen Lindqvist"
+        "name": "Nils Lindqvist"
       }
     ],
     "summary": {
@@ -218,6 +218,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Hacker News lurker, Hugging Face tinkerer, coffee shop coder.",
+  "x_profile": {
+    "work": "CS master's student",
+    "hometown": "Munich, Germany",
+    "traits": [
+      "focused",
+      "witty",
+      "introverted"
+    ],
+    "voice": "Hana is focused and witty, and stays quiet until the topic gets nerdy."
   },
   "x_cluster": "builders"
 }

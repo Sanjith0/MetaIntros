@@ -1,8 +1,8 @@
 {
   "id": "p47",
-  "name": "Mira Dubois",
+  "name": "Mira Kowalski",
   "first_name": "Mira",
-  "last_name": "Dubois",
+  "last_name": "Kowalski",
   "birthday": "06/15/2002",
   "gender": "female",
   "location": {
@@ -152,7 +152,7 @@
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       }
     ],
     "summary": {
@@ -191,6 +191,17 @@
   },
   "x_preferences": {
     "women_only_party": true
+  },
+  "about": "Camping trips booked six months ahead. Redwoods forever.",
+  "x_profile": {
+    "work": "Environmental consultant",
+    "hometown": "Milwaukee, Wisconsin",
+    "traits": [
+      "planner",
+      "outdoorsy",
+      "friendly"
+    ],
+    "voice": "Mira is a planner who books campsites months out and loves sharing a good itinerary."
   },
   "x_cluster": "hike-photo"
 }

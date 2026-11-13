@@ -1,8 +1,8 @@
 {
   "id": "p23",
-  "name": "Marcus Kim",
+  "name": "Marcus Bell",
   "first_name": "Marcus",
-  "last_name": "Kim",
+  "last_name": "Bell",
   "birthday": "06/09/2001",
   "gender": "male",
   "location": {
@@ -146,19 +146,19 @@
       },
       {
         "id": "p21",
-        "name": "Omar Nguyen"
+        "name": "Omar Haddad"
       },
       {
         "id": "p24",
-        "name": "Ivan Mensah"
+        "name": "Ivan Petrov"
       },
       {
         "id": "p41",
-        "name": "Rafael Nguyen"
+        "name": "Rafael Torres"
       },
       {
         "id": "p63",
-        "name": "Rowan Brooks"
+        "name": "Quinn Foster"
       }
     ],
     "summary": {
@@ -197,6 +197,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Board game café regular with a soft spot for Ghibli.",
+  "x_profile": {
+    "work": "Accountant",
+    "hometown": "Oakland, California",
+    "traits": [
+      "warm",
+      "organised",
+      "quietly funny"
+    ],
+    "voice": "Marcus is the one who books the table and arrives with a shortlist of games."
   },
   "x_cluster": "games-anime"
 }

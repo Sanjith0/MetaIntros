@@ -1,8 +1,8 @@
 {
   "id": "p66",
-  "name": "Julia Chen",
-  "first_name": "Julia",
-  "last_name": "Chen",
+  "name": "Sofia Alvarez",
+  "first_name": "Sofia",
+  "last_name": "Alvarez",
   "birthday": "06/02/1998",
   "gender": "female",
   "location": {
@@ -145,15 +145,15 @@
       },
       {
         "id": "p64",
-        "name": "Zoe Chen"
+        "name": "Lily Zhou"
       },
       {
         "id": "p67",
-        "name": "Rosa Ferreira"
+        "name": "Camila Souza"
       },
       {
         "id": "p68",
-        "name": "Tomás Ali"
+        "name": "Tomás Herrera"
       }
     ],
     "summary": {
@@ -191,6 +191,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "I bake bread on Sundays. King Arthur, Serious Eats, Cantor Arts Center.",
+  "x_profile": {
+    "work": "Museum educator",
+    "hometown": "Santa Fe, New Mexico",
+    "traits": [
+      "gentle",
+      "artsy",
+      "thoughtful"
+    ],
+    "voice": "Sofia is gentle and thoughtful, and loves explaining a painting or a recipe."
   },
   "x_cluster": "food"
 }

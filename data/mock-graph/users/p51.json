@@ -1,8 +1,8 @@
 {
   "id": "p51",
-  "name": "Ethan Novak",
+  "name": "Ethan Walsh",
   "first_name": "Ethan",
-  "last_name": "Novak",
+  "last_name": "Walsh",
   "birthday": "06/13/2002",
   "gender": "male",
   "location": {
@@ -144,7 +144,7 @@
     "data": [
       {
         "id": "p18",
-        "name": "Jin Shah"
+        "name": "Rohan Shah"
       },
       {
         "id": "p52",
@@ -152,19 +152,19 @@
       },
       {
         "id": "p58",
-        "name": "Kai Patel"
+        "name": "Kai Mehta"
       },
       {
         "id": "p60",
-        "name": "Aisha Müller"
+        "name": "Hana Weber"
       },
       {
         "id": "p70",
-        "name": "Dev Johnson"
+        "name": "Dev Malhotra"
       },
       {
         "id": "p76",
-        "name": "Priya Bauer"
+        "name": "Priya Nair"
       }
     ],
     "summary": {
@@ -202,6 +202,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Building an AI side project every weekend. Devpost, Figma, Philz.",
+  "x_profile": {
+    "work": "Founding engineer at a startup",
+    "hometown": "Boston, Massachusetts",
+    "traits": [
+      "ambitious",
+      "energetic",
+      "talkative"
+    ],
+    "voice": "Ethan talks fast about ideas, pitches side projects and loves a whiteboard."
   },
   "x_cluster": "builders"
 }
