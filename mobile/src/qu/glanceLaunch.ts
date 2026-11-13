@@ -27,11 +27,22 @@ function rememberOrigin(path: string) {
   if (q.get('source') === 'metaintros' && q.get('id')) setGlanceOrigin({ id: q.get('id')!, title: q.get('title') ?? '' });
 }
 
+/** The Glance path the embedded screen opens next. Kept here, not in route params: params are decoded, so a title
+ * with "&" in it would split the path. */
+let pendingPath = '/glance/connections';
+export const glanceEmbedPath = () => pendingPath;
+
+/** On phones, show a Glance path in the embedded screen instead of mounting Glance's native screens (deep links). */
+export function redirectToGlanceEmbed(path: string) {
+  pendingPath = path;
+  router.replace('/glance-embed' as never);
+}
+
 /** Open a Glance route: in the app on the web; embedded in Link on phones (browser sheet as a fallback). */
 export function openGlance(path: string) {
   if (!glanceNeedsBrowser) { router.push(path as never); return; }
   rememberOrigin(path);
-  if (hasWebView()) { router.push({ pathname: '/glance-embed', params: { path } } as never); return; }
+  if (hasWebView()) { pendingPath = path; router.push('/glance-embed' as never); return; }
   void WebBrowser.openBrowserAsync(`${WEB_APP}/#${path}`, {
     presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
     dismissButtonStyle: 'done',

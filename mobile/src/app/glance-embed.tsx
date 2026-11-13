@@ -1,33 +1,35 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Feather from '@expo/vector-icons/Feather';
-import { WEB_APP, hasWebView } from '../qu/glanceLaunch';
+import { WEB_APP, glanceEmbedPath, hasWebView } from '../qu/glanceLaunch';
 import { glanceOrigin } from '../qu/glanceOrigin';
 
 /**
  * Glance inside Link on phones. Glance's face recognition is browser code (face-api + MediaPipe), so its screens
- * run in a WebView here, with the camera allowed, under Link's own back bar. The page hides its own bar when embedded.
+ * run in a WebView here, full screen with the camera allowed. There is no bar: the page's own back arrow on the
+ * event screen posts {type: 'back'}, and this screen returns to the Link event Glance was opened from.
  */
 export default function GlanceEmbed() {
-  const { path } = useLocalSearchParams<{ path?: string }>();
   const [loading, setLoading] = useState(true);
-  const origin = glanceOrigin();
-  const back = () => router.navigate((origin ? `/events/${origin.id}` : '/events') as never);
-  const target = `${WEB_APP}/#${typeof path === 'string' && path.startsWith('/glance') ? path : '/glance/events'}`;
+  const [path] = useState(glanceEmbedPath);
+  const back = () => {
+    const origin = glanceOrigin();
+    router.navigate((origin ? `/events/${origin.id}` : '/events') as never);
+  };
+  const onMessage = (data: string) => {
+    try { if ((JSON.parse(data) as { type?: string }).type === 'back') back(); } catch { /* not ours */ }
+  };
+  const target = `${WEB_APP}/#${path.startsWith('/glance') ? path : '/glance/connections'}`;
   // Loaded here, not at the top: builds without the native WebView must still open every other screen.
   const WebView = hasWebView() ? (require('react-native-webview') as typeof import('react-native-webview')).WebView : null;
   return <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: '#ffffff' }}>
-    <Pressable testID="glance-back" accessibilityRole="button" accessibilityLabel={origin ? `Back to ${origin.title || 'the event'} in Link` : 'Back to Link'} onPress={back}
-      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 6, height: 44, paddingHorizontal: 12, backgroundColor: pressed ? '#e4e6eb' : '#ffffff', borderBottomWidth: 1, borderBottomColor: '#ced0d4' })}>
-      <Feather name="chevron-left" size={24} color="#0866ff" />
-      <Text numberOfLines={1} style={{ flex: 1, fontFamily: 'Inter_600SemiBold', fontSize: 15, color: '#0866ff' }}>{origin ? `Back to ${origin.title || 'the event'}` : 'Back to Link'}</Text>
-      <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#65676b' }}>Glance</Text>
-    </Pressable>
     {WebView ? <View style={{ flex: 1 }}>
       <WebView source={{ uri: target }} style={{ flex: 1 }}
         onLoadEnd={() => setLoading(false)}
+        // Tells the page it is inside Link before its code runs (it hides web-only chrome and routes "back" here).
+        injectedJavaScriptBeforeContentLoaded="window.LINK_EMBED = true; true;"
+        onMessage={event => onMessage(event.nativeEvent.data)}
         javaScriptEnabled domStorageEnabled allowsInlineMediaPlayback mediaPlaybackRequiresUserAction={false}
         mediaCapturePermissionGrantType="grant" allowsBackForwardNavigationGestures
         originWhitelist={['https://*', 'http://*']} />

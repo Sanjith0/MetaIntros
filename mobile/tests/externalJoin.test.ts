@@ -51,7 +51,7 @@ describe("join link", () => {
   it("round-trips through its own link, and keys one Glance event per outside event", () => {
     const join = parseExternalJoin({ source: "metaintros", id: "ev-indie-guild", title: "Indie Night: Local & Loud", place: "The Guild, Menlo Park", name: "Jordan" })!;
     const href = externalJoinHref(join);
-    expect(href.startsWith("/join?")).toBe(true);
+    expect(href.startsWith("/glance/join?")).toBe(true);
     expect(parseExternalJoin(Object.fromEntries(new URLSearchParams(href.split("?")[1])))).toEqual(join);
     expect(externalKey("metaintros", "ev-indie-guild")).toBe("metaintros:ev-indie-guild");
     expect(validExternalId("ev_indie-1")).toBe(true);

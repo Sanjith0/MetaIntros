@@ -6,6 +6,7 @@ import { Button, Empty, Notice, Page } from './components';
 import { colors, s } from './theme';
 import { useGlance } from './state';
 import { parseExternalJoin, setPendingJoin } from './externalJoin';
+import { leaveGlance } from './qu/glanceOrigin';
 
 /**
  * Where a "Join with Glance" link from another app lands. It opens the Glance event
@@ -37,10 +38,10 @@ export function JoinExternalScreen() {
     });
   }, [join, mode, loading, token, needsEnrollment, ready, attempt, joinExternalEvent]);
 
-  const toEvents = () => router.replace('/glance/events');
+  const toEvents = leaveGlance;
   if (!join) return <Page title="Join with Glance">
     <Empty icon="link" title="This link does not open an event." text="Ask for a fresh Join with Glance link from the event page, or open one of your events." />
-    <Button onPress={toEvents}>Go to your events</Button>
+    <Button onPress={toEvents}>Back to Link</Button>
   </Page>;
   return <Page title="Join with Glance">
     <View style={{ gap: 8 }}>
@@ -50,7 +51,7 @@ export function JoinExternalScreen() {
     </View>
     {mode !== 'live' ? <>
       <Notice>Joining from another app needs the live backend. This build runs the sample walkthrough.</Notice>
-      <Button onPress={toEvents}>See the walkthrough</Button>
+      <Button onPress={() => router.replace('/glance/events')}>See the walkthrough</Button>
     </> : needsEnrollment ? <View style={[s.soft, { gap: 12 }]}>
       <Text style={s.heading}>Create your Glance profile first.</Text>
       <Text style={s.muted}>It takes a name. Then you go straight into this event, where people who turned Glance on can recognize each other.</Text>
@@ -58,7 +59,7 @@ export function JoinExternalScreen() {
     </View> : error ? <>
       <Notice error>{error}</Notice>
       <Button testID="join-retry" tone="secondary" icon="refresh-cw" onPress={() => { setError(''); setAttempt(value => value + 1); }}>Try again</Button>
-      <Button tone="ghost" onPress={toEvents}>Go to your events</Button>
+      <Button tone="ghost" onPress={toEvents}>Back to Link</Button>
     </> : <View style={[s.row, { paddingVertical: 12 }]}>
       <ActivityIndicator color={colors.blue} />
       <Text style={[s.muted, s.grow]}>Opening this event in Glance…</Text>

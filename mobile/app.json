@@ -35,8 +35,8 @@
         "expo-image-picker",
         {
           "photosPermission": "Select the portrait you want other event attendees to see.",
-          "cameraPermission": "Take your attendee profile portrait.",
-          "microphonePermission": false
+          "cameraPermission": "Take your attendee portrait and detect the optional three-finger end gesture during a consented conversation.",
+          "microphonePermission": "Record a conversation only after both participants agree. Either person can stop."
         }
       ],
       "expo-secure-store",
