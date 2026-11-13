@@ -98,7 +98,7 @@ function PhotoDetail({ partyId, photo, onChanged, onDeleted }: { partyId: string
         <View style={{ flex: 1 }}><Text style={t.body}>Squadmates can include this in a post</Text><Text style={t.meta}>{shareable ? 'On. Turning it off removes it from their posts too.' : 'Off. Only you can post this photo.'}</Text></View>
         <Switch testID="photo-shareable" value={shareable} onValueChange={async v => { setShareable(v); if (!(await patch({ shareable: v }))) setShareable(!v); }} />
       </View>
-      <Button testID="photo-delete" icon="trash-2" onPress={async () => { if (!confirm) return setConfirm(true); const r = await sendJSON('DELETE', url); if (r.ok) onDeleted(); else setError("Couldn't delete that photo."); }}>{confirm ? 'Tap again to delete' : 'Delete photo'}</Button>
+      <Button testID="photo-delete" icon="trash-2" onPress={async () => { if (!confirm) { setConfirm(true); setTimeout(() => setConfirm(false), 4000); return; } const r = await sendJSON('DELETE', url); if (r.ok) onDeleted(); else setError("Couldn't delete that photo."); }}>{confirm ? 'Tap again to delete' : 'Delete photo'}</Button>
     </> : <>
       {photo.caption ? <Text style={t.body}>{photo.caption}</Text> : null}
       <Text style={t.meta}>{photo.shareable ? `${first(photo.uploader.name)} lets squadmates include this in a post.` : `Only ${first(photo.uploader.name)} can post this photo.`}</Text>

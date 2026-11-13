@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
-import { Image, Linking, Pressable, Text, View } from 'react-native';
+import { Linking, Pressable, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useData } from '../../../qu/hooks';
 import { postJSON } from '../../../qu/api';
 import { pickPhotos } from '../../../qu/pickPhotos';
 import { Avatar, Button, Icon, Loading, Row, Screen, c, font, t } from '../../../qu/ui';
+import { SvgImage } from '../../../qu/SvgImage';
 
 interface Arrival { id: string; name: string; avatarColor: string; checkedInAt: string | null; photoUrl: string | null; isSimulated?: boolean; isLive?: boolean }
 interface Info { meId: string; event: { venueName: string; lat: number; lng: number } }
 
 /** A schematic street map with one pin at the meeting point (no tiles, no live location), as on the web app. */
-const MAP = `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120"><rect width="320" height="120" fill="#f0f2f5"/>'
+const MAP = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120"><rect width="320" height="120" fill="#f0f2f5"/>'
   + [20, 60, 100].map(y => `<line x1="0" x2="320" y1="${y}" y2="${y}" stroke="#fff" stroke-width="8"/>`).join('')
   + [40, 120, 200, 280].map(x => `<line y1="0" y2="120" x1="${x}" x2="${x}" stroke="#fff" stroke-width="8"/>`).join('')
   + '<rect x="128" y="28" width="64" height="24" rx="4" fill="#e4e6eb"/><circle cx="160" cy="60" r="16" fill="#e41e3f" opacity="0.15"/>'
-  + '<path d="M160 40c-7 0-12 5-12 12 0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#e41e3f"/><circle cx="160" cy="52" r="4" fill="#fff"/></svg>')}`;
+  + '<path d="M160 40c-7 0-12 5-12 12 0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#e41e3f"/><circle cx="160" cy="52" r="4" fill="#fff"/></svg>');
 
 /** Find each other (components/chat/FindYourParty.tsx): the meeting spot, "I'm here", an optional photo, and who has arrived. */
 export default function FindEachOther() {
@@ -37,7 +38,7 @@ export default function FindEachOther() {
   return <Screen title="Find each other" back={`/squad/${partyId}`} testID="find-each-other">
     <View testID="find-your-party" style={{ backgroundColor: c.surface }}>
       <Pressable testID="meeting-pin" accessibilityLabel={`Map: ${spot}`} onPress={() => Linking.openURL(`https://maps.google.com/?q=${ev.lat},${ev.lng}`)}>
-        <Image source={{ uri: MAP }} style={{ width: '100%', height: 120 }} />
+        <SvgImage xml={MAP} width="100%" height={120} />
         <View style={{ position: 'absolute', top: 8, right: 8, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: c.surface, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 4 }}>
           <Icon name="navigation" size={12} /><Text style={[t.meta, { color: c.ink, fontFamily: font.semibold }]}>Directions</Text>
         </View>
