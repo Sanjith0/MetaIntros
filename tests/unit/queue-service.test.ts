@@ -37,7 +37,7 @@ describe("queue service (DB)", () => {
     expect(party.members).toHaveLength(6);
     expect(party.members.map((m) => m.userId)).not.toContain("p09"); // Me blocked p09
     expect(party.rationale).toBeTruthy();
-    const trace = await prisma.agentTrace.findMany({ where: { partyId: party.id, agent: "party_formation" } });
+    const trace = await prisma.agentTrace.findMany({ where: { partyId: party.id, agent: { in: ["orchestrator", "companion"] } } });
     expect(trace.length).toBeGreaterThanOrEqual(5);
     // spare simulated joiners were withdrawn
     expect(await prisma.queueEntry.count({ where: { status: "waiting", parked: false } })).toBe(0);
@@ -120,7 +120,7 @@ describe("queue service (DB)", () => {
     await setClockOffsetMs(0);
   });
 
-  it("no event fits the squad: cancelled once, then a cooldown (no retry every tick) and a no_fit reason", async () => {
+  it("no event fits the squad: no squad is formed, the room is not re-run every tick, and the user sees a no_fit reason", async () => {
     // Move every event to Saturday 3:30am — inside the weekend, but outside anyone's free time.
     const { start } = weekendRange(await clockNow());
     const sat = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1, 3, 30);
@@ -128,9 +128,13 @@ describe("queue service (DB)", () => {
     await joinQueue("p01", { eventId: null, targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
     expect(await tickAndAccept()).toBe(0);
-    expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(1);
+    // The Companion engine checks a squad can actually meet before forming it, so nothing is formed then cancelled.
+    expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(0);
+    const rooms = await prisma.matchRoom.count();
+    expect(rooms).toBe(1);
     for (let i = 0; i < 3; i++) expect(await tickAndAccept()).toBe(0);
-    expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(1); // cooldown held
+    expect(await prisma.matchRoom.count()).toBe(rooms); // the room is not re-run every tick
+    expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(0);
     expect((await getQueueStatus("p01")).problem).toBe("no_fit");
   });
 });

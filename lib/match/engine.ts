@@ -198,6 +198,34 @@ function eligibleFor(anchorUnit: QueueItem[], pool: QueueItem[], people: Map<str
   return base.filter((c) => !c.groupId || pool.filter((p) => p.groupId === c.groupId).every((m) => ok.has(m.entryId)));
 }
 
+/**
+ * Everyone who could be matched with this anchor at its current search level: the anchor's own
+ * queue-together group (`unit`, anchor first) and everyone else who passes the same filters as
+ * findProposal (`items`, whole groups only). Null if the anchor's group can't fit a squad.
+ */
+export function eligiblePool(
+  anchor: QueueItem,
+  pool: QueueItem[],
+  people: Map<string, Person>,
+  landmarks: Map<string, { id: string; lat: number; lng: number }>,
+  opts: EngineOptions,
+): { unit: QueueItem[]; items: QueueItem[]; level: SearchLevel; index: number } | null {
+  const { level, index } = levelFor(opts.now - anchor.joinedAt, opts);
+  if (!people.get(anchor.userId)) return null;
+  const mixedDelay = opts.mixedFillDelayMs ?? 12_000;
+  // The anchor brings its whole queue-together group (if any); strangers fill the remaining spots.
+  const unit = [anchor, ...unitOf(anchor, pool).filter((u) => u.entryId !== anchor.entryId)];
+  if (unit.length > anchor.targetSize || unit.some((u) => !people.get(u.userId))) return null;
+  const items = eligibleFor(unit, pool, people, landmarks, level.radiusKm, (c) => {
+    if (c.isSimulated) {
+      if (opts.fillMode === "live") return false;
+      if (opts.fillMode === "mixed" && !anchor.isSimulated && opts.now - anchor.joinedAt < mixedDelay) return false;
+    }
+    return true;
+  });
+  return { unit, items, level, index };
+}
+
 /** Best safe candidate groups for one anchor at its current search level. */
 export function findProposal(
   anchor: QueueItem,
@@ -207,21 +235,10 @@ export function findProposal(
   opts: EngineOptions,
   score: Scorer,
 ): Proposal | null {
-  const { level, index } = levelFor(opts.now - anchor.joinedAt, opts);
-  const anchorP = people.get(anchor.userId);
-  if (!anchorP) return null;
-  const mixedDelay = opts.mixedFillDelayMs ?? 12_000;
-
-  // The anchor brings its whole queue-together group (if any); strangers fill the remaining spots.
-  const anchorUnit = [anchor, ...unitOf(anchor, pool).filter((u) => u.entryId !== anchor.entryId)];
-  if (anchorUnit.length > anchor.targetSize || anchorUnit.some((u) => !people.get(u.userId))) return null;
-  const eligible = eligibleFor(anchorUnit, pool, people, landmarks, level.radiusKm, (c) => {
-    if (c.isSimulated) {
-      if (opts.fillMode === "live") return false;
-      if (opts.fillMode === "mixed" && !anchor.isSimulated && opts.now - anchor.joinedAt < mixedDelay) return false;
-    }
-    return true;
-  });
+  const found = eligiblePool(anchor, pool, people, landmarks, opts);
+  if (!found) return null;
+  const { level, index, unit: anchorUnit, items: eligible } = found;
+  const anchorP = people.get(anchor.userId)!;
   if (eligible.length < anchor.targetSize - anchorUnit.length) return null;
   const sc = groupAwareScorer(score, [...anchorUnit, ...eligible]);
 
@@ -350,6 +367,74 @@ export async function runTickAsync(
     // left) must not be retried by the next anchor with the same people within the same pass.
     chosen!.entryIds.forEach((id) => taken.add(id));
     if (ok) formed++;
+  }
+  return formed;
+}
+
+/** The most people one run of the Companion engine considers. */
+export const MAX_ROOM = 8;
+
+/**
+ * Companion-engine tick. For each anchor (same order and rules as runTickAsync) the "room" is the
+ * anchor plus everyone who could be matched with them; `match` (the Companion engine) returns the
+ * squads the Companions and the Orchestrator settled on. Code re-checks every squad before it is
+ * committed: exact size, entries still free, one event at most, and the hard safety rules.
+ */
+export async function runRoomsAsync(
+  waiting: QueueItem[],
+  people: Map<string, Person>,
+  landmarks: Map<string, { id: string; lat: number; lng: number }>,
+  opts: EngineOptions,
+  match: (anchor: QueueItem, room: QueueItem[], level: number) => Promise<Candidate[]>,
+  commit: (p: Proposal, c: Candidate) => Promise<boolean>,
+): Promise<number> {
+  const pool = [...waiting].sort((a, b) => a.joinedAt - b.joinedAt || Number(a.isSimulated) - Number(b.isSimulated) || a.entryId.localeCompare(b.entryId));
+  const taken = new Set<string>();
+  let formed = 0;
+  for (const anchor of pool) {
+    if (taken.has(anchor.entryId)) continue;
+    if (anchor.isSimulated && !(opts.simAnchors ?? opts.fillMode === "simulated")) continue;
+    const found = eligiblePool(anchor, pool.filter((p) => !taken.has(p.entryId)), people, landmarks, opts);
+    if (!found) continue;
+    // Everyone in a room must be able to go to the same event (the first specific event wins), and
+    // queue-together groups come in whole or not at all, within the room cap.
+    let eventId = found.unit.find((u) => u.eventId)?.eventId ?? null;
+    const room = [...found.unit];
+    const seenGroups = new Set(found.unit.map((u) => u.groupId).filter(Boolean));
+    for (const it of found.items) {
+      if (it.groupId && seenGroups.has(it.groupId)) continue;
+      const unit = unitOf(it, found.items);
+      if (it.groupId) seenGroups.add(it.groupId);
+      const unitEvent = unit.find((u) => u.eventId)?.eventId ?? null;
+      if (unitEvent && eventId && unitEvent !== eventId) continue;
+      if (room.length + unit.length > MAX_ROOM) continue;
+      eventId = eventId ?? unitEvent;
+      room.push(...unit);
+    }
+    if (room.length < anchor.targetSize) continue;
+    const inRoom = new Map(room.map((r) => [r.entryId, r]));
+    const candidates = await match(anchor, room, found.index).catch(() => [] as Candidate[]);
+    for (const c of candidates) {
+      const members = c.entryIds.map((id) => inRoom.get(id));
+      const ok =
+        c.entryIds.length === anchor.targetSize &&
+        new Set(c.entryIds).size === c.entryIds.length &&
+        members.every((m) => m && !taken.has(m.entryId)) &&
+        c.userIds.join() === members.map((m) => m!.userId).join() &&
+        // a queue-together group is never split
+        members.every((m) => !m!.groupId || room.filter((r) => r.groupId === m!.groupId).every((r) => c.entryIds.includes(r.entryId))) &&
+        validateParty(c.userIds.map((u) => people.get(u)!)).ok;
+      if (!ok) continue;
+      const proposal: Proposal = { anchorEntryId: anchor.entryId, targetSize: anchor.targetSize, mode: modeOf(anchor), eventId, bucketId: anchor.bucketId, level: found.index, candidates: [c] };
+      if (await commit(proposal, { ...c, eventId })) {
+        c.entryIds.forEach((id) => taken.add(id));
+        formed++;
+      }
+    }
+    // A room runs once per tick, whatever the outcome: leftover fillers must not form another squad
+    // before they are withdrawn, and a room that failed must not be re-run by its next anchor in the
+    // same pass (each run is ~45 model calls).
+    room.forEach((r) => taken.add(r.entryId));
   }
   return formed;
 }

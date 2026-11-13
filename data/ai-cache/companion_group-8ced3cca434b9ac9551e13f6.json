@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Ekansh is hoping for a squad of 2 for an active event this weekend. They would bring upbeat, social energy and love swapping tips on climbing at Peninsula Boulders, cheering the Warriors, or Palo Alto Pickleball meetups. They like getting out and doing something active and would love to plan a climb, run, or game watch together.\", \"cites\": [\"live-be04a947:likes[0]\", \"live-be04a947:likes[2]\", \"live-be04a947:groups[2]\", \"live-be04a947:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1413,
+    "completionTokens": 467
+  },
+  "savedAt": "2026-11-13T00:51:11.725Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan is hoping for a chill new hangout with a squad of 4 and would bring shared love for bouldering, vinyl digging, and photo walks. They would vibe with Freya, Zoe and Yuki on climbing and music. Jordan likes low-key, chill plans so mellow energy works best.\", \"cites\": [\"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2150,
+    "completionTokens": 348
+  },
+  "savedAt": "2026-11-13T00:29:12.471Z"
+}

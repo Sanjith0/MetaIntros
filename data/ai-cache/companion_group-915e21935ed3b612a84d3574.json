@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Rosa is hoping for a chill squad of 6 for Indie Night and loves low-key hangs. They would bring vinyl chat from Peninsula Vinyl Collectors, climbing talk, and big Phoebe Bridgers energy, plus 35mm photo walk stories. Works best when it's relaxed and easygoing.\", \"cites\": [\"p11:socialStyle\", \"p11:groups[0]\", \"p11:likes[2]\", \"p11:music[0]\", \"p11:groups[2]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2984,
+    "completionTokens": 409
+  },
+  "savedAt": "2026-11-13T00:26:28.566Z"
+}

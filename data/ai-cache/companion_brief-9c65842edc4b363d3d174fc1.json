@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Adi is chill and prefers low-key, relaxed plans. They tend to keep conversation easygoing and connect over shared interests like indie music, climbing, and coffee shop hangs.\",\"depth\":{\"live-1dfe7bd8:music[0]\":\"Listens to Phoebe Bridgers and went to Phoebe Bridgers @ Greek Theatre\",\"live-1dfe7bd8:events[2]\":\"Phoebe Bridgers @ Greek Theatre lines up with listening to Phoebe Bridgers\",\"live-1dfe7bd8:likes[4]\":\"Interest in Vinyl Me, Please connects to Peninsula Vinyl Collectors group\",\"live-1dfe7bd8:groups[0]\":\"In Peninsula Vinyl Collectors, plus likes Vinyl Me, Please and Rasputin Music\",\"live-1dfe7bd8:likes[2]\":\"Follows Bay Area Climbers Coalition, Climbing Magazine, and Peninsula Bouldering League\"},\"lightsUp\":[\"live-1dfe7bd8:music[0]\",\"live-1dfe7bd8:groups[0]\",\"live-1dfe7bd8:likes[7]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 828,
+    "completionTokens": 885
+  },
+  "savedAt": "2026-11-13T00:13:33.661Z"
+}

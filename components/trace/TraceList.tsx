@@ -18,12 +18,13 @@ interface Step {
 }
 
 const AGENT: Record<string, string> = {
+  orchestrator: "Orchestrator",
   party_formation: "Squad matching",
   event_selection: "Event pick",
   hangout_planner: "Hangout plan",
   host: "AI host",
   talk_cards: "Talk cards",
-  companion: "Pre-chats",
+  companion: "Companions",
   ratings: "Past ratings",
 };
 

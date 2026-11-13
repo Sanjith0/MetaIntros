@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Ben hangs back by the bar talking about Climbing Magazine finds p14:likes[0] instead of crowding the stage at Indie Night, how would Jordan actually spend that set with them?\", \"cites\": [\"p14:likes[0]\"]}, \"p02\": {\"say\": \"Ben loves low-key chats about vinyl finds from Vinyl Me, Please p14:likes[1] between bands — would Freya join that corner chat or pull toward the front?\", \"cites\": [\"p14:likes[1]\"]}, \"p03\": {\"say\": \"When Ben wants to sit out a loud set and geek out over Snail Mail influences p14:music[0] at Indie Night, what would Zoe do in that moment?\", \"cites\": [\"p14:music[0]\"]}, \"p04\": {\"say\": \"If the showcase gets packed and Ben prefers a chill spot near the back discussing Climbing Magazine p14:likes[0], how would Reza navigate that with them?\", \"cites\": [\"p14:likes[0]\"]}, \"p05\": {\"say\": \"Ben likes to trade Vinyl Me, Please stories p14:likes[1] during breaks — if the crowd surges, would Yuki stay chatting or move forward?\", \"cites\": [\"p14:likes[1]\"]}, \"p11\": {\"say\": \"If Ben steps outside between sets for a quieter chat about Snail Mail p14:music[0], would Rosa come along or keep their spot inside?\", \"cites\": [\"p14:music[0]\"]}, \"p12\": {\"say\": \"Ben is into low-key hangs and might skip the mosh to talk Climbing Magazine p14:likes[0] — how would Gabe actually handle that moment together?\", \"cites\": [\"p14:likes[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3663,
+    "completionTokens": 725
+  },
+  "savedAt": "2026-11-13T00:25:54.400Z"
+}

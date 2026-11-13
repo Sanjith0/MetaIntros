@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p02\", \"line\": {\"say\": \"Jordan would love a chill squad trading Bouldering Daily beta and Fujifilm X shots over Philz Coffee.\", \"cites\": [\"p01:likes[1]\", \"p01:likes[6]\", \"p01:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1477,
+    "completionTokens": 695
+  },
+  "savedAt": "2026-11-13T00:29:08.013Z"
+}

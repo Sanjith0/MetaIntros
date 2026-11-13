@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"live-be04a947\": {\"say\": \"Afnan likes getting out for a climb at Peninsula Boulders and then hanging after — if they planned that this weekend, how would Ekansh approach the session, like coaching beta, climbing side-by-side, or chatting between routes?\", \"cites\": [\"live-fffb1569:likes[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1308,
+    "completionTokens": 441
+  },
+  "savedAt": "2026-11-13T00:51:00.446Z"
+}

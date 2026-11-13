@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan is hoping for a chill squad of 5 for Indie Night and would love to keep it low-key. They would bring easy chat about vinyl digging, bouldering, and shooting on Fujifilm. They are into Bay Area Photo Walks and love relaxed hangs where everyone can geek out over music.\", \"cites\": [\"p01:socialStyle\", \"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2440,
+    "completionTokens": 331
+  },
+  "savedAt": "2026-11-13T00:27:23.326Z"
+}

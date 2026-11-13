@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Daniel is chill and prefers low-key, laid-back plans. They tend to keep conversations easygoing and friendly, often around music, coffee, film, and climbing.\",\"depth\":{\"p07:likes[1]\":\"Follows Bay Area Concerts and is in Bay Area Indie Shows\",\"p07:likes[4]\":\"Into Blue Bottle Coffee, part of Peninsula Coffee Nerds and Latte Art Throwdown\",\"p07:likes[5]\":\"Likes A24 and is in Peninsula Film Club\",\"p07:music[0]\":\"Listens to Japanese Breakfast along with Mitski and Wet Leg\",\"p07:events[0]\":\"Joins Castle Rock Outdoor Climb Day and follows Climbing Magazine\"},\"lightsUp\":[\"p07:likes[1]\",\"p07:likes[4]\",\"p07:music[0]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 538,
+    "completionTokens": 724
+  },
+  "savedAt": "2026-11-12T20:24:39.636Z"
+}

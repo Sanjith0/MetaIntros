@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import LANDMARKS from "@/data/seed/landmarks.json";
-import { findProposal, LEVELS, LIVE_FLOOR_LEVEL, runTick, type EngineOptions, type QueueItem } from "@/lib/match/engine";
+import { eligiblePool, findProposal, LEVELS, LIVE_FLOOR_LEVEL, MAX_ROOM, runRoomsAsync, runTick, type Candidate, type EngineOptions, type QueueItem } from "@/lib/match/engine";
+import { groupCohesion } from "@/lib/match/cohesion";
 import { makePairScorer } from "@/lib/match/compat";
 import { validateParty } from "@/lib/match/safety";
 import { nearestLandmark } from "@/lib/geo";
@@ -144,5 +145,57 @@ describe("queue engine", () => {
     const r = runTick(q, people, landmarks, { now: 0, fillMode: "simulated" }, () => bogus);
     expect(r[0].chosen.userIds).not.toContain("p73");
     expect(r[0].chosen.userIds).toHaveLength(6);
+  });
+});
+
+describe("Companion-engine rooms", () => {
+  const opts: EngineOptions = { now: 0, fillMode: "simulated" };
+  const adults = [...people.values()].filter((p) => p.ageBand === "18-24" && !p.womenOnlyParty && p.blocked.size === 0).map((p) => p.id).sort();
+  const cand = (items: QueueItem[]): Candidate => ({ entryIds: items.map((i) => i.entryId), userIds: items.map((i) => i.userId), eventId: null, cohesion: groupCohesion(items.map((i) => people.get(i.userId)!)) });
+
+  it("eligiblePool is everyone the anchor could be matched with: same size and queue, allowed, not the anchor", () => {
+    const pool = [item("p01", 0, { isSimulated: false }), item("p09", 1), item(adults[0], 2), item(adults[1], 3, { targetSize: 4 }), item(adults[2], 4, { mode: "hangout" }), item(adults[3], 5, { eventId: "ev-a" })];
+    const got = eligiblePool(pool[0], pool, people, landmarks, opts)!;
+    expect(got.items.map((i) => i.userId)).toEqual([adults[0], adults[3]]); // p09 is blocked, wrong size and wrong queue are out
+    expect(got.index).toBe(0);
+  });
+
+  it("the room is capped, skips anchors with too few people, and never mixes two specific events", async () => {
+    const many = adults.slice(0, 40).map((id, i) => item(id, i, { targetSize: 4 }));
+    const rooms: QueueItem[][] = [];
+    await runRoomsAsync(many, people, landmarks, opts, async (_a, room) => (rooms.push(room), []), async () => true);
+    expect(rooms[0]).toHaveLength(MAX_ROOM);
+    expect(rooms[0][0].userId).toBe(adults[0]);
+
+    const few = adults.slice(0, 3).map((id, i) => item(id, i, { targetSize: 6 }));
+    let called = 0;
+    await runRoomsAsync(few, people, landmarks, opts, async () => (called++, []), async () => true);
+    expect(called).toBe(0);
+
+    const mixed = [item(adults[0], 0, { targetSize: 3 }), item(adults[1], 1, { targetSize: 3, eventId: "ev-a" }), item(adults[2], 2, { targetSize: 3, eventId: "ev-b" }), item(adults[3], 3, { targetSize: 3 })];
+    const seen: QueueItem[][] = [];
+    await runRoomsAsync(mixed, people, landmarks, opts, async (_a, room) => (seen.push(room), []), async () => true);
+    expect(seen[0].map((r) => r.userId)).toEqual([adults[0], adults[1], adults[3]]); // ev-b can't join a room going to ev-a
+  });
+
+  it("only commits squads that pass the code checks, and uses a room once per tick", async () => {
+    const items = adults.slice(0, 9).map((id, i) => item(id, i, { targetSize: 3 }));
+    const blockedPair = [item("p01", 0, { targetSize: 3 }), item("p09", 1, { targetSize: 3 }), item(adults[0], 2, { targetSize: 3 })];
+    const committed: string[][] = [];
+    const commit = async (_p: unknown, c: Candidate) => (committed.push(c.userIds), true);
+    const formed = await runRoomsAsync(items, people, landmarks, opts, async (_a, room) => [
+      cand(room.slice(0, 2)), // wrong size
+      cand([room[0], room[0], room[1]]), // duplicate
+      { ...cand(room.slice(0, 3)), userIds: [room[5].userId, room[1].userId, room[2].userId] }, // ids don't match entries
+      cand(room.slice(0, 3)), // ok
+      cand(room.slice(2, 5)), // reuses a taken entry
+      cand(room.slice(3, 6)), // ok
+    ], commit);
+    expect(formed).toBe(2);
+    expect(committed).toEqual([adults.slice(0, 3), adults.slice(3, 6)]); // and the 3 left over did not get a second room this tick
+    committed.length = 0;
+    // an unsafe squad is never committed, whatever the engine returns
+    expect(await runRoomsAsync([blockedPair[0], blockedPair[2], item(adults[1], 3, { targetSize: 3 })], people, landmarks, opts, async () => [cand(blockedPair)], commit)).toBe(0);
+    expect(committed).toEqual([]);
   });
 });

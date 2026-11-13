@@ -26,6 +26,6 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
     // NETWORK_DISABLED: every E2E run doubles as an offline (Wi-Fi died) run
-    env: { DATABASE_URL: "file:./e2e.db", PORT: String(PORT), E2E_PORT: String(PORT), AI_MODE: "cache", NETWORK_DISABLED: "1" },
+    env: { DATABASE_URL: "file:./e2e.db", PORT: String(PORT), E2E_PORT: String(PORT), AI_MODE: "cache", NETWORK_DISABLED: "1", CHECKIN_MS: "0" },
   },
 });

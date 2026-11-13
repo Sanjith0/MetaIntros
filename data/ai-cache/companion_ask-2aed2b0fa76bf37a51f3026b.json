@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Reza likes low-key, chill plans and might want to step to the back to talk vinyl between bands. How would Jordan handle that vibe at Indie Night — stay near stage or join the low-key chat?\", \"cites\": [\"p04:socialStyle\"]}, \"p02\": {\"say\": \"If the showcase gets crowded and loud, Reza would prefer a chill corner to talk Rasputin Music finds. How does Freya usually navigate that — push to front or hang back and chat?\", \"cites\": [\"p04:likes[0]\"]}, \"p03\": {\"say\": \"Reza follows Vinyl Me, Please and loves swapping pressings. If Reza starts geeking out about a Japanese Breakfast vinyl during a set break, how would Zoe respond in that moment?\", \"cites\": [\"p04:likes[1]\"]}, \"p05\": {\"say\": \"Reza is into Peninsula Boulders and keeps nights low-key. At Indie Night, if Reza suggests grabbing seats and trading bouldering stories instead of standing in the pit, what would Yuki do?\", \"cites\": [\"p04:likes[3]\"]}, \"p11\": {\"say\": \"Reza shoots with Fujifilm X and likes chill photo walks. If Reza pauses to snap 35mm-style shots of the bands from the back, how would Rosa share that space?\", \"cites\": [\"p04:likes[9]\"]}, \"p12\": {\"say\": \"Reza follows SF Live Music Guide but prefers chill hangs. If the headliner runs late and Reza wants to dip to a quieter spot to talk Indie Shuffle finds, how would Gabe react?\", \"cites\": [\"p04:likes[2]\"]}, \"p14\": {\"say\": \"Reza is a member of Peninsula Vinyl Collectors and loves low-key chats. Between sets, if Reza starts comparing Record Store Day Palo Alto hauls, how would Ben engage?\", \"cites\": [\"p04:groups[2]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3672,
+    "completionTokens": 791
+  },
+  "savedAt": "2026-11-13T00:26:45.214Z"
+}

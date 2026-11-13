@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe is hoping for a chill Indie Night showcase with a low-key crew of 5. They would bring their love of vinyl collecting, bouldering, and 35mm film photography and enjoy easygoing chat about music and photo walks. They like low-key, chill plans and would have the best time if the vibe stays relaxed.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\", \"p03:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2616,
+    "completionTokens": 439
+  },
+  "savedAt": "2026-11-13T00:27:23.357Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Freya and Jordan are hanging at Indie Night between sets, how would Jordan keep it chill when Freya starts swapping stories from Golden Gate Photo Walk?\", \"cites\": [\"p02:events[0]\"]}, \"p03\": {\"say\": \"At Indie Night, if Freya wants to step to the side for a low-key chat about V-Scale Memes instead of crowding the stage, how would Zoe respond?\", \"cites\": [\"p02:likes[1]\"]}, \"p04\": {\"say\": \"Between bands at Indie Night, Freya likes trading Bay Area Concerts tips in a chill corner. How would Reza join that kind of easygoing hang?\", \"cites\": [\"p02:likes[4]\"]}, \"p05\": {\"say\": \"Freya and Yuki both boulder daily and are in Peninsula Bouldering Crew. At Indie Night, how would Yuki balance chatting about climbing with watching the bands?\", \"cites\": [\"p02:likes[0]\"]}, \"p11\": {\"say\": \"Freya prefers low-key, chill plans at shows. If the crowd gets loud at Indie Night, how would Rosa find a relaxed spot with Freya to still enjoy it?\", \"cites\": [\"p02:socialStyle\"]}, \"p12\": {\"say\": \"Freya loves A24 and low-key film chat. If there's downtime at Indie Night, how would Gabe vibe with Freya swapping movie and music recommendations?\", \"cites\": [\"p02:likes[6]\"]}, \"p14\": {\"say\": \"Freya is into Bay Area Concerts and likes keeping things chill between sets. How would Ben hang with Freya when they want to step back and chat vinyl?\", \"cites\": [\"p02:likes[4]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3514,
+    "completionTokens": 798
+  },
+  "savedAt": "2026-11-13T00:26:44.485Z"
+}

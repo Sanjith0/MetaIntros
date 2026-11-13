@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Gabe is hoping for a chill squad of 6 for the weekend. They'd bring easygoing chat about vinyl, climbing and indie nights, and likes low-key, chill plans. Gabe is in Bay Area Climbers and Peninsula Vinyl Collectors and goes to Indie Night at The Guild, so they'd vibe with Jordan, Freya, Zoe, Reza and Yuki on relaxed hangs.\", \"cites\": [\"p12:groups[2]\", \"p12:groups[1]\", \"p12:events[0]\", \"p12:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3053,
+    "completionTokens": 477
+  },
+  "savedAt": "2026-11-13T00:28:21.617Z"
+}

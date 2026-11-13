@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p11\", \"line\": {\"say\": \"Zoe would love this low-key vinyl, bouldering and film photo crew for Indie Night.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1726,
+    "completionTokens": 1081
+  },
+  "savedAt": "2026-11-13T00:26:23.202Z"
+}

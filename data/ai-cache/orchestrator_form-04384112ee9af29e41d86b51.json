@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p04\", \"p05\", \"p12\"], \"why\": \"You all share Bouldering Daily and Rasputin Music plus a love for vinyl and Bay Area Concerts — ideal low-key crew to hang back and chat between bands at Indie Night.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1406,
+    "completionTokens": 985
+  },
+  "savedAt": "2026-11-13T00:27:21.687Z"
+}

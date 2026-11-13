@@ -18,7 +18,7 @@ export async function generateTalkCards(partyId: string) {
   const sparks = await prisma.preChat.findMany({ where: { partyId } });
   const sparkClaims = (a: string, b: string): Claim[] => {
     const pc = sparks.find((s) => (s.userAId === a && s.userBId === b) || (s.userAId === b && s.userBId === a));
-    return pc ? (pc.sparks as string[]).slice(0, 1).map((t) => ({ kind: "spark" as const, text: `Conversation spark (from an AI pre-chat simulation): ${t}`, sources: [`preChat:${pc.id}`] })) : [];
+    return pc ? (pc.sparks as string[]).slice(0, 1).map((t) => ({ kind: "spark" as const, text: `Conversation spark (from your Companions' AI conversation): ${t}`, sources: [`preChat:${pc.id}`] })) : [];
   };
 
   const pairs: PairInput[] = [];

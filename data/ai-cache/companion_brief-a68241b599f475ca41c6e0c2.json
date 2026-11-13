@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Simon is chill and prefers low-key plans, tending to keep conversation laid-back and easygoing around shared interests like climbing, hiking, records, and indie music.\",\"depth\":{\"p06:likes[0]\":\"Follows Peninsula Boulders and goes to Bouldering Night at Peninsula Boulders\",\"p06:music[1]\":\"Listens to Phoebe Bridgers and went to Phoebe Bridgers @ Greek Theatre\",\"p06:likes[4]\":\"Follows Bay Area Hiker and AllTrails, in Peninsula Hikers, did Mission Peak Sunrise Hike\",\"p06:likes[3]\":\"Into Vinyl Me, Please, in Peninsula Vinyl Collectors, goes to Record Store Day Palo Alto\",\"p06:likes[2]\":\"Follows Pitchfork, in Bay Area Indie Shows, listens to Mitski and Phoebe Bridgers\"},\"lightsUp\":[\"p06:events[2]\",\"p06:music[1]\",\"p06:events[3]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 611,
+    "completionTokens": 798
+  },
+  "savedAt": "2026-11-12T20:24:37.322Z"
+}

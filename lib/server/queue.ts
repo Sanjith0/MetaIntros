@@ -2,13 +2,14 @@ import { prisma } from "@/lib/db";
 import { PartySize } from "@/lib/domain/enums";
 import { assignBucket, bucketDistanceKm } from "@/lib/match/buckets";
 import { makePairScorer } from "@/lib/match/compat";
-import { levelFor, playersFound, queuesCompatible, runTickAsync, type Candidate, type Proposal, type QueueItem, type QueueMode } from "@/lib/match/engine";
+import { levelFor, playersFound, queuesCompatible, runRoomsAsync, type Candidate, type Proposal, type QueueItem, type QueueMode } from "@/lib/match/engine";
 import { pairAllowed } from "@/lib/match/safety";
 import { loadPeople, type Person } from "@/lib/profile/load";
 import { publish } from "./bus";
 import { setAiMode } from "@/lib/ai";
 import { getFillMode, getSetting } from "./settings";
-import { formParty, chooseCandidate } from "./pipeline";
+import { formParty } from "./pipeline";
+import { lastRoomFoundNoSquad, matchRoom, roomStageFor } from "./rooms";
 import { checkStalls } from "./host";
 import { sweepExpiredChats } from "./expiry";
 import { sweepReadyChecks } from "./readyCheck";
@@ -30,6 +31,7 @@ async function withRatings(people: Map<string, Person>, items: Pick<QueueItem, "
   applyAvoids(people, signals, (a, b) => Boolean(groupOf.get(a)) && groupOf.get(a) === groupOf.get(b));
   return { signals, score: ratingAwareScorer(makePairScorer(), signals) };
 }
+import { cleanNote } from "@/lib/companion/brief";
 
 // ───────────────────────── join / leave ─────────────────────────
 
@@ -50,6 +52,8 @@ export interface JoinInput {
   lng?: number;
   /** manual area pick */
   landmarkId?: string;
+  /** "What do you want tonight?" (optional; only the person's own Companion sees it) */
+  tonight?: string | null;
   locationSource: "gps" | "manual" | "seed";
   /** let friends see this queue; omitted = your saved setting. Given = also remembered as your setting. */
   visibleToFriends?: boolean;
@@ -59,13 +63,15 @@ export interface JoinInput {
 
 export type JoinResult =
   | { ok: true; entryId: string; bucketId: string; bucketName: string }
-  | { ok: false; error: "too_far" | "bad_size" | "private_event" | "no_event" | "no_location" | "bad_mode"; nearest?: string };
+  | { ok: false; error: "too_far" | "bad_size" | "private_event" | "no_event" | "no_location" | "bad_mode" | "sensitive_tonight"; nearest?: string };
 
 export async function joinQueue(userId: string, input: JoinInput): Promise<JoinResult> {
   if (!PartySize.safeParse(input.targetSize).success) return { ok: false, error: "bad_size" };
   const mode: QueueMode = input.mode ?? "events";
   if (mode !== "events" && mode !== "hangout") return { ok: false, error: "bad_mode" };
   if (mode === "hangout" && input.eventId) return { ok: false, error: "bad_mode" }; // hangouts are new, never an existing event
+  const tonight = cleanNote(input.tonight);
+  if (tonight === "sensitive") return { ok: false, error: "sensitive_tonight" };
   if (input.eventId) {
     const ev = await prisma.event.findUnique({ where: { id: input.eventId } });
     if (!ev || ev.kind !== "event") return { ok: false, error: "no_event" }; // can't queue into another squad's hangout
@@ -97,7 +103,7 @@ export async function joinQueue(userId: string, input: JoinInput): Promise<JoinR
   const entry = await prisma.queueEntry.create({
     data: {
       userId, mode, eventId: input.eventId, targetPartySize: input.targetSize, lat: lat!, lng: lng!, bucketLandmarkId: bucket.id,
-      visibleToFriends, viaFriendId: input.viaFriendId ?? null,
+      visibleToFriends, viaFriendId: input.viaFriendId ?? null, tonight,
     },
   });
   if (!user.isSimulated) {
@@ -138,7 +144,7 @@ export async function leaveQueue(userId: string) {
  * - event_started: queued from an event that has already started
  * - no_fit: a squad formed but no event/spot fit everyone; retried after a cooldown
  */
-export type QueueProblem = "no_events" | "event_started" | "no_fit";
+export type QueueProblem = "no_events" | "event_started" | "no_fit" | "no_squad";
 
 export interface QueueStatus {
   state: "idle" | "waiting" | "matched";
@@ -157,6 +163,9 @@ export interface QueueStatus {
   /** Where the search reaches right now, for the queue screen's search map. Counts only, never faces. */
   searchArea?: SearchArea;
   partyId?: string | null;
+  /** what the Companion engine is doing for this user right now, if a room is running */
+  stage?: string;
+  stageNote?: string;
 }
 
 export interface SearchArea {
@@ -184,15 +193,19 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
   const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: nowMs(), fillMode: await getFillMode() }, score) : { found: 1, userIds: [userId] };
   const users = await prisma.user.findMany({ where: { id: { in: pf.userIds } }, select: { id: true, name: true, avatarColor: true } });
   const searchArea = anchor ? searchAreaFor(anchor, waiting, people, landmarks, await getFillMode()) : undefined;
+  const room = await roomStageFor(userId);
   return {
     state: "waiting",
+    stage: room?.stage,
+    stageNote: room?.note,
     entryId: entry.id,
     targetSize: entry.targetPartySize,
     mode: entry.mode as QueueMode,
     eventId: entry.eventId,
     bucketName: entry.bucketLandmark.name,
     bucketId: entry.bucketLandmarkId,
-    problem: problems.get(entry.id),
+    // no_squad is only shown, never used to hold someone back: a new person joining starts a fresh room.
+    problem: problems.get(entry.id) ?? (!room && (await lastRoomFoundNoSquad(userId, entry.joinedAt)) ? "no_squad" : undefined),
     waitedMs: nowMs() - entry.joinedAt.getTime(),
     found: pf.found,
     foundUsers: pf.userIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean),
@@ -298,16 +311,24 @@ export async function tick(): Promise<number> {
     const landmarks = await landmarkMap();
     const fillMode = await getFillMode();
     const mixedFillDelayMs = Number(await getSetting("mixedFillDelayMs", "12000"));
-    const formed = await runTickAsync(
+    const formed = await runRoomsAsync(
       waiting,
       people,
       landmarks,
       // fillers never start a squad of their own: they only complete squads around real people
       { now: nowMs(), fillMode, mixedFillDelayMs, simAnchors: false },
-      (p: Proposal) => chooseCandidate(p, people),
+      // The Companion engine decides who goes together. Wait until a real user's room has finished filling.
+      async (anchor: QueueItem, room: QueueItem[]) =>
+        room.some((r) => fillPending(r.entryId))
+          ? []
+          : matchRoom(anchor, room, people, (entryIds) => {
+              // The Companions found people, but no event or spot works for any of their groups.
+              for (const id of entryIds) cooldowns().set(id, nowMs() + NO_FIT_COOLDOWN_MS);
+              for (const r of room.filter((x) => entryIds.includes(x.entryId))) publish("queue", { type: "problem" }, [r.userId]);
+            }, score),
       async (p: Proposal, c: Candidate) => {
         const r = await formParty(p, c, people);
-        if (r.partyId) for (const id of c.entryIds) cleanupSimFor(id);
+        if (r.partyId) await Promise.all(c.entryIds.map((id) => cleanupSimFor(id)));
         else if ("reason" in r && r.reason === "no_event") {
           // Nothing fits this squad right now: let them wait it out instead of retrying every tick.
           for (const id of c.entryIds) cooldowns().set(id, nowMs() + NO_FIT_COOLDOWN_MS);
@@ -315,7 +336,6 @@ export async function tick(): Promise<number> {
         }
         return Boolean(r.partyId);
       },
-      score,
     );
     // push fresh "players found" counts to waiting real users
     for (const w of waiting.filter((x) => !x.isSimulated)) publish("queue", { type: "tick" }, [w.userId]);
@@ -325,7 +345,7 @@ export async function tick(): Promise<number> {
   }
 }
 
-const g = globalThis as unknown as { __quTicker?: NodeJS.Timeout; __quSim?: Map<string, { timers: NodeJS.Timeout[]; spawned: string[] }> };
+const g = globalThis as unknown as { __quTicker?: NodeJS.Timeout; __quSim?: Map<string, { timers: NodeJS.Timeout[]; spawned: string[]; readyAt: number }> };
 
 export function ensureTicker() {
   if (process.env.NODE_ENV === "test" || g.__quTicker) return;
@@ -345,6 +365,12 @@ export function stopTicker() {
 // ───────────────────────── simulated fill ─────────────────────────
 
 const sims = () => (g.__quSim ??= new Map());
+
+/** True while simulated fillers are still trickling into this real user's room. */
+function fillPending(entryId: string) {
+  const s = sims().get(entryId);
+  return Boolean(s && Date.now() < s.readyAt);
+}
 
 function cancelSim(entryId: string) {
   const s = sims().get(entryId);
@@ -376,7 +402,9 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
   const fillMs = Number(await getSetting("simFillMs", "18000"));
   const delay = mode === "mixed" ? Number(await getSetting("mixedFillDelayMs", "12000")) : 0;
   const entry = await prisma.queueEntry.findUniqueOrThrow({ where: { id: entryId } });
-  const rec = { timers: [] as NodeJS.Timeout[], spawned: [] as string[] };
+  // The Companion engine wants a whole room to choose from, not just enough people for one squad.
+  const roomFill = Number(await getSetting("roomFill", "8"));
+  const rec = { timers: [] as NodeJS.Timeout[], spawned: [] as string[], readyAt: Date.now() + (opts.immediate ? 0 : delay + fillMs) + 250 };
   sims().set(entryId, rec);
 
   const plan = async () => {
@@ -396,7 +424,7 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
     const pool = [...people.values()].filter((p) => p.isSimulated && !busy.has(p.id) && pairAllowed(me, p) && crew.every((c) => pairAllowed(c, p)));
     // greedy: most compatible with the joiner *and* with already-picked fillers
     const picked: Person[] = [];
-    while (picked.length < need + 1 && pool.length) {
+    while (picked.length < Math.max(need + 1, roomFill - 1) && pool.length) {
       pool.sort((a, b) => fitScore(b) - fitScore(a) || a.id.localeCompare(b.id));
       const next = pool.shift()!;
       if (picked.every((p) => pairAllowed(p, next))) picked.push(next);

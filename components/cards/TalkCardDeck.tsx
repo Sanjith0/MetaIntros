@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CalendarCheck, Copy, Shapes, Sparkles, Tag, Users } from "lucide-react";
 import { AiLabel, Avatar, Bubble, cn } from "@/components/fb";
 import { AiSourceLabel } from "@/components/ai/AiSource";
+import { stripCitations } from "@/lib/companion/text";
 
 import { TopBar } from "@/components/fb/TopBar";
 import { useToast } from "@/components/fb/Toast";
@@ -36,7 +37,7 @@ const KIND_ICON: Record<ClaimKind, typeof Tag> = { shared_interest: Tag, mutual_
 
 function humanSource(src: string, meId: string) {
   if (src === "mutualFriends") return "mutual friends";
-  if (src.startsWith("preChat:")) return "AI pre-chat (simulated)";
+  if (src.startsWith("preChat:")) return "Companion conversation (AI)";
   const [uid, field] = src.split(":");
   const f = field.replace(/\[\d+\]/, "");
   const name = { likes: "likes", groups: "groups", music: "music", events: "events", x_not_interested: "not-interested list", socialStyle: "activity pattern", availability: "availability" }[f] ?? f;
@@ -103,7 +104,7 @@ export function TalkCardDeck({ cards, meId, initialMember, partyId, eventTitle }
                             <Icon size={16} />
                           </span>
                           <span className="min-w-0">
-                            <span className="block text-body">{cl.text}</span>
+                            <span className="block text-body">{stripCitations(cl.text)}</span>
                             <span className="block text-meta text-muted">
                               From{" "}
                               {cl.sources.map((s, j) => (
@@ -125,12 +126,12 @@ export function TalkCardDeck({ cards, meId, initialMember, partyId, eventTitle }
                         <button
                           type="button"
                           onClick={() => {
-                            navigator.clipboard?.writeText(o).catch(() => {});
+                            navigator.clipboard?.writeText(stripCitations(o)).catch(() => {});
                             toast("Copied. Paste it in your squad chat.");
                           }}
                           className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-body hover:bg-press"
                         >
-                          <span>{o}</span>
+                          <span>{stripCitations(o)}</span>
                           <Copy size={16} className="shrink-0 text-muted" aria-label="Copy" />
                         </button>
                       </li>
@@ -140,25 +141,28 @@ export function TalkCardDeck({ cards, meId, initialMember, partyId, eventTitle }
                 {c.preChat && (
                   <details className="rounded-card bg-wash p-3" data-testid="prechat">
                     <summary className="flex cursor-pointer items-center justify-between gap-2 text-body font-semibold">
-                      Companion pre-chat
-                      <span className="text-meta font-normal text-muted" data-testid="prechat-label">AI simulation</span>
+                      What your Companions talked about
+                      <span className="flex items-center gap-1.5">
+                        {c.preChat.transcript.length > 6 && <span className="text-meta font-normal text-link" data-testid="prechat-deep">Went deeper</span>}
+                        <span className="text-meta font-normal text-muted" data-testid="prechat-label">AI simulation</span>
+                      </span>
                     </summary>
-                    <p className="mt-1 text-meta text-muted">Simulated by AI from your two profiles only. These are not real messages.</p>
+                    <p className="mt-1 text-meta text-muted">Your Companion AI and theirs talked before you were matched. Each one knew only its own person, and only what they chose to share. These are not real messages.</p>
                     <AiSourceLabel source={c.preChat.source} className="mt-1" />
-                    <ul className="mt-2 space-y-1">
+                    <ul className="mt-2 max-h-64 space-y-1 overflow-y-auto pr-1" data-testid="prechat-thread">
                       {c.preChat.transcript.map((t, i) => {
                         const mine = (t.speaker === "A") === c.preChat!.meIsA;
                         return (
                           <li key={i} className={cn("flex", mine && "justify-end")}>
                             <span className="max-w-[85%]">
-                              <span className={cn("mb-0.5 block text-[12px] text-muted", mine && "text-right")}>{mine ? "Your AI" : `${first(c.subject.name)}'s AI`}</span>
-                              <Bubble mine={mine}>{t.text}</Bubble>
+                              <span className={cn("mb-0.5 block text-[12px] text-muted", mine && "text-right")}>{mine ? "Your Companion" : `${first(c.subject.name)}'s Companion`}</span>
+                              <Bubble mine={mine}>{stripCitations(t.text)}</Bubble>
                             </span>
                           </li>
                         );
                       })}
                     </ul>
-                    {c.preChat.sparks.length > 0 && <p className="mt-2 text-meta">Topics that came up: {c.preChat.sparks.join(", ")}</p>}
+                    {c.preChat.sparks.length > 0 && <p className="mt-2 text-meta">Topics that came up: {c.preChat.sparks.map(stripCitations).join(", ")}</p>}
                   </details>
                 )}
                 <AiLabel className="leading-snug" testId="openers-source">{openersLine(c.content)} Politics, religion, health and sexuality are never used.</AiLabel>

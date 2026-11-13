@@ -52,6 +52,10 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await expect.poll(() => page.getByTestId("trace-step").count(), { timeout: 15_000 }).toBeGreaterThanOrEqual(8);
   await shot(page, "22-how-we-matched");
   await page.keyboard.press("Escape");
+  await page.getByTestId("squad-decision").scrollIntoViewIfNeeded();
+  await shot(page, "40-squad-decision");
+  await page.getByTestId("numbers-vs-companion").scrollIntoViewIfNeeded();
+  await shot(page, "41-numbers-vs-companion");
   await page.getByTestId("open-squad-chat").click();
   await expect(page.getByTestId("msg-host").first()).toBeVisible();
   await shot(page, "23-squad-chat");
@@ -61,6 +65,11 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await page.getByTestId("open-talk-cards").click();
   await expect(page.locator('[data-testid^="talk-card-"]').first()).toBeVisible();
   await shot(page, "25-talk-cards");
+  const pre = page.locator('[data-testid^="talk-card-"]').first().getByTestId("prechat");
+  await pre.locator("summary").click();
+  await pre.scrollIntoViewIfNeeded();
+  await shot(page, "42-companion-conversation");
+  await pre.locator("summary").click();
   await page.goBack();
   await page.getByTestId("open-find").click();
   await page.getByTestId("im-here").click();
@@ -93,6 +102,10 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await page.getByTestId("open-album").click();
   await expect(page.getByTestId("squad-album")).toBeVisible();
   await shot(page, "32-squad-album");
+
+  await gotoReady(page, "/profile");
+  await page.getByTestId("brief-card").scrollIntoViewIfNeeded();
+  await shot(page, "43-companion-brief");
 
   expect(errors.filter((e) => !e.includes("404"))).toEqual([]);
 });

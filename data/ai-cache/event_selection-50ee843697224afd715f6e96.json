@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"ev-indie-guild\", \"runnersUp\": [\"ev-photo-walk\", \"ev-karaoke\"], \"reasons\": [\"Only option matching 2 unanimous interests (6/6 Indie music + 6/6 Live music)\", \"Local bands showcase creates easy conversation for strangers vs passive watching\"]}",
+  "task": "event_selection",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 433,
+    "completionTokens": 459
+  },
+  "savedAt": "2026-11-13T00:28:23.600Z"
+}

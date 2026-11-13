@@ -1,0 +1,11 @@
+{
+  "text": "{\"answers\": {\"live-be04a947\": {\"say\": \"Afnan really likes getting out and doing something active and tends to socialize around shared activities. At Peninsula Boulders, they enjoy talking while climbing, not just climbing and leaving. They are part of the Bay Area Climbers community and like swapping beta, hanging around after a session to chat, and grabbing food if others are up for it. It's very much climb plus social time for them.\", \"cites\": [\"live-fffb1569:socialStyle\", \"live-fffb1569:likes[0]\", \"live-fffb1569:groups[0]\"]}}, \"verdicts\": {\"live-be04a947\": {\"score\": 96, \"wouldEnjoy\": [\"Near-identical active interests - climbing at Peninsula Boulders, Warriors/NBA, Strava running, AllTrails/REI outdoors, and pickleball.\", \"Both want a squad of 2 for an active weekend event and have an upbeat, social-around-sports style.\"], \"concerns\": [], \"needs\": [], \"talkTopics\": [\"live-fffb1569:likes[0]\", \"live-fffb1569:likes[6]\", \"live-fffb1569:groups[1]\", \"live-be04a947:likes[0]\", \"live-be04a947:likes[2]\"], \"opener\": \"Want to plan a Peninsula Boulders session this weekend and grab food after to swap beta?\", \"confidence\": \"high\"}}, \"picks\": [\"live-be04a947\"]}",
+  "task": "companion_answer",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1476,
+    "completionTokens": 653
+  },
+  "savedAt": "2026-11-13T00:51:02.925Z"
+}

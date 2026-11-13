@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-live-be04a947\", \"members\": [\"live-be04a947\", \"live-fffb1569\"], \"line\": {\"say\": \"Afnan would love a Peninsula Boulders session with Ekansh this weekend.\", \"cites\": [\"live-fffb1569:likes[0]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1073,
+    "completionTokens": 551
+  },
+  "savedAt": "2026-11-13T00:51:08.344Z"
+}

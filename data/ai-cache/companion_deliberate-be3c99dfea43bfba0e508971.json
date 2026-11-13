@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p14\", \"line\": {\"say\": \"Rosa loves low-key hangs, vinyl digging and climbing chat between sets.\", \"cites\": [\"p11:socialStyle\", \"p11:likes[5]\", \"p11:likes[2]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1666,
+    "completionTokens": 578
+  },
+  "savedAt": "2026-11-13T00:26:21.949Z"
+}

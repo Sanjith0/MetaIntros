@@ -13,6 +13,8 @@ import { TraceRow } from "@/components/trace/TraceList";
 import { fmtDuration } from "@/lib/format";
 import { SearchMap, type SearchAreaView } from "./SearchMap";
 import { nowMs } from "@/lib/clock";
+import { CompanionFeed } from "@/components/companion/CompanionFeed";
+import { SquadDecision } from "@/components/companion/SquadDecision";
 
 interface Status {
   state: "idle" | "waiting" | "matched";
@@ -22,7 +24,10 @@ interface Status {
   bucketName?: string;
   bucketId?: string;
   /** set by the queue when it can't form a squad yet (main c75421b) */
-  problem?: "no_events" | "event_started" | "no_fit";
+  problem?: "no_events" | "event_started" | "no_fit" | "no_squad";
+  /** what the Companion engine is doing for this person right now, if a room is running */
+  stage?: string;
+  stageNote?: string;
   waitedMs?: number;
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
@@ -44,6 +49,19 @@ interface Party {
 }
 
 const first = (n: string) => n.split(" ")[0];
+
+/** What the Companion engine is doing, in the person's words. */
+const STAGE_LABEL: Record<string, string> = {
+  briefing: "Companions are reading profiles",
+  circles: "Grouping people who might click",
+  mingling: "Your Companion is meeting everyone",
+  checkin: "Your Companion is checking its picks with you",
+  deep: "Going deeper with a few people",
+  deliberating: "Companions are proposing squads",
+  forming: "Forming your squad",
+  group: "Your squad's Companions are talking it over",
+  signoff: "Waiting for everyone's yes",
+};
 
 export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: string | null }) {
   const [status, setStatus] = useState<Status | null>(null);
@@ -119,7 +137,10 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
   const n = status.targetSize ?? 5;
   const found = Math.min(status.found ?? 1, n);
   const users = status.foundUsers ?? [];
-  const widening = elapsed > 16_000 ? "Looking in nearby areas too" : elapsed > 8_000 ? "Widening the search a little" : "Looking for people you'd get along with";
+  const widening =
+    status.problem === "no_squad" ? "Waiting for someone new to join"
+    : status.stage && STAGE_LABEL[status.stage] ? STAGE_LABEL[status.stage]
+    : elapsed > 16_000 ? "Looking in nearby areas too" : elapsed > 8_000 ? "Widening the search a little" : "Looking for people you'd get along with";
   const kind = status.mode === "hangout" ? "New hangout" : status.eventId ? eventTitle ?? "This event" : "Any event this weekend";
 
   return (
@@ -147,7 +168,7 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
           <p className="mt-4 text-center text-timer font-bold tabular-nums" data-testid="queue-timer" aria-label={`Waiting ${fmtDuration(elapsed)}`}>
             {fmtDuration(elapsed)}
           </p>
-          <p className="text-center text-meta text-muted" aria-live="polite">{widening}</p>
+          <p className="text-center text-meta text-muted" aria-live="polite" data-testid="room-stage" data-stage={status.stage ?? ""}>{widening}</p>
           {status.searchArea && <SearchMap area={status.searchArea} me={users[0]} />}
 
           <p className="mt-5 text-body font-semibold" data-testid="players-found">
@@ -176,6 +197,7 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
           <p className="mt-3 text-meta text-muted">You&apos;ll see who they are once your squad is ready.</p>
           {status.problem && <QueueProblem status={status} />}
         </Section>
+        <CompanionFeed meId={users[0]?.id} />
         <Section flush title="While you wait">
           <ListRow leading={<IconCircle><EyeOff size={18} /></IconCircle>} title="Nobody sees you yet" subtitle="Your squad sees your first name once it's ready." />
           <ListRow leading={<IconCircle><ShieldCheck size={18} /></IconCircle>} title="Public places only" subtitle="Squads meet at the event's front entrance." />
@@ -193,6 +215,7 @@ const PROBLEM_TEXT: Record<NonNullable<Status["problem"]>, string> = {
   no_events: "There are no upcoming events left this weekend to sort your squad into.",
   event_started: "This event has already started, so we can't form a squad for it.",
   no_fit: "We found people, but no event works for everyone's free time and tastes yet. We'll keep trying.",
+  no_squad: "Your Companion talked with everyone here, but the Companions didn't settle on a squad. You'll be matched as soon as someone new joins the queue.",
 };
 
 /** Why the queue can't form a squad yet, with one way forward (from main's queue no-fit handling). */
@@ -214,7 +237,7 @@ function QueueProblem({ status }: { status: Status }) {
   return (
     <div role="status" className="mt-3 rounded-card bg-wash p-3" data-testid="queue-problem" data-problem={status.problem}>
       <p className="text-body">{text}</p>
-      {!hangout && (
+      {!hangout && status.problem !== "no_squad" && (
         <Button block className="mt-2" disabled={busy} onClick={switchToHangout} data-testid="switch-to-hangout" icon={<MapPinned size={16} />}>
           Plan a new hangout instead
         </Button>
@@ -390,6 +413,8 @@ function SquadFound({ party, meId }: { party: Party; meId: string }) {
             </Card>
           </Section>
         )}
+
+        <SquadDecision partyId={party.id} />
 
         <div className="bg-surface">
           <TraceRow partyId={party.id} />

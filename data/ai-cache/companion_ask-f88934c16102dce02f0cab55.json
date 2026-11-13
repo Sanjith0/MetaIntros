@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p02\": {\"say\": \"Freya also loves bouldering — if Jordan steps to the back to chat low-key about Bouldering Daily between bands, how would Freya keep the vibe going?\", \"cites\": [\"p01:likes[1]\"]}, \"p03\": {\"say\": \"Zoe is into vinyl too — if Jordan wants to hang near the merch and talk about Vinyl Me, Please finds after the set, would Zoe join that chill corner?\", \"cites\": [\"p01:likes[5]\"]}, \"p04\": {\"say\": \"If the showcase gets crowded and Jordan suggests a quieter spot to talk Fujifilm X shots from the night, how would Reza respond?\", \"cites\": [\"p01:likes[6]\"]}, \"p05\": {\"say\": \"Yuki likes Bay Area Concerts — if Jordan wants to stay low-key and compare notes on local bands between sets, how would Yuki engage?\", \"cites\": [\"p01:likes[3]\"]}, \"p11\": {\"say\": \"Rosa likes chill hangs — if Jordan wants to skip the front pit and chat about Climbing Magazine over coffee after, would Rosa be into that pace?\", \"cites\": [\"p01:likes[0]\"]}, \"p12\": {\"say\": \"If Jordan is vibing to the music but keeping conversation casual about Indie Shuffle discoveries, how would Gabe balance watching bands and chatting?\", \"cites\": [\"p01:likes[2]\"]}, \"p14\": {\"say\": \"Ben prefers relaxed hangs — if Jordan suggests ducking out early for Philz Coffee to debrief the bands, how would Ben handle that low-key move?\", \"cites\": [\"p01:likes[7]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3526,
+    "completionTokens": 706
+  },
+  "savedAt": "2026-11-13T00:26:44.338Z"
+}

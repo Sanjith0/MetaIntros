@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"line\": {\"say\": \"Ekansh is keen for an active squad of 3 - bouldering at Peninsula Boulders and Warriors talk together!\", \"cites\": [\"live-14e8a601:likes[0]\", \"live-14e8a601:likes[6]\", \"live-14e8a601:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1214,
+    "completionTokens": 530
+  },
+  "savedAt": "2026-11-13T00:39:54.049Z"
+}

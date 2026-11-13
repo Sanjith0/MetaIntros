@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Reza likes this chill crew to hang back and chat vinyl and bouldering between bands.\", \"cites\": [\"p04:socialStyle\", \"p04:groups[2]\", \"p04:likes[3]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1623,
+    "completionTokens": 621
+  },
+  "savedAt": "2026-11-13T00:27:15.998Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Zoe would love low-key vinyl, bouldering and photo chat between bands.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1691,
+    "completionTokens": 636
+  },
+  "savedAt": "2026-11-13T00:27:15.156Z"
+}

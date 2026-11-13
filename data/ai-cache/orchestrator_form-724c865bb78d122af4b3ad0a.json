@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p05\", \"p11\", \"p12\", \"p14\"], \"why\": \"You all click as a chill vinyl and climbing crew — bonding over Rasputin Music digs, Vinyl Me, Please finds, Bouldering Daily and Climbing Magazine beta, plus Indie Shuffle and Pitchfork tips between sets. Perfect low-key squad to post up in back, trade stories, and actually hear the bands together.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1446,
+    "completionTokens": 1237
+  },
+  "savedAt": "2026-11-13T00:26:26.862Z"
+}

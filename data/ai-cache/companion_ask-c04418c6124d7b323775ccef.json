@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Reza likes to keep it low-key between sets and chat about vinyl finds. If the crowd gets packed up front, how would Jordan want to hang - stay back and talk shop or push forward for the music?\", \"cites\": [\"p04:socialStyle\"]}, \"p02\": {\"say\": \"Reza is into Peninsula Boulders and usually prefers chill corners to loud crowds. At Indie Night, if Reza steps outside for a breather between bands, how would Freya handle that moment?\", \"cites\": [\"p04:likes[3]\"]}, \"p03\": {\"say\": \"Reza follows Vinyl Me, Please and loves swapping pressings. If Reza is geeking out over a band's vinyl at the merch table instead of watching, how would Zoe join in or steer them back?\", \"cites\": [\"p04:likes[1]\"]}, \"p05\": {\"say\": \"Reza is all about low-key, chill plans at shows. If the showcase runs long and gets hectic, how would Yuki keep the vibe relaxed together with Reza?\", \"cites\": [\"p04:socialStyle\"]}, \"p11\": {\"say\": \"Reza shoots with Fujifilm X and might want to snap a few film-style shots during sets. How would Rosa feel about pausing to get the right angle versus just soaking in the music?\", \"cites\": [\"p04:likes[9]\"]}, \"p12\": {\"say\": \"Reza loves Rasputin Music and digging into local band stories. If Reza wants to hang back and talk about a band's influences between sets, how would Gabe want to spend that downtime?\", \"cites\": [\"p04:likes[0]\"]}, \"p14\": {\"say\": \"Reza is in Peninsula Vinyl Collectors and likes easygoing chats over shared interests. At a 6-person squad show, how would Ben make space for quieter one-on-one chats with Reza amid the group?\", \"cites\": [\"p04:groups[2]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3672,
+    "completionTokens": 712
+  },
+  "savedAt": "2026-11-13T00:25:52.200Z"
+}

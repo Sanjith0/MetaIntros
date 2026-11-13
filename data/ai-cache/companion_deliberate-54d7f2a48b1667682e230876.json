@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Zoe would love bouldering, Rasputin vinyl dig, and Fujifilm X photo wander — low-key and chill.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1739,
+    "completionTokens": 503
+  },
+  "savedAt": "2026-11-13T00:28:14.114Z"
+}

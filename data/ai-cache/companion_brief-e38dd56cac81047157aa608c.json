@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Kansh likes getting out and doing something active and tends to socialize around shared activities rather than just hanging out. They are most talkative when swapping tips, plans, or stories about climbing, cycling, yoga, and local sports.\", \"depth\": {\"live-565ee82f:likes[0]\": \"Peninsula Boulders - climbing gym they follow\", \"live-565ee82f:groups[1]\": \"Peninsula Weekend Riders - group for weekend bike rides\", \"live-565ee82f:groups[2]\": \"Sunset Yoga Palo Alto - local yoga community\", \"live-565ee82f:groups[3]\": \"Warriors Fans Bay Area - connects with other Warriors fans\", \"live-565ee82f:likes[8]\": \"USA Pickleball - interest in pickleball\"}, \"lightsUp\": [\"live-565ee82f:likes[0]\", \"live-565ee82f:groups[1]\", \"live-565ee82f:groups[3]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 711,
+    "completionTokens": 564
+  },
+  "savedAt": "2026-11-13T01:00:14.184Z"
+}

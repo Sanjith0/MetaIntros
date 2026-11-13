@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Jordan and Yuki both like low-key hangs - if they're at Indie Night and the crowd gets packed up front, how would Jordan handle finding a chill spot to actually enjoy the bands together? Yuki likes Bay Area Concerts p05:likes[2]\", \"cites\": [\"p05:likes[2]\"]}, \"p02\": {\"say\": \"Freya and Yuki both love Bouldering Daily - between sets at Indie Night, would Freya be the type to trade V-Scale memes and concert tips in a small corner rather than pushing into the loud center?\", \"cites\": [\"p05:likes[1]\"]}, \"p03\": {\"say\": \"If Yuki and Zoe are checking out local bands and want to snap some film-style pics, how would Zoe balance chatting about vinyl and actually watching the show with Yuki?\", \"cites\": [\"p05:likes[5]\"]}, \"p04\": {\"say\": \"Reza and Yuki both dig vinyl - if one band is too loud for talking, would Reza suggest stepping to the merch or lobby to chat Rasputin Music finds and then come back?\", \"cites\": [\"p05:likes[0]\"]}, \"p11\": {\"say\": \"Rosa and Yuki both prefer chill plans - at Indie Night, if the vibe gets hectic, how would Rosa keep it relaxed for the group while still catching the local bands?\", \"cites\": [\"p05:socialStyle\"]}, \"p12\": {\"say\": \"Gabe and Yuki share Pitchfork and vinyl tastes - during a slower set, would Gabe want to hang back and swap notes on the bands like Wet Leg p05:music[0] or wander off solo?\", \"cites\": [\"p05:music[0]\"]}, \"p14\": {\"say\": \"Ben and Yuki both did Record Store Day Palo Alto - if they meet at Indie Night, would Ben be up for low-key crate-digging stories between bands instead of trying to rally a big afterparty?\", \"cites\": [\"p05:events[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3571,
+    "completionTokens": 670
+  },
+  "savedAt": "2026-11-13T00:25:51.481Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Kansh likes getting out and doing something active and tends to socialize around shared activities. They enjoy talking while doing things like climbing, playing board games, or getting outside with others.\",\"depth\":{\"live-dbe3dba0:likes[0]\":\"Climbs at Peninsula Boulders and is part of Bay Area Climbers and Bay Area Climbers Coalition\",\"live-dbe3dba0:likes[2]\":\"Plays Catan and is in Palo Alto Board Gamers\",\"live-dbe3dba0:likes[6]\":\"Into pickleball, follows USA Pickleball and is in Palo Alto Pickleball\",\"live-dbe3dba0:likes[4]\":\"Likes Midpeninsula Open Space and is in Baylands Nature Lovers\",\"live-dbe3dba0:likes[8]\":\"Follows Golden State Warriors and the NBA\"},\"lightsUp\":[\"live-dbe3dba0:likes[0]\",\"live-dbe3dba0:likes[2]\",\"live-dbe3dba0:likes[6]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 593,
+    "completionTokens": 575
+  },
+  "savedAt": "2026-11-13T00:13:33.348Z"
+}

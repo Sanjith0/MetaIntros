@@ -27,7 +27,11 @@ describe("Met through Queue Up", () => {
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: true } });
     await fastForward();
     expect((await getBadges("p01")).friends).toBe(0);
-    const mates = party.members.filter((m) => m.userId !== "p01").map((m) => m.userId);
+    const squad = party.members.filter((m) => m.userId !== "p01").map((m) => m.userId);
+    // Someone the Companions matched Me with may already be a Facebook friend; only new friendships count here.
+    const already = new Set((await prisma.friendship.findMany({ where: { OR: [{ userAId: "p01" }, { userBId: "p01" }] } })).map((f) => (f.userAId === "p01" ? f.userBId : f.userAId)));
+    const mates = squad.filter((m) => !already.has(m));
+    expect(mates.length).toBeGreaterThan(0);
     for (const m of mates) await sendSquadRequest("p01", m, party.id);
 
     const rows = await listQueueUpFriends("p01");
@@ -38,7 +42,7 @@ describe("Met through Queue Up", () => {
       const first = (card.content as unknown as CardContent).claims.find((c) => c.kind === "shared_interest")!;
       expect(first.text).toContain(r.sharedNote!);
     }
-    expect((await getBadges("p01")).friends).toBe(3);
+    expect((await getBadges("p01")).friends).toBe(mates.length);
     await markTabSeen("p01", "friends");
     expect((await getBadges("p01")).friends).toBe(0);
   });

@@ -61,6 +61,7 @@ model User {
   talkCardsOwned   TalkCard[]      @relation("CardOwner")
   talkCardsAbout   TalkCard[]      @relation("CardSubject")
   sessions         DeviceSession[]
+  companionBrief   CompanionBrief?
 }
 
 model TasteProfile {
@@ -225,6 +226,8 @@ model QueueEntry {
   /// queuing together: everyone with the same groupId lands in the same squad (never split)
   groupId          String?
   group            QueueGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  /// "What do you want tonight?" in the person's own words. Only their own Companion sees it.
+  tonight          String?
 
   @@index([status])
 }
@@ -253,6 +256,7 @@ model Party {
   preChats       PreChat[]
   traces         AgentTrace[]
   friendRequests FriendRequest[]
+  recaps         CompanionRecap[]
 }
 
 model PartyMember {
@@ -513,4 +517,47 @@ model MateRating {
   @@unique([partyId, raterId, rateeId])
   @@index([raterId])
   @@index([rateeId])
+}
+/// What a user's Companion agent may say about them (share level per fact) plus the model-written parts of the brief.
+model CompanionBrief {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// { [factId]: "open" | "need_only" | "private" } — overrides of the defaults
+  shares    Json
+  /// { depth: { [factId]: string }, communication: string, lightsUp: string[] } written by the Profile Analyst
+  generated Json?
+  /// what the person told their Companion at check-ins (string[], last few kept; private to their Companion)
+  told      Json?
+  updatedAt DateTime @updatedAt
+}
+
+/// One run of the Companion engine over a set of waiting queue entries.
+model MatchRoom {
+  id           String   @id @default(cuid())
+  /// sorted queue-entry ids, comma-joined
+  signature    String
+  anchorUserId String
+  /// comma-joined user ids in the room (for stage lookups)
+  userIds      String
+  /// "briefing" | "circles" | "mingling" | "deep" | "deliberating" | "forming" | "group" | "done" | "waiting"
+  stage        String
+  note         String   @default("")
+  /// summary once finished (null while running)
+  result       Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([anchorUserId])
+}
+
+/// What one member sees about how their squad was decided: their conversations, their own
+/// Companion's notes, the group conversation, and the similarity-score comparison.
+model CompanionRecap {
+  id      String @id @default(cuid())
+  partyId String
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  userId  String
+  data    Json
+
+  @@unique([partyId, userId])
 }

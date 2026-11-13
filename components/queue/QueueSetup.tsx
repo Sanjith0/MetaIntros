@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { CalendarDays, ChevronRight, Crosshair, Lock, MapPin, MapPinned, ShieldCheck } from "lucide-react";
@@ -40,6 +41,7 @@ function getPosition(timeoutMs = 6000): Promise<GeolocationPosition> {
 const ERRORS: Record<string, string> = {
   private_event: "Queue Up only works for events at public venues.",
   age: "Queue Up is for people 18 and over.",
+  sensitive_tonight: "Keep it to plans and vibe: your note can't mention health, religion, politics or sexuality.",
 };
 
 export function QueueSetup({ event, landmarks, mode: initialMode = "events", variant = "page", shareDefault = false }: Props) {
@@ -50,6 +52,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [share, setShare] = useState(shareDefault);
+  const [tonight, setTonight] = useState("");
   const [together, setTogether] = useState<TogetherRole>({ role: "none", joined: 1 });
   const onRole = useCallback((r: TogetherRole) => {
     setTogether(r);
@@ -63,7 +66,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
     setError(null);
     const r = await fetch("/api/queue/join", {
       method: "POST",
-      body: JSON.stringify({ mode, eventId: mode === "events" ? event?.id ?? null : null, targetSize: size, visibleToFriends: share, ...body }),
+      body: JSON.stringify({ mode, eventId: mode === "events" ? event?.id ?? null : null, targetSize: size, visibleToFriends: share, tonight: tonight.trim() || null, ...body }),
     }).catch(() => null);
     const j = r ? await r.json().catch(() => ({})) : { error: "network" };
     if (j.ok) return router.push("/queue");
@@ -179,6 +182,18 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
           </div>
         )}
       </section>}
+
+      <div className="mx-4 mt-4">
+        <label htmlFor="tonight" className="block text-body font-semibold">What do you want tonight? <span className="font-normal text-muted">(optional)</span></label>
+        <textarea id="tonight" data-testid="tonight" value={tonight} onChange={(e) => setTonight(e.target.value.slice(0, 200))} rows={2}
+          placeholder="e.g. first night out since moving, not drinking, somewhere I can actually talk"
+          className="mt-1 w-full resize-none rounded-btn bg-wash p-3 text-body text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent" />
+        <p className="mt-0.5 flex items-center gap-1 text-meta text-muted"><Lock size={12} aria-hidden /> Only your Companion reads this. It uses it to judge who fits, and never repeats it.</p>
+        <p className="mt-2 text-meta text-muted" data-testid="companion-note">
+          Your Companion AI speaks for you to find people you&apos;d click with.{" "}
+          <Link href="/profile" className="font-semibold text-link" data-testid="review-brief">Review what it can share</Link>
+        </p>
+      </div>
 
       <label className="mx-4 mt-4 flex cursor-pointer items-start gap-3" data-testid="share-with-friends">
         <span className="min-w-0 flex-1">

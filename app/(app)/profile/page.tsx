@@ -6,6 +6,8 @@ import { QueueVisibilityToggle } from "@/components/profile/QueueVisibilityToggl
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/server/session";
 import { VOCAB_BY_TAG } from "@/lib/graph/vocabulary";
+import { BriefCard } from "@/components/companion/BriefCard";
+import { getBriefFor } from "@/lib/server/briefs";
 
 export default async function ProfilePage() {
   const me = await getCurrentUser();
@@ -15,6 +17,7 @@ export default async function ProfilePage() {
     prisma.partyMember.count({ where: { userId: me.id, party: { status: { in: ["confirmed", "completed"] } } } }),
   ]);
   const tags = ((tp?.interestTags ?? []) as { tag: string }[]).slice(0, 10);
+  const brief = await getBriefFor(me.id, { mode: "events", eventTitle: null, targetSize: 6 }, false);
   return (
     <div data-testid="profile-page">
       <TopBar title="Profile" />
@@ -38,6 +41,7 @@ export default async function ProfilePage() {
         <Section title="Queue Up privacy" flush>
           <QueueVisibilityToggle initial={me.queueVisibility === "friends"} />
         </Section>
+        {brief && <BriefCard initial={brief.facts.map(({ id, kind, text, share }) => ({ id, kind, text, share }))} communication={brief.communication} />}
         <Section title="Interests">
           <ul className="flex flex-wrap gap-2">
             {tags.map((t) => (

@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan is hoping for a chill Indie Night showcase with a low-key crew. They would bring shared love of vinyl digging, bouldering chat, and photo walk eye. Jordan gravitates toward relaxed plans and easy conversation around climbing, music, and photography.\", \"cites\": [\"p01:socialStyle\", \"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2834,
+    "completionTokens": 284
+  },
+  "savedAt": "2026-11-13T00:26:28.357Z"
+}

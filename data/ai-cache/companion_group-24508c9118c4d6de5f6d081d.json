@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Afnan is hoping for a squad of 2 to get out and do something active this weekend. They would bring upbeat energy and love to chat while climbing at Peninsula Boulders, running with Palo Alto Runners, or watching the Warriors. They socialize best around shared activities.\", \"cites\": [\"live-fffb1569:likes[0]\", \"live-fffb1569:groups[1]\", \"live-fffb1569:likes[6]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1356,
+    "completionTokens": 359
+  },
+  "savedAt": "2026-11-13T00:51:11.598Z"
+}

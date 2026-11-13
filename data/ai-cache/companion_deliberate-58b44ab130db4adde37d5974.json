@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p04\", \"line\": {\"say\": \"Reza's squad is low-key vinyl digs at Rasputin and Peninsula Boulders chat.\", \"cites\": [\"p04:likes[0]\", \"p04:likes[3]\", \"p04:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1596,
+    "completionTokens": 1020
+  },
+  "savedAt": "2026-11-13T00:29:08.587Z"
+}

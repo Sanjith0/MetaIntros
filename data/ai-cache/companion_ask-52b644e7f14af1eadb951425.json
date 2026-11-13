@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Gabe suggests checking out Indie Night at The Guild after a chill photo walk, how would Jordan balance chatting about vinyl and climbing versus just vibing to the music?\", \"cites\": [\"p12:events[0]\"]}, \"p02\": {\"say\": \"Gabe loves low-key hangs around Peninsula Film Club and bouldering. If the squad grabs coffee after climbing, how does Freya keep conversation going when energy dips?\", \"cites\": [\"p12:groups[0]\"]}, \"p03\": {\"say\": \"Gabe is into Bay Area Climbers and likes easygoing nights. If plans shift from bouldering to browsing Rasputin Music, how would Zoe handle the change?\", \"cites\": [\"p12:groups[2]\"]}, \"p04\": {\"say\": \"Gabe goes to Indie Night at The Guild and likes chill plans. If the venue gets crowded, how would Reza steer the group toward something more laid-back?\", \"cites\": [\"p12:events[0]\"]}, \"p05\": {\"say\": \"Gabe is in Peninsula Vinyl Collectors and loves low-key hangs. If you all end up digging through crates together, how does Yuki share finds without taking over?\", \"cites\": [\"p12:groups[1]\"]}, \"p11\": {\"say\": \"Gabe likes low-key, chill plans and follows Climbing Magazine. On a mellow night hopping between coffee and a record store, how would Rosa pace the hang?\", \"cites\": [\"p12:socialStyle\"]}, \"p14\": {\"say\": \"Gabe goes to Peninsula Bouldering League and prefers chill nights. If the group wants to extend the night after climbing, what would Ben suggest to keep it relaxed?\", \"cites\": [\"p12:events[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3731,
+    "completionTokens": 694
+  },
+  "savedAt": "2026-11-13T00:28:40.608Z"
+}

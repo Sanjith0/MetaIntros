@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Yuki would love low-key bouldering, Rasputin digging and photo wander — chill pace fits perfectly.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:likes[5]\", \"p05:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1610,
+    "completionTokens": 657
+  },
+  "savedAt": "2026-11-13T00:28:14.575Z"
+}

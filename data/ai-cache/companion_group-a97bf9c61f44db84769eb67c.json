@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Ben is hoping for a chill Indie Night with easy wandering conversation. They would bring their love for Snail Mail, vinyl digging, and climbing talk, and likes keeping things low-key and relaxed. Excited to hang with fellow vinyl and climbing folks for a mellow showcase.\", \"cites\": [\"p14:likes[0]\", \"p14:likes[1]\", \"p14:music[0]\", \"p14:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2971,
+    "completionTokens": 320
+  },
+  "savedAt": "2026-11-13T00:26:28.949Z"
+}

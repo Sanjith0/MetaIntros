@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Freya and Jordan grab Philz after bouldering, how would Jordan keep the hang chill when Freya is swapping V-Scale memes and photo walk stories? Freya boulders daily in Peninsula Bouldering Crew.\", \"cites\": [\"p02:likes[0]\"]}, \"p03\": {\"say\": \"If Freya and Zoe plan a low-key night after Golden Gate Photo Walk, how would Zoe steer conversation when Freya wants to geek out over A24 films and concert tips?\", \"cites\": [\"p02:likes[6]\"]}, \"p04\": {\"say\": \"Freya loves low-key, chill plans. If they and Reza hit Rasputin Music then a small gig, how would Reza balance browsing vinyl with keeping things relaxed for Freya?\", \"cites\": [\"p02:socialStyle\"]}, \"p05\": {\"say\": \"Freya follows Bay Area Concerts and is in Peninsula Gig Buddies. If Freya and Yuki catch an indie show together, how would Yuki handle the crowd and downtime between sets?\", \"cites\": [\"p02:likes[4]\"]}, \"p11\": {\"say\": \"Freya is into Pitchfork and low-key hangs. If Freya and Rosa are at a record store digging for vinyl, how would Rosa make it feel easygoing rather than rushed?\", \"cites\": [\"p02:likes[2]\"]}, \"p12\": {\"say\": \"Freya likes A24 and Peninsula Film Club. If Freya and Gabe do a chill movie night after bouldering, how would Gabe keep the vibe relaxed when debating the film?\", \"cites\": [\"p02:likes[6]\"]}, \"p14\": {\"say\": \"Freya enjoys Indie Night at The Guild and chill squads. If Freya and Ben go together, how would Ben navigate a busy venue while keeping conversation easygoing for Freya?\", \"cites\": [\"p02:events[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3498,
+    "completionTokens": 844
+  },
+  "savedAt": "2026-11-13T00:27:38.321Z"
+}

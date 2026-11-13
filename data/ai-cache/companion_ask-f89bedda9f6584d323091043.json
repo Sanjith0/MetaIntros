@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"live-14e8a601\": {\"say\": \"Eknash loves getting out to Peninsula Boulders. If the three of you hit the gym together tonight, how does Ekansh usually balance focused climbing with keeping the group chat going and inclusive?\", \"cites\": [\"live-eaa288e3:likes[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1421,
+    "completionTokens": 471
+  },
+  "savedAt": "2026-11-13T00:39:42.535Z"
+}

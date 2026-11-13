@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p14\", \"line\": {\"say\": \"Ben is all about low-key hangs chatting climbing and vinyl between bands.\", \"cites\": [\"p14:socialStyle\", \"p14:likes[0]\", \"p14:likes[1]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1644,
+    "completionTokens": 962
+  },
+  "savedAt": "2026-11-13T00:27:18.663Z"
+}

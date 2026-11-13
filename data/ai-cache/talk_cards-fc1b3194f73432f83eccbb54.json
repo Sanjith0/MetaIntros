@@ -1,0 +1,11 @@
+{
+  "text": "{\"pairs\": [{\"owner\": \"live-be04a947\", \"subject\": \"live-fffb1569\", \"openers\": [\"Hey Afnan! Saw we're both in Bay Area Climbers and Palo Alto Runners — have you ever done the side-by-side climbing at Peninsula Boulders?\", \"Hey Afnan, looks like we both gravitate to active weekends — are you more hiking with Peninsula Hikers or catching a Warriors game lately?\", \"Hi Afnan! We're both into basketball and climbing — do you usually get out for a run or a climb on the weekends?\"]}, {\"owner\": \"live-fffb1569\", \"subject\": \"live-be04a947\", \"openers\": [\"Hey Ekansh! Saw we're both in Bay Area Climbers and Palo Alto Runners — have you tried climbing side-by-side at Peninsula Boulders?\", \"Hi Ekansh! Noticed we both like to get out and do something active on weekends and we're both into basketball — Warriors Fans Bay Area keeping you busy?\", \"Hey Ekansh, we're both into pickleball and climbing — do you lean more running or climbing for an active weekend?\"]}]}",
+  "task": "talk_cards",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 337,
+    "completionTokens": 692
+  },
+  "savedAt": "2026-11-13T00:51:16.698Z"
+}

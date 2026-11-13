@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Afbab is chill and prefers low-key, laid-back plans. They tend to socialize in small, easygoing settings and enjoy relaxed conversation around music, movies, anime, and trivia.\", \"depth\": {\"live-15511ec9:likes[4]\": \"Follows Geeks Who Drink for trivia nights\", \"live-15511ec9:groups[2]\": \"Member of Peninsula Trivia Teams\", \"live-15511ec9:groups[0]\": \"Member of Bay Area Indie Shows to find local concerts\", \"live-15511ec9:music[0]\": \"Listens to Phoebe Bridgers\", \"live-15511ec9:likes[6]\": \"Fan of Studio Ghibli\"}, \"lightsUp\": [\"live-15511ec9:groups[0]\", \"live-15511ec9:groups[2]\", \"live-15511ec9:likes[6]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 622,
+    "completionTokens": 741
+  },
+  "savedAt": "2026-11-13T01:00:14.747Z"
+}

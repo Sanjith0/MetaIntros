@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Gabe loves low-key hangs at Indie Night at The Guild p12:events[0]. If the showcase gets packed and loud, would Jordan prefer to find a quieter corner to chat about climbing and photos, or stay front row?\", \"cites\": [\"p12:events[0]\"]}, \"p02\": {\"say\": \"Gabe is in Peninsula Film Club p12:groups[0] and likes chill, easygoing chats. Between bands at the showcase, how would Freya actually spend downtime - swapping memes, talking film, or wandering to check vinyl?\", \"cites\": [\"p12:groups[0]\"]}, \"p03\": {\"say\": \"Gabe is part of Bay Area Climbers p12:groups[2] and likes low-key plans. If the Indie Night crowd gets overwhelming, would Zoe want to step outside for a mellow chat about bouldering and film?\", \"cites\": [\"p12:groups[2]\"]}, \"p04\": {\"say\": \"Gabe follows SF Live Music Guide p12:likes[1] but prefers chill vibes. At the showcase, if a band is too loud, would Reza be up for hanging back and talking vinyl and bouldering instead?\", \"cites\": [\"p12:likes[1]\"]}, \"p05\": {\"say\": \"Gabe is in Peninsula Vinyl Collectors p12:groups[1] and likes laid-back nights. How would Yuki handle a set they don't love - stay and vibe, or slip to the lobby to trade record store stories?\", \"cites\": [\"p12:groups[1]\"]}, \"p11\": {\"say\": \"Gabe likes low-key, chill plans p12:socialStyle. During Indie Night, if Gabe wants to sit out a high-energy act and just chat over coffee, would Rosa be happy joining that slower pace?\", \"cites\": [\"p12:socialStyle\"]}, \"p14\": {\"say\": \"Gabe goes to Bouldering Night at Peninsula Boulders p12:events[2] and likes wandering conversations. At the showcase, would Ben prefer to bounce between sets or post up in one spot and chat about climbing and indie tracks?\", \"cites\": [\"p12:events[2]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3747,
+    "completionTokens": 845
+  },
+  "savedAt": "2026-11-13T00:26:47.069Z"
+}

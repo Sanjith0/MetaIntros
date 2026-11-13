@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"sp-boulders-rwc\", \"title\": \"Saturday Bouldering at Peninsula Boulders\", \"plan\": \"Let's meet Sat 12pm for a casual bouldering session with rentals on site and cheer each other on.\", \"reasons\": [\"All 3 are into climbing - unanimous match\", \"Bouldering is perfect for 3 strangers to chat between climbs\"]}",
+  "task": "hangout_planner",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 465,
+    "completionTokens": 762
+  },
+  "savedAt": "2026-11-13T00:40:00.413Z"
+}

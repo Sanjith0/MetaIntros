@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"live-14e8a601\": {\"say\": \"Ek likes getting out and doing something active. If Ek suggested a quick bouldering session at Peninsula Boulders followed by catching Warriors highlights nearby, how would Ekansh handle the switch from active to hangout?\", \"cites\": [\"live-4015ac32:socialStyle\", \"live-4015ac32:likes[2]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1307,
+    "completionTokens": 627
+  },
+  "savedAt": "2026-11-13T00:39:43.408Z"
+}

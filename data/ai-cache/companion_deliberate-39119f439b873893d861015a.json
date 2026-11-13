@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p14\", \"line\": {\"say\": \"Rosa would love this low-key boulder, coffee and vinyl squad, very chill and easygoing.\", \"cites\": [\"p11:likes[2]\", \"p11:likes[4]\", \"p11:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1679,
+    "completionTokens": 758
+  },
+  "savedAt": "2026-11-13T00:28:14.999Z"
+}

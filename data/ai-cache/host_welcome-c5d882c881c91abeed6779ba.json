@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\":\"Hey Jordan, Freya, Zoe, and Yuki — welcome to your squad chat! We're all set for the Vinyl Dig & Listening Bar Hang on Fri, Nov 13 · 7 PM, meeting at the front entrance of Menlo record shop listening bar. Can't wait to meet you all and dig through some crates together.\",\"icebreaker\":\"To kick us off — what's the best vinyl find you've scored recently that you keep going back to?\",\"interestTag\":\"vinyl\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 271,
+    "completionTokens": 401
+  },
+  "savedAt": "2026-11-13T00:29:17.193Z"
+}

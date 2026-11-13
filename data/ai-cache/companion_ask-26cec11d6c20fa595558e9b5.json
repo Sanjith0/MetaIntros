@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Zoe is into Vinyl Me, Please and likes low-key hangs. If at Indie Night Zoe wanted to step to the back to chat about a recent crate find instead of crowding the stage, how would Jordan actually handle that moment?\", \"cites\": [\"p03:likes[3]\", \"p03:socialStyle\"]}, \"p02\": {\"say\": \"Zoe follows Bouldering Daily and loves chill photo walks. If the showcase gets loud and Zoe suggests grabbing a quiet corner to swap V-Scale Memes and film shots, what would Freya do?\", \"cites\": [\"p03:likes[0]\", \"p03:likes[6]\"]}, \"p04\": {\"say\": \"Zoe prefers low-key, chill plans and collects vinyl. If between bands Zoe wants to sit out a set to talk records and Fujifilm X shots, how would Reza respond in the moment?\", \"cites\": [\"p03:socialStyle\", \"p03:likes[3]\"]}, \"p05\": {\"say\": \"Zoe is into Peninsula Bouldering League and low-key hangs. If Zoe wants to skip the mosh pit area and watch from the back while chatting about bouldering, how would Yuki actually act?\", \"cites\": [\"p03:likes[0]\", \"p03:socialStyle\"]}, \"p11\": {\"say\": \"Zoe shoots 35mm film and likes chill nights. If Zoe pulls out a film camera to snap the venue vibe between sets, would Rosa join in, give space, or steer elsewhere?\", \"cites\": [\"p03:likes[6]\"]}, \"p12\": {\"say\": \"Zoe loves Vinyl Me, Please and keeps things chill. If the crowd surges forward and Zoe hangs back near the merch/vinyl table, what would Gabe do next?\", \"cites\": [\"p03:likes[3]\", \"p03:socialStyle\"]}, \"p14\": {\"say\": \"Zoe follows Bouldering Daily and prefers relaxed hangouts. If Zoe suggests a quick coffee-break style pause outside during a loud intermission to chat climbing and records, how would Ben react?\", \"cites\": [\"p03:likes[0]\", \"p03:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3702,
+    "completionTokens": 756
+  },
+  "savedAt": "2026-11-13T00:26:44.583Z"
+}

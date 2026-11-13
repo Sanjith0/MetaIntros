@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Rosa likes low-key, chill plans p11:socialStyle. If Rosa suggested skipping a loud spot for a chill photo walk and trading vinyl stories from Peninsula Vinyl Collectors, how would Jordan actually hang?\", \"cites\": [\"p11:socialStyle\"]}, \"p02\": {\"say\": \"Rosa is into vinyl via Vinyl Me, Please p11:likes[4] and low-key hangs. If the squad wanted to flip through crates at Rasputin then grab coffee, how would Freya vibe with that pace?\", \"cites\": [\"p11:likes[4]\"]}, \"p03\": {\"say\": \"Rosa shoots 35mm film photography p11:likes[7]. If Rosa brought a film camera to a small vinyl listening night with friends, how would Zoe join the conversation?\", \"cites\": [\"p11:likes[7]\"]}, \"p04\": {\"say\": \"Rosa follows Bay Area Climbers Coalition p11:likes[2]. If Rosa talked about a chill bouldering session then low-key vinyl hang after, how would Reza actually spend that evening?\", \"cites\": [\"p11:likes[2]\"]}, \"p05\": {\"say\": \"Rosa is a fan of Phoebe Bridgers p11:music[0]. If Rosa put on Phoebe at a cozy 4-person hang and folks shared climbing memes, how would Yuki jump in?\", \"cites\": [\"p11:music[0]\"]}, \"p12\": {\"say\": \"Rosa is in Peninsula Vinyl Collectors p11:groups[0]. If Rosa suggested a quiet night digging for vinyl and swapping Pitchfork finds instead of a big party, how would Gabe roll with it?\", \"cites\": [\"p11:groups[0]\"]}, \"p14\": {\"say\": \"Rosa likes low-key, chill plans p11:socialStyle. If the group had to choose between a loud bar and a mellow coffee + vinyl chat, how would Ben steer the night?\", \"cites\": [\"p11:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3660,
+    "completionTokens": 858
+  },
+  "savedAt": "2026-11-13T00:28:38.657Z"
+}

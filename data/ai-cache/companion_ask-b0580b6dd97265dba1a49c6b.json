@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Yuki is geeking out over vinyl finds from Rasputin Music and shooting the bands on Fujifilm X between sets, how would Jordan join in or give space during Indie Night?\", \"cites\": [\"p05:likes[0]\"]}, \"p02\": {\"say\": \"Yuki loves low-key hangs and swapping stories from Peninsula Bouldering Crew. If the showcase gets crowded and loud, how would Freya keep it chill with them?\", \"cites\": [\"p05:groups[0]\", \"p05:socialStyle\"]}, \"p03\": {\"say\": \"Yuki is into Wet Leg and low-key vibes. If they want to sit out a loud band to talk about Record Store Day Palo Alto finds, how would Zoe respond?\", \"cites\": [\"p05:music[0]\", \"p05:events[0]\"]}, \"p04\": {\"say\": \"Yuki prefers chill plans and chatting about bouldering. If they suggest stepping outside between bands to talk Beta from Bouldering Daily, what would Reza actually do?\", \"cites\": [\"p05:likes[1]\", \"p05:socialStyle\"]}, \"p11\": {\"say\": \"Yuki lights up talking Pitchfork reviews and vinyl. If Yuki wants to hang near the back dissecting the opener quietly, how would Rosa share that moment?\", \"cites\": [\"p05:likes[3]\"]}, \"p12\": {\"say\": \"If Yuki is vibing to boygenius covers and wants to keep conversation mellow instead of pushing to the front, how would Gabe navigate that with them?\", \"cites\": [\"p05:music[1]\"]}, \"p14\": {\"say\": \"Yuki loves low-key, chill plans around Bay Area Concerts. If the crowd surges and Yuki wants to hang back and chat, how would Ben handle it?\", \"cites\": [\"p05:likes[2]\", \"p05:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3571,
+    "completionTokens": 648
+  },
+  "savedAt": "2026-11-13T00:26:43.917Z"
+}

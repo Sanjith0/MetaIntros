@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Freya is hoping for a chill squad of 6 for something low-key this weekend. They would bring lots to share from bouldering daily, A24 film chat, and Bay Area concerts. They love low-key, chill plans and swapping V-Scale memes and photo walk stories. Would prefer something quieter and relaxed over a loud club night.\", \"cites\": [\"p02:likes[0]\", \"p02:likes[6]\", \"p02:likes[4]\", \"p02:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2820,
+    "completionTokens": 371
+  },
+  "savedAt": "2026-11-13T00:28:21.466Z"
+}

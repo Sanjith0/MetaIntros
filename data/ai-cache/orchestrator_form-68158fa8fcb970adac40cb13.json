@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"live-14e8a601\", \"live-4015ac32\", \"live-eaa288e3\"], \"why\": \"You all bond over Peninsula Boulders and Bay Area Climbers Coalition, with Golden State Warriors hype to fuel you — perfect crew for a bouldering session then hanging out together.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 732,
+    "completionTokens": 801
+  },
+  "savedAt": "2026-11-13T00:39:56.454Z"
+}

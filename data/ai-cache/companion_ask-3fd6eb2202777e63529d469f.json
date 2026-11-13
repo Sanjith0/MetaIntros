@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"live-fffb1569\": {\"say\": \"If Ekansh wants to make a weekend plan around Peninsula Boulders, how does Afnan usually balance climbing time with socializing after — do they stick around to chat, swap beta, grab food?\", \"cites\": [\"live-be04a947:likes[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1365,
+    "completionTokens": 476
+  },
+  "savedAt": "2026-11-13T00:50:59.690Z"
+}

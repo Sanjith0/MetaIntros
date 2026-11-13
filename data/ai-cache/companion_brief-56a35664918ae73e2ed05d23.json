@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Ekansh likes getting out and doing something active, and they tend to be upbeat and social around shared sports and outdoor plans, happy to swap tips and make plans to meet up.\",\"depth\":{\"live-be04a947:likes[0]\":\"Follows Peninsula Boulders for climbing\",\"live-be04a947:likes[2]\":\"Follows Golden State Warriors and the NBA\",\"live-be04a947:likes[4]\":\"Interested in USA Pickleball and Pickleball Kitchen\",\"live-be04a947:likes[6]\":\"Uses Strava and Runner's World content\",\"live-be04a947:likes[8]\":\"Uses AllTrails and REI for outdoor activities\"},\"lightsUp\":[\"live-be04a947:likes[0]\",\"live-be04a947:likes[2]\",\"live-be04a947:groups[2]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 638,
+    "completionTokens": 661
+  },
+  "savedAt": "2026-11-13T00:45:24.709Z"
+}

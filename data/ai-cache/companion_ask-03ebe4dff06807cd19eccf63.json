@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p02\": {\"say\": \"If Jordan is hanging back by the merch table geeking out over vinyl finds from Rasputin Music, how would Freya actually spend that set - up front filming, or hanging back chatting? Jordan follows Vinyl Me, Please.\", \"cites\": [\"p01:likes[5]\"]}, \"p03\": {\"say\": \"Jordan likes low-key photo walks between bands with Fujifilm X. If the showcase gets crowded and loud, would Zoe step outside for a chill photo break with Jordan or stay inside for the next act?\", \"cites\": [\"p01:likes[6]\"]}, \"p04\": {\"say\": \"Jordan follows Bouldering Daily and likes swapping climbing stories during downtime. At Indie Night, would Reza be down to trade bouldering beta between sets or prefer to focus only on the music?\", \"cites\": [\"p01:likes[1]\"]}, \"p05\": {\"say\": \"Jordan is into vinyl through Vinyl Me, Please and likes low-key chats. If Yuki spots a rare pressing at the showcase pop-up, would they want to dig through crates together with Jordan or keep watching the band?\", \"cites\": [\"p01:likes[5]\"]}, \"p11\": {\"say\": \"Jordan shoots with Fujifilm X and likes chill plans. If Rosa wants to shoot 35mm film of the bands, would they coordinate a low-key photo spot together with Jordan or split up to get different angles?\", \"cites\": [\"p01:likes[6]\"]}, \"p12\": {\"say\": \"Jordan follows Bouldering Daily and is in Bay Area Climbers. Between local bands, if Gabe starts swapping V-Scale memes and climbing stories, would that be their vibe for a chill hang with Jordan?\", \"cites\": [\"p01:likes[1]\"]}, \"p14\": {\"say\": \"Jordan likes low-key, chill plans and Philz Coffee hangs. After the showcase, would Ben be up for a quiet debrief over coffee talking vinyl and climbing, or head to a louder afterparty?\", \"cites\": [\"p01:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3526,
+    "completionTokens": 769
+  },
+  "savedAt": "2026-11-13T00:25:52.055Z"
+}

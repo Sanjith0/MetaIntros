@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Zoe would love that low-key post-climb hang trading Bouldering Daily beta and Rasputin Music finds.\", \"cites\": [\"p03:likes[0]\", \"p03:likes[2]\", \"p03:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1664,
+    "completionTokens": 653
+  },
+  "savedAt": "2026-11-13T00:29:07.492Z"
+}

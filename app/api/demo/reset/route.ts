@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
 import { cancelAllSims } from "@/lib/server/queue";
+import { cancelCheckIns } from "@/lib/server/rooms";
 import { publish } from "@/lib/server/bus";
 
 export const dynamic = "force-dynamic";
@@ -9,8 +10,9 @@ export const dynamic = "force-dynamic";
 /** One-click reset + reseed (demo control panel; also used by E2E tests for isolation). */
 export async function POST() {
   cancelAllSims();
+  cancelCheckIns(); // rooms waiting on a person go ahead without them
   // demo settings survive a reset (the presenter picks the mode once)
-  const keep = await prisma.appSetting.findMany({ where: { key: { in: ["fillMode", "simFillMs", "mixedFillDelayMs", "aiMode"] } } });
+  const keep = await prisma.appSetting.findMany({ where: { key: { in: ["fillMode", "simFillMs", "mixedFillDelayMs", "aiMode", "checkinMs"] } } });
   const r = await seedDatabase(prisma);
   for (const k of keep) await prisma.appSetting.upsert({ where: { key: k.key }, create: { key: k.key, value: k.value }, update: { value: k.value } });
   publish("demo", { type: "reset" });

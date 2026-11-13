@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Leo gravitates toward low-key, chill plans and keeps things relaxed and friendly. They enjoy swapping recommendations and easygoing conversation rather than high-energy scenes.\",\"depth\":{\"p13:likes[3]\":\"Follows climbing content via Climbing Magazine.\",\"p13:likes[4]\":\"Into Bay Area hiking via Bay Area Hiker.\",\"p13:groups[0]\":\"Member of Bay Area Indie Shows group.\",\"p13:events[0]\":\"Went to Big Sur Camping Trip event.\",\"p13:music[1]\":\"Listens to Mitski.\"},\"lightsUp\":[\"p13:likes[4]\",\"p13:groups[0]\",\"p13:events[0]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 556,
+    "completionTokens": 641
+  },
+  "savedAt": "2026-11-12T20:24:39.230Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p12\", \"members\": [\"p01\", \"p02\", \"p11\", \"p12\"], \"line\": {\"say\": \"Gabe likes low-key chill plans for climbing chat and vinyl digging with Bay Area Climbers crew.\", \"cites\": [\"p12:groups[2]\", \"p12:groups[1]\", \"p12:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1637,
+    "completionTokens": 614
+  },
+  "savedAt": "2026-11-13T00:29:09.267Z"
+}

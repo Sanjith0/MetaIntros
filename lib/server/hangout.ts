@@ -17,6 +17,11 @@ import { writeTrace } from "./trace";
 export const HANGOUT_SPOTS = SPOTS as Spot[];
 export const HANGOUT_MIN_HORIZON_MS = 2 * 86_400_000;
 
+/** How far ahead a hangout may be planned: the same window as the existing-events queue ("this weekend"), so Fast-forward jumps stay short. */
+export function hangoutHorizon(now: Date): Date {
+  return new Date(Math.max(weekendRange(now).end.getTime(), now.getTime() + HANGOUT_MIN_HORIZON_MS));
+}
+
 export async function hangoutGroup(members: Person[], cand: Candidate, bucketId: string): Promise<HangoutGroup> {
   const entries = await prisma.queueEntry.findMany({ where: { id: { in: cand.entryIds } }, include: { bucketLandmark: true } });
   const lm = await prisma.landmark.findUniqueOrThrow({ where: { id: bucketId } });
@@ -35,8 +40,7 @@ export function setHangoutPlanner(fn: HangoutPlanner) {
 export async function planHangout(members: Person[], cand: Candidate, bucketId: string, partyId: string): Promise<{ eventId: string } | null> {
   const now = await clockNow();
   const group = await hangoutGroup(members, cand, bucketId);
-  // Same window as the existing-events queue ("this weekend"), so Fast-forward jumps stay short.
-  const horizon = new Date(Math.max(weekendRange(now).end.getTime(), now.getTime() + HANGOUT_MIN_HORIZON_MS));
+  const horizon = hangoutHorizon(now);
   const plan = await planner({ spots: HANGOUT_SPOTS, group, now, horizon }).catch(() => null);
   if (!plan) return null;
   await writeTrace(partyId, plan.steps);

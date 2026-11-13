@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Afnan likes getting out and doing something active and tends to socialize around shared activities. They enjoy talking while climbing, running, hiking, or watching a game with other fans.\", \"depth\": {\"live-fffb1569:likes[0]\": \"Interest in Peninsula Boulders gym\", \"live-fffb1569:groups[0]\": \"Member of Bay Area Climbers group\", \"live-fffb1569:groups[1]\": \"Member of Palo Alto Runners group\", \"live-fffb1569:groups[3]\": \"Member of Warriors Fans Bay Area group\", \"live-fffb1569:likes[8]\": \"Interest in USA Pickleball\"}, \"lightsUp\": [\"live-fffb1569:likes[0]\", \"live-fffb1569:groups[1]\", \"live-fffb1569:likes[6]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 573,
+    "completionTokens": 537
+  },
+  "savedAt": "2026-11-13T00:50:58.334Z"
+}
