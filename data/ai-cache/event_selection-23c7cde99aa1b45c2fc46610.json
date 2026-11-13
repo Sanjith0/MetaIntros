@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"ev-vinyl-swap\", \"runnersUp\": [\"ev-indie-guild\", \"ev-photo-walk\"], \"reasons\": [\"Covers 6/6 on vinyl records and indie music\", \"Swap + listening format makes mingling easy\"]}",
+  "task": "event_selection",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 443,
+    "completionTokens": 621
+  },
+  "savedAt": "2026-11-13T06:10:47.047Z"
+}

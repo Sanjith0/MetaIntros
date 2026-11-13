@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p13\", \"p15\"], \"why\": \"You all share Rasputin Music deep cuts and V-Scale Memes, with lots to swap between Bouldering Daily beta and Vinyl Me, Please spins.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1282,
+    "completionTokens": 2552
+  },
+  "savedAt": "2026-11-13T06:31:36.615Z"
+}

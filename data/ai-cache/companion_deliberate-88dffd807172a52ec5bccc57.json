@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\":\"back\",\"proposalId\":\"prop-p12\",\"members\":[\"p01\",\"p03\",\"p05\",\"p12\"],\"line\":{\"say\":\"Yuki loves low-key chill climbs and indie shows with Jordan, Zoe and Gabe.\",\"cites\":[\"p05:socialStyle\",\"p05:events[1]\",\"p05:groups[2]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1343,
+    "completionTokens": 1379
+  },
+  "savedAt": "2026-11-13T06:30:12.373Z"
+}

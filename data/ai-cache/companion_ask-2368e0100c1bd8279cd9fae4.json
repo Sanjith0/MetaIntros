@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p11\": {\"say\": \"Jordan likes low-key, chill plans. If they are out with a small squad for a relaxed evening, how does Rosa usually help everyone feel included and keep things chill?\", \"cites\": [\"p01:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1287,
+    "completionTokens": 877
+  },
+  "savedAt": "2026-11-13T06:12:17.497Z"
+}

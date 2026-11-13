@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Zoe would love a chill night of bouldering talk and gig photography with Jordan, Yuki and Rosa.\", \"cites\": [\"p03:likes[0]\", \"p03:likes[6]\", \"p03:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1469,
+    "completionTokens": 1328
+  },
+  "savedAt": "2026-11-13T06:18:34.854Z"
+}

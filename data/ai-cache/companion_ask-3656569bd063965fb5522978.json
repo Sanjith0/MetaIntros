@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Picture Zoe and Jordan at a chill Bay Area show, Zoe shooting 35mm between sets — what does Jordan actually do in those quiet gaps, stick nearby chatting or drift off exploring solo?\", \"cites\": [\"p03:likes[5]\", \"p03:likes[6]\"]}, \"p13\": {\"say\": \"If Zoe and Leo are hanging low-key after a climb, Zoe sharing V-Scale memes from projecting the same V4 for months — how does Leo actually join in, laugh along, trade stories, or stay quiet?\", \"cites\": [\"p03:likes[0]\", \"p03:likes[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1762,
+    "completionTokens": 962
+  },
+  "savedAt": "2026-11-13T06:02:27.985Z"
+}

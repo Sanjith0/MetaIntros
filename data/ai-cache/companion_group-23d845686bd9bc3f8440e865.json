@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki hopes for a chill Indie Night: Local Bands Showcase with six. They would bring Fujifilm X concert photography and vivid stories bouncing between climbing and shows, plus love for Wet Leg, boygenius and Bay Area concerts. They thrive with low-key, chill plans and Peninsula Bouldering Crew / Bay Area Indie Shows overlap.\", \"cites\": [\"p05:likes[5]\", \"p05:music[0]\", \"p05:music[1]\", \"p05:likes[2]\", \"p05:socialStyle\", \"p05:groups[0]\", \"p05:groups[2]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2768,
+    "completionTokens": 853
+  },
+  "savedAt": "2026-11-13T05:49:13.740Z"
+}

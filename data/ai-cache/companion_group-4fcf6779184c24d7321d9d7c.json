@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Kwame hopes for a chill Indie Night showcase with everyone. They would bring indie playlist deep cuts, vinyl talk and calm low-key energy plus dry asides. To make it work, keep plans low-key and chill with space to check in.\", \"cites\": [\"p15:music[0]\", \"p15:likes[0]\", \"p15:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2771,
+    "completionTokens": 754
+  },
+  "savedAt": "2026-11-13T05:49:19.586Z"
+}

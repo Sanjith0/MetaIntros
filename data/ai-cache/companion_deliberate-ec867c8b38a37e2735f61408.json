@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\":\"back\",\"proposalId\":\"prop-p14\",\"line\":{\"say\":\"Jordan would love this chill vinyl and climbing crew for the weekend.\",\"cites\":[\"p01:likes[5]\",\"p01:likes[1]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1435,
+    "completionTokens": 808
+  },
+  "savedAt": "2026-11-13T06:08:05.602Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe hopes for a chill new hangout as a squad of 4. They'd bring 35mm gig shots, V4-project stories and vinyl/concert tips, plus dry humour one-on-one. They love low-key plans and would thrive photo-walking, crate-digging or talking bouldering and Bay Area shows with Jordan, Rosa and Kwame.\", \"cites\": [\"p03:likes[6]\", \"p03:likes[0]\", \"p03:likes[5]\", \"p03:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2139,
+    "completionTokens": 706
+  },
+  "savedAt": "2026-11-13T06:19:40.070Z"
+}

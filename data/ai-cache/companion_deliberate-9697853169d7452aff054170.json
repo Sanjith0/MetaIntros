@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"members\": [\"p01\", \"p03\", \"p05\", \"p11\"], \"line\": {\"say\": \"Rosa would enjoy chill bouldering and indie show plans with this kind squad.\", \"cites\": [\"p11:events[1]\", \"p11:groups[1]\", \"p11:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1530,
+    "completionTokens": 1582
+  },
+  "savedAt": "2026-11-13T06:18:45.062Z"
+}

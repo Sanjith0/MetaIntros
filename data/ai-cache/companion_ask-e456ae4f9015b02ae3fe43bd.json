@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Arjun kicks off a playful Philz vs Blue Bottle debate between bands to keep things moving, how would Jordan join in given they warm up slowly?\", \"cites\": [\"p14:likes[6]\"]}, \"p03\": {\"say\": \"When Arjun keeps things low-key and chill at Indie Night but drops terrible puns, how would Zoe respond one-on-one versus in the group?\", \"cites\": [\"p14:socialStyle\"]}, \"p05\": {\"say\": \"If Arjun chats about Bouldering Night at Peninsula Boulders before the show, how would Yuki balance storytelling and planning the next trip?\", \"cites\": [\"p14:events[3]\"]}, \"p12\": {\"say\": \"If Arjun starts pun-filled banter at Indie Night at The Guild, how would Gabe keep things low-key while cheering everyone on?\", \"cites\": [\"p14:events[1]\"]}, \"p15\": {\"say\": \"If Arjun wants a chill squad for Indie Night and loves friendly debate, how would Kwame check everyone is okay while sharing dry asides?\", \"cites\": [\"p14:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2758,
+    "completionTokens": 1168
+  },
+  "savedAt": "2026-11-13T05:51:48.462Z"
+}

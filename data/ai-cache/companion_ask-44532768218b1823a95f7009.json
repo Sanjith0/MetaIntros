@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p11\": {\"say\": \"Jordan likes low-key, chill plans. At the Indie Night showcase between sets, how would Rosa actually spend that downtime with Jordan — chatting, browsing merch, stepping out?\", \"cites\": [\"p01:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1291,
+    "completionTokens": 573
+  },
+  "savedAt": "2026-11-13T05:44:33.695Z"
+}

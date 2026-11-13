@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Rosa hopes for a chill squad of 6 for a weekend gig or climb. They would bring indie-show energy, vinyl chat and 35mm photo walk ideas. Rosa is a bit nervous in crowds at first and really appreciates being included in low-key plans.\", \"cites\": [\"p11:socialStyle\", \"p11:groups[1]\", \"p11:likes[7]\", \"p11:groups[2]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2941,
+    "completionTokens": 826
+  },
+  "savedAt": "2026-11-13T06:09:43.521Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Rosa hopes for a chill Indie Night: Local Bands Showcase with this crew. They would bring love for Phoebe Bridgers, Mitski and Snail Mail, plus Indie Shuffle finds, vinyl-collector chat and climbing and film-photography talk. New to the Bay and a bit nervous in crowds at first, Rosa really appreciates being included and likes low-key, chill plans.\", \"cites\": [\"p11:music[0]\", \"p11:music[1]\", \"p11:music[2]\", \"p11:likes[1]\", \"p11:groups[0]\", \"p11:likes[2]\", \"p11:likes[7]\", \"p11:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2568,
+    "completionTokens": 1050
+  },
+  "savedAt": "2026-11-13T06:01:41.759Z"
+}

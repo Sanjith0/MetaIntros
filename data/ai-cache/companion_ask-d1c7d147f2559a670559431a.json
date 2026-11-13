@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Arjun kicks off a playful Philz Coffee debate over a chill hang, how would Jordan actually act in the back-and-forth with Arjun in the moment?\", \"cites\": [\"p14:likes[6]\"]}, \"p03\": {\"say\": \"When Arjun is keeping things low-key at Indie Night at The Guild, how does Zoe handle chatting and photographing alongside Arjun through the night?\", \"cites\": [\"p14:events[1]\"]}, \"p05\": {\"say\": \"If Arjun meets Yuki for Bouldering Night at Peninsula Boulders, how would Yuki share stories and include Arjun between climbs?\", \"cites\": [\"p14:events[3]\"]}, \"p12\": {\"say\": \"When Arjun wants a low-key chill hang, how does Gabe actually hype up and joke with Arjun without overwhelming them?\", \"cites\": [\"p14:socialStyle\"]}, \"p15\": {\"say\": \"If Arjun starts a friendly pun-filled Blue Bottle Coffee debate on a chill night out, how would Kwame respond and stay engaged with Arjun?\", \"cites\": [\"p14:likes[5]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2746,
+    "completionTokens": 1246
+  },
+  "savedAt": "2026-11-13T06:02:50.134Z"
+}

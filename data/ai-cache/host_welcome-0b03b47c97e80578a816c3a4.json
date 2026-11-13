@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\": \"Hey Jordan, Zoe, Rosa and Kwame! So glad you're matched for Vinyl Dig & Listen in Menlo on Fri, Nov 13 · 7 PM. Let's meet at the front entrance of Menlo record shop listening bar — see you there! 🎶\", \"icebreaker\": \"What's the best vinyl find you've ever dug up?\", \"interestTag\": \"vinyl\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 284,
+    "completionTokens": 521
+  },
+  "savedAt": "2026-11-13T06:20:16.754Z"
+}

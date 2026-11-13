@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p12\", \"members\": [\"p01\", \"p03\", \"p12\", \"p13\"], \"line\": {\"say\": \"Gabe would enjoy chill climbing and vinyl night with Jordan, Zoe and Leo.\", \"cites\": [\"p12:socialStyle\", \"p12:groups[2]\", \"p12:groups[1]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1464,
+    "completionTokens": 1123
+  },
+  "savedAt": "2026-11-13T06:18:57.546Z"
+}

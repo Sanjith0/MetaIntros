@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p15\", \"members\": [\"p01\", \"p03\", \"p11\", \"p13\", \"p15\"], \"line\": {\"say\": \"Jordan would love a calm cozy-edge crew for Indie Shuffle finds and vinyl chat.\", \"cites\": [\"p01:likes[2]\", \"p01:likes[5]\", \"p01:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1398,
+    "completionTokens": 1487
+  },
+  "savedAt": "2026-11-13T06:26:17.570Z"
+}

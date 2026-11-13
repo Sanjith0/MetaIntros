@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p14\", \"members\": [\"p01\", \"p03\", \"p05\", \"p11\", \"p14\", \"p15\"], \"line\": {\"say\": \"Rosa would love chill vinyl, climbing chat and indie gigs with this kind crew.\", \"cites\": [\"p11:socialStyle\", \"p11:likes[2]\", \"p11:groups[1]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1599,
+    "completionTokens": 1232
+  },
+  "savedAt": "2026-11-13T06:08:14.753Z"
+}

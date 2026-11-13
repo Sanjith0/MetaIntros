@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p11\": {\"say\": \"If Jordan settles into a low-key chill spot between sets to chat, how would Rosa join in and help everyone feel included?\", \"cites\": [\"p01:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1291,
+    "completionTokens": 633
+  },
+  "savedAt": "2026-11-13T05:52:47.348Z"
+}

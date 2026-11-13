@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"line\": {\"say\": \"Zoe enjoys chill projecting, 35mm film frames and Bay Area concerts with Jordan, Yuki and Leo.\", \"cites\": [\"p03:likes[0]\", \"p03:likes[6]\", \"p03:likes[5]\", \"p03:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1474,
+    "completionTokens": 1083
+  },
+  "savedAt": "2026-11-13T06:30:18.442Z"
+}

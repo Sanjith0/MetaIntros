@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p05\", \"p11\", \"p13\", \"p15\"], \"why\": \"You all share Bouldering Daily, Rasputin Music and Climbing Magazine love plus indie and vinyl swapping — perfect for trading climbing jokes, gig shots and new finds between sets together!\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1336,
+    "completionTokens": 1317
+  },
+  "savedAt": "2026-11-13T06:21:41.143Z"
+}

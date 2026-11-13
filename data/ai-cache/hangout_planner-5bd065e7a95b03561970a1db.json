@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"sp-guild-vinyl\", \"title\": \"Vinyl Dig & Listen in Menlo\", \"plan\": \"Let's meet Fri 7pm at Menlo record shop listening bar for crate-digging and the listening bar together.\", \"reasons\": [\"Matches 4/4 interests: Vinyl records + Indie music\", \"Close at 1.8km and perfect for easy stranger chat\"]}",
+  "task": "hangout_planner",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 471,
+    "completionTokens": 754
+  },
+  "savedAt": "2026-11-13T06:20:01.698Z"
+}

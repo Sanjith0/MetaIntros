@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki hopes for a chill Indie Night Local Bands Showcase with this five. They would bring concert photography chat with a Fujifilm X in the bag and love swapping Bouldering Daily and Bay Area indie shows talk. They like low-key, chill plans and vibe best keeping it mellow together.\", \"cites\": [\"p05:likes[5]\", \"p05:likes[1]\", \"p05:groups[2]\", \"p05:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2383,
+    "completionTokens": 1376
+  },
+  "savedAt": "2026-11-13T06:01:44.851Z"
+}

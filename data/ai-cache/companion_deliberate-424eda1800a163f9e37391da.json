@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p15\", \"line\": {\"say\": \"Zoe would love chill back-row gig photos and vinyl chat with this calm crew.\", \"cites\": [\"p03:likes[6]\", \"p03:likes[3]\", \"p03:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1501,
+    "completionTokens": 1387
+  },
+  "savedAt": "2026-11-13T06:26:04.043Z"
+}

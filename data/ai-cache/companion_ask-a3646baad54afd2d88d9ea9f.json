@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Gabe keeps hangs low-key and chill with goofy encouragement. If the showcase gets loud and crowded between bands, how does Jordan actually settle in and connect with Gabe one-on-one?\", \"cites\": [\"p12:socialStyle\"]}, \"p03\": {\"say\": \"Gabe shares V-Scale Memes with relaxed silly humor. When Zoe goes quiet in the big crowd, how would Zoe and Gabe find each other for dry side jokes between bands?\", \"cites\": [\"p12:likes[3]\"]}, \"p05\": {\"say\": \"Gabe loves the Golden Gate Photo Walk and chill hangs. If Yuki starts bouncing chaotically between climbing and concert photography stories, how does Yuki loop Gabe into the conversation?\", \"cites\": [\"p12:events[3]\"]}, \"p13\": {\"say\": \"Gabe cracks jokes in full climbing slang while keeping things chill. When Gabe gets loud and goofy between sets, how does Leo actually respond in the moment?\", \"cites\": [\"p12:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2467,
+    "completionTokens": 1103
+  },
+  "savedAt": "2026-11-13T05:44:44.622Z"
+}

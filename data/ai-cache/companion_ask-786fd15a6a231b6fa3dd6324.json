@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Leo hangs back listening in chill mode at the showcase, how does Jordan spend set breaks — finding quiet side chats, grabbing coffee, or exploring the venue?\", \"cites\": [\"p13:socialStyle\"]}, \"p05\": {\"say\": \"If Leo starts a thoughtful late-night chat about KEXP live sessions after the bands, how does Yuki join in — storytelling, photos, or planning next show?\", \"cites\": [\"p13:likes[2]\"]}, \"p11\": {\"say\": \"When Leo keeps things low-key to help Rosa feel included at the crowded showcase, how does Rosa respond — open up, stay quiet, or stick close?\", \"cites\": [\"p13:socialStyle\"]}, \"p14\": {\"say\": \"If Leo is quietly digging into Rasputin Music finds between sets, how does Arjun keep conversation going — playful debate, puns, or introducing others?\", \"cites\": [\"p13:likes[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2312,
+    "completionTokens": 1163
+  },
+  "savedAt": "2026-11-13T05:44:48.042Z"
+}
