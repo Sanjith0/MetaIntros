@@ -29,6 +29,7 @@ request. Hot files need a `scripts/board claim` first; see AGENTS.md.
 | 2 | `components/chat/ChatThread.tsx:201` (screen 28) | §8 Layout: sticky bars never cover content. The scroll target was inside the list, so the read-only bar covered the newest message (the "chat has ended" notice). It was also a `<div>` inside a `<ul>` | Scroll target moved after the sticky footer |
 | 3 | `app/join/page.tsx:90` (screen 12) | §2 tokens: inputs use the `wash` fill. §8 Accessibility: `outline-none` removed the focus ring | `bg-wash`, no border, global focus ring kept |
 | 4 | `app/(app)/friends/page.tsx:107` (screen 10) | §4 States: an empty state has one action | Added a grey "Find a squad" link to `/events` |
+| 26 | `components/events/RsvpButtons.tsx:28-37` (event pages) | §8 Layout: no sideways scroll at 390px. The action row's buttons couldn't shrink, so a wider system font (Linux in CI, or Verdana locally) pushed "…" 14px off-screen and widened the page to 404px. Found by `design.spec` on the first CI run | The three buttons now shrink (`min-w-0`) and truncate their labels; "…" doesn't shrink |
 
 ## Follow-ups
 

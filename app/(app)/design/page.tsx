@@ -406,9 +406,9 @@ export default function DesignPage() {
               <DateLine start={SAMPLE_START} />
               <p className="text-page font-bold">Indie Night</p>
               <div className="mt-2 flex gap-2">
-                <Button className="flex-1" icon={<Star size={16} />}>Interested</Button>
-                <Button className="flex-1" icon={<Check size={16} />}>Going</Button>
-                <Button className="flex-1" icon={<Mail size={16} />}>Invite</Button>
+                <Button className="min-w-0 flex-1" icon={<Star size={16} />}><span className="truncate">Interested</span></Button>
+                <Button className="min-w-0 flex-1" icon={<Check size={16} />}><span className="truncate">Going</span></Button>
+                <Button className="min-w-0 flex-1" icon={<Mail size={16} />}><span className="truncate">Invite</span></Button>
                 <IconButton label="More"><MoreHorizontal size={20} /></IconButton>
               </div>
             </div>
