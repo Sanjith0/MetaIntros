@@ -59,8 +59,12 @@ test("squad album → AI-suggested post on Home → story; album stays squad-onl
   await page.getByTestId("open-share").click();
   await expect(page.getByTestId("share-outing")).toBeVisible();
 
-  // Let AI suggest a post: offline here, so the template is used and labeled as such
-  await page.getByTestId("share-ai").click();
+  // Post ideas load on their own: offline here, so one template idea and no chat recap
+  await expect(page.getByTestId("share-ideas")).toBeVisible();
+  await expect(page.getByTestId("share-idea")).toHaveCount(1);
+  await expect(page.getByTestId("share-recap")).toHaveCount(0);
+  await expect(page.getByTestId("share-ai")).toHaveCount(0);
+  await page.getByTestId("share-idea").first().click();
   await expect(page.getByTestId("post-composer")).toBeVisible();
   await expect(page.getByTestId("ai-source")).toHaveAttribute("data-source", "fallback");
   await expect(page.getByTestId("ai-source")).toContainText("Template (AI unavailable)");
