@@ -10,7 +10,7 @@ import { EventCover } from "@/components/events/EventCover";
 import { PostComposer, type ComposerAlbum } from "./PostComposer";
 import { StoryViewer, type StoryGroupItem } from "./StoryViewer";
 
-interface MockStory { id: string; name: string; color: string; pattern: string }
+interface MockStory { id: string; name: string; color: string; pattern: string; photo?: string }
 
 /**
  * Top of Home: "What's on your mind?" and the stories rail. Both open one composer (text, or photos
@@ -75,9 +75,9 @@ export function HomeTop({ me, stories, mockStories, albums }: { me: { name: stri
           );
         })}
         {mockStories.map((s) => (
-          <EventCover key={s.id} color={s.color} pattern={s.pattern} label={`${s.name}'s story`} className="h-44 w-24 shrink-0 rounded-card">
+          <EventCover key={s.id} color={s.color} pattern={s.pattern} src={s.photo} label={`${s.name}'s story`} className="h-44 w-24 shrink-0 rounded-card">
             <span className="absolute top-2 left-2"><Avatar name={s.name} color={s.color} size={32} className="ring-2 ring-accent" /></span>
-            <span className="absolute right-2 bottom-2 left-2 text-meta leading-tight font-semibold text-surface">{s.name}</span>
+            <span className="absolute inset-x-0 bottom-0 bg-ink/50 px-2 py-1.5 text-meta leading-tight font-semibold text-surface">{s.name}</span>
           </EventCover>
         ))}
       </div>

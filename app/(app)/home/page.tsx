@@ -4,6 +4,7 @@ import { TopBar } from "@/components/fb/TopBar";
 import { FacePile, Stack } from "@/components/fb";
 import { EventCover } from "@/components/events/EventCover";
 import { DateLine } from "@/components/events/DateLine";
+import { eventCoverSrc } from "@/lib/images";
 import { Post } from "@/components/feed/Post";
 import { HomeTop } from "@/components/posts/HomeTop";
 import { RealPost } from "@/components/posts/RealPost";
@@ -59,18 +60,18 @@ export default async function HomePage() {
         {POSTS.map((p) => {
           const ev = shared.find((e) => e.id === p.eventId);
           return (
-            <Post key={p.id} who={p.who} color={p.color} ago={p.ago} text={p.text} likes={p.likes} comments={p.comments}>
+            <Post key={p.id} who={p.who} color={p.color} avatarUrl={p.avatar} ago={p.ago} text={p.text} likes={p.likes} comments={p.comments}>
               {ev ? (
                 <Link href={`/events/${ev.id}`} className="block" data-testid="feed-event">
-                  <EventCover color={ev.coverColor} pattern={ev.coverPattern} className="aspect-[2/1]" />
+                  <EventCover color={ev.coverColor} pattern={ev.coverPattern} src={eventCoverSrc(ev.id)} label={ev.title} className="aspect-[2/1]" />
                   <div className="bg-wash px-4 py-2">
                     <DateLine start={ev.startsAt} />
                     <p className="truncate text-body font-semibold">{ev.title}</p>
                     <p className="truncate text-meta text-muted">{ev.venueName}</p>
                   </div>
                 </Link>
-              ) : p.cover ? (
-                <EventCover color={p.cover.color} pattern={p.cover.pattern} className="aspect-[2/1]" />
+              ) : p.photo ? (
+                <EventCover color={p.color} pattern="dots" src={p.photo} label={`Photo from ${p.who}`} className="aspect-[4/3]" />
               ) : null}
             </Post>
           );

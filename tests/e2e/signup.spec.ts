@@ -18,7 +18,7 @@ test("two phones sign up live and get separate sessions", async ({ browser }) =>
   for (const t of ["climbing", "indie-music", "coffee", "film", "hiking"]) await a.getByTestId(`join-interest-${t}`).click();
   await a.getByTestId("join-submit").click();
   await expect(a).toHaveURL(/\/events/);
-  await expect(a.getByTestId("me-avatar")).toHaveText("R");
+  await expect(a.getByTestId("me-avatar").getByRole("img")).toHaveAccessibleName(/^Riley/);
 
   await gotoReady(b, "/join");
   await b.getByTestId("join-name").fill("Morgan");
@@ -26,15 +26,15 @@ test("two phones sign up live and get separate sessions", async ({ browser }) =>
   await b.getByTestId("join-gender-none").click();
   await b.getByTestId("join-sample").click();
   await expect(b).toHaveURL(/\/events/);
-  await expect(b.getByTestId("me-avatar")).toHaveText("M");
+  await expect(b.getByTestId("me-avatar").getByRole("img")).toHaveAccessibleName(/^Morgan/);
 
   // A is still A
   await reloadReady(a);
-  await expect(a.getByTestId("me-avatar")).toHaveText("R");
+  await expect(a.getByTestId("me-avatar").getByRole("img")).toHaveAccessibleName(/^Riley/);
   // Without a session you're the presenter's "Me"
   const c = await (await browser.newContext()).newPage();
   await gotoReady(c, "/events");
-  await expect(c.getByTestId("me-avatar")).toHaveText("JL");
+  await expect(c.getByTestId("me-avatar").getByRole("img")).toHaveAccessibleName("Jordan Lee");
   await ctxA.close();
   await ctxB.close();
 });

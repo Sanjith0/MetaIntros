@@ -22,11 +22,13 @@ test("queue together by code: two phones, one squad (strangers fill the rest)", 
   const pal = await liveUser(browser, "Ben");
 
   await gotoReady(host, "/queue/start?mode=anything");
+  await host.getByTestId("bring-friends").click();
   await host.getByTestId("group-get-code").click();
   const code = (await host.getByTestId("group-code").textContent())!.trim();
   expect(code).toMatch(/^[A-Z0-9]{4}$/);
 
   await gotoReady(pal, "/queue/start?mode=anything");
+  await pal.getByTestId("bring-friends").click();
   await pal.getByTestId("group-code-input").fill(code);
   await pal.getByTestId("group-code-join").click();
   await expect(pal.getByTestId("group-member-card")).toContainText("You're queuing with Ana");
@@ -57,6 +59,7 @@ test("queue together by code: two phones, one squad (strangers fill the rest)", 
 
 test("invite a friend from queue setup: seeded friend accepts, group queues together", async ({ page }) => {
   await gotoReady(page, "/queue/start?mode=anything");
+  await page.getByTestId("bring-friends").click();
   await page.getByTestId("group-invite-friends").click();
   const first = page.getByTestId("group-invite-sheet").locator('[data-testid^="group-invite-p"]').first();
   await first.click();
