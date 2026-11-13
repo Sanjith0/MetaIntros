@@ -56,6 +56,7 @@ test("Events: plan a new hangout in one tap, keep queuing while in a squad, see 
   await expect(rows).toHaveCount(2);
   await expect(page.getByTestId("my-squads")).toContainText("Your squads · 2");
   await expect(page.locator('[data-testid^="my-squad-"][data-hangout="true"]')).toHaveCount(1);
+  await expect(page.getByTestId("squad-banner")).toHaveCount(0); // the list covers both squads; no squad shows twice
   await shot(page, "52-events-your-squads");
 
   // leave the hangout squad from Squad info
