@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p03\": {\"say\": \"Rosa prefers low-key, chill plans and can feel nervous in crowds at first — how would Zoe actually make room for Rosa during a packed Indie Night set, say between bands when everyone is jostling for spots?\", \"cites\": [\"p11:socialStyle\"]}, \"p05\": {\"say\": \"Rosa follows Bay Area Climbers Coalition and wants climbing partners for low-key hangs — if Rosa and Yuki meet up before Indie Night, how would Yuki actually spend that pre-show time with Rosa?\", \"cites\": [\"p11:likes[2]\"]}, \"p12\": {\"say\": \"Rosa is into V-Scale Memes and chill hangs but gets nervous in crowds — how would Gabe actually balance loud cheering and jokes with keeping Rosa comfortable during the Indie Night showcase?\", \"cites\": [\"p11:likes[6]\"]}, \"p14\": {\"say\": \"Rosa loves Philz Coffee for a pre-show wind-down — if Rosa and Arjun grab coffee before Indie Night, how would Arjun actually keep the Philz vs Blue Bottle debate fun and inclusive for Rosa?\", \"cites\": [\"p11:likes[8]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2498,
+    "completionTokens": 1477
+  },
+  "savedAt": "2026-11-13T05:51:36.160Z"
+}

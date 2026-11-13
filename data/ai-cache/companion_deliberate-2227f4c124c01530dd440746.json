@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Rosa feels included with this chill indie and vinyl crew for Indie Night.\", \"cites\": [\"p11:groups[1]\", \"p11:groups[0]\", \"p11:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1589,
+    "completionTokens": 1119
+  },
+  "savedAt": "2026-11-13T05:47:52.812Z"
+}

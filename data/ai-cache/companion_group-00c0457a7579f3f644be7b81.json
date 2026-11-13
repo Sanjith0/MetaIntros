@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Kwame hopes for a chill Indie Night Local Bands Showcase with this squad of five. They would bring indie playlists from Mitski to Japanese Breakfast, Vinyl Me Please chat, V-Scale memes and Film Club talk. They like low-key chill plans and checking everyone is okay.\", \"cites\": [\"p15:music[0]\", \"p15:music[1]\", \"p15:likes[0]\", \"p15:likes[1]\", \"p15:groups[0]\", \"p15:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2415,
+    "completionTokens": 841
+  },
+  "savedAt": "2026-11-13T06:27:23.390Z"
+}

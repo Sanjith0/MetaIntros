@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan hopes for a chill Indie Night Local Bands Showcase with good show talk. They would bring love of Indie Shuffle, Japanese Breakfast, Alvvays, Bay Area concerts, plus Rasputin Music and vinyl chat and Fujifilm photo walk eye. They do best with low-key, chill plans and ease in slowly.\", \"cites\": [\"p01:likes[2]\", \"p01:music[0]\", \"p01:music[1]\", \"p01:likes[3]\", \"p01:likes[4]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:groups[0]\", \"p01:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2422,
+    "completionTokens": 819
+  },
+  "savedAt": "2026-11-13T06:01:39.224Z"
+}

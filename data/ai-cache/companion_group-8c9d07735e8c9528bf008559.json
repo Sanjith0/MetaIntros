@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki hopes for a chill squad of 6 for a weekend event. They would bring concert photography with Fujifilm X, bouldering stories from Peninsula Bouldering Crew, and love for Bay Area indie shows and vinyl hunting. They are easy, low-key and would thrive keeping plans chill and inclusive.\", \"cites\": [\"p05:likes[5]\", \"p05:groups[0]\", \"p05:groups[2]\", \"p05:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2756,
+    "completionTokens": 670
+  },
+  "savedAt": "2026-11-13T06:09:31.089Z"
+}

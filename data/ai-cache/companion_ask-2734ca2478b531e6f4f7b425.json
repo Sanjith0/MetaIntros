@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Yuki always carries a Fujifilm X in the bag for concert photography. If Yuki and Jordan hit a Bay Area indie show together, what would that night actually look like for them?\", \"cites\": [\"p05:likes[5]\"]}, \"p03\": {\"say\": \"Yuki goes to Bouldering Night at Peninsula Boulders. If Yuki and Zoe go together after projecting, how do they spend the evening, take breaks, and keep it chill?\", \"cites\": [\"p05:events[1]\"]}, \"p15\": {\"say\": \"Yuki boulders with the Peninsula Bouldering Crew. If Yuki and Kwame plan a chill weekend hang around climbing and music, how does Kwame actually show up and join in?\", \"cites\": [\"p05:groups[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1945,
+    "completionTokens": 1428
+  },
+  "savedAt": "2026-11-13T06:02:29.793Z"
+}

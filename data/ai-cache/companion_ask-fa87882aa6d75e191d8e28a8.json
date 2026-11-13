@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Leo likes low-key, chill plans. How does Jordan warm up and share space with Leo during a crowded Indie Night showcase when both prefer to ease in slowly?\", \"cites\": [\"p13:socialStyle\"]}, \"p05\": {\"say\": \"Leo loves KEXP live sessions. How would Yuki balance vivid climbing and photo stories with giving Leo room to listen then open up about music production between sets?\", \"cites\": [\"p13:likes[2]\"]}, \"p11\": {\"say\": \"Leo likes low-key, chill plans. How would Rosa and Leo support each other if Rosa feels nervous in the crowd during the Local Bands Showcase?\", \"cites\": [\"p13:socialStyle\"]}, \"p14\": {\"say\": \"Leo likes low-key, chill plans. How does Arjun use puns and friendly debate to keep Leo included in downtime between bands without overwhelming quieter moments?\", \"cites\": [\"p13:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2312,
+    "completionTokens": 738
+  },
+  "savedAt": "2026-11-13T05:51:46.439Z"
+}

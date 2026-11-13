@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p05\", \"p11\", \"p14\"], \"why\": \"You all click over Rasputin Music and Bouldering Daily, with plenty to trade on Climbing Magazine, Indie Shuffle and Bay Area Concerts for your next climb-and-show plan.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1225,
+    "completionTokens": 1799
+  },
+  "savedAt": "2026-11-13T06:01:31.292Z"
+}

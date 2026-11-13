@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Leo hopes for a chill weekend squad of 6. They would bring KEXP live session talk, Letterboxd film logs, Bay Area Indie Shows energy, plus Rasputin Music finds and V-Scale Memes humor. They do best with low-key, chill plans, listening first then opening up late-night.\", \"cites\": [\"p13:likes[2]\", \"p13:likes[5]\", \"p13:groups[0]\", \"p13:likes[1]\", \"p13:likes[0]\", \"p13:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2705,
+    "completionTokens": 1131
+  },
+  "savedAt": "2026-11-13T06:10:33.021Z"
+}

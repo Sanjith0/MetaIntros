@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Yuki has their Fujifilm X in the bag for concert photography, how would Jordan spend the sets alongside them — stick close chatting, wander for angles, or ease in quietly?\", \"cites\": [\"p05:likes[5]\"]}, \"p03\": {\"say\": \"If Yuki keeps the night low-key and chill swapping climbing and photo stories, how would Zoe actually hang with them between bands — observe quietly, trade shots, crack dry humour?\", \"cites\": [\"p05:socialStyle\"]}, \"p15\": {\"say\": \"Given Yuki boulders with the Peninsula Bouldering Crew, how would Kwame connect with them at the showcase — talk crew beta between sets, share playlists, check everyone's comfortable?\", \"cites\": [\"p05:groups[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1953,
+    "completionTokens": 1120
+  },
+  "savedAt": "2026-11-13T05:44:38.119Z"
+}

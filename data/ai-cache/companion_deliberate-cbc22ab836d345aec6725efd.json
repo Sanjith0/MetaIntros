@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p05\", \"members\": [\"p01\", \"p03\", \"p05\", \"p12\"], \"line\": {\"say\": \"Gabe loves chill hangs for climbs, memes and vinyl-backed indie talk with Jordan, Zoe and Yuki.\", \"cites\": [\"p12:socialStyle\", \"p12:groups[2]\", \"p12:likes[3]\", \"p12:groups[1]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1469,
+    "completionTokens": 1710
+  },
+  "savedAt": "2026-11-13T06:30:36.085Z"
+}

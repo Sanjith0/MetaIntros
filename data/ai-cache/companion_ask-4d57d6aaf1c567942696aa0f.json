@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Indie Night gets packed between bands, how would Jordan actually hang back with Kwame to keep things low-key and chill together?\", \"cites\": [\"p15:socialStyle\"]}, \"p03\": {\"say\": \"If the showcase crowd feels overwhelming, how would Zoe find a quieter moment with Kwame to share sharp one-on-one observations about the bands?\", \"cites\": [\"p15:music[0]\"]}, \"p11\": {\"say\": \"If Rosa feels nervous in the crowd, how would Rosa and Kwame actually look out for each other and stay included while catching the bands?\", \"cites\": [\"p15:socialStyle\"]}, \"p12\": {\"say\": \"When Gabe gets loudly encouraging and goofy between sets, how would Gabe read Kwame and keep the hangout feeling low-key and chill?\", \"cites\": [\"p15:socialStyle\"]}, \"p13\": {\"say\": \"During a quieter moment between sets, how would Leo and Kwame actually open up in thoughtful conversation about Letterboxd films or live sessions?\", \"cites\": [\"p15:likes[4]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2686,
+    "completionTokens": 1101
+  },
+  "savedAt": "2026-11-13T05:51:51.127Z"
+}

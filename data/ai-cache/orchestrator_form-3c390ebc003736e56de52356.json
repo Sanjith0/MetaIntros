@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p11\", \"p13\", \"p15\"], \"why\": \"You all bond over Rasputin Music, Bouldering Daily and V-Scale Memes with plenty of vinyl talk and Indie Shuffle finds to share from a cozy edge spot.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1314,
+    "completionTokens": 1199
+  },
+  "savedAt": "2026-11-13T06:26:59.676Z"
+}

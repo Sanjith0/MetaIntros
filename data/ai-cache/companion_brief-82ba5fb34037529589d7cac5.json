@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Arjun is chill and sociable, loves a friendly competitive debate, drops terrible puns, and keeps the conversation moving.\", \"depth\": {\"p14:likes[5]\": \"One side of Arjun's Philz vs Blue Bottle debate from intro\", \"p14:likes[6]\": \"The other side of Arjun's Philz vs Blue Bottle debate from intro\", \"p14:groups[0]\": \"Links with Climbing Magazine and Bouldering Night at Peninsula Boulders around climbing\", \"p14:groups[2]\": \"Links with Vinyl Me, Please, Rasputin Music and Record Store Day Palo Alto around crate digging\", \"p14:music[0]\": \"Fits with Indie Shuffle, Bay Area Concerts and Indie Night at The Guild\"}, \"lightsUp\": [\"p14:likes[6]\", \"p14:groups[0]\", \"p14:groups[2]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 741,
+    "completionTokens": 1250
+  },
+  "savedAt": "2026-11-13T05:44:19.014Z"
+}

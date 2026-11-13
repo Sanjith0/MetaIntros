@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Kwame hopes for a new chill hangout as a squad of 4. They'd bring vinyl chat, indie playlists with Mitski, plus film and bouldering stories. They like low-key, chill plans and would prefer somewhere quieter to keep conversation easy.\", \"cites\": [\"p15:likes[0]\", \"p15:music[0]\", \"p15:groups[0]\", \"p15:groups[1]\", \"p15:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2011,
+    "completionTokens": 813
+  },
+  "savedAt": "2026-11-13T06:19:41.623Z"
+}

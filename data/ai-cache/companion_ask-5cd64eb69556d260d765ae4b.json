@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Yuki brings a Fujifilm X for concert photography, how would Jordan spend time with them at a chill Bay Area show together?\", \"cites\": [\"p05:likes[5]\"]}, \"p03\": {\"say\": \"When Yuki heads to Bouldering Night at Peninsula Boulders, how would Zoe actually hang out with them during the session?\", \"cites\": [\"p05:events[1]\"]}, \"p15\": {\"say\": \"Yuki likes low-key, chill plans, so how would Kwame shape an evening together to keep the whole squad comfortable?\", \"cites\": [\"p05:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1945,
+    "completionTokens": 735
+  },
+  "savedAt": "2026-11-13T06:12:09.408Z"
+}

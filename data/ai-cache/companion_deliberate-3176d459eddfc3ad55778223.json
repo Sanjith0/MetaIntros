@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p13\", \"members\": [\"p01\", \"p03\", \"p11\", \"p13\", \"p15\"], \"line\": {\"say\": \"Kwame loves low-key chill plans with Vinyl Me, Please and Indie Shuffle finds.\", \"cites\": [\"p15:socialStyle\", \"p15:likes[0]\", \"p15:likes[2]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1377,
+    "completionTokens": 1047
+  },
+  "savedAt": "2026-11-13T06:26:43.419Z"
+}

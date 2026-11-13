@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p11\", \"members\": [\"p01\", \"p03\", \"p05\", \"p11\", \"p13\", \"p15\"], \"line\": {\"say\": \"Leo backs this chill indie crew for KEXP chats between sets.\", \"cites\": [\"p13:likes[2]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1386,
+    "completionTokens": 1116
+  },
+  "savedAt": "2026-11-13T05:47:52.610Z"
+}

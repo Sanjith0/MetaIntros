@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p11\": {\"say\": \"If Jordan suggests a low-key evening browsing vinyl then grabbing Philz Coffee after, how does Rosa usually act in that kind of chill hang — chatty, quiet at first, wandering off?\", \"cites\": [\"p01:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1287,
+    "completionTokens": 634
+  },
+  "savedAt": "2026-11-13T06:02:24.400Z"
+}

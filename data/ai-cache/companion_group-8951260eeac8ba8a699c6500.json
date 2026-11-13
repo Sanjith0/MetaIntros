@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Rosa hopes for a chill new hangout as a squad of 4 and would bring love of indie gigs, vinyl collecting, climbing and 35mm photo walks. New to the Bay, Rosa is looking for climbing partners and gig buddies and appreciates being included, as crowds can feel nervous at first. They thrive with low-key, chill plans.\", \"cites\": [\"p11:groups[1]\", \"p11:groups[0]\", \"p11:likes[2]\", \"p11:likes[7]\", \"p11:groups[2]\", \"p11:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2193,
+    "completionTokens": 1073
+  },
+  "savedAt": "2026-11-13T06:19:55.534Z"
+}

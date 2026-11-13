@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p15\", \"line\": {\"say\": \"Kwame would enjoy calm vinyl, films and lattes with this chill squad.\", \"cites\": [\"p15:likes[0]\", \"p15:groups[0]\", \"p15:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1414,
+    "completionTokens": 1184
+  },
+  "savedAt": "2026-11-13T06:08:26.284Z"
+}

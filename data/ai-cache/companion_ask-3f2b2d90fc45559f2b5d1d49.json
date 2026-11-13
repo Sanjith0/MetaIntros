@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Arjun kicks off a playful Philz vs Blue Bottle debate in line, how does Jordan actually join in while keeping the vibe low-key and chill with the Indie Night crowd?\", \"cites\": [\"p14:likes[6]\"]}, \"p03\": {\"say\": \"Between sets when Arjun drops terrible puns about recent vinyl finds from Peninsula Vinyl Collectors, how does Zoe respond one-on-one in the crowd?\", \"cites\": [\"p14:groups[2]\"]}, \"p05\": {\"say\": \"If Arjun starts swapping stories from Bouldering Night at Peninsula Boulders between bands, how does Yuki bounce between climbing talk and concert photos in the moment?\", \"cites\": [\"p14:events[3]\"]}, \"p12\": {\"say\": \"When Arjun teases a friendly competitive debate around Climbing Magazine beta talk before the headliner, how does Gabe keep it encouraging and goofy without hyping the group too much?\", \"cites\": [\"p14:likes[0]\"]}, \"p15\": {\"say\": \"During a lull at Indie Night at The Guild when Arjun keeps conversation moving with Snail Mail chat, how does Kwame check in on everyone while staying calm and low-key?\", \"cites\": [\"p14:events[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2758,
+    "completionTokens": 822
+  },
+  "savedAt": "2026-11-13T05:44:47.223Z"
+}
