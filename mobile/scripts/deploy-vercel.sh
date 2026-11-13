@@ -6,7 +6,9 @@ cd "$(dirname "$0")/.."
 : "${QUEUEUP_URL:?Set QUEUEUP_URL to the Queue Up server (https://...)}"
 QUEUEUP_URL="${QUEUEUP_URL%/}"
 node -e '
-  const fs = require("fs"); const v = JSON.parse(fs.readFileSync("vercel.json", "utf8"));
+  const fs = require("fs");
+  // dist/ is already built: Vercel only serves it, so no install or build step there.
+  const v = { buildCommand: "", installCommand: "", outputDirectory: ".", framework: null };
   v.rewrites = [
     { source: "/api/:path*", destination: process.env.QUEUEUP_URL + "/api/:path*" },
     { source: "/images/:path*", destination: process.env.QUEUEUP_URL + "/images/:path*" },
