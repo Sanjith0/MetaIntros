@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import { Stack, router, useGlobalSearchParams, usePathname } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import { glanceOrigin, setGlanceOrigin } from '../../qu/glanceOrigin';
@@ -15,6 +15,9 @@ export default function GlanceLayout() {
   if (path.startsWith('/glance/join') && params.source === 'metaintros' && typeof params.id === 'string') setGlanceOrigin({ id: params.id, title: String(params.title ?? '') });
   const origin = glanceOrigin();
   const back = () => router.navigate((origin ? `/events/${origin.id}` : '/events') as never);
+  // Inside Link's phone app, Glance's web screens run in a WebView that already has Link's back bar.
+  const embedded = Platform.OS === 'web' && typeof window !== 'undefined' && 'ReactNativeWebView' in window;
+  if (embedded) return <View style={{ flex: 1 }}><Stack screenOptions={{ headerShown: false, animation: 'fade' }} /></View>;
   return <View style={{ flex: 1 }}>
     <Pressable testID="glance-back" accessibilityRole="button" accessibilityLabel={origin ? `Back to ${origin.title || 'the event'} in Link` : 'Back to Link'} onPress={back}
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 6, height: 44, paddingHorizontal: 12, backgroundColor: pressed ? '#e4e6eb' : '#ffffff', borderBottomWidth: 1, borderBottomColor: '#ced0d4' })}>
