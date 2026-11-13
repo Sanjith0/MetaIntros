@@ -47,6 +47,7 @@ MAX_OPEN_ASKS=3
 MAX_WORDS=120
 DEADLINE_SEC=600
 CACHE_TTL=120
+EMPTY_TTL=20   # GitHub's list endpoints lag a few seconds behind writes; don't trust "nothing" for long
 INBOX_MAX_LINES=25
 
 say() { printf '%s\n' "$*"; }
@@ -123,7 +124,8 @@ api_get() { # api_get <path> <jq> : cached, paginated GET; stale cache is used i
   local key f
   key=$(printf '%s|%s' "$1" "$2" | cksum | tr ' ' '_')
   f="$CACHE/$key"
-  if [ -f "$f" ] && fresh "$f.at" "$CACHE_TTL"; then cat "$f"; return 0; fi
+  if [ -s "$f" ] && fresh "$f.at" "$CACHE_TTL"; then cat "$f"; return 0; fi
+  if [ -f "$f" ] && [ ! -s "$f" ] && fresh "$f.at" "$EMPTY_TTL"; then return 0; fi
   if gh api --paginate "$1" --jq "$2" >"$f.tmp" 2>/dev/null; then
     mv "$f.tmp" "$f"; now >"$f.at"; cat "$f"; return 0
   fi
@@ -356,10 +358,13 @@ inbox_items() { # prints "key<TAB>text" lines
   # shared contracts changed on origin/main since this branch's merge base
   mb=$(merge_base HEAD) || return 0
   # shellcheck disable=SC2086
-  git diff --name-only "$mb" origin/main -- $CONTRACTS 2>/dev/null | while IFS= read -r f; do
-    c=$(git log -1 --format='%h %s' "$mb..origin/main" -- "$f")
-    printf 'contract:%s:%s\tcontract change on main: %s (%s). Merge origin/main before you build on it.\n' "$f" "${c%% *}" "$f" "$(printf '%s' "${c#* }" | cut -c1-70)"
-  done
+  f=$(git diff --name-only "$mb" origin/main -- $CONTRACTS 2>/dev/null | sed 's|^prisma/migrations/\([^/]*\)/.*|migration \1|' | sort -u)
+  if [ -n "$f" ]; then
+    # shellcheck disable=SC2086
+    c=$(git log -1 --format='%h %s' "$mb..origin/main" -- $CONTRACTS)
+    printf 'contract:%s\tshared contracts changed on main since your base (newest: %s): %s. Merge origin/main before you build on them.\n' \
+      "$(printf '%s %s' "$f" "$c" | cksum | cut -d' ' -f1)" "$(printf '%s' "$c" | cut -c1-60)" "$(printf '%s' "$f" | paste -sd, - | sed 's/,/, /g' | cut -c1-300)"
+  fi
 }
 
 cmd_inbox() {
@@ -448,8 +453,9 @@ resolve_target() { # sets TLABEL (to: label) TNAME (display) TASSIGNEE (login or
     *)
       TNAME=${t#origin/}
       pr=$(pr_of_branch "$TNAME")
-      if [ -n "$pr" ]; then TASSIGNEE=${pr#*$'\t'}; else TASSIGNEE=$(gh api "repos/$REPO/commits/$TNAME" --jq '.author.login // ""' 2>/dev/null); fi ;;
+      if [ -n "$pr" ]; then TASSIGNEE=${pr#*$'\t'}; else TASSIGNEE=$(gh api "repos/$REPO/commits/$TNAME" --jq '.author.login // ""' 2>/dev/null) || TASSIGNEE=""; fi ;;
   esac
+  case $TASSIGNEE in *[!A-Za-z0-9-]*) TASSIGNEE="" ;; esac
   TLABEL=$(label_name "$TNAME")
 }
 
@@ -633,6 +639,7 @@ $list
   [ -n "$res" ] || { say "board: could not post the claim."; return 0; }
   bust
   say "CLAIM #${res%%$'\t'*} until $(fmt_hm "$until") UTC: ${res#*$'\t'}"
+  say "GitHub lists lag a few seconds: if scripts/board claims shows an older claim on these files in a minute, close yours and ask."
 }
 
 cmd_claims() {

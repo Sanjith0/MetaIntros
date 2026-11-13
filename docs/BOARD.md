@@ -90,6 +90,10 @@ target is assigned to the author of its open PR, or of its newest commit; `@pers
   `**CHALLENGE**` or `**NEEDS HUMAN**`. A person can write them by hand in the same shape.
 - GitHub reads are cached for 120 seconds in `.git/board/` (shared by all worktrees of a clone).
   What `inbox` has shown is remembered per branch there too, which is what `--new` uses.
+- GitHub's issue lists lag 4 to 6 seconds behind a write (measured 2026-11-12), so an empty list is
+  trusted for only 20 seconds. A new ask reaches another inbox within about two minutes at worst.
+  Two claims on one file made within seconds of each other can both land: the older issue wins, and
+  the newer claimant closes theirs and asks instead. `radar` shows both.
 - Every call is REST (`gh api`) and JSON is read with gh's built-in `--jq`; no `jq` binary.
 
 ## Hooks and cloud sessions
