@@ -1,7 +1,7 @@
 {
   "id": "p29",
-  "name": "Ava Sato",
-  "first_name": "Ava",
+  "name": "Mei Sato",
+  "first_name": "Mei",
   "last_name": "Sato",
   "birthday": "06/10/2002",
   "gender": "female",
@@ -165,15 +165,15 @@
       },
       {
         "id": "p25",
-        "name": "Ivan Castillo"
+        "name": "Luis Castillo"
       },
       {
         "id": "p30",
-        "name": "Diego Cohen"
+        "name": "Diego Ramírez"
       },
       {
         "id": "p36",
-        "name": "Ben Müller"
+        "name": "Ben Fischer"
       }
     ],
     "summary": {
@@ -201,6 +201,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Run club Saturdays, Blue Bottle after. Cycling when my knees complain.",
+  "x_profile": {
+    "work": "Product manager",
+    "hometown": "Tokyo, Japan",
+    "traits": [
+      "organised",
+      "friendly",
+      "goal-driven"
+    ],
+    "voice": "Mei is organised and friendly, and plans both the route and the coffee stop."
   },
   "x_cluster": "run-coffee"
 }

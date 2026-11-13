@@ -1,8 +1,8 @@
 {
   "id": "p31",
-  "name": "Isaac Moreau",
+  "name": "Isaac Wright",
   "first_name": "Isaac",
-  "last_name": "Moreau",
+  "last_name": "Wright",
   "birthday": "06/12/2001",
   "gender": "male",
   "location": {
@@ -141,11 +141,11 @@
       },
       {
         "id": "p32",
-        "name": "Noor Johnson"
+        "name": "Noor Siddiqui"
       },
       {
         "id": "p33",
-        "name": "Caleb Wong"
+        "name": "Caleb Turner"
       },
       {
         "id": "p37",
@@ -157,11 +157,11 @@
       },
       {
         "id": "p50",
-        "name": "Oscar Park"
+        "name": "Sam Park"
       },
       {
         "id": "p65",
-        "name": "Emerson Shah"
+        "name": "Emerson Gray"
       }
     ],
     "summary": {
@@ -199,6 +199,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Trail runs, REI garage sales, too much coffee.",
+  "x_profile": {
+    "work": "Postdoc, climate science",
+    "hometown": "Denver, Colorado",
+    "traits": [
+      "thoughtful",
+      "dry",
+      "outdoorsy"
+    ],
+    "voice": "Isaac is thoughtful and understated, with a dry sense of humour."
   },
   "x_cluster": "run-coffee"
 }

@@ -1,8 +1,8 @@
 {
   "id": "p63",
-  "name": "Rowan Brooks",
-  "first_name": "Rowan",
-  "last_name": "Brooks",
+  "name": "Quinn Foster",
+  "first_name": "Quinn",
+  "last_name": "Foster",
   "birthday": "06/19/1999",
   "gender": "custom",
   "location": {
@@ -154,15 +154,15 @@
       },
       {
         "id": "p23",
-        "name": "Marcus Kim"
+        "name": "Marcus Bell"
       },
       {
         "id": "p67",
-        "name": "Rosa Ferreira"
+        "name": "Camila Souza"
       },
       {
         "id": "p68",
-        "name": "Tomás Ali"
+        "name": "Tomás Herrera"
       }
     ],
     "summary": {
@@ -206,6 +206,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Farmers market at 8, Tartine at 10, cooking for friends at 7.",
+  "x_profile": {
+    "work": "Pastry chef",
+    "hometown": "Nashville, Tennessee",
+    "traits": [
+      "warm",
+      "a natural host",
+      "creative"
+    ],
+    "voice": "Quinn is a natural host who feeds people and asks what everyone is craving."
   },
   "x_cluster": "food"
 }

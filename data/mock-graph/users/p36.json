@@ -1,8 +1,8 @@
 {
   "id": "p36",
-  "name": "Ben Müller",
+  "name": "Ben Fischer",
   "first_name": "Ben",
-  "last_name": "Müller",
+  "last_name": "Fischer",
   "birthday": "06/01/1999",
   "gender": "male",
   "location": {
@@ -141,19 +141,19 @@
       },
       {
         "id": "p28",
-        "name": "Julia Mensah"
+        "name": "Julia Hart"
       },
       {
         "id": "p29",
-        "name": "Ava Sato"
+        "name": "Mei Sato"
       },
       {
         "id": "p32",
-        "name": "Noor Johnson"
+        "name": "Noor Siddiqui"
       },
       {
         "id": "p33",
-        "name": "Caleb Wong"
+        "name": "Caleb Turner"
       },
       {
         "id": "p45",
@@ -161,11 +161,11 @@
       },
       {
         "id": "p48",
-        "name": "Hugo Andersen"
+        "name": "Hugo Laurent"
       },
       {
         "id": "p55",
-        "name": "Kiara Chen"
+        "name": "Grace Lin"
       }
     ],
     "summary": {
@@ -209,6 +209,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Runner, farmers market regular, aspiring sourdough baker.",
+  "x_profile": {
+    "work": "Medical student",
+    "hometown": "Minneapolis, Minnesota",
+    "traits": [
+      "earnest",
+      "friendly",
+      "a planner"
+    ],
+    "voice": "Ben is earnest and friendly, plans everything ahead and always has snacks."
   },
   "x_cluster": "run-coffee"
 }

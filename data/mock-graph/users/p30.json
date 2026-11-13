@@ -1,8 +1,8 @@
 {
   "id": "p30",
-  "name": "Diego Cohen",
+  "name": "Diego Ramírez",
   "first_name": "Diego",
-  "last_name": "Cohen",
+  "last_name": "Ramírez",
   "birthday": "06/02/2004",
   "gender": "male",
   "location": {
@@ -141,7 +141,7 @@
       },
       {
         "id": "p29",
-        "name": "Ava Sato"
+        "name": "Mei Sato"
       },
       {
         "id": "p37",
@@ -153,7 +153,7 @@
       },
       {
         "id": "p55",
-        "name": "Kiara Chen"
+        "name": "Grace Lin"
       }
     ],
     "summary": {
@@ -197,6 +197,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "November Project, long rides, podcasts on 1.5x. Morning person.",
+  "x_profile": {
+    "work": "Human biology student",
+    "hometown": "Los Angeles, California",
+    "traits": [
+      "energetic",
+      "optimistic",
+      "talkative"
+    ],
+    "voice": "Diego is high energy and optimistic, and loves passing on the podcast from that morning."
   },
   "x_cluster": "run-coffee"
 }

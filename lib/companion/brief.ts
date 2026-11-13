@@ -136,9 +136,10 @@ function hopingFor(ctx: QueueContext) {
 
 function templateGenerated(p: Person, facts: Fact[]): Generated {
   const style = STYLE_TEXT[p.profile.socialStyle].replace(/^Likes /, "");
+  const voice = p.persona?.voice && !GENDERED.test(p.persona.voice) ? p.persona.voice : null;
   return {
     depth: {},
-    communication: `${firstName(p)} gravitates to ${style} and opens up fastest over a shared interest.`,
+    communication: voice ?? `${firstName(p)} gravitates to ${style} and opens up fastest over a shared interest.`,
     lightsUp: facts.filter((f) => f.share === "open" && f.kind !== "style" && f.kind !== "avoid").slice(0, 2).map((f) => f.id),
   };
 }
@@ -182,8 +183,14 @@ export async function generate(p: Person): Promise<{ gen: Generated; source: AiS
   const ai = await runAi({
     task: "companion_brief",
     system:
-      "You are the Profile Analyst inside Facebook Events' Queue Up. You prepare a brief for one person's Companion agent, which will describe this person to other Companions. Using ONLY the listed facts: write `communication`, one or two sentences in the THIRD PERSON about how this person tends to socialise and talk; add `depth`, a short specific note for up to 5 facts where the facts themselves support it, keyed by fact id; and list in `lightsUp` up to 3 fact ids they would most enjoy talking about. Never invent facts. Refer to the person by first name or as \"they\"; never guess a gender or use he/she. Never mention or infer politics, religion, health or sexuality. JSON only: {\"communication\": \"...\", \"depth\": {\"<fact id>\": \"...\"}, \"lightsUp\": [\"<fact id>\"]}.",
-    user: JSON.stringify({ name: firstName(p), socialStyle: p.profile.socialStyle, facts: facts.map((f) => ({ id: f.id, kind: f.kind, text: f.text })) }),
+      "You are the Profile Analyst inside Facebook Events' Queue Up. You prepare a brief for one person's Companion agent, which will describe this person to other Companions. Using ONLY the listed facts, plus the person's own `intro` line and their `personality` (how they come across, when given): write `communication`, one or two sentences in the THIRD PERSON about how this person tends to socialise and talk, true to that personality; add `depth`, a short specific note for up to 5 facts where the facts themselves support it, keyed by fact id; and list in `lightsUp` up to 3 fact ids they would most enjoy talking about. Never invent facts. Refer to the person by first name or as \"they\"; never guess a gender or use he/she. Never mention or infer politics, religion, health or sexuality. JSON only: {\"communication\": \"...\", \"depth\": {\"<fact id>\": \"...\"}, \"lightsUp\": [\"<fact id>\"]}.",
+    user: JSON.stringify({
+      name: firstName(p),
+      socialStyle: p.profile.socialStyle,
+      ...(p.persona?.about ? { intro: p.persona.about } : {}),
+      ...(p.persona?.voice ? { personality: { traits: p.persona.traits, voice: p.persona.voice } } : {}),
+      facts: facts.map((f) => ({ id: f.id, kind: f.kind, text: f.text })),
+    }),
     schema: Out,
     fallback: () => tpl,
     maxTokens: 700,

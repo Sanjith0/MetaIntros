@@ -159,7 +159,7 @@
       },
       {
         "id": "p12",
-        "name": "Gabe Chen"
+        "name": "Gabe Kahale"
       },
       {
         "id": "p13",
@@ -167,15 +167,15 @@
       },
       {
         "id": "p28",
-        "name": "Julia Mensah"
+        "name": "Julia Hart"
       },
       {
         "id": "p78",
-        "name": "Zoe Park"
+        "name": "Maya Jeon"
       },
       {
         "id": "p80",
-        "name": "Mira Rahman"
+        "name": "Farah Rahman"
       }
     ],
     "summary": {
@@ -213,6 +213,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Half climber, half concert photographer. There's a Fujifilm in my bag at all times.",
+  "x_profile": {
+    "work": "Freelance photographer",
+    "hometown": "Lyon, France",
+    "traits": [
+      "adventurous",
+      "thoughtful",
+      "a little chaotic"
+    ],
+    "voice": "Yuki tells stories in vivid detail and is always halfway through planning the next trip."
   },
   "x_cluster": "indie-climb"
 }

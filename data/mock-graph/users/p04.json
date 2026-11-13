@@ -188,19 +188,19 @@
       },
       {
         "id": "p14",
-        "name": "Ben Patel"
+        "name": "Arjun Patel"
       },
       {
         "id": "p15",
-        "name": "Ravi Mensah"
+        "name": "Kwame Mensah"
       },
       {
         "id": "p25",
-        "name": "Ivan Castillo"
+        "name": "Luis Castillo"
       },
       {
         "id": "p64",
-        "name": "Zoe Chen"
+        "name": "Lily Zhou"
       }
     ],
     "summary": {
@@ -244,6 +244,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "KEXP on repeat, chalk on my hands. Ask me what's in my record crate.",
+  "x_profile": {
+    "work": "Barista and part-time sound tech",
+    "hometown": "Fremont, California",
+    "traits": [
+      "warm",
+      "talkative",
+      "spontaneous"
+    ],
+    "voice": "Reza brings up music within a minute, makes friends with strangers easily and always suggests one more stop."
   },
   "x_cluster": "indie-climb"
 }

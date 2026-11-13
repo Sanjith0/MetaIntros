@@ -148,15 +148,15 @@
       },
       {
         "id": "p12",
-        "name": "Gabe Chen"
+        "name": "Gabe Kahale"
       },
       {
         "id": "p15",
-        "name": "Ravi Mensah"
+        "name": "Kwame Mensah"
       },
       {
         "id": "p36",
-        "name": "Ben Müller"
+        "name": "Ben Fischer"
       },
       {
         "id": "p37",
@@ -164,15 +164,15 @@
       },
       {
         "id": "p70",
-        "name": "Dev Johnson"
+        "name": "Dev Malhotra"
       },
       {
         "id": "p72",
-        "name": "Anika Patel"
+        "name": "Anika Desai"
       },
       {
         "id": "p77",
-        "name": "Aisha Andersen"
+        "name": "Zara Holm"
       }
     ],
     "summary": {
@@ -205,6 +205,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Weekday boulderer, weekend hiker, writer of Letterboxd reviews nobody asked for.",
+  "x_profile": {
+    "work": "Mechanical engineer",
+    "hometown": "Manchester, UK",
+    "traits": [
+      "wry",
+      "steady",
+      "opinionated about films"
+    ],
+    "voice": "Simon has a dry sense of humour, gives long film takes and is a calm presence in any group."
   },
   "x_cluster": "indie-climb"
 }

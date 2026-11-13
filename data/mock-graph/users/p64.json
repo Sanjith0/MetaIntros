@@ -1,8 +1,8 @@
 {
   "id": "p64",
-  "name": "Zoe Chen",
-  "first_name": "Zoe",
-  "last_name": "Chen",
+  "name": "Lily Zhou",
+  "first_name": "Lily",
+  "last_name": "Zhou",
   "birthday": "06/15/1999",
   "gender": "female",
   "location": {
@@ -123,23 +123,23 @@
       },
       {
         "id": "p58",
-        "name": "Kai Patel"
+        "name": "Kai Mehta"
       },
       {
         "id": "p62",
-        "name": "Reza Ibrahim"
+        "name": "Yusuf Ibrahim"
       },
       {
         "id": "p66",
-        "name": "Julia Chen"
+        "name": "Sofia Alvarez"
       },
       {
         "id": "p68",
-        "name": "Tomás Ali"
+        "name": "Tomás Herrera"
       },
       {
         "id": "p71",
-        "name": "Freya Sato"
+        "name": "Aiko Mori"
       }
     ],
     "summary": {
@@ -183,6 +183,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Thrift flips, ramen crawls and Letterboxd lists.",
+  "x_profile": {
+    "work": "Fashion merchandiser",
+    "hometown": "San Francisco, California",
+    "traits": [
+      "stylish",
+      "playful",
+      "curious"
+    ],
+    "voice": "Lily is playful and stylish, and always has a new spot to try."
   },
   "x_cluster": "food"
 }

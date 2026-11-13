@@ -1,7 +1,7 @@
 {
   "id": "p80",
-  "name": "Mira Rahman",
-  "first_name": "Mira",
+  "name": "Farah Rahman",
+  "first_name": "Farah",
   "last_name": "Rahman",
   "birthday": "06/25/1999",
   "gender": "female",
@@ -135,15 +135,15 @@
       },
       {
         "id": "p77",
-        "name": "Aisha Andersen"
+        "name": "Zara Holm"
       },
       {
         "id": "p78",
-        "name": "Zoe Park"
+        "name": "Maya Jeon"
       },
       {
         "id": "p79",
-        "name": "Leila Johnson"
+        "name": "Leila Karimi"
       }
     ],
     "summary": {
@@ -176,6 +176,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Ramen, D&D, Ghibli and live jazz. Cosy chaos.",
+  "x_profile": {
+    "work": "Librarian",
+    "hometown": "Dhaka, Bangladesh",
+    "traits": [
+      "cosy",
+      "witty",
+      "imaginative"
+    ],
+    "voice": "Farah is cosy and witty, and tells wonderfully strange stories."
   },
   "x_cluster": "bridge"
 }

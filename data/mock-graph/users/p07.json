@@ -127,23 +127,23 @@
       },
       {
         "id": "p08",
-        "name": "Jin Costa"
+        "name": "Hiro Tanaka"
       },
       {
         "id": "p14",
-        "name": "Ben Patel"
+        "name": "Arjun Patel"
       },
       {
         "id": "p18",
-        "name": "Jin Shah"
+        "name": "Rohan Shah"
       },
       {
         "id": "p25",
-        "name": "Ivan Castillo"
+        "name": "Luis Castillo"
       },
       {
         "id": "p70",
-        "name": "Dev Johnson"
+        "name": "Dev Malhotra"
       }
     ],
     "summary": {
@@ -181,6 +181,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Vinyl, good coffee and a climbing habit I can't really afford.",
+  "x_profile": {
+    "work": "Economics student",
+    "hometown": "Sacramento, California",
+    "traits": [
+      "friendly",
+      "detail-minded",
+      "punctual"
+    ],
+    "voice": "Daniel asks lots of questions and remembers everything you tell them."
   },
   "x_cluster": "indie-climb"
 }

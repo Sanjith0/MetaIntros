@@ -149,11 +149,11 @@
     "data": [
       {
         "id": "p53",
-        "name": "Nate Kim"
+        "name": "Tyler Han"
       },
       {
         "id": "p56",
-        "name": "Noor Adeyemi"
+        "name": "Amara Obi"
       }
     ],
     "summary": {
@@ -197,6 +197,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Founder, bookstore browser, Kepler's regular.",
+  "x_profile": {
+    "work": "Startup founder",
+    "hometown": "Phoenix, Arizona",
+    "traits": [
+      "thoughtful",
+      "bookish",
+      "ambitious"
+    ],
+    "voice": "Elijah is bookish and thoughtful, and recommends a book in every conversation."
   },
   "x_cluster": "builders"
 }

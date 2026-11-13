@@ -1,8 +1,8 @@
 {
   "id": "p48",
-  "name": "Hugo Andersen",
+  "name": "Hugo Laurent",
   "first_name": "Hugo",
-  "last_name": "Andersen",
+  "last_name": "Laurent",
   "birthday": "06/15/2000",
   "gender": "male",
   "location": {
@@ -119,27 +119,27 @@
     "data": [
       {
         "id": "p28",
-        "name": "Julia Mensah"
+        "name": "Julia Hart"
       },
       {
         "id": "p36",
-        "name": "Ben Müller"
+        "name": "Ben Fischer"
       },
       {
         "id": "p41",
-        "name": "Rafael Nguyen"
+        "name": "Rafael Torres"
       },
       {
         "id": "p43",
-        "name": "Emma Patel"
+        "name": "Emma Lindgren"
       },
       {
         "id": "p44",
-        "name": "Kai Cohen"
+        "name": "Eli Rosen"
       },
       {
         "id": "p50",
-        "name": "Oscar Park"
+        "name": "Sam Park"
       }
     ],
     "summary": {
@@ -167,6 +167,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "REI member since forever. Birding, trails, and SFMOMA when it rains.",
+  "x_profile": {
+    "work": "UX researcher",
+    "hometown": "Montreal, Canada",
+    "traits": [
+      "calm",
+      "cultured",
+      "curious"
+    ],
+    "voice": "Hugo is calm and cultured, and moves easily from trails to modern art."
   },
   "x_cluster": "hike-photo"
 }

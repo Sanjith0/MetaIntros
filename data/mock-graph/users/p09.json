@@ -140,19 +140,19 @@
       },
       {
         "id": "p12",
-        "name": "Gabe Chen"
+        "name": "Gabe Kahale"
       },
       {
         "id": "p14",
-        "name": "Ben Patel"
+        "name": "Arjun Patel"
       },
       {
         "id": "p15",
-        "name": "Ravi Mensah"
+        "name": "Kwame Mensah"
       },
       {
         "id": "p31",
-        "name": "Isaac Moreau"
+        "name": "Isaac Wright"
       }
     ],
     "summary": {
@@ -185,6 +185,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Criterion Collection completionist. I climb to clear my head.",
+  "x_profile": {
+    "work": "Film studies student",
+    "hometown": "Miami, Florida",
+    "traits": [
+      "intense",
+      "witty",
+      "direct"
+    ],
+    "voice": "Kiara has strong opinions, debates for fun and skips the small talk."
   },
   "x_cluster": "indie-climb"
 }

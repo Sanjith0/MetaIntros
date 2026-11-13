@@ -1,8 +1,8 @@
 {
   "id": "p22",
-  "name": "Kai Rossi",
-  "first_name": "Kai",
-  "last_name": "Rossi",
+  "name": "Kenji Nakamura",
+  "first_name": "Kenji",
+  "last_name": "Nakamura",
   "birthday": "06/06/2002",
   "gender": "male",
   "location": {
@@ -130,7 +130,7 @@
       },
       {
         "id": "p16",
-        "name": "Elena Shah"
+        "name": "Elena Vasquez"
       },
       {
         "id": "p17",
@@ -142,11 +142,11 @@
       },
       {
         "id": "p76",
-        "name": "Priya Bauer"
+        "name": "Priya Nair"
       },
       {
         "id": "p78",
-        "name": "Zoe Park"
+        "name": "Maya Jeon"
       }
     ],
     "summary": {
@@ -190,6 +190,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Karaoke closer. Valorant. Criterion and anime in equal measure.",
+  "x_profile": {
+    "work": "Video editor",
+    "hometown": "Seattle, Washington",
+    "traits": [
+      "charismatic",
+      "dramatic",
+      "fun"
+    ],
+    "voice": "Kenji is a performer who grabs the mic first and turns any hangout into a bit."
   },
   "x_cluster": "games-anime"
 }

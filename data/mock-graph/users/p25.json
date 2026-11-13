@@ -1,7 +1,7 @@
 {
   "id": "p25",
-  "name": "Ivan Castillo",
-  "first_name": "Ivan",
+  "name": "Luis Castillo",
+  "first_name": "Luis",
   "last_name": "Castillo",
   "birthday": "06/21/2007",
   "gender": "male",
@@ -133,7 +133,7 @@
       },
       {
         "id": "p16",
-        "name": "Elena Shah"
+        "name": "Elena Vasquez"
       },
       {
         "id": "p26",
@@ -141,19 +141,19 @@
       },
       {
         "id": "p29",
-        "name": "Ava Sato"
+        "name": "Mei Sato"
       },
       {
         "id": "p33",
-        "name": "Caleb Wong"
+        "name": "Caleb Turner"
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       },
       {
         "id": "p78",
-        "name": "Zoe Park"
+        "name": "Maya Jeon"
       }
     ],
     "summary": {
@@ -191,6 +191,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Dimension 20 superfan. Looking for a Valorant duo.",
+  "x_profile": {
+    "work": "Biology student",
+    "hometown": "El Paso, Texas",
+    "traits": [
+      "enthusiastic",
+      "sweet",
+      "talkative"
+    ],
+    "voice": "Luis is excited about everything and will happily explain a whole D&D world's lore."
   },
   "x_cluster": "games-anime"
 }

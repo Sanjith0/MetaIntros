@@ -145,15 +145,15 @@
       },
       {
         "id": "p21",
-        "name": "Omar Nguyen"
+        "name": "Omar Haddad"
       },
       {
         "id": "p24",
-        "name": "Ivan Mensah"
+        "name": "Ivan Petrov"
       },
       {
         "id": "p34",
-        "name": "Jade Sato"
+        "name": "Jade Okafor"
       },
       {
         "id": "p39",
@@ -196,6 +196,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Wingspan, chess and Chainsaw Man. I'll teach you any board game.",
+  "x_profile": {
+    "work": "Game design student",
+    "hometown": "Berlin, Germany",
+    "traits": [
+      "patient",
+      "nerdy",
+      "deadpan"
+    ],
+    "voice": "Rowan explains rules patiently, has a deadpan sense of humour and prefers a small table to a loud room."
   },
   "x_cluster": "games-anime"
 }

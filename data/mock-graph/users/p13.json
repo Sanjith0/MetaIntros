@@ -137,11 +137,11 @@
       },
       {
         "id": "p12",
-        "name": "Gabe Chen"
+        "name": "Gabe Kahale"
       },
       {
         "id": "p15",
-        "name": "Ravi Mensah"
+        "name": "Kwame Mensah"
       },
       {
         "id": "p37",
@@ -149,11 +149,11 @@
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       },
       {
         "id": "p47",
-        "name": "Mira Dubois"
+        "name": "Mira Kowalski"
       }
     ],
     "summary": {
@@ -191,6 +191,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "KEXP live sessions, trail runs and way too many film logs.",
+  "x_profile": {
+    "work": "Audio engineering student",
+    "hometown": "Houston, Texas",
+    "traits": [
+      "chill",
+      "thoughtful",
+      "night owl"
+    ],
+    "voice": "Leo is mellow, listens more than talks and opens up about music production."
   },
   "x_cluster": "indie-climb"
 }

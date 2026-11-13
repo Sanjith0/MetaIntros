@@ -1,7 +1,7 @@
 {
   "id": "p50",
-  "name": "Oscar Park",
-  "first_name": "Oscar",
+  "name": "Sam Park",
+  "first_name": "Sam",
   "last_name": "Park",
   "birthday": "06/22/2002",
   "gender": "male",
@@ -123,7 +123,7 @@
       },
       {
         "id": "p31",
-        "name": "Isaac Moreau"
+        "name": "Isaac Wright"
       },
       {
         "id": "p45",
@@ -131,7 +131,7 @@
       },
       {
         "id": "p48",
-        "name": "Hugo Andersen"
+        "name": "Hugo Laurent"
       }
     ],
     "summary": {
@@ -170,6 +170,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Trail dog dad. AllTrails, REI, camping in Big Basin.",
+  "x_profile": {
+    "work": "Hardware engineer",
+    "hometown": "Spokane, Washington",
+    "traits": [
+      "easygoing",
+      "loyal",
+      "outdoorsy"
+    ],
+    "voice": "Sam is easygoing and loyal, the friend with the car and the spare tent."
   },
   "x_cluster": "hike-photo"
 }

@@ -1,8 +1,8 @@
 {
   "id": "p79",
-  "name": "Leila Johnson",
+  "name": "Leila Karimi",
   "first_name": "Leila",
-  "last_name": "Johnson",
+  "last_name": "Karimi",
   "birthday": "06/23/2007",
   "gender": "female",
   "location": {
@@ -123,23 +123,23 @@
       },
       {
         "id": "p32",
-        "name": "Noor Johnson"
+        "name": "Noor Siddiqui"
       },
       {
         "id": "p54",
-        "name": "Owen Lindqvist"
+        "name": "Nils Lindqvist"
       },
       {
         "id": "p75",
-        "name": "Ivy Costa"
+        "name": "Ivy Lam"
       },
       {
         "id": "p78",
-        "name": "Zoe Park"
+        "name": "Maya Jeon"
       },
       {
         "id": "p80",
-        "name": "Mira Rahman"
+        "name": "Farah Rahman"
       }
     ],
     "summary": {
@@ -172,6 +172,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Open space hikes, startup news and Blue Note records.",
+  "x_profile": {
+    "work": "Economics student",
+    "hometown": "San Mateo, California",
+    "traits": [
+      "curious",
+      "calm",
+      "an old soul"
+    ],
+    "voice": "Leila is curious and calm, an old soul with a jazz record collection."
   },
   "x_cluster": "bridge"
 }

@@ -116,7 +116,7 @@
     "data": [
       {
         "id": "p24",
-        "name": "Ivan Mensah"
+        "name": "Ivan Petrov"
       }
     ],
     "summary": {
@@ -161,6 +161,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "EDC every year. Warriors games, late-night tacos, out every Friday.",
+  "x_profile": {
+    "work": "Bartender",
+    "hometown": "Las Vegas, Nevada",
+    "traits": [
+      "energetic",
+      "night owl",
+      "loud"
+    ],
+    "voice": "Sage is all energy, never leaves before 2am and hypes everyone up."
   },
   "x_cluster": "outlier-nightlife"
 }
