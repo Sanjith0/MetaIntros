@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Lock, Timer } from "lucide-react";
+import { Check, ChevronDown, Lock, Timer } from "lucide-react";
 import { Avatar, Button } from "@/components/fb";
 import { stripCitations } from "@/lib/companion/text";
+import { CompanionThread, type ThreadLine } from "./CompanionThread";
 
 export interface CheckInView {
   id: string;
   kind: "picks" | "objection";
   secondsLeft: number;
-  picks?: { targetSize: number; picks: { id: string; score: number; why: string }[]; others: { id: string; score: number }[] };
+  picks?: { targetSize: number; picks: { id: string; score: number; why: string; enjoy?: string[]; concerns?: string[]; needs?: string[] }[]; others: { id: string; score: number }[] };
   /** before your Companion turns down something someone suggested, it asks you */
   objection?: { items: { with: string; activity: string; asked: string; companionThinks: string }[] };
 }
@@ -19,9 +20,11 @@ type People = Record<string, { name: string; avatarColor: string; anonymous?: bo
 const first = (n?: string) => (n ?? "Someone").split(" ")[0];
 
 /** The question a person's Companion is waiting on. If they don't answer in time, it goes ahead on its own. */
-export function CheckInCard({ checkIn, people, onSent }: { checkIn: CheckInView; people: People; meId?: string; onSent?: () => void }) {
+/** `threads`: your Companion's conversation with each person, so a pick can be read in full before you decide. */
+export function CheckInCard({ checkIn, people, threads, onSent }: { checkIn: CheckInView; people: People; meId?: string; threads?: Record<string, ThreadLine[]>; onSent?: () => void }) {
   const [left, setLeft] = useState(checkIn.secondsLeft);
   const [drop, setDrop] = useState<string[]>([]);
+  const [open, setOpen] = useState<string | null>(null);
   const [up, setUp] = useState<string[]>([]);
   const [told, setTold] = useState("");
   const [sent, setSent] = useState<null | "sent" | "error" | "sensitive">(null);
@@ -32,6 +35,7 @@ export function CheckInCard({ checkIn, people, onSent }: { checkIn: CheckInView;
     setLeft(checkIn.secondsLeft);
     setSent(null);
     setDrop([]);
+    setOpen(null);
     setUp([]);
     setTold("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,21 +71,45 @@ export function CheckInCard({ checkIn, people, onSent }: { checkIn: CheckInView;
       {checkIn.kind === "picks" && checkIn.picks && (
         <>
           <p className="text-title">Your Companion is checking with you</p>
-          <p className="mt-0.5 text-body text-muted">Here&apos;s who it would put in your squad of {checkIn.picks.targetSize}. Drop anyone you don&apos;t want, and tell it anything it got wrong about you.</p>
+          <p className="mt-0.5 text-body text-muted">Here&apos;s who it would put in your squad of {checkIn.picks.targetSize}. Tap someone to read what your Companion learned about them. Drop anyone you don&apos;t want, and tell it anything it got wrong about you.</p>
           {countdown}
           <ul className="mt-2 divide-y divide-divider">
             {checkIn.picks.picks.map((p) => {
               const out = drop.includes(p.id);
+              const isOpen = open === p.id;
+              const lines = threads?.[p.id] ?? [];
               return (
-                <li key={p.id} className={`flex items-center gap-2 py-2 ${out ? "opacity-50" : ""}`} data-testid="checkin-pick">
-                  <Avatar name={people[p.id]?.name ?? "?"} color={people[p.id]?.avatarColor} size={40} blurred={people[p.id]?.anonymous} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-body font-semibold">{name(p.id)} <span className="font-normal text-muted">· {p.score}</span></span>
-                    {p.why && <span className="block truncate text-meta text-muted">{stripCitations(p.why)}</span>}
-                  </span>
-                  <Button size="sm" aria-pressed={out} data-testid="checkin-drop" onClick={() => setDrop((d) => (out ? d.filter((x) => x !== p.id) : [...d, p.id]))}>
-                    {out ? "Undo" : "Drop"}
-                  </Button>
+                <li key={p.id} className="py-2" data-testid="checkin-pick">
+                  <div className={`flex items-center gap-2 ${out ? "opacity-50" : ""}`}>
+                    <button type="button" className="flex min-h-11 min-w-0 flex-1 items-center gap-2 text-left" aria-expanded={isOpen} data-testid="checkin-pick-toggle" onClick={() => setOpen(isOpen ? null : p.id)}>
+                      <Avatar name={people[p.id]?.name ?? "?"} color={people[p.id]?.avatarColor} size={40} blurred={people[p.id]?.anonymous} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-body font-semibold">{name(p.id)} <span className="font-normal text-muted">· {p.score}</span></span>
+                        {p.why && <span className={`block text-meta text-muted ${isOpen ? "" : "truncate"}`}>{stripCitations(p.why)}</span>}
+                      </span>
+                      <ChevronDown size={18} className={`shrink-0 text-muted transition ${isOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    <Button size="sm" aria-pressed={out} data-testid="checkin-drop" onClick={() => setDrop((d) => (out ? d.filter((x) => x !== p.id) : [...d, p.id]))}>
+                      {out ? "Undo" : "Drop"}
+                    </Button>
+                  </div>
+                  {isOpen && (
+                    <div className="mt-2 space-y-2" data-testid="checkin-pick-detail">
+                      <div className="rounded-card bg-wash p-2.5 text-body">
+                        <p className="text-meta font-semibold text-muted">Your Companion&apos;s private read on {name(p.id)}</p>
+                        {(p.enjoy ?? []).map((t, i) => <p key={`e${i}`} className="mt-1">You&apos;d enjoy: {stripCitations(t)}</p>)}
+                        {(p.concerns ?? []).map((t, i) => <p key={`c${i}`} className="mt-1">Watch out: {stripCitations(t)}</p>)}
+                        {(p.needs ?? []).map((t, i) => <p key={`n${i}`} className="mt-1">You&apos;d need: {stripCitations(t)}</p>)}
+                        {!p.enjoy?.length && !p.concerns?.length && !p.needs?.length && <p className="mt-1 text-muted">No notes yet.</p>}
+                      </div>
+                      {lines.length > 0 && (
+                        <>
+                          <p className="text-meta font-semibold text-muted">What the two Companions said</p>
+                          <CompanionThread lines={lines} otherName={name(p.id)} />
+                        </>
+                      )}
+                    </div>
+                  )}
                 </li>
               );
             })}

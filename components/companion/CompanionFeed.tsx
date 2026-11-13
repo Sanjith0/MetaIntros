@@ -85,7 +85,7 @@ export function CompanionFeed({ meId }: { meId?: string }) {
       <p className="mt-1 flex items-center gap-1 text-meta text-muted"><Lock size={12} /> Scores are your Companion&apos;s private notes. Nobody sees theirs on you.</p>
 
       {view.checkIn ? (
-        <CheckInCard key={view.checkIn.id} checkIn={view.checkIn} people={people} meId={meId} onSent={() => setSentAt(Date.now())} />
+        <CheckInCard key={view.checkIn.id} checkIn={view.checkIn} people={people} meId={meId} threads={Object.fromEntries(convs.map((c) => [c.with, c.lines]))} onSent={() => setSentAt(Date.now())} />
       ) : (
         sentAt > 0 && now - sentAt < 4000 && <CheckInSent />
       )}

@@ -200,6 +200,11 @@ describe("Companion engine in the queue", () => {
     expect(view!.stage).toBe("checkin");
     const ci = view!.checkIn!;
     expect(ci.picks!.picks.length).toBeGreaterThan(0);
+    // each pick carries the Companion's full private read, so the person can see what to expect
+    for (const p of ci.picks!.picks) {
+      expect(Array.isArray(p.enjoy) && Array.isArray(p.concerns) && Array.isArray(p.needs)).toBe(true);
+      expect(p.enjoy.length + p.concerns.length).toBeGreaterThan(0);
+    }
     expect(ci.secondsLeft).toBeGreaterThan(0);
     expect(await answerCheckIn("p02", ci.id, { drop: [] })).toEqual({ ok: false, error: "not_found" }); // someone else's check-in
     expect(await answerCheckIn("p01", ci.id, { told: "my therapist says go out" })).toEqual({ ok: false, error: "sensitive" });

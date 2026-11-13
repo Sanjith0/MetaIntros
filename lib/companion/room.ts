@@ -24,7 +24,8 @@ export type Stage = "briefing" | "circles" | "mingling" | "checkin" | "deep" | "
 /** What a person is shown at the first check-in: who their Companion would pick, and why. */
 export interface PicksOffer {
   targetSize: number;
-  picks: { id: string; score: number; why: string }[];
+  /** `enjoy`/`concerns`/`needs`: the Companion's full private read on each pick (shown only to its own person) */
+  picks: { id: string; score: number; why: string; enjoy: string[]; concerns: string[]; needs: string[] }[];
   /** everyone else their Companion talked with */
   others: { id: string; score: number }[];
 }
@@ -347,7 +348,10 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     await stage("checkin", "Your Companion is checking its picks with you");
     await Promise.all(realActive.map(async ({ cs, m }) => {
       const mine = verdicts.get(m)!;
-      const ranked = cs.partners(m).map((id) => ({ id, score: mine.get(id)?.score ?? 0, why: mine.get(id)?.wouldEnjoy[0] ?? mine.get(id)?.concerns[0] ?? "" })).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+      const ranked = cs.partners(m).map((id) => {
+        const v = mine.get(id);
+        return { id, score: v?.score ?? 0, why: v?.wouldEnjoy[0] ?? v?.concerns[0] ?? "", enjoy: v?.wouldEnjoy ?? [], concerns: v?.concerns ?? [], needs: v?.needs ?? [] };
+      }).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
       const answer = await askPicks(m, { targetSize, picks: ranked.slice(0, targetSize - 1), others: ranked.slice(targetSize - 1).map(({ id, score }) => ({ id, score })) }).catch(() => null);
       if (!answer) return;
       const ok = new Set(cs.partners(m));
