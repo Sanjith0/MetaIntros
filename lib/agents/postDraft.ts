@@ -92,6 +92,11 @@ export interface Sanitized extends PostDraft {
   captionFromTemplate: boolean;
 }
 
+/** A sentence may be shown if it isn't sensitive, names nobody who must stay unnamed, and doesn't copy a masked "[name]". */
+function keepSentence(s: string, hiddenNames: string[]) {
+  return !isSensitiveText(s) && !mentionsAny(s, hiddenNames) && !s.includes("[name]");
+}
+
 /** Enforce the rules on whatever the model returned. */
 export function sanitizeDraft(raw: PostDraft, i: PostDraftInput): Sanitized {
   const allowed = new Set(i.photos.map((p) => p.id));
@@ -107,7 +112,7 @@ export function sanitizeDraft(raw: PostDraft, i: PostDraftInput): Sanitized {
   if (!ids.length) ids = tpl.photoIds;
 
   const sentences = raw.caption.replace(/\s+/g, " ").trim().split(/(?<=[.?!])\s+/).filter(Boolean);
-  const kept = sentences.filter((s) => !isSensitiveText(s) && !mentionsAny(s, i.hiddenNames));
+  const kept = sentences.filter((s) => keepSentence(s, i.hiddenNames));
   stripped += sentences.length - kept.length;
   let caption = truncate(kept.join(" ").trim(), MAX_DRAFT_CAPTION);
   let captionFromTemplate = false;
@@ -125,7 +130,7 @@ export interface PostIdea extends PostDraft {
 /** Keep the sentences that are safe to show: not sensitive, and naming nobody who must stay unnamed. */
 function safeSentences(text: string, hiddenNames: string[]) {
   const sentences = text.replace(/\s+/g, " ").trim().split(/(?<=[.?!])\s+/).filter(Boolean);
-  const kept = sentences.filter((s) => !isSensitiveText(s) && !mentionsAny(s, hiddenNames));
+  const kept = sentences.filter((s) => keepSentence(s, hiddenNames));
   return { text: kept.join(" ").trim(), stripped: sentences.length - kept.length };
 }
 
@@ -172,6 +177,7 @@ export async function draftPostIdeas(i: PostDraftInput): Promise<{ recap: string
       "Then suggest 3 different post ideas, in this order: style \"event\" (about the event itself), style \"chat\" (built from something the squad talked about), style \"casual\" (short and casual). " +
       "You cannot see the photos: for each idea choose up to 4 photo ids from the list using only the metadata (prefer the poster's own photos, a mix of moments, and photos with captions), in the order they should appear. Vary the photos across ideas when there are enough. " +
       "Each caption is in the poster's voice (first person, max 220 characters, at most 2 sentences). " +
+      "Use the chat only for shared plans, activities and topics the squad talked about: never mention anyone's personal news, feelings, problems or private details, even without a name. " +
       "Don't name any squadmate, don't invent details beyond the event, the chat, photo captions and shared interests, " +
       "and never mention politics, religion, health or sexuality. No hashtags, no emoji, no exclamation marks. " +
       'JSON only: {"recap": "...", "ideas": [{"style": "event", "photoIds": ["..."], "caption": "..."}]}.',

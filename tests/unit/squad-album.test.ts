@@ -294,6 +294,37 @@ describe("post draft agent", () => {
     ]);
   });
 
+  it("tells the model the chat is for shared plans and topics only, never anyone's personal news", async () => {
+    await photo(partyId, "p01");
+    await say("p02", "Tacos after?");
+    mockProvider().on("post_ideas", () => JSON.stringify({ recap: "Tacos were the plan.", ideas: [{ style: "chat", photoIds: [], caption: "Tacos with the squad." }] }));
+    await ideasOf();
+    const system = mockProvider().calls.find((c) => c.task === "post_ideas")!.messages[0].content;
+    expect(system).toMatch(/never .*personal news/i);
+  });
+
+  it("leaves out messages from a squadmate either side has blocked", async () => {
+    await photo(partyId, "p01");
+    await prisma.block.create({ data: { blockerId: "p03", blockedId: "p01" } });
+    await say("p03", "Arcade rematch next week.");
+    await say("p02", "Tacos after?");
+    mockProvider().on("post_ideas", () => JSON.stringify({ recap: "Tacos were the plan.", ideas: [{ style: "chat", photoIds: [], caption: "Tacos with the squad." }] }));
+    await ideasOf();
+    const payload = JSON.parse(mockProvider().calls.find((c) => c.task === "post_ideas")!.messages[1].content);
+    expect(payload.chat).toEqual([{ by: "Freya", text: "Tacos after?" }]);
+  });
+
+  it("drops any sentence that copies a masked [name] into a caption or the recap", async () => {
+    await photo(partyId, "p01");
+    await say("p02", "Rossi's is open late.");
+    mockProvider().on("post_ideas", () =>
+      JSON.stringify({ recap: "Your squad picked [name]'s for dinner. Everyone stayed late.", ideas: [{ style: "chat", photoIds: [], caption: "Late dinner at [name]'s. Best night in ages." }] }),
+    );
+    const r = await ideasOf();
+    expect(r.recap).toBe("Everyone stayed late.");
+    expect(r.ideas[0].caption).toBe("Best night in ages.");
+  });
+
   it("caps at 3 ideas and 4 photos each, drops repeated captions, and keeps a friend's name", async () => {
     const ids: string[] = [];
     for (const u of ["p01", "p01", "p02", "p02", "p03", "p05"]) ids.push(await photo(partyId, u));

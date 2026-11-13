@@ -318,11 +318,12 @@ const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * What people wrote in the squad chat, for the post ideas: the last 40 user messages, oldest first.
- * Host and system lines are left out, sensitive messages are dropped, squadmates' last names are
+ * Host and system lines are left out, as are messages from anyone blocked (either way); sensitive messages are dropped, squadmates' last names are
  * masked, and each line is cut to 200 characters.
  */
 async function squadChatLines(chatId: string | undefined, userId: string, members: { userId: string; user: { name: string } }[]): Promise<ChatLine[]> {
   if (!chatId) return [];
+  const blocked = await blockedIdsOf(userId);
   const rows = await prisma.chatMessage.findMany({
     where: { chatId, kind: "user", senderId: { not: null } },
     orderBy: { createdAt: "desc" },
@@ -334,7 +335,7 @@ async function squadChatLines(chatId: string | undefined, userId: string, member
   const mask = (t: string) => lastNames.reduce((acc, n) => acc.replace(new RegExp(`(^|[^\\p{L}])${escapeRe(n)}(?=$|[^\\p{L}])`, "giu"), "$1[name]"), t);
   return rows
     .reverse()
-    .filter((r) => firstOf.has(r.senderId!) && !isSensitiveText(r.body))
+    .filter((r) => firstOf.has(r.senderId!) && !blocked.has(r.senderId!) && !isSensitiveText(r.body))
     .map((r) => ({ by: r.senderId === userId ? "you" : firstOf.get(r.senderId!)!, text: mask(r.body.replace(/\s+/g, " ").trim()).slice(0, MAX_CHAT_LINE) }))
     .filter((l) => l.text.length > 0);
 }
