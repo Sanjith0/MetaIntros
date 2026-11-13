@@ -20,14 +20,14 @@ export default function VideoPage() {
         {VIDEOS.map((v) => (
           <article key={v.id} className="bg-surface pb-3">
             <div className="flex items-center gap-2 px-4 py-3">
-              <Avatar name={v.page} color={v.color} size={40} />
+              <Avatar name={v.page} color={v.color} photoUrl={v.avatar} size={40} />
               <div>
                 <p className="text-body font-semibold">{v.page}</p>
                 <p className="text-meta text-muted">{v.ago}</p>
               </div>
             </div>
             <p className="px-4 pb-2 text-body">{v.title}</p>
-            <EventCover color={v.color} pattern={v.pattern} className="aspect-video">
+            <EventCover color={v.color} pattern={v.pattern} src={v.thumb} label={v.title} className="aspect-video">
               <span className="absolute inset-0 flex items-center justify-center">
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-scrim text-surface" aria-label="Play (off in this prototype)">
                   <Play size={26} fill="currentColor" />

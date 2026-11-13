@@ -16,6 +16,7 @@ export function Post({
   id,
   who,
   color,
+  avatarUrl,
   ago,
   text,
   likes,
@@ -30,6 +31,8 @@ export function Post({
   id?: string;
   who: string;
   color: string;
+  /** a Page's profile picture; people without one get their drawn avatar */
+  avatarUrl?: string;
   ago: string;
   text: string;
   likes?: number;
@@ -45,7 +48,7 @@ export function Post({
   return (
     <article id={id} className="scroll-mt-20 bg-surface" data-testid={testId}>
       <div className="flex items-center gap-2 px-4 pt-3">
-        <Avatar name={who} color={color} size={40} />
+        <Avatar name={who} color={color} photoUrl={avatarUrl} size={40} />
         <div className="min-w-0 flex-1">
           {place ? (
             <p className="text-body leading-snug"><span className="font-semibold">{who}</span> {place}</p>

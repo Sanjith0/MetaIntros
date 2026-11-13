@@ -1,5 +1,5 @@
 /*
- * Event covers are content, standing in for an event photo: the colour and pattern come from the event's data.
+ * Event covers are content. Seeded events have a photo (lib/images.ts); the rest stand in with the event's colour and pattern.
  * This is the one place pattern overlays live (exempt from the no-raw-colour check, like avatars).
  */
 const PATTERNS: Record<string, string> = {
@@ -16,10 +16,14 @@ export function coverBackground(color: string, pattern: string) {
   return `${PATTERNS[pattern] ?? PATTERNS.dots}, ${color}`;
 }
 
-export function EventCover({ color, pattern, height, className = "", label = "Event cover", children }: { color: string; pattern: string; height?: number; className?: string; label?: string; children?: React.ReactNode }) {
+/** A cover: the event's photo when it has one (lib/images.ts), over its colour while it loads; else colour + pattern. */
+export function EventCover({ color, pattern, src, height, className = "", label = "Event cover", eager = false, children }: { color: string; pattern: string; src?: string | null; height?: number; className?: string; label?: string; /** above the fold (an event page's hero): don't lazy-load */ eager?: boolean; children?: React.ReactNode }) {
   const width = /(^|\s)w-/.test(className) ? "" : "w-full";
   return (
-    <div role="img" aria-label={label} className={`relative overflow-hidden ${width} ${className}`} style={{ height, background: coverBackground(color, pattern) }}>
+    // Seeded photos are AI-generated stand-ins (scripts/gen-images.ts), and their name says so.
+    <div role="img" aria-label={src ? `${label} (AI image)` : label} className={`relative overflow-hidden ${width} ${className}`} style={{ height, background: src ? color : coverBackground(color, pattern) }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {src && <img src={src} alt="" loading={eager ? "eager" : "lazy"} decoding="async" className="absolute inset-0 h-full w-full object-cover" data-testid="cover-photo" />}
       {children}
     </div>
   );

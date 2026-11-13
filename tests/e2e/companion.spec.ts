@@ -28,6 +28,7 @@ test("the brief: what my Companion may share is mine to decide, and it sticks", 
 
 test("a sensitive note for tonight is refused with a clear message", async ({ page }) => {
   await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
+  await page.getByTestId("companion-note").click();
   await page.getByTestId("tonight").fill("my therapist says I should go out more");
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
@@ -37,7 +38,7 @@ test("a sensitive note for tonight is refused with a clear message", async ({ pa
 
 test("queueing runs the Companion engine: squad of the chosen size, visible trace, Companion conversations on the cards", async ({ page }) => {
   await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
-  await expect(page.getByTestId("companion-note")).toBeVisible();
+  await page.getByTestId("companion-note").click();
   await page.getByTestId("tonight").fill("first night out since moving, somewhere I can actually talk");
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();

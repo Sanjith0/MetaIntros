@@ -34,27 +34,20 @@ export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault 
 
   return (
     <section className="bg-surface px-4 py-3" data-testid="queue-entry">
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3">
         <IconCircle tone="on" size={40}><Users size={20} /></IconCircle>
         <div className="min-w-0 flex-1">
           <h2 className="text-title font-semibold">{again ? "Up for another one?" : also ? "Go with another squad" : event ? "Going alone? Go with a squad" : "Go with a squad"}</h2>
-          <p className="text-body text-muted">
-            {again
-              ? "Queue again for another event or a new hangout, with a new squad or friends."
-              : also
-                ? "You can be in more than one squad."
-                : event
-                ? "We'll match you with a few people nearby who'd get along. Meet at the door, walk in together."
-                : "Queue for an event and we'll match you with a few people nearby who'd get along. Meet at the door, walk in together."}
-          </p>
+          {/* One line at most: who's in line. What a squad is, the title and the button already say. */}
+          {friendsInLine > 0 ? (
+            <p className="text-meta font-semibold text-link" data-testid="friends-in-line">
+              {friendsInLine === 1 ? "1 friend is" : `${friendsInLine} friends are`} in line for this
+            </p>
+          ) : (
+            pulse && <p className="text-meta text-muted" data-testid="queue-pulse">{pulse}</p>
+          )}
         </div>
       </div>
-      {pulse && <p className="mt-2 text-meta text-muted" data-testid="queue-pulse">{pulse}</p>}
-      {friendsInLine > 0 && (
-        <p className="mt-1 text-meta font-semibold text-link" data-testid="friends-in-line">
-          {friendsInLine === 1 ? "1 friend is" : `${friendsInLine} friends are`} in line for this
-        </p>
-      )}
       <Button variant={again || also ? "secondary" : "primary"} block className="mt-3" data-testid={event ? "queue-up-button" : "queue-entry-open"} onClick={() => openAt(first)}>
         {again || also ? "Find another squad for an event" : event ? "Find a squad to go with" : "Find a squad for an event"}
       </Button>
@@ -73,10 +66,10 @@ export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault 
         {step.kind === "modes" && (
           <ul className="pb-2">
             <li>
-              <ListRow onClick={() => setStep({ kind: "pick" })} testId="queue-pick-event" leading={<IconCircle><CalendarCheck size={20} /></IconCircle>} title="For an event you pick" subtitle="Your squad goes to that event together." trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
+              <ListRow onClick={() => setStep({ kind: "pick" })} testId="queue-pick-event" leading={<IconCircle><CalendarCheck size={20} /></IconCircle>} title="Pick an event" trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
             </li>
             <li>
-              <ListRow onClick={() => setStep({ kind: "setup", mode: "events", event: null })} testId="queue-anything" leading={<IconCircle><CalendarDays size={20} /></IconCircle>} title="For any event this weekend" subtitle="We match your squad, then pick an event you'll all like." trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
+              <ListRow onClick={() => setStep({ kind: "setup", mode: "events", event: null })} testId="queue-anything" leading={<IconCircle><CalendarDays size={20} /></IconCircle>} title="Any event this weekend" subtitle="We pick one you'll all like" trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
             </li>
           </ul>
         )}

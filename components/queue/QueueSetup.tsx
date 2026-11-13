@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-import { CalendarDays, ChevronRight, Crosshair, Lock, MapPin, MapPinned, ShieldCheck } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { CalendarDays, ChevronRight, Crosshair, Eye, Lock, MapPin, MapPinned, ShieldCheck, Sparkles } from "lucide-react";
 import { Button, Chip, IconCircle, ListRow } from "@/components/fb";
 import { DateLine } from "@/components/events/DateLine";
+import { Switch } from "@/components/album/Switch";
 import { QueueTogether, type TogetherRole } from "./QueueTogether";
 
 type Mode = "events" | "hangout";
@@ -53,6 +54,13 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
   const [busy, setBusy] = useState(false);
   const [share, setShare] = useState(shareDefault);
   const [tonight, setTonight] = useState("");
+  const [noteOpen, setNoteOpen] = useState(false);
+  // Opening the area list in place replaces the row you tapped: move focus to its heading so you don't lose your place.
+  const areaHeading = useRef<HTMLHeadingElement>(null);
+  const manual = loc.kind === "manual";
+  useEffect(() => {
+    if (manual) areaHeading.current?.focus();
+  }, [manual]);
   const [together, setTogether] = useState<TogetherRole>({ role: "none", joined: 1 });
   const onRole = useCallback((r: TogetherRole) => {
     setTogether(r);
@@ -71,7 +79,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
     const j = r ? await r.json().catch(() => ({})) : { error: "network" };
     if (j.ok) return router.push("/queue");
     setBusy(false);
-    if (j.error === "too_far") setLoc({ kind: "manual", reason: "You look far from our Queue Up areas. Pick where you'll meet:" });
+    if (j.error === "too_far") setLoc({ kind: "manual", reason: "You're far from Queue Up areas. Pick one to find your squad" });
     else setError(ERRORS[j.error] ?? "Couldn't join the queue. Try again.");
   };
 
@@ -82,7 +90,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
       const pos = await getPosition();
       await join({ lat: pos.coords.latitude, lng: pos.coords.longitude, locationSource: "gps" });
     } catch {
-      setLoc({ kind: "manual", reason: "Location is off. Choose your area instead:" });
+      setLoc({ kind: "manual", reason: "Location is off. Pick an area to find your squad" });
     }
   };
 
@@ -93,35 +101,20 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
       </p>
     );
 
+  const title = event ? event.title : mode === "hangout" ? "Plan a new hangout" : "Any event this weekend";
+  const chevron = <ChevronRight size={20} className="text-muted" aria-hidden />;
+
+  // One decision (size), one button. Everything optional is a quiet row that opens in place.
   return (
     <div data-testid="queue-setup" className="bg-surface">
-      {variant === "page" && (
+      {variant === "page" ? (
         <div className="px-4 pt-3">
-          {event ? (
-            <>
-              <DateLine start={new Date(event.startsAt)} />
-              <h2 className="text-headline font-bold" data-testid="queue-title">{event.title}</h2>
-              <p className="text-meta text-muted">{event.venue}</p>
-            </>
-          ) : (
-            <>
-              <h2 className="text-headline font-bold" data-testid="queue-title">{mode === "hangout" ? "Plan a new hangout" : "Any event this weekend"}</h2>
-              <p className="text-body text-muted">
-                {mode === "hangout"
-                  ? "We'll match your squad, then plan a hangout at a public spot near all of you, when you're all free."
-                  : "We'll match your squad, then pick an existing event you'll all like."}
-              </p>
-            </>
-          )}
+          {event && <DateLine start={new Date(event.startsAt)} />}
+          <h2 className="text-headline font-bold" data-testid="queue-title">{title}</h2>
+          {event && <p className="text-meta text-muted">{event.venue}</p>}
         </div>
-      )}
-      {variant === "sheet" && (
-        <h3 className="sr-only" data-testid="queue-title">{event ? event.title : mode === "hangout" ? "Plan a new hangout" : "Any event this weekend"}</h3>
-      )}
-      {variant === "sheet" && !event && (
-        <p className="px-4 text-body text-muted">
-          {mode === "hangout" ? "We'll match your squad, then plan a hangout at a public spot near all of you, when you're all free." : "We'll match your squad, then pick an existing event you'll all like."}
-        </p>
+      ) : (
+        <h3 className="sr-only" data-testid="queue-title">{title}</h3>
       )}
 
       {!event && variant === "page" && (
@@ -135,8 +128,8 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
         </div>
       )}
 
-      <section className={variant === "page" ? "mt-4 px-4" : "mt-2 px-4"} aria-labelledby="size-label">
-        <h3 id="size-label" className="text-body font-semibold">Squad size</h3>
+      <section className={variant === "page" ? "mt-4 px-4" : "mt-3 px-4"} aria-labelledby="size-label">
+        <h3 id="size-label" className="text-body font-semibold">Squad size, including you</h3>
         <div className="mt-2 flex gap-2" role="radiogroup" aria-labelledby="size-label">
           {SIZES.map((n) => (
             <Chip key={n} on={size === n} role="radio" aria-checked={size === n} data-testid={`size-${n}`} onClick={() => setSize(n)} disabled={together.role === "host" && n - 1 < together.joined} className="min-w-14 justify-center">
@@ -144,27 +137,23 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
             </Chip>
           ))}
         </div>
-        <p className="mt-1.5 text-meta text-muted">Including you. You&apos;re only matched with people who picked the same size.</p>
       </section>
 
-      <QueueTogether onRole={onRole} />
+      <div className="mt-3">
+        <QueueTogether onRole={onRole} />
 
-      {!member && <section className="mt-4" aria-labelledby="where-label">
-        <h3 id="where-label" className="px-4 text-body font-semibold">Where you&apos;ll start from</h3>
-        {loc.kind !== "manual" ? (
-          <>
-            <p className="px-4 text-meta text-muted">We use your location once to pick a nearby area. It isn&apos;t stored or shown to anyone.</p>
-            <ListRow
-              onClick={() => setLoc({ kind: "manual", reason: "Choose your area:" })}
-              testId="choose-area"
-              leading={<IconCircle><MapPin size={18} /></IconCircle>}
-              title="Choose an area instead"
-              trailing={<ChevronRight size={20} className="text-muted" aria-hidden />}
-            />
-          </>
+        {!member && (loc.kind !== "manual" ? (
+          <ListRow
+            onClick={() => setLoc({ kind: "manual", reason: "Pick an area to find your squad" })}
+            testId="choose-area"
+            leading={<IconCircle><MapPin size={18} /></IconCircle>}
+            title="Starting area"
+            subtitle="Location used once, never stored or shown"
+            trailing={chevron}
+          />
         ) : (
-          <div data-testid="area-picker">
-            <p className="px-4 text-meta text-muted">{loc.reason}</p>
+          <section data-testid="area-picker" aria-labelledby="area-label">
+            <h3 id="area-label" ref={areaHeading} tabIndex={-1} className="px-4 pt-2 text-body font-semibold">{loc.reason}</h3>
             <ul className="mt-1">
               {landmarks.map((l) => (
                 <li key={l.id}>
@@ -179,44 +168,43 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
                 </li>
               ))}
             </ul>
-          </div>
-        )}
-      </section>}
+          </section>
+        ))}
 
-      <div className="mx-4 mt-4">
-        <label htmlFor="tonight" className="block text-body font-semibold">What do you want tonight? <span className="font-normal text-muted">(optional)</span></label>
-        <textarea id="tonight" data-testid="tonight" value={tonight} onChange={(e) => setTonight(e.target.value.slice(0, 200))} rows={2}
-          placeholder="e.g. first night out since moving, not drinking, somewhere I can actually talk"
-          className="mt-1 w-full resize-none rounded-btn bg-wash p-3 text-body text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent" />
-        <p className="mt-0.5 flex items-center gap-1 text-meta text-muted"><Lock size={12} aria-hidden /> Only your Companion reads this. It uses it to judge who fits, and never repeats it.</p>
-        <p className="mt-2 text-meta text-muted" data-testid="companion-note">
-          Your Companion AI speaks for you to find people you&apos;d click with.{" "}
-          <Link href="/profile" className="font-semibold text-link" data-testid="review-brief">Review what it can share</Link>
-        </p>
+        {noteOpen ? (
+          <div className="px-4 py-2">
+            <label htmlFor="tonight" className="block text-body font-semibold">What do you want tonight?</label>
+            <textarea id="tonight" data-testid="tonight" value={tonight} onChange={(e) => setTonight(e.target.value.slice(0, 200))} rows={2} autoFocus
+              placeholder="e.g. first night out since moving, somewhere I can actually talk"
+              className="mt-1 w-full resize-none rounded-btn bg-wash p-3 text-body text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent" />
+            <p className="flex items-center gap-1 text-meta text-muted">
+              <Lock size={12} aria-hidden /> Only your Companion reads this.{" "}
+              <Link href="/profile" className="font-semibold text-link" data-testid="review-brief">What it shares</Link>
+            </p>
+          </div>
+        ) : (
+          <ListRow
+            onClick={() => setNoteOpen(true)}
+            testId="companion-note"
+            leading={<IconCircle><Sparkles size={18} /></IconCircle>}
+            title="Add a note for your Companion"
+            subtitle="Your AI Companion talks to others for you"
+            trailing={chevron}
+          />
+        )}
+
+        <label className="flex min-h-14 cursor-pointer items-center gap-3 px-4 py-2" data-testid="share-with-friends">
+          <IconCircle><Eye size={18} /></IconCircle>
+          <span className="min-w-0 flex-1">
+            <span className="block text-body font-medium">Let friends see you&apos;re queuing</span>
+            <span className="block text-meta text-muted">They see the event and your area</span>
+          </span>
+          <Switch checked={share} onChange={(e) => setShare(e.target.checked)} data-testid="share-with-friends-toggle" />
+        </label>
       </div>
 
-      <label className="mx-4 mt-4 flex cursor-pointer items-start gap-3" data-testid="share-with-friends">
-        <span className="min-w-0 flex-1">
-          <span className="block text-body font-semibold">Let friends see you&apos;re queuing</span>
-          <span className="block text-meta text-muted">
-            Your friends see which event and area, never who else is in line. They can queue up too. You can change this on your profile.
-          </span>
-        </span>
-        <input
-          type="checkbox"
-          role="switch"
-          checked={share}
-          onChange={(e) => setShare(e.target.checked)}
-          data-testid="share-with-friends-toggle"
-          className="mt-1 h-5 w-9 shrink-0 cursor-pointer appearance-none rounded-full bg-control transition-colors before:block before:h-4 before:w-4 before:translate-x-0.5 before:translate-y-0.5 before:rounded-full before:bg-surface before:shadow before:transition-transform checked:bg-accent checked:before:translate-x-[18px]"
-        />
-      </label>
-
-      <p className="mx-4 mt-3 flex items-start gap-2 rounded-card bg-wash p-3 text-meta text-muted">
-        <ShieldCheck size={16} className="mt-px shrink-0 text-ink" aria-hidden />
-        <span>
-          18+ only, matched within your age range{mode === "hangout" ? ", with other people planning a hangout" : ""}. Squads only meet at public places, never include anyone you&apos;ve blocked, and you can leave any time.
-        </span>
+      <p className="mx-4 mt-2 flex items-center gap-1.5 text-meta text-muted" data-testid="safety-line">
+        <ShieldCheck size={12} className="shrink-0" aria-hidden /> 18+, public places only, never anyone you&apos;ve blocked
       </p>
 
       {error && (
@@ -226,7 +214,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
       )}
 
       {loc.kind !== "manual" && !member && (
-        <div className={variant === "page" ? "sticky bottom-[calc(52px+env(safe-area-inset-bottom))] mt-4 border-t border-divider bg-surface px-4 py-3" : "px-4 pt-4 pb-1"}>
+        <div className={variant === "page" ? "sticky bottom-[calc(52px+env(safe-area-inset-bottom))] mt-3 border-t border-divider bg-surface px-4 py-3" : "px-4 pt-3 pb-1"}>
           <Button variant="primary" size="lg" block disabled={busy || loc.kind === "locating"} onClick={findSquad} data-testid="find-squad" icon={loc.kind === "locating" ? <Crosshair size={18} className="animate-spin" /> : null}>
             {loc.kind === "locating" ? "Finding your area…" : together.role === "host" && together.joined > 1 ? `Find a squad for ${together.joined} of you` : "Find my squad"}
           </Button>

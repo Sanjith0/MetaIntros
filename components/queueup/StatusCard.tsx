@@ -13,7 +13,7 @@ import type { StatusCard as Card } from "@/lib/server/status";
  * The single Queue Up status card. One state, one line of context, one next action.
  * Waiting ticks its own timer; every state refreshes when the queue or squad changes.
  */
-export function StatusCard({ card }: { card: Card }) {
+export function StatusCard({ card, onEventPage = false }: { card: Card; /** on the event's own page: don't repeat its title */ onEventPage?: boolean }) {
   const router = useRouter();
   const [elapsed, setElapsed] = useState(card.state === "waiting" ? card.waitedMs : 0);
   const base = useRef({ at: 0, waited: card.state === "waiting" ? card.waitedMs : 0 });
@@ -65,11 +65,13 @@ export function StatusCard({ card }: { card: Card }) {
   const when = fmtEventWhen(new Date(card.startsAt));
   const sharing = card.state === "after" && card.action.href.endsWith("/share");
   const copy = {
-    ready: { title: `Your squad is going to ${card.title}`, sub: `${when} · ${card.faces.length} people`, Icon: CalendarDays },
+    ready: onEventPage
+      ? { title: "Your squad is going", sub: `${card.faces.length} people`, Icon: CalendarDays }
+      : { title: `Your squad is going to ${card.title}`, sub: `${when} · ${card.faces.length} people`, Icon: CalendarDays },
     venue: { title: card.checkedIn ? "You're checked in" : `${card.title} is starting`, sub: `Meet at the front entrance · ${card.venueName}`, Icon: MapPin },
     after: sharing
-      ? { title: `How was ${card.title}?`, sub: "Share photos from your squad album, or skip it.", Icon: Images }
-      : { title: `How was ${card.title}?`, sub: "Add the people you'd like to see again. Only mutual adds become friends.", Icon: UserPlus },
+      ? { title: `How was ${card.title}?`, sub: "Share photos from your squad album", Icon: Images }
+      : { title: `How was ${card.title}?`, sub: "Only mutual adds become friends", Icon: UserPlus },
   }[card.state];
   // The button's icon names its action (open the chat), not the card's state (a date).
   const ActionIcon = card.action.href.startsWith("/chats/") ? MessageCircle : copy.Icon;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronRight, KeyRound, UserPlus, Users } from "lucide-react";
 import { Avatar, Button, FacePile, IconCircle, ListRow } from "@/components/fb";
 import { Sheet } from "@/components/fb/Sheet";
@@ -31,6 +31,12 @@ export function QueueTogether({ onRole }: { onRole: (r: TogetherRole) => void })
   const router = useRouter();
   const [s, setS] = useState<State | null>(null);
   const [picking, setPicking] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  // Opening replaces the row you tapped: move focus to the section heading so you don't lose your place.
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (expanded) heading.current?.focus();
+  }, [expanded]);
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -63,11 +69,24 @@ export function QueueTogether({ onRole }: { onRole: (r: TogetherRole) => void })
     return j.ok as boolean;
   };
 
-  if (!s) return null;
+  // Collapsed to one row until you want it; a group or an invite opens it by itself. The row needs no data,
+  // so it shows while groups load and nothing below it jumps.
+  if (!s || (!expanded && !g && s.invites.length === 0))
+    return (
+      <div data-testid="queue-together" data-role={role}>
+        <ListRow
+          onClick={() => setExpanded(true)}
+          testId="bring-friends"
+          leading={<IconCircle><UserPlus size={18} /></IconCircle>}
+          title="Bring friends"
+          trailing={<ChevronRight size={20} className="text-muted" aria-hidden />}
+        />
+      </div>
+    );
 
   return (
-    <section className="mt-4" aria-labelledby="together-label" data-testid="queue-together" data-role={role}>
-      <h3 id="together-label" className="px-4 text-body font-semibold">Queue together</h3>
+    <section className="pt-2 pb-1" aria-labelledby="together-label" data-testid="queue-together" data-role={role}>
+      <h3 id="together-label" ref={heading} tabIndex={-1} className="px-4 text-body font-semibold">Bring friends</h3>
 
       {s.invites.map((inv) => (
         <div key={inv.groupId} className="mx-4 mt-2 flex items-center gap-3 rounded-card bg-wash p-3" data-testid="group-invite">
@@ -89,12 +108,11 @@ export function QueueTogether({ onRole }: { onRole: (r: TogetherRole) => void })
               {joined.length > 2 ? ` and ${joined.length - 2} more` : ""}
             </p>
           </div>
-          <p className="mt-1 text-meta text-muted">{first(g.host.name)} picks the squad size and starts the queue. You&apos;ll go to the queue screen when they do.</p>
+          <p className="mt-1 text-meta text-muted">{first(g.host.name)} starts the queue.</p>
           <Button size="sm" variant="secondary" className="mt-2" disabled={busy} onClick={() => act({ action: "leave" })} data-testid="group-leave">Leave group</Button>
         </div>
       ) : (
         <>
-          <p className="px-4 text-meta text-muted">Bring friends. You stay together in one squad and Queue Up fills the other spots.</p>
           {g && joined.length + g.members.filter((m) => m.status === "invited").length > 1 && (
             <ul className="mt-1" data-testid="group-members">
               {g.members.map((m) => (

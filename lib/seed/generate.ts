@@ -86,7 +86,7 @@ export interface PersonSheet {
 }
 export const PEOPLE = PEOPLE_JSON as Record<string, PersonSheet>;
 
-const COLORS = ["#1877f2", "#e41e3f", "#f7b928", "#45bd62", "#7c3aed", "#f02849", "#2abba7", "#ff6f00", "#8b5cf6", "#0ea5e9", "#d946ef", "#14b8a6"];
+const COLORS = ["#0866ff", "#e41e3f", "#f7b928", "#45bd62", "#7c3aed", "#f02849", "#2abba7", "#ff6f00", "#8b5cf6", "#0ea5e9", "#d946ef", "#14b8a6"];
 
 export interface GeneratedSeed {
   users: GraphUser[];

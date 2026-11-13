@@ -3,11 +3,11 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
- * DESIGN.md guard: pages and feature components use tokens only. Event covers are content (exempt);
- * avatar colours are data, never literals in UI files.
+ * DESIGN.md guard: pages and feature components use tokens only. Event covers and the drawn avatar
+ * character are content (exempt); avatar colours are data, never literals in UI files.
  */
 const ROOTS = ["app", "components"];
-const EXEMPT = new Set(["components/events/EventCover.tsx"]);
+const EXEMPT = new Set(["components/events/EventCover.tsx", "components/fb/Character.tsx"]);
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((f) => {

@@ -8,6 +8,7 @@ import { Avatar, Button, ButtonLink, Card, IconCircle, ListRow, Section, Stack }
 import { TopBar } from "@/components/fb/TopBar";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { EventCover } from "@/components/events/EventCover";
+import { eventCoverSrc } from "@/lib/images";
 import { DateLine } from "@/components/events/DateLine";
 import { TraceRow } from "@/components/trace/TraceList";
 import { fmtDuration } from "@/lib/format";
@@ -398,7 +399,7 @@ function SquadFound({ party, meId }: { party: Party; meId: string }) {
           <Section>
             <Card testId="party-event">
               <Link href={`/events/${party.event.id}`} data-testid="view-event" className="block">
-                {party.event.coverColor && <EventCover color={party.event.coverColor} pattern={party.event.coverPattern ?? "dots"} height={72} />}
+                {party.event.coverColor && <EventCover color={party.event.coverColor} pattern={party.event.coverPattern ?? "dots"} src={eventCoverSrc(party.event.id)} label={party.event.title} height={72} />}
                 <div className="p-3">
                   <DateLine start={new Date(party.event.startsAt)} />
                   <p className="text-title font-semibold" data-testid="party-event-title">{party.event.title}</p>

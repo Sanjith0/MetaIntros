@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
-import { Flag, Globe, Lock, MapPin, MapPinned, Users } from "lucide-react";
+import { Lock, MapPin, MapPinned } from "lucide-react";
 import { TopBar } from "@/components/fb/TopBar";
 import { FacePile, IconCircle, Section, Stack, ButtonLink } from "@/components/fb";
 import { EventCover } from "@/components/events/EventCover";
 import { DateLine } from "@/components/events/DateLine";
+import { eventCoverSrc } from "@/lib/images";
 import { ActionRow } from "@/components/events/RsvpButtons";
 import { QueueEntry } from "@/components/queueup/QueueEntry";
 import { StatusCard } from "@/components/queueup/StatusCard";
@@ -51,12 +52,11 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
       <TopBar back="/events" title={e.title} />
       <Stack>
         <div className="bg-surface pb-3">
-          <EventCover color={e.coverColor} pattern={e.coverPattern} className="aspect-[2/1]" />
+          <EventCover color={e.coverColor} pattern={e.coverPattern} src={eventCoverSrc(e.id)} label={e.title} eager className="aspect-[2/1]" />
           <div className="px-4 pt-3">
             <DateLine start={e.startsAt} end={e.endsAt} />
             <h1 className="mt-1 text-page font-bold" data-testid="event-title">{e.title}</h1>
             <p className="mt-1 text-body text-muted">{e.venueName}</p>
-            {!hangout && <p className="text-meta text-muted">Event by {e.hostName}</p>}
           </div>
           {!hangout && (
             <div className="mt-3 px-4">
@@ -68,13 +68,13 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
         {hangout ? (
           <p data-testid="hangout-badge" className="flex items-start gap-3 bg-surface px-4 py-3 text-body">
             <IconCircle tone="on"><MapPinned size={18} /></IconCircle>
-            <span>A hangout Queue Up planned for your squad, at a public spot near all of you. Only your squad can see it.</span>
+            <span>Planned for your squad. Only your squad can see it.</span>
           </p>
         ) : null}
 
         {card ? (
           <>
-            <StatusCard card={card} />
+            <StatusCard card={card} onEventPage />
             {card.state === "after" && (
               <div className="bg-surface px-4 pb-3">
                 <ButtonLink href="/events?queue=1" variant="secondary" block data-testid="find-another-squad">Find another squad</ButtonLink>
@@ -101,13 +101,10 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
 
         <Section title="Details">
           <ul>
-            {!hangout && <DetailRow icon={<Users size={20} />}>{e.goingCount + e.interestedCount} people responded</DetailRow>}
-            {!hangout && <DetailRow icon={<Flag size={20} />}>Event by <span className="font-semibold">{e.hostName}</span></DetailRow>}
             <DetailRow icon={<MapPin size={20} />}>
               <span className="font-semibold">{e.venueName}</span>
               <span className="block text-meta text-muted">{e.venueAddress}</span>
             </DetailRow>
-            <DetailRow icon={hangout ? <Lock size={20} /> : <Globe size={20} />}>{hangout ? "Private · Only your squad" : e.isPublicVenue ? "Public · Anyone can see this event" : "Public event at a private venue"}</DetailRow>
           </ul>
           <p className="mt-2 text-body">{e.description}</p>
           {e.tagsList.length > 0 && (
