@@ -4,7 +4,7 @@
  */
 import { prisma } from "@/lib/db";
 import { toJson } from "@/lib/json";
-import { pairKey, runRoom, sparksFor, type HumanCheckIns, type LiveEvent, type PicksAnswer, type PicksOffer, type RoomParty, type SignoffAnswer, type SignoffOffer } from "@/lib/companion/room";
+import { pairKey, runRoom, sparksFor, type HumanCheckIns, type LiveEvent, type ObjectionAnswer, type ObjectionOffer, type PicksAnswer, type PicksOffer, type RoomParty } from "@/lib/companion/room";
 import { cleanNote } from "@/lib/companion/brief";
 import { buildRecap, type Recap } from "@/lib/companion/recap";
 import type { TableRow, Verdict } from "@/lib/companion/orchestrator";
@@ -297,13 +297,13 @@ export async function checkInMs(): Promise<number> {
 
 type CheckIn =
   | { id: string; roomId: string; userId: string; kind: "picks"; offer: PicksOffer; expiresAt: number; resolve: (a: PicksAnswer | null) => void }
-  | { id: string; roomId: string; userId: string; kind: "signoff"; offer: SignoffOffer; expiresAt: number; resolve: (a: SignoffAnswer | null) => void };
+  | { id: string; roomId: string; userId: string; kind: "objection"; offer: ObjectionOffer; expiresAt: number; resolve: (a: ObjectionAnswer | null) => void };
 
 const gc = globalThis as unknown as { __quCheckIns?: Map<string, CheckIn> };
 const checkIns = () => (gc.__quCheckIns ??= new Map());
 let seq = 0;
 
-function ask<A>(w: LiveRoom, userId: string, kind: CheckIn["kind"], offer: PicksOffer | SignoffOffer, ms: number): Promise<A | null> {
+function ask<A>(w: LiveRoom, userId: string, kind: CheckIn["kind"], offer: PicksOffer | ObjectionOffer, ms: number): Promise<A | null> {
   return new Promise((done) => {
     const id = `ci-${Date.now().toString(36)}-${++seq}`;
     const finish = (a: A | null) => {
@@ -324,8 +324,11 @@ async function checkInsFor(w: LiveRoom, real: string[]): Promise<HumanCheckIns |
   const ms = await checkInMs();
   if (!ms || !real.length) return undefined;
   // The final yes/no is main's ready check ("I'm in" after the squad and plan are set), so the room
-  // itself only checks the Companion's picks with each person.
-  return { picks: (userId, offer) => ask<PicksAnswer>(w, userId, "picks", offer, ms) };
+  // checks the Companion's picks with each person, and asks before it turns down a suggestion.
+  return {
+    picks: (userId, offer) => ask<PicksAnswer>(w, userId, "picks", offer, ms),
+    objection: (userId, offer) => ask<ObjectionAnswer>(w, userId, "objection", offer, ms),
+  };
 }
 
 /** Answer every pending check-in with "no answer" (demo reset). */
@@ -333,7 +336,7 @@ export function cancelCheckIns() {
   for (const c of [...checkIns().values()]) c.resolve(null);
 }
 
-export type CheckInReply = { drop?: unknown; told?: unknown; decision?: unknown };
+export type CheckInReply = { drop?: unknown; told?: unknown; up?: unknown };
 
 /** A person answers their own pending check-in. */
 export async function answerCheckIn(userId: string, id: string, reply: CheckInReply): Promise<{ ok: true } | { ok: false; error: "not_found" | "bad_answer" | "sensitive" }> {
@@ -348,24 +351,30 @@ export async function answerCheckIn(userId: string, id: string, reply: CheckInRe
     c.resolve({ drop, ...(told ? { told } : {}) });
     return { ok: true };
   }
-  if (reply.decision !== "yes" && reply.decision !== "no") return { ok: false, error: "bad_answer" };
-  c.resolve({ decision: reply.decision });
+  // objection: which suggestions this person would be up for after all (the rest: "not for me")
+  if (reply.up !== undefined && !Array.isArray(reply.up)) return { ok: false, error: "bad_answer" };
+  const items = (c.offer as ObjectionOffer).items;
+  const up = ((reply.up as unknown[] | undefined) ?? []).filter((u): u is string => typeof u === "string" && items.some((i) => i.with === u));
+  // remembered for next time, like what a person tells their Companion at the picks check-in
+  const upFor = items.filter((i) => up.includes(i.with)).map((i) => i.activity);
+  if (upFor.length) await rememberTold(userId, `I'd actually be up for ${upFor.join(" and ")}`).catch(() => {});
+  (c.resolve as (a: ObjectionAnswer | null) => void)({ up });
   return { ok: true };
 }
 
 export interface CheckInView {
   id: string;
-  kind: "picks" | "signoff";
+  kind: "picks" | "objection";
   secondsLeft: number;
   picks?: PicksOffer;
-  signoff?: SignoffOffer;
+  objection?: ObjectionOffer;
 }
 
 function checkInFor(userId: string): CheckInView | null {
   const c = [...checkIns().values()].find((x) => x.userId === userId);
   if (!c) return null;
   const secondsLeft = Math.max(0, Math.round((c.expiresAt - Date.now()) / 1000));
-  return c.kind === "picks" ? { id: c.id, kind: "picks", secondsLeft, picks: c.offer } : { id: c.id, kind: "signoff", secondsLeft, signoff: c.offer };
+  return c.kind === "picks" ? { id: c.id, kind: "picks", secondsLeft, picks: c.offer } : { id: c.id, kind: "objection", secondsLeft, objection: c.offer };
 }
 
 export interface LiveView {
@@ -404,13 +413,13 @@ export async function liveViewFor(userId: string): Promise<LiveView | null> {
     byOther.set(other, [...(byOther.get(other) ?? []), { from: l.from === userId ? "me" : "them", kind: l.kind, say: l.say, blocked: l.blocked }]);
   }
   const mine = w.notes.get(userId);
-  const order = (k: ThreadMsg["kind"]) => ["intro", "ask", "answer", "followup", "close"].indexOf(k);
   const conversations = [...byOther.entries()]
     .map(([other, lines]) => ({
       with: other,
       deep: w.deep.has(pairKey(userId, other)),
       notes: mine?.get(other) ?? null,
-      lines: [...lines].sort((a, b) => order(a.kind) - order(b.kind) || Number(a.from === "them") - Number(b.from === "them")),
+      // in the order they were said: the Companions take turns
+      lines,
     }))
     .sort((a, b) => Number(b.deep) - Number(a.deep) || (b.notes?.score ?? -1) - (a.notes?.score ?? -1) || a.with.localeCompare(b.with));
   const proposals = w.proposals.filter((p) => p.members.includes(userId)).map((p) => ({ by: p.by, members: p.members, line: p.line, backers: p.backers.length }));
@@ -419,7 +428,7 @@ export async function liveViewFor(userId: string): Promise<LiveView | null> {
     .map((gr) => ({ members: gr.members, lines: gr.lines, status: gr.ok === undefined ? ("talking" as const) : gr.ok ? ("agreed" as const) : ("didnt_work" as const) }));
   const circle = w.circles.find((c) => c.members.includes(userId));
   const checkIn = checkInFor(userId);
-  const offered = checkIn?.picks ? [...checkIn.picks.picks, ...checkIn.picks.others].map((p) => p.id) : checkIn?.signoff?.members ?? [];
+  const offered = checkIn?.picks ? [...checkIn.picks.picks, ...checkIn.picks.others].map((p) => p.id) : checkIn?.objection?.items.map((i) => i.with) ?? [];
   const ids = [...new Set([userId, ...conversations.map((c) => c.with), ...proposals.flatMap((p) => p.members), ...groups.flatMap((gr) => gr.members), ...offered])];
   const users = await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, avatarColor: true } });
   // Until the squad is ready, nobody sees who else is in the queue (DESIGN: "Nobody sees you yet").
@@ -443,7 +452,7 @@ export async function liveViewFor(userId: string): Promise<LiveView | null> {
     checkIn: checkIn && {
       ...checkIn,
       ...(checkIn.picks ? { picks: { ...checkIn.picks, picks: checkIn.picks.picks.map((p) => ({ ...p, why: scrub(p.why) })) } } : {}),
-      ...(checkIn.signoff ? { signoff: { ...checkIn.signoff, companionSaid: scrub(checkIn.signoff.companionSaid), groupLines: checkIn.signoff.groupLines.map((l) => ({ ...l, say: scrub(l.say) })) } } : {}),
+      ...(checkIn.objection ? { objection: { items: checkIn.objection.items.map((i) => ({ ...i, asked: scrub(i.asked), companionThinks: scrub(i.companionThinks) })) } } : {}),
     },
   };
 }

@@ -187,7 +187,7 @@ async function round<T>(c: RoundCtx, task: string, payload: Record<string, unkno
 
 const say = (m: Pick<ThreadMsg, "from" | "kind" | "say">) => ({ from: m.from, kind: m.kind, say: m.say });
 
-/* ───────────────────────── round 1: ask ───────────────────────── */
+/* ───────────────────────── round 1: ask (the Companion who starts) ───────────────────────── */
 
 export async function askRound(c: RoundCtx, intros: Map<string, OpenView>) {
   const partners = [...intros.keys()].sort();
@@ -205,7 +205,31 @@ export async function askRound(c: RoundCtx, intros: Map<string, OpenView>) {
   return { asks, source: r.source, audit: r.audit };
 }
 
-/* ───────────────────────── round 1: answer + judge ───────────────────────── */
+/* ───────────────────────── objections ───────────────────────── */
+
+/**
+ * A reply that turns down something the other side suggested. `say` on the line is the Companion's
+ * own guess ("not their thing"); `ifUp` is what it says instead if its person turns out to be up for it.
+ * The room asks the real person before either is sent.
+ */
+export interface Objection {
+  activity: string;
+  ifUp: Msg;
+}
+
+const OBJECTION_RULE =
+  'If an answer would turn down something their Companion suggested or asked about (an activity or kind of plan you think your person would not want), add to that answer "objection": {"activity": "<2-5 words naming it>", "ifUp": {"say": "<the same answer, written as if your person IS up for it>", "cites": []}}. Your "say" stays your honest guess. Your person will be asked which is true before anything is sent.';
+
+function objectionOf(c: RoundCtx, raw: unknown): Objection | null {
+  const o = (raw as { objection?: unknown } | undefined)?.objection as { activity?: unknown; ifUp?: unknown } | undefined;
+  if (!o || typeof o.activity !== "string" || !o.activity.trim() || isSensitiveText(o.activity)) return null;
+  const up = typeof o.ifUp === "string" ? { say: o.ifUp, cites: [] } : o.ifUp;
+  const ifUp = line(c, up, { say: "", cites: [] });
+  if (!ifUp.say.trim() || ifUp.blocked) return null;
+  return { activity: o.activity.trim().slice(0, 60), ifUp };
+}
+
+/* ───────────────────────── round 2: reply (answer, then ask back) ───────────────────────── */
 
 function fallbackAnswer(c: RoundCtx) {
   const f = openFacts(c.brief).slice(0, 2);
@@ -214,27 +238,70 @@ function fallbackAnswer(c: RoundCtx) {
   return { say: `${n} would probably ${REACTION[c.brief.tonight.energy]}. ${n} is into ${f.map((x) => x.text).join(" and ")}.`, cites: f.map((x) => x.id) };
 }
 
-export async function answerRound(c: RoundCtx, intros: Map<string, OpenView>, questions: Map<string, string>) {
+/** Answer the question each partner's Companion asked first, then ask one back. */
+export async function replyRound(c: RoundCtx, intros: Map<string, OpenView>, questions: Map<string, string>) {
   const partners = [...intros.keys()].sort();
   const resolve = makeResolver(partners, c.people);
   const r = await round(
-    c, "companion_answer",
-    { round: "answer", circle_mates: partners.map((id) => ({ ...intros.get(id), their_companion_asks: questions.get(id) ?? null })) },
+    c, "companion_reply",
+    { round: "reply", circle_mates: partners.map((id) => ({ ...intros.get(id), their_companion_asks: questions.get(id) ?? null })) },
     partners.map((id) => ({ id, text: JSON.stringify(intros.get(id)) + (questions.get(id) ?? "") })),
-    `Round: ANSWER AND JUDGE. For EACH circle-mate: (1) answer the question their Companion asked about your person, honestly, in about 60-100 words, citing your fact ids; (2) give your PRIVATE verdict on how your person and theirs would get along: score 0-100, wouldEnjoy (1-2 short lines), concerns (0-2), needs (0-2), talkTopics (fact ids from either side), opener (one line your person could say to theirs), confidence (low|medium|high). The verdict is never shown to them. Then list in "picks" up to ${MAX_PICKS} ids you want a deeper conversation with. JSON only: {"answers": {"<id>": {"say": "...", "cites": []}}, "verdicts": {"<id>": {"score": 0, "wouldEnjoy": [], "concerns": [], "needs": [], "talkTopics": [], "opener": "", "confidence": "medium"}}, "picks": ["<id>"]}.`,
+    `Round: REPLY. Each circle-mate's Companion just asked you a question about your person. For EACH: (1) answer it honestly in 40-80 words, citing your fact ids, replying to what they actually asked; (2) then ask ONE question back to their Companion (max 35 words), building on what they asked or told you, that would reveal how their person behaves on a night out with yours. ${OBJECTION_RULE} JSON only: {"replies": {"<circle-mate id>": {"answer": {"say": "...", "cites": [], "objection": null}, "ask": {"say": "...", "cites": []}}}}.`,
+    z.object({ replies: z.any().optional() }), { replies: {} }, partners.length,
+  );
+  const got = byPartner(r.data?.replies, resolve);
+  const answers = new Map<string, Msg>();
+  const asks = new Map<string, Msg>();
+  const objections = new Map<string, Objection>();
+  partners.forEach((id, i) => {
+    const g = got.get(id) as { answer?: unknown; ask?: unknown } | undefined;
+    answers.set(id, line(c, g?.answer, fallbackAnswer(c)));
+    asks.set(id, line(c, g?.ask, { say: SCENARIOS[(i + 1) % SCENARIOS.length](intros.get(id)!.name), cites: [] }));
+    const o = objectionOf(c, g?.answer);
+    if (o && !answers.get(id)!.blocked) objections.set(id, o);
+  });
+  return { answers, asks, objections, source: r.source, audit: r.audit };
+}
+
+/* ───────────────────────── round 3: answer + judge ───────────────────────── */
+
+/**
+ * Answer the questions asked back (only partners in `questions`), then give a private verdict on
+ * EVERY partner, having seen the whole exchange (`threads`), and pick who to go deeper with.
+ */
+export async function answerRound(c: RoundCtx, intros: Map<string, OpenView>, questions: Map<string, string>, threads: Map<string, { from: string; say: string }[]> = new Map()) {
+  const partners = [...intros.keys()].sort();
+  const answering = partners.filter((id) => questions.has(id));
+  const resolve = makeResolver(partners, c.people);
+  const who = (from: string) => (from === c.me.id ? "you" : "them");
+  const r = await round(
+    c, "companion_answer",
+    {
+      round: "answer",
+      circle_mates: partners.map((id) => ({
+        ...intros.get(id),
+        ...(threads.get(id)?.length ? { conversation_so_far: threads.get(id)!.map((l) => ({ from: who(l.from), say: l.say })) } : {}),
+        their_companion_asks: questions.get(id) ?? null,
+      })),
+    },
+    partners.map((id) => ({ id, text: JSON.stringify(intros.get(id)) + (questions.get(id) ?? "") + (threads.get(id) ?? []).filter((l) => l.from === id).map((l) => l.say).join("\n") })),
+    `Round: ANSWER AND JUDGE. (1) For each circle-mate whose Companion asked you a question (their_companion_asks is not null), answer it honestly in about 40-80 words, citing your fact ids, replying to what they actually asked. ${OBJECTION_RULE} (2) For EVERY circle-mate, having read the whole conversation, give your PRIVATE verdict on how your person and theirs would get along: score 0-100, wouldEnjoy (1-2 short lines), concerns (0-2), needs (0-2), talkTopics (fact ids from either side), opener (one line your person could say to theirs), confidence (low|medium|high). The verdict is never shown to them. Then list in "picks" up to ${MAX_PICKS} ids you want a deeper conversation with. JSON only: {"answers": {"<id>": {"say": "...", "cites": [], "objection": null}}, "verdicts": {"<id>": {"score": 0, "wouldEnjoy": [], "concerns": [], "needs": [], "talkTopics": [], "opener": "", "confidence": "medium"}}, "picks": ["<id>"]}.`,
     z.object({ answers: z.any().optional(), verdicts: z.any().optional(), picks: z.any().optional() }), {}, partners.length,
   );
   const gotA = byPartner(r.data?.answers, resolve);
   const gotV = byPartner(r.data?.verdicts, resolve);
   const answers = new Map<string, Msg>();
+  const objections = new Map<string, Objection>();
   const verdicts = new Map<string, Verdict>();
-  for (const id of partners) {
+  for (const id of answering) {
     answers.set(id, line(c, gotA.get(id), fallbackAnswer(c)));
-    verdicts.set(id, coerceVerdict(gotV.get(id), fallbackVerdict(c.me, c.people.get(id)!), topicsFor(c, intros.get(id))));
+    const o = objectionOf(c, gotA.get(id));
+    if (o && !answers.get(id)!.blocked) objections.set(id, o);
   }
+  for (const id of partners) verdicts.set(id, coerceVerdict(gotV.get(id), fallbackVerdict(c.me, c.people.get(id)!), topicsFor(c, intros.get(id))));
   let picks = [...new Set((Array.isArray(r.data?.picks) ? r.data.picks : []).map(resolve).filter((x): x is string => Boolean(x)))].slice(0, MAX_PICKS);
   if (!r.data) picks = [...partners].sort((a, b) => verdicts.get(b)!.score - verdicts.get(a)!.score || a.localeCompare(b)).slice(0, 3);
-  return { answers, verdicts, picks, source: r.source, audit: r.audit };
+  return { answers, objections, verdicts, picks, source: r.source, audit: r.audit };
 }
 
 /* ───────────────────────── deep dive ───────────────────────── */

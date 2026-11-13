@@ -45,19 +45,23 @@ describe("companion room", () => {
     expect([...used, ...r.heldBack].sort()).toEqual(pool.slice(0, 12).sort());
   });
 
-  it("pairs above the similarity gate talk (6 messages, 8 for deep pairs), and nobody is stranded below it", async () => {
+  it("pairs above the similarity gate talk, taking turns (6 messages, 8 for deep pairs), and nobody is stranded below it", async () => {
     const r = await runRoom(input(10));
     const m = r.circles[0].members;
     expect(m).toHaveLength(10);
     const score = makePairScorer();
     for (let i = 0; i < m.length; i++) for (let j = i + 1; j < m.length; j++) {
       if (score(people.get(m[i])!, people.get(m[j])!).score < SIMILARITY_GATE) continue;
-      expect(r.threads.get(pairKey(m[i], m[j]))!.slice(0, 6).map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer"]);
+      const t = r.threads.get(pairKey(m[i], m[j]))!.slice(0, 6);
+      // turn-taking: 1 asks, 2 answers and asks back, 1 answers
+      expect(t.map((x) => x.kind)).toEqual(["intro", "intro", "ask", "answer", "ask", "answer"]);
+      const [one, two] = [t[2].from, t[2].to];
+      expect(t.slice(2).map((x) => x.from)).toEqual([one, two, two, one]);
     }
     // everyone talks to at least their closest few (enough for a squad), even below the gate
     for (const id of m) expect([...r.threads.keys()].filter((k) => k.split("|").includes(id)).length).toBeGreaterThanOrEqual(3);
     expect(r.deep.length).toBeGreaterThan(0);
-    for (const k of r.deep) expect(r.threads.get(k)!.map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer", "close", "close"]);
+    for (const k of r.deep) expect(r.threads.get(k)!.map((x) => x.kind)).toEqual(["intro", "intro", "ask", "answer", "ask", "answer", "close", "close"]);
     for (const [k, t] of r.threads) if (!r.deep.includes(k)) expect(t).toHaveLength(6);
   });
 
@@ -131,6 +135,7 @@ describe("companion room", () => {
     const toAll = (req: Req) => Object.fromEntries(ids.filter((i) => i !== owner(req)).map((i) => [i, leak(req)]));
     mockProvider()
       .on("companion_ask", (req) => JSON.stringify({ asks: toAll(req) }))
+      .on("companion_reply", (req) => JSON.stringify({ replies: Object.fromEntries(ids.filter((i) => i !== owner(req)).map((i) => [i, { answer: { ...leak(req), objection: { activity: "karaoke", ifUp: leak(req) } }, ask: leak(req) }])) }))
       .on("companion_answer", (req) => JSON.stringify({ answers: toAll(req), picks: ids, verdicts: Object.fromEntries(ids.map((i) => [i, { score: 100 }])) }))
       .on("companion_close", (req) => JSON.stringify({ says: toAll(req), verdicts: {}, proposal: { members: ids, line: leak(req) } }))
       .on("companion_deliberate", (req) => JSON.stringify({ action: "hold", line: leak(req) }))

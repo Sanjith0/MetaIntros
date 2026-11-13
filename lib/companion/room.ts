@@ -1,8 +1,8 @@
 /**
  * The room: one run of the Companion engine over a set of people waiting in the queue.
  *
- *   circles (Orchestrator) → every allowed pair in a circle talks (intro, ask, answer + private
- *   verdict) → picked pairs go deeper (follow-up, close) → each Companion proposes a squad →
+ *   circles (Orchestrator) → every allowed pair in a circle talks, taking turns (intros; one asks,
+ *   the other answers and asks back, the first answers; then each writes a private verdict) → picked pairs go deeper (follow-up, close) → each Companion proposes a squad →
  *   one deliberation round (back / amend / hold) → the Orchestrator forms squads → the squad's
  *   Companions talk as a group and each signs off (yes / yes_if / no).
  *
@@ -15,7 +15,7 @@ import type { TraceStep } from "@/lib/server/trace";
 import { openView, privateTexts, type Brief, type OpenView } from "./brief";
 import { safeMessage, type Msg } from "./checks";
 import { SIMILARITY_GATE, deepPairs, drawCircles, formParties, templateWhy, wanted, type Circle, type TableResponse, type TableRow, type Verdict, type Verdicts } from "./orchestrator";
-import { askRound, answerRound, closeRound, deliberate, groupRound, type RoundCtx, type ThreadMsg } from "./rounds";
+import { askRound, answerRound, closeRound, deliberate, groupRound, replyRound, type Objection, type RoundCtx, type ThreadMsg } from "./rounds";
 import { makePairScorer } from "@/lib/match/compat";
 import { combineSources, type AgentSource } from "@/lib/ai/status";
 
@@ -44,6 +44,14 @@ export interface SignoffOffer {
 export interface SignoffAnswer {
   decision: "yes" | "no";
 }
+/** Before a Companion turns down something the other side suggested, it asks its person. */
+export interface ObjectionOffer {
+  items: { with: string; activity: string; asked: string; companionThinks: string }[];
+}
+export interface ObjectionAnswer {
+  /** the people whose suggestion this person said they'd be up for after all */
+  up: string[];
+}
 /**
  * Asking the real people in a room. Each call resolves with their answer, or null if they didn't
  * answer in time, in which case their Companion goes ahead on its own.
@@ -51,6 +59,7 @@ export interface SignoffAnswer {
 export interface HumanCheckIns {
   picks?: (userId: string, offer: PicksOffer) => Promise<PicksAnswer | null>;
   signoff?: (userId: string, offer: SignoffOffer) => Promise<SignoffAnswer | null>;
+  objection?: (userId: string, offer: ObjectionOffer) => Promise<ObjectionAnswer | null>;
 }
 
 export interface RoomInput {
@@ -120,6 +129,7 @@ export interface RoomResult {
 }
 
 export const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+const hash = (t: string) => [...t].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
 const first = (p: Pick<Person, "name">) => p.name.split(" ")[0];
 const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
@@ -148,6 +158,30 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
   const asLine = (from: string, to: string, kind: ThreadMsg["kind"], m: Msg): ThreadMsg => ({ from, to, kind, say: m.say, cites: m.cites, blocked: m.blocked });
   const stage = async (s: Stage, note: string) => {
     await input.onStage?.(s, note);
+  };
+  /**
+   * A Companion wants to turn down what someone suggested. A real person is asked first (one card for
+   * all of them); their answer picks which line is sent. No answer, or a simulated person: the
+   * Companion's own guess stands. "Up for it" is remembered for the rest of the room.
+   */
+  const settleObjections = async (m: string, said: Map<string, Msg>, objections: Map<string, Objection>, asked: Map<string, string>): Promise<Map<string, Msg>> => {
+    const askPerson = input.human?.objection;
+    if (!objections.size || !askPerson || !isReal(m)) return said;
+    const items = [...objections].map(([to, o]) => ({ with: to, activity: o.activity, asked: asked.get(to) ?? "", companionThinks: said.get(to)?.say ?? "" }));
+    const answer = await askPerson(m, { items }).catch(() => null);
+    if (!answer?.up.length) return said;
+    const out = new Map(said);
+    const upFor: string[] = [];
+    for (const [to, o] of objections) {
+      if (!answer.up.includes(to)) continue;
+      out.set(to, o.ifUp);
+      upFor.push(o.activity);
+    }
+    if (upFor.length) {
+      const b = briefs.get(m)!;
+      briefs.set(m, { ...b, told: [...(b.told ?? []), `I'd actually be up for ${upFor.join(" and ")}`] });
+    }
+    return out;
   };
   let calls = 0;
   const sources: AgentSource[] = [];
@@ -209,7 +243,19 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     const pairs: [string, string][] = [];
     for (let i = 0; i < members.length; i++) for (let j = i + 1; j < members.length; j++) if (talking.has(pairKey(members[i], members[j]))) pairs.push([members[i], members[j]]);
     const active = members.filter((m) => partners(m).length > 0);
-    return { circle, members, useModel, onlyOne, partners, keep, ctx, introsFor, pairs, active, picks: new Map<string, string[]>(), deep: [] as [string, string][], table: [] as TableRow[], want: new Map<string, Set<string>>() };
+    // Turn-taking: in each pair one Companion starts (asks first). Starts are spread evenly.
+    const startCount = new Map<string, number>();
+    const starterOf = new Map<string, string>();
+    for (const [a, b] of pairs) {
+      const sa = startCount.get(a) ?? 0;
+      const sb = startCount.get(b) ?? 0;
+      const s = sa < sb ? a : sb < sa ? b : hash(pairKey(a, b)) % 2 ? b : a;
+      starterOf.set(pairKey(a, b), s);
+      startCount.set(s, (startCount.get(s) ?? 0) + 1);
+    }
+    const startsWith = (id: string) => partners(id).filter((p) => starterOf.get(pairKey(id, p)) === id);
+    const respondsTo = (id: string) => partners(id).filter((p) => starterOf.get(pairKey(id, p)) === p);
+    return { circle, members, useModel, onlyOne, partners, keep, ctx, introsFor, pairs, active, starterOf, startsWith, respondsTo, picks: new Map<string, string[]>(), deep: [] as [string, string][], table: [] as TableRow[], want: new Map<string, Set<string>>() };
   });
   type CS = (typeof circles)[number];
 
@@ -225,37 +271,68 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     });
   };
   await Promise.all(circles.map(async (cs) => {
-    for (const [a, b] of cs.pairs) {
+    for (const [x, y] of cs.pairs) {
+      const [a, b] = cs.starterOf.get(pairKey(x, y)) === y ? [y, x] : [x, y];
       post(a, b, "intro", intro(a));
       post(b, a, "intro", intro(b));
       live({ type: "line", line: asLine(a, b, "intro", intro(a)) });
       live({ type: "line", line: asLine(b, a, "intro", intro(b)) });
     }
-    const asks = await Promise.all(cs.active.map((m) => askRound(cs.ctx(m), cs.introsFor(m)).then((r) => {
-      for (const [to, msg] of r.asks) live({ type: "line", line: asLine(m, to, "ask", msg) });
+    // 1. The starter asks.
+    const starters = cs.active.filter((m) => cs.startsWith(m).length);
+    const asks = await Promise.all(starters.map((m) => askRound(cs.ctx(m), cs.introsFor(m, cs.startsWith(m))).then((r) => {
+      for (const [to, msg] of r.asks) {
+        post(m, to, "ask", msg);
+        live({ type: "line", line: asLine(m, to, "ask", msg) });
+      }
       return r;
     })));
     asks.forEach((r) => count(r.source));
-    const askOf = new Map(cs.active.map((m, i) => [m, asks[i].asks]));
-    for (const [a, b] of cs.pairs) {
-      post(a, b, "ask", askOf.get(a)!.get(b)!);
-      post(b, a, "ask", askOf.get(b)!.get(a)!);
-    }
-    const answers = await Promise.all(cs.active.map((m) => answerRound(cs.ctx(m), cs.introsFor(m), new Map(cs.partners(m).map((p) => [p, askOf.get(p)!.get(m)!.say]))).then((r) => {
-      for (const [to, msg] of r.answers) live({ type: "line", line: asLine(m, to, "answer", msg) });
+    const askOf = new Map(starters.map((m, i) => [m, asks[i].asks]));
+
+    // 2. The other answers, then asks back. Before turning down a suggestion, it checks with its person.
+    const responders = cs.active.filter((m) => cs.respondsTo(m).length);
+    const replies = await Promise.all(responders.map(async (m) => {
+      const theirs = new Map(cs.respondsTo(m).map((p) => [p, askOf.get(p)!.get(m)!.say]));
+      const r = await replyRound(cs.ctx(m), cs.introsFor(m, cs.respondsTo(m)), theirs);
+      const answers = await settleObjections(m, r.answers, r.objections, theirs);
+      for (const [to, msg] of answers) {
+        post(m, to, "answer", msg);
+        live({ type: "line", line: asLine(m, to, "answer", msg) });
+        const back = r.asks.get(to)!;
+        post(m, to, "ask", back);
+        live({ type: "line", line: asLine(m, to, "ask", back) });
+      }
+      return r;
+    }));
+    replies.forEach((r) => count(r.source));
+    const askBackOf = new Map(responders.map((m, i) => [m, replies[i].asks]));
+
+    // 3. The starter answers; then every Companion writes its private notes on everyone it talked with.
+    const answers = await Promise.all(cs.active.map(async (m) => {
+      const theirs = new Map(cs.startsWith(m).map((p) => [p, askBackOf.get(p)!.get(m)!.say]));
+      const sofar = new Map(cs.partners(m).map((p) => [p, (threads.get(pairKey(m, p)) ?? []).filter((l) => l.kind !== "intro").map((l) => ({ from: l.from, say: l.say }))]));
+      const r = await answerRound(cs.ctx(m), cs.introsFor(m), theirs, sofar);
+      const settled = await settleObjections(m, r.answers, r.objections, theirs);
+      for (const [to, msg] of settled) {
+        post(m, to, "answer", msg);
+        live({ type: "line", line: asLine(m, to, "answer", msg) });
+      }
+      // Their person said they'd be up for it: that's no longer a concern.
+      for (const [to, o] of r.objections) {
+        if (settled.get(to) !== o.ifUp) continue;
+        const v = r.verdicts.get(to);
+        const words = o.activity.toLowerCase();
+        if (v) r.verdicts.set(to, { ...v, concerns: v.concerns.filter((x) => !x.toLowerCase().includes(words)) });
+      }
       live({ type: "notes", from: m, notes: [...r.verdicts], picks: r.picks });
       return r;
-    })));
+    }));
     answers.forEach((r) => count(r.source));
     cs.active.forEach((m, i) => {
       for (const [about, v] of answers[i].verdicts) verdicts.get(m)!.set(about, v);
       cs.picks.set(m, answers[i].picks);
     });
-    const ansOf = new Map(cs.active.map((m, i) => [m, answers[i].answers]));
-    for (const [a, b] of cs.pairs) {
-      post(a, b, "answer", ansOf.get(a)!.get(b)!);
-      post(b, a, "answer", ansOf.get(b)!.get(a)!);
-    }
   }));
 
   // ── check-in: each real person sees who their Companion would pick, can drop people and correct it ──
@@ -295,7 +372,9 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     })));
     close.forEach((r) => count(r.source));
     const cOf = new Map(cs.active.map((m, i) => [m, close[i]]));
-    for (const [a, b] of cs.deep) {
+    for (const [x, y] of cs.deep) {
+      // the Companion that started the conversation speaks first, so the other's line reads as its reply
+      const [a, b] = cs.starterOf.get(pairKey(x, y)) === y ? [y, x] : [x, y];
       post(a, b, "close", cOf.get(a)!.says.get(b)!);
       post(b, a, "close", cOf.get(b)!.says.get(a)!);
     }

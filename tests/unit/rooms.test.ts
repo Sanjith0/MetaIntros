@@ -218,6 +218,48 @@ describe("Companion engine in the queue", () => {
     await setSetting("checkinMs", "0");
   });
 
+  it("before turning down a suggestion, the person is asked on their phone, and their answer picks the line", async () => {
+    const NO = "Karaoke isn't really Jordan's thing.";
+    const UP = "Jordan would actually be up for karaoke.";
+    const mates = (req: { messages: { content: string }[] }) => JSON.parse(req.messages[1].content).circle_mates as { id: string; their_companion_asks: string | null }[];
+    const objecting = { say: NO, cites: [], objection: { activity: "karaoke", ifUp: { say: UP, cites: [] } } };
+    mockProvider()
+      .on("companion_reply", (req) => JSON.stringify({ replies: Object.fromEntries(mates(req).map((m) => [m.id, { answer: objecting, ask: { say: "And yours?", cites: [] } }])) }))
+      .on("companion_answer", (req) => JSON.stringify({ answers: Object.fromEntries(mates(req).filter((m) => m.their_companion_asks).map((m) => [m.id, objecting])), verdicts: {}, picks: [] }));
+    await setSetting("checkinMs", "5000");
+    await join(4);
+    await wait(300);
+    const running = tick();
+    let view = await liveViewFor("p01");
+    for (let i = 0; i < 100 && view?.checkIn?.kind !== "objection"; i++) {
+      if (view?.checkIn?.kind === "picks") await answerCheckIn("p01", view.checkIn.id, { drop: [] });
+      await wait(50);
+      view = await liveViewFor("p01");
+    }
+    const ci = view!.checkIn!;
+    expect(ci.kind).toBe("objection");
+    const item = ci.objection!.items[0];
+    expect(item).toMatchObject({ activity: "karaoke", companionThinks: NO });
+    expect(item.asked.length).toBeGreaterThan(0);
+    // until the squad is ready, the other person is "Person A…" on this card too
+    expect(view!.people[item.with].name).toMatch(/^Person [A-Z]/);
+    expect(await answerCheckIn("p01", ci.id, { up: "everyone" })).toEqual({ ok: false, error: "bad_answer" });
+    expect(await answerCheckIn("p01", ci.id, { up: [item.with, "not-in-the-offer"] })).toEqual({ ok: true });
+    // keep answering any later cards so the room finishes quickly
+    for (let i = 0; i < 40; i++) {
+      const v = await liveViewFor("p01");
+      if (v?.checkIn) await answerCheckIn("p01", v.checkIn.id, v.checkIn.kind === "picks" ? { drop: [] } : { up: [] });
+      if (v?.stage === "done") break;
+      await wait(50);
+    }
+    await running;
+    const lines = (await liveViewFor("p01"))!.conversations.find((c) => c.with === item.with)!.lines;
+    expect(lines.some((l) => l.from === "me" && l.say.includes("up for karaoke"))).toBe(true);
+    const brief = await prisma.companionBrief.findUniqueOrThrow({ where: { userId: "p01" } });
+    expect(JSON.stringify(brief.told)).toContain("karaoke");
+    await setSetting("checkinMs", "0");
+  });
+
   it("check-ins time out and the Companion goes ahead", async () => {
     await setSetting("checkinMs", "200");
     await join(4);

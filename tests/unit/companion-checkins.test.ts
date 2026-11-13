@@ -82,6 +82,48 @@ describe("human check-ins", () => {
     expect(JSON.stringify(vetoed.parties.map((p) => [p.why, p.groupChat, p.steps]))).not.toMatch(/p01 said no|secret/);
   });
 
+  describe("asking before turning down a suggestion", () => {
+    const NO = "Karaoke isn't really their thing.";
+    const UP = "They'd actually be up for karaoke.";
+    const mates = (req: Req) => (JSON.parse(req.messages[1].content).circle_mates as { id: string; their_companion_asks: string | null }[]);
+    const objecting = { say: NO, cites: [], objection: { activity: "karaoke", ifUp: { say: UP, cites: [] } } };
+    beforeEach(() => {
+      // every Companion turns down every suggestion, in both the reply and the answer round
+      mockProvider()
+        .on("companion_reply", (req) => JSON.stringify({ replies: Object.fromEntries(mates(req).map((m) => [m.id, { answer: objecting, ask: { say: "What about yours?", cites: [] } }])) }))
+        .on("companion_answer", (req) => JSON.stringify({ answers: Object.fromEntries(mates(req).filter((m) => m.their_companion_asks).map((m) => [m.id, objecting])), verdicts: Object.fromEntries(mates(req).map((m) => [m.id, { score: 70, concerns: ["Karaoke would be a stretch"] }])), picks: [] }));
+    });
+    const p01Answers = (r: Awaited<ReturnType<typeof runRoom>>) => [...r.threads.values()].flat().filter((l) => l.from === "p01" && l.kind === "answer");
+
+    it("only the real person is asked, with one card per round listing every objection", async () => {
+      const asked: { u: string; n: number }[] = [];
+      const r = await runRoom(input({ objection: async (u, offer) => { asked.push({ u, n: offer.items.length }); expect(offer.items.every((i) => i.activity === "karaoke" && i.companionThinks === NO && i.asked)).toBe(true); return null; } }));
+      expect(asked.length).toBeGreaterThan(0);
+      expect(asked.length).toBeLessThanOrEqual(2); // the reply round and the answer round
+      expect(asked.every((a) => a.u === "p01")).toBe(true);
+      expect(asked.reduce((n, a) => n + a.n, 0)).toBe(p01Answers(r).length);
+      // no answer: the Companion's own guess is sent
+      expect(p01Answers(r).every((l) => l.say === NO)).toBe(true);
+    });
+
+    it("'up for it' sends the other line, drops that concern and is remembered for the rest of the room", async () => {
+      const r = await runRoom(input({ objection: async (_u, offer) => ({ up: offer.items.map((i) => i.with) }) }));
+      expect(p01Answers(r).length).toBeGreaterThan(0);
+      expect(p01Answers(r).every((l) => l.say === UP)).toBe(true);
+      // "Karaoke would be a stretch" is gone from p01's notes on the people it answered in the last round
+      const answeredLast = new Set([...r.threads.values()].map((t) => t.filter((l) => l.kind !== "close")).filter((t) => t.at(-1)?.from === "p01").map((t) => t.at(-1)!.to));
+      for (const id of answeredLast) expect(r.verdicts.get("p01")!.get(id)!.concerns).toEqual([]);
+      const later = mockProvider().calls.filter((c) => c.task === "companion_close" && owner(c) === "p01");
+      expect(later.length).toBeGreaterThan(0);
+      for (const c of later) expect(JSON.parse(c.messages[1].content).your_person_told_you.said.join(" ")).toContain("karaoke");
+    });
+
+    it("an answer that names someone it wasn't offered changes nothing for them", async () => {
+      const r = await runRoom(input({ objection: async () => ({ up: ["p99", "nobody"] }) }));
+      expect(p01Answers(r).every((l) => l.say === NO)).toBe(true);
+    });
+  });
+
   it("a check-in that throws is treated as no answer", async () => {
     const r = await runRoom(input({ picks: async () => { throw new Error("phone gone"); }, signoff: async () => { throw new Error("phone gone"); } }));
     expect(r.parties.length).toBeGreaterThan(0);

@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { Check, Lock, Timer } from "lucide-react";
-import { AiLabel, Avatar, Button } from "@/components/fb";
+import { Avatar, Button } from "@/components/fb";
 import { stripCitations } from "@/lib/companion/text";
 
 export interface CheckInView {
   id: string;
-  kind: "picks" | "signoff";
+  kind: "picks" | "objection";
   secondsLeft: number;
   picks?: { targetSize: number; picks: { id: string; score: number; why: string }[]; others: { id: string; score: number }[] };
-  signoff?: { members: string[]; recommend: "yes" | "yes_if" | "no"; companionSaid: string; groupLines: { from: string; say: string }[] };
+  /** before your Companion turns down something someone suggested, it asks you */
+  objection?: { items: { with: string; activity: string; asked: string; companionThinks: string }[] };
 }
 
 type People = Record<string, { name: string; avatarColor: string; anonymous?: boolean }>;
@@ -18,9 +19,10 @@ type People = Record<string, { name: string; avatarColor: string; anonymous?: bo
 const first = (n?: string) => (n ?? "Someone").split(" ")[0];
 
 /** The question a person's Companion is waiting on. If they don't answer in time, it goes ahead on its own. */
-export function CheckInCard({ checkIn, people, meId, onSent }: { checkIn: CheckInView; people: People; meId?: string; onSent?: () => void }) {
+export function CheckInCard({ checkIn, people, onSent }: { checkIn: CheckInView; people: People; meId?: string; onSent?: () => void }) {
   const [left, setLeft] = useState(checkIn.secondsLeft);
   const [drop, setDrop] = useState<string[]>([]);
+  const [up, setUp] = useState<string[]>([]);
   const [told, setTold] = useState("");
   const [sent, setSent] = useState<null | "sent" | "error" | "sensitive">(null);
   const [busy, setBusy] = useState(false);
@@ -30,6 +32,7 @@ export function CheckInCard({ checkIn, people, meId, onSent }: { checkIn: CheckI
     setLeft(checkIn.secondsLeft);
     setSent(null);
     setDrop([]);
+    setUp([]);
     setTold("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkIn.id]);
@@ -97,23 +100,34 @@ export function CheckInCard({ checkIn, people, meId, onSent }: { checkIn: CheckI
         </>
       )}
 
-      {checkIn.kind === "signoff" && checkIn.signoff && (
+      {checkIn.kind === "objection" && checkIn.objection && (
         <>
-          <p className="text-title">Your squad is ready. Are you in?</p>
-          <p className="mt-1 text-body">{checkIn.signoff.members.filter((m) => m !== meId).map(name).join(", ")} and you</p>
-          <p className="mt-1 text-body text-muted" data-testid="checkin-recommend">
-            Your Companion recommends: <b className="text-ink">{checkIn.signoff.recommend === "no" ? "not this group" : "I'm in"}</b>
-          </p>
-          {checkIn.signoff.companionSaid && (
-            <p className="mt-1 text-body">&ldquo;{stripCitations(checkIn.signoff.companionSaid)}&rdquo; <AiLabel className="ml-1" /></p>
-          )}
+          <p className="text-title">Quick question from your Companion</p>
+          <p className="mt-0.5 text-body text-muted">Before it says no for you, it wants to check.</p>
           {countdown}
-          {sent === "error" && <p className="mt-1 text-meta text-muted">Too late or couldn&apos;t send. Your Companion&apos;s call stood.</p>}
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <Button block disabled={busy} data-testid="checkin-no" onClick={() => send({ decision: "no" })}>Not this group</Button>
-            <Button block variant="primary" disabled={busy} data-testid="checkin-yes" onClick={() => send({ decision: "yes" })}>I&apos;m in</Button>
-          </div>
-          <p className="mt-1 text-meta text-muted">If you say no, nobody is told it was you.</p>
+          <ul className="mt-2 divide-y divide-divider">
+            {checkIn.objection.items.map((o) => {
+              const yes = up.includes(o.with);
+              return (
+                <li key={o.with} className="py-2" data-testid="objection-item">
+                  <div className="flex items-start gap-2">
+                    <Avatar name={people[o.with]?.name ?? "?"} color={people[o.with]?.avatarColor} size={32} blurred={people[o.with]?.anonymous} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-body"><span className="font-semibold">{name(o.with)}&apos;s Companion asked:</span> &ldquo;{stripCitations(o.asked)}&rdquo;</p>
+                      <p className="mt-1 text-body">Your Companion thinks you wouldn&apos;t be into <b>{o.activity}</b>. Would you?</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <Button block size="sm" variant={yes ? "secondary" : "primary"} aria-pressed={!yes} data-testid="objection-not-for-me" onClick={() => setUp((u) => u.filter((x) => x !== o.with))}>Not for me</Button>
+                    <Button block size="sm" variant={yes ? "primary" : "secondary"} aria-pressed={yes} data-testid="objection-up-for-it" onClick={() => setUp((u) => (yes ? u : [...u, o.with]))}>I&apos;d be up for it</Button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          {sent === "error" && <p className="mt-1 text-meta text-muted">Too late or couldn&apos;t send. Your Companion went with its guess.</p>}
+          <Button block variant="primary" className="mt-2" disabled={busy} data-testid="objection-send" onClick={() => send({ up })}>Send</Button>
+          <p className="mt-1 flex items-center gap-1 text-meta text-muted"><Lock size={12} /> Only your Companion sees your answer.</p>
         </>
       )}
     </div>

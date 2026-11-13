@@ -69,6 +69,33 @@ describe("companion rounds", () => {
     expect(out.asks.get(others[0])!.blocked).toBe(true);
   });
 
+  it("replyRound answers each question and asks one back, with template lines when the model fails", async () => {
+    const qs = new Map(others.map((o) => [o, "What would they do at 11pm?"]));
+    const out = await rounds.replyRound(ctx(), intros, qs);
+    expect([...out.answers.keys()].sort()).toEqual(others);
+    expect([...out.asks.values()].every((m) => m.say.trim().endsWith("?"))).toBe(true);
+    expect(out.objections.size).toBe(0);
+    expect(JSON.parse(mockProvider().calls[0].messages[1].content).circle_mates[0].their_companion_asks).toBe("What would they do at 11pm?");
+  });
+
+  it("replyRound keeps a well-formed objection, and drops one about a sensitive topic", async () => {
+    const [a, b] = others;
+    mockProvider().on("companion_reply", () => JSON.stringify({ replies: {
+      [a]: { answer: { say: "Karaoke isn't their thing.", cites: [], objection: { activity: "karaoke", ifUp: "They'd be up for karaoke." } }, ask: { say: "And yours?", cites: [] } },
+      [b]: { answer: { say: "Not for them.", cites: [], objection: { activity: "church service", ifUp: { say: "Sure.", cites: [] } } }, ask: { say: "Yours?", cites: [] } },
+    } }));
+    const out = await rounds.replyRound(ctx(), intros, new Map(others.map((o) => [o, "Karaoke after?"])));
+    expect(out.answers.get(a)!.say).toBe("Karaoke isn't their thing.");
+    expect(out.objections.get(a)).toEqual({ activity: "karaoke", ifUp: expect.objectContaining({ say: "They'd be up for karaoke.", blocked: false }) });
+    expect(out.objections.has(b)).toBe(false);
+  });
+
+  it("answerRound only answers the questions asked back, but judges everyone", async () => {
+    const out = await rounds.answerRound(ctx(), intros, new Map([[others[0], "And yours?"]]));
+    expect([...out.answers.keys()]).toEqual([others[0]]);
+    expect([...out.verdicts.keys()].sort()).toEqual(others);
+  });
+
   it("answerRound gives a clamped verdict per person and at most 4 picks", async () => {
     mockProvider().on("companion_answer", () => JSON.stringify({ answers: {}, verdicts: Object.fromEntries(others.map((o) => [o, { score: 400, wouldEnjoy: ["Both go to church"], opener: "Hi" }])), picks: [me, ...others] }));
     const out = await rounds.answerRound(ctx(), intros, new Map(others.map((o) => [o, "What would they do?"])));
