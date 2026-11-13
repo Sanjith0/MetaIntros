@@ -18,6 +18,7 @@ import { CameraPicker } from './CameraPicker';
 import { PersonCardView } from './PersonCards';
 import { GLASSES_THUMBNAIL, glassesViewSize, PeopleCardTracker, type PersonCard } from './peopleCards';
 import { TapCounter } from './secretTaps';
+import { useKeepAwake } from './capture/wakeLock';
 import { createDevClient } from './data/devClient';
 
 const firstName = (name: string) => name.split(' ')[0];
@@ -352,6 +353,8 @@ export function LiveCameraScreen() {
     else if (router.canGoBack()) router.back(); else router.replace(`/glance/register/${id}`);
   };
   const cameraActive = focused && enabled && Platform.OS === 'web';
+  // Nobody touches the phone while looking around a room: the screen must not lock.
+  useKeepAwake(cameraActive);
   const counting = countdownView.secondsRemaining !== null;
   const partnerName = firstName(people.get(countdownView.partnerId ?? '')?.name ?? 'your partner');
   const flashing = !demoPairPending && !active && inFinalStretch(countdownView, LIVE_RECOGNITION_HOLD_MS, LIVE_RECOGNITION_FLASH_MS);

@@ -5,6 +5,7 @@ import { ConvexError } from 'convex/values';
 import { Badge, Button, Empty, Field, Icon, Notice, Page, Portrait } from './components';
 import { colors, fonts, s } from './theme';
 import { deploymentURL } from './state';
+import { closeGlanceToProfile } from './qu/glanceOrigin';
 import { useScreenFocused } from './screens';
 import { preloadFaceModels } from './capture/FaceCamera';
 import { GuidedFaceScan, saveScanSets, type ScanResult, type ScanStop } from './GuidedFaceScan';
@@ -100,7 +101,9 @@ export function DevToolsScreen() {
 
   // Arriving from "Rescan" on a registered face (four taps in LIVE Camera): open that
   // person's rescan as soon as the list has loaded, once per arrival.
-  const { rescan: rescanParam } = useLocalSearchParams<{ rescan?: string }>();
+  const { rescan: rescanParam, from } = useLocalSearchParams<{ rescan?: string; from?: string }>();
+  // Opened from Link's Profile tab (six taps): the back arrow returns there, not into Glance.
+  const onBack = from === 'profile' ? closeGlanceToProfile : undefined;
   const [opened, setOpened] = useState('');
   if (data && rescanParam && opened !== rescanParam) {
     setOpened(rescanParam);
@@ -113,10 +116,10 @@ export function DevToolsScreen() {
   const camera = (running: boolean, children?: React.ReactNode) => <GuidedFaceScan active={focused && Platform.OS === 'web'}
     scopeId="dev:scan" running={running} wantPortrait size={cameraWidth} onDone={finishScan} onStop={stopScan}>{children}</GuidedFaceScan>;
 
-  if (!client) return <Page back title="Dev tools"><Text style={s.title}>Dev tools</Text>
+  if (!client) return <Page back onBack={onBack} title="Dev tools"><Text style={s.title}>Dev tools</Text>
     <Empty icon="tool" title="Needs the live backend" text="This build runs the sample walkthrough, which keeps face scans in this tab only. Manage them from Register faces instead." /></Page>;
 
-  if (!data) return <Page back title="Dev tools">
+  if (!data) return <Page back onBack={onBack} title="Dev tools">
     <View style={{ gap: 8 }}><Text style={s.title}>Dev tools</Text>
       <Text style={s.muted}>See and manage every face scan, and add profiles for people without the app.</Text></View>
     {blocked ? <>
@@ -127,7 +130,7 @@ export function DevToolsScreen() {
 
   const adding = scanning?.kind === 'add';
   const rescanning = scanning?.kind === 'rescan' ? scanning : null;
-  return <Page back title="Dev tools">
+  return <Page back onBack={onBack} title="Dev tools">
     <View style={s.between}>
       <Text style={s.title}>Dev tools</Text>
       <View style={[s.row, { gap: 4 }]}>
