@@ -35,7 +35,7 @@ import { DateLine } from "@/components/events/DateLine";
  * Template: detail page (back TopBar, then a Stack of Sections).
  */
 export const metadata: Metadata = {
-  title: "Design system · Queue Up prototype",
+  title: "Design system · Link prototype",
   robots: { index: false, follow: false },
 };
 
@@ -336,12 +336,12 @@ export default function DesignPage() {
 
         <Section title="Chat parts">
           <ul className="flex flex-col gap-0.5">
-            <SystemLine>Queue Up formed your squad of 5. This chat disappears 24h after the event.</SystemLine>
+            <SystemLine>Link formed your squad of 5. This chat disappears 24h after the event.</SystemLine>
             <li className="flex flex-col items-start gap-0.5">
               <span className="flex items-center gap-1.5 px-3 text-meta text-muted">
-                Queue Up host <AiLabel>AI</AiLabel>
+                Link host <AiLabel>AI</AiLabel>
               </span>
-              <Bubble mine={false} pos="first">Hi all, I&apos;m the Queue Up host, an AI.</Bubble>
+              <Bubble mine={false} pos="first">Hi all, I&apos;m the Link host, an AI.</Bubble>
               <Bubble mine={false} pos="last">Ask me anything with @host.</Bubble>
             </li>
             <li className="flex flex-col items-end gap-0.5 pt-2">
@@ -422,7 +422,7 @@ export default function DesignPage() {
             <StaticTabBar />
           </Template>
 
-          <Template id="sheet" name="3. Bottom-sheet flow" href="/events/ev-indie-guild" model="/events/ev-indie-guild, Queue Up" stack="the page under a scrim · Sheet: grabber, title and close, a short form, sticky primary" tall>
+          <Template id="sheet" name="3. Bottom-sheet flow" href="/events/ev-indie-guild" model="/events/ev-indie-guild, Link" stack="the page under a scrim · Sheet: grabber, title and close, a short form, sticky primary" tall>
             <TopBar back title="Indie Night" />
             <div className="absolute inset-0 bg-scrim" />
             <div className="absolute inset-x-0 bottom-0 rounded-t-sheet bg-surface pb-3 shadow-elevated">
@@ -464,9 +464,9 @@ export default function DesignPage() {
             </div>
             <div className="flex flex-col items-start gap-0.5 bg-surface px-3 py-3">
               <span className="flex items-center gap-1.5 px-3 text-meta text-muted">
-                Queue Up host <AiLabel>AI</AiLabel>
+                Link host <AiLabel>AI</AiLabel>
               </span>
-              <Bubble mine={false}>Hi all, I&apos;m the Queue Up host, an AI.</Bubble>
+              <Bubble mine={false}>Hi all, I&apos;m the Link host, an AI.</Bubble>
               <span className="self-end pt-1">
                 <Bubble mine>See you there</Bubble>
               </span>

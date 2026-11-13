@@ -3,7 +3,7 @@ import { resetDemo, gotoReady } from "./helpers";
 
 test.beforeEach(async ({ request }) => resetDemo(request));
 
-test("friends tabs render seeded data; Queue Up tab starts empty", async ({ page }) => {
+test("friends tabs render seeded data; Link tab starts empty", async ({ page }) => {
   await gotoReady(page, "/friends");
   await expect(page.getByTestId("friends-tab-friends")).toHaveAttribute("aria-selected", "true");
   await expect(page.getByTestId("friend-row")).toHaveCount(8);

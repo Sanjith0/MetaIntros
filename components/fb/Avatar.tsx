@@ -16,7 +16,7 @@ export function initials(name: string) {
 
 /**
  * A person's circle: their photo, or their drawn character. `character={false}` is for things (a squad chat,
- * Queue Up itself): initials on the colour. `blurred` hides who it is until the squad is confirmed, so it
+ * Link itself): initials on the colour. `blurred` hides who it is until the squad is confirmed, so it
  * draws a stand-in that carries nothing of the person.
  */
 export function Avatar({

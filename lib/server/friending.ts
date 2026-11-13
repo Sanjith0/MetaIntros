@@ -18,7 +18,7 @@ async function areFriends(a: string, b: string) {
   return Boolean(await prisma.friendship.findUnique({ where: { userAId_userBId: { userAId: x, userBId: y } } }));
 }
 
-/** Top shared interest for the "Met through Queue Up" note: from the talk card, else profiles. */
+/** Top shared interest for the "Met through Link" note: from the talk card, else profiles. */
 export async function sharedNoteFor(partyId: string, a: string, b: string): Promise<string | null> {
   const card = await prisma.talkCard.findUnique({ where: { partyId_ownerId_subjectId: { partyId, ownerId: a, subjectId: b } } });
   const claim = (card?.content as unknown as CardContent | undefined)?.claims.find((c) => c.kind === "shared_interest");

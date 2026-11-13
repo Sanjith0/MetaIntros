@@ -91,7 +91,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
           />
         ) : (
           <p data-testid="queue-up-private" className="flex items-center gap-2 bg-surface px-4 py-3 text-meta text-muted">
-            <Lock size={16} aria-hidden /> Queue Up only works for events at public venues.
+            <Lock size={16} aria-hidden /> Link only works for events at public venues.
           </p>
         )}
 

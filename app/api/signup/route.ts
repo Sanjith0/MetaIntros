@@ -14,7 +14,7 @@ const SampleInput = z
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   await sweepExpiredSignups(prisma);
-  if (body?.ageBand && !isAdultBand(body.ageBand)) return NextResponse.json({ error: "Queue Up is for people 18 and over." }, { status: 400 });
+  if (body?.ageBand && !isAdultBand(body.ageBand)) return NextResponse.json({ error: "Link is for people 18 and over." }, { status: 400 });
   let result;
   if (body?.sample) {
     const p = SampleInput.safeParse(body);

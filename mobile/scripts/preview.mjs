@@ -1,4 +1,4 @@
-// Serves the Expo web export (dist/) and forwards /api and /images to the Queue Up server,
+// Serves the Expo web export (dist/) and forwards /api and /images to the Link server,
 // the same way vercel.json does on Vercel. Usage: QUEUEUP_URL=http://localhost:3000 node scripts/preview.mjs
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
@@ -16,7 +16,7 @@ http.createServer(async (req, res) => {
     const up = http.request({ hostname: backend.hostname, port: backend.port || 80, path: req.url, method: req.method, headers: { ...req.headers, host: backend.host } }, r => {
       res.writeHead(r.statusCode ?? 502, r.headers); r.pipe(res);
     });
-    up.on('error', () => { res.writeHead(502); res.end('Queue Up server unreachable'); });
+    up.on('error', () => { res.writeHead(502); res.end('Link server unreachable'); });
     req.pipe(up);
     return;
   }
@@ -28,4 +28,4 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { 'content-type': types[path.extname(file)] ?? 'application/octet-stream' });
     res.end(body);
   } catch { res.writeHead(404); res.end(); }
-}).listen(port, () => console.log(`Preview on http://localhost:${port} → Queue Up at ${backend.origin}`));
+}).listen(port, () => console.log(`Preview on http://localhost:${port} → Link at ${backend.origin}`));

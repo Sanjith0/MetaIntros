@@ -55,8 +55,8 @@ export function TopBar({ variant, title, back, right, testId }: { variant?: "hom
           </>
         ) : variant === "home" ? (
           <>
-            <Link href="/home" className="text-[22px] leading-none font-bold tracking-tight text-ink" aria-label="Queue Up home (prototype)">
-              Queue Up
+            <Link href="/home" className="text-[22px] leading-none font-bold tracking-tight text-ink" aria-label="Link home (prototype)">
+              Link
             </Link>
             <div className="ml-auto flex items-center gap-2">
               <IconButton label="Create post"><Plus size={20} strokeWidth={2.4} /></IconButton>

@@ -34,7 +34,7 @@ const SCRIPT = [
   "Talk cards (quick reply or squad info)",
   "Find each other → I'm here",
   "Fast-forward: the event ends for everyone → chat archives",
-  "Add squad as friends → Met through Queue Up",
+  "Add squad as friends → Met through Link",
 ];
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -75,7 +75,7 @@ export default function DemoPage() {
   return (
     <main className="mx-auto min-h-dvh max-w-md bg-wash px-4 pb-10 text-ink" data-testid="demo-panel">
       <PrototypeLabel className="-mx-4 mb-4" />
-      <p className="text-meta text-muted">Queue Up · presenter only</p>
+      <p className="text-meta text-muted">Link · presenter only</p>
       <h1 className="text-2xl font-extrabold">Demo control panel</h1>
 
       <section className="mt-4 grid grid-cols-2 gap-2">

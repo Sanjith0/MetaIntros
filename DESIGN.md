@@ -1,6 +1,6 @@
-# DESIGN.md: Queue Up inside the Facebook app
+# DESIGN.md: Link inside the Facebook app
 
-Queue Up is a layer inside the Facebook mobile app's Events tab. The phone UI should read as
+Link is a layer inside the Facebook mobile app's Events tab. The phone UI should read as
 the Facebook app at a glance, with our feature drawn in the same materials. This file wins
 every design conflict, including conflicts with any design skill or generator.
 
@@ -165,7 +165,7 @@ only.
 
 | Component | Spec |
 |---|---|
-| **TopBar** | 56px, white, hairline bottom border. *Home* variant: our neutral text logotype "Queue Up" (22px/700, `ink`, not blue, no Facebook lettering) at left; at right three 36px round `control` icon buttons: Create, Search, Messages (red count badge). *Section* variant: section title (`text-page`) at left plus Search and Messages. *Back* variant: 40px chevron, `text-title` truncated title, optional right actions. The prototype label sits in a 20px strip under the bar in every variant. |
+| **TopBar** | 56px, white, hairline bottom border. *Home* variant: our neutral text logotype "Link" (22px/700, `ink`, not blue, no Facebook lettering) at left; at right three 36px round `control` icon buttons: Create, Search, Messages (red count badge). *Section* variant: section title (`text-page`) at left plus Search and Messages. *Back* variant: 40px chevron, `text-title` truncated title, optional right actions. The prototype label sits in a 20px strip under the bar in every variant. |
 | **PrototypeLabel** | "Hackathon prototype, not Facebook", 11px `muted` on `wash`, centred. |
 | **TabBar** | Fixed bottom, white, hairline top. Six equal tabs: Home, Video, Friends, Events, Notifications, Profile. Lucide icons at 24px with 11px labels. Active tab: `accent` icon and label, a 2.4 stroke and a light fill. Inactive: `muted`, 1.8 stroke. Badge: red pill, white 11px/700, 2px white ring, top-right of the icon. Hidden in chat threads. |
 | **Section** | Full-width white block, 16px padding. Optional header row: `text-title` title plus a blue "See all" link at the right. Sections stack on 8px of wash. |
@@ -180,7 +180,7 @@ only.
 | **Bubble** | 15px, 8×12 padding, `rounded-bubble`. Incoming: `bubble-in`/ink. Outgoing: `accent`/white. Runs stack 2px apart, with joined corners at 4px on the sender's side. Sender's first name (12px `muted`) sits above the first incoming bubble of a run, with a 28px avatar beside the last. Max width 75%. |
 | **Composer** | Bottom bar: a pill input (`wash`, 36px, radius 18, placeholder "Aa") and a 36px accent send icon. Enter sends. |
 | **AiLabel** | Inline `Sparkles` 12px plus "AI" (or "Written by AI") in 12px `muted`. Used wherever text is machine-written. |
-| **Avatar** | Circle with a photo, or a drawn character: original art (`Character.tsx`) whose hair, skin and smile come from the name, wearing the person's own colour on a light tint of it (content). Things (a squad chat, Queue Up) keep initials on their colour (`character={false}`). Optional 2px white ring. A `blurred` state blurs a stand-in that carries nothing of the person until the squad is confirmed. |
+| **Avatar** | Circle with a photo, or a drawn character: original art (`Character.tsx`) whose hair, skin and smile come from the name, wearing the person's own colour on a light tint of it (content). Things (a squad chat, Link) keep initials on their colour (`character={false}`). Optional 2px white ring. A `blurred` state blurs a stand-in that carries nothing of the person until the squad is confirmed. |
 
 ### Feature components (built only from `components/fb/`)
 
@@ -206,7 +206,7 @@ only.
     and the "Let friends see you're queuing" switch. One safety line, and a sticky "Find my squad".
     No helper paragraphs.
   - The event page opens straight at step 2.
-- **StatusCard**: the single card showing the user's Queue Up state: waiting → squad ready → at
+- **StatusCard**: the single card showing the user's Link state: waiting → squad ready → at
   the venue → after. It always has exactly one next action. It appears at the top of the Events
   tab and on the event page it concerns.
 - **QueueScreen**:
@@ -234,7 +234,7 @@ only.
 - **Chat thread**:
   - Messenger header: back, face pile, name, "N members · ends in…", and an info button.
   - A pinned plan strip.
-  - Grey and blue bubbles in runs. The AI host is a plain grey incoming bubble with "Queue Up
+  - Grey and blue bubbles in runs. The AI host is a plain grey incoming bubble with "Link
     host" and an AI label.
   - Quick-reply chips: Ask the host, Talk cards, Find each other. "Aa" composer.
   - The tab bar steps aside.
@@ -390,7 +390,7 @@ was written, so inferred values stay inferred until a new capture supports a cha
 |---|---|---|---|---|
 | Colours, radii, shadows, type scale | `@theme` tokens | `reference/EVENT_PAGE.md` §6 | all colour tokens, 6/8/18px radii, both shadows, 13/15/17/20/24px type, system font | 12px sheet radius, 11px tab labels, 34px timer |
 | Buttons, chips, on state, hover | `Button`, `Chip` | `EVENT_PAGE.md` §4, §6 | 6px radius, accent and grey fills, `on` colours, 5% hover overlay | 36px height on mobile, pill chips on mobile |
-| Event page | detail template, `ActionRow`, `DateLine` | `EVENT_PAGE.md` §2, §3 | order of cover, date line, title, actions; date red; guest list | mobile column widths, our Queue Up unit placement |
+| Event page | detail template, `ActionRow`, `DateLine` | `EVENT_PAGE.md` §2, §3 | order of cover, date line, title, actions; date red; guest list | mobile column widths, our Link unit placement |
 | Event card, Events tab | `EventCard`, tab root template | `EVENT_PAGE.md` §5 | — (discovery returned Not Found logged out) | card anatomy, filter chips, feed order |
 | Top bar, tab bar | `TopBar`, `TabBar` | Meta newsroom post on the tab bar (Dec 2025), press coverage | — | tab set and order, 56px bar (seen on web), 52px tabs |
 | Chat thread | chat template, `Bubble`, `Composer` | `reference/MESSENGER_CHAT.md` §1–3 | bubble colours, 18px radius, padding, pill colour, header button colour | mobile header layout, runs, pinned strip, quick replies |

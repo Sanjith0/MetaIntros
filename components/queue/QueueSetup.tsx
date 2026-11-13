@@ -40,8 +40,8 @@ function getPosition(timeoutMs = 6000): Promise<GeolocationPosition> {
 }
 
 const ERRORS: Record<string, string> = {
-  private_event: "Queue Up only works for events at public venues.",
-  age: "Queue Up is for people 18 and over.",
+  private_event: "Link only works for events at public venues.",
+  age: "Link is for people 18 and over.",
   sensitive_tonight: "Keep it to plans and vibe: your note can't mention health, religion, politics or sexuality.",
 };
 
@@ -79,7 +79,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
     const j = r ? await r.json().catch(() => ({})) : { error: "network" };
     if (j.ok) return router.push("/queue");
     setBusy(false);
-    if (j.error === "too_far") setLoc({ kind: "manual", reason: "You're far from Queue Up areas. Pick one to find your squad" });
+    if (j.error === "too_far") setLoc({ kind: "manual", reason: "You're far from Link areas. Pick one to find your squad" });
     else setError(ERRORS[j.error] ?? "Couldn't join the queue. Try again.");
   };
 
@@ -97,7 +97,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
   if (event && !event.isPublic)
     return (
       <p data-testid="queue-setup" className="flex items-center gap-2 bg-surface p-4 text-muted">
-        <Lock size={16} aria-hidden /> Queue Up only works for events at public venues.
+        <Lock size={16} aria-hidden /> Link only works for events at public venues.
       </p>
     );
 

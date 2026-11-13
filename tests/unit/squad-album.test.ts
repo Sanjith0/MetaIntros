@@ -279,16 +279,16 @@ describe("post draft agent", () => {
     const mine = await photo(partyId, "p01");
     mockProvider().on("post_draft", () => JSON.stringify({ photoIds: ["nope"], caption: "Yuki and Zoe made it. Church after?" }));
     let d = (await suggestPost(partyId, "p01", await now())) as { ok: true; draft: { photoIds: string[]; caption: string; source: string } };
-    expect(d.draft).toMatchObject({ photoIds: [mine, theirs], caption: "Indie Night with my Queue Up squad.", source: "fallback" });
+    expect(d.draft).toMatchObject({ photoIds: [mine, theirs], caption: "Indie Night with my Link squad.", source: "fallback" });
 
     mockProvider().reset(); // no handler → the model call fails → template
     d = (await suggestPost(partyId, "p01", await now())) as typeof d;
-    expect(d.draft).toMatchObject({ photoIds: [mine, theirs], caption: "Indie Night with my Queue Up squad.", source: "fallback" });
+    expect(d.draft).toMatchObject({ photoIds: [mine, theirs], caption: "Indie Night with my Link squad.", source: "fallback" });
   });
 
   it("an AI-drafted post records its source and whether the caption was edited", async () => {
     const mine = await photo(partyId, "p01");
-    const r = (await createPost("p01", { kind: "post", audience: "friends", caption: "Indie Night with my Queue Up squad, again", partyId, photoIds: [mine], ai: { source: "live", caption: "Indie Night with my Queue Up squad." } })) as { id: string };
+    const r = (await createPost("p01", { kind: "post", audience: "friends", caption: "Indie Night with my Link squad, again", partyId, photoIds: [mine], ai: { source: "live", caption: "Indie Night with my Link squad." } })) as { id: string };
     const p = await prisma.post.findUniqueOrThrow({ where: { id: r.id } });
     expect(p).toMatchObject({ aiSource: "live", aiEdited: true });
     expect((await prisma.shareChoice.findUniqueOrThrow({ where: { partyId_userId: { partyId, userId: "p01" } } })).choice).toBe("ai");
@@ -307,7 +307,7 @@ describe("sanitizeDraft (pure)", () => {
     hiddenNames: ["Zoe", "Kim"],
   };
   it("template puts own photos first", () => {
-    expect(postTemplate(input)).toEqual({ photoIds: ["b", "a"], caption: "Indie Night with my Queue Up squad." });
+    expect(postTemplate(input)).toEqual({ photoIds: ["b", "a"], caption: "Indie Night with my Link squad." });
   });
   it("matches names on word boundaries only, case-insensitively", () => {
     expect(sanitizeDraft({ photoIds: ["a"], caption: "Zoetrope vibes all night." }, input).caption).toBe("Zoetrope vibes all night.");

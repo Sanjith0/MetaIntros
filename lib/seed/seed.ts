@@ -58,7 +58,7 @@ export interface SeedOptions {
 
 /**
  * Wipe-and-reseed in one transaction with stable IDs → idempotent.
- * Live users and all Queue Up activity (parties, squad chats …) are cleared too.
+ * Live users and all Link activity (parties, squad chats …) are cleared too.
  */
 export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {}) {
   // The global clock (lib/clock.ts) survives a reseed; the world is rebuilt around *its* now.

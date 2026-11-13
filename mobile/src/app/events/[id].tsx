@@ -48,7 +48,7 @@ export default function EventDetail() {
     </> : hangout ? null : e.isPublicVenue ? <QueueEntry pulse={data.pulse} landmarks={data.landmarks} shareDefault={data.shareDefault}
       event={{ id: e.id, title: e.title, startsAt: e.startsAt, venue: e.venueName, isPublic: e.isPublicVenue }}
       friendsInLine={data.friendQueues.filter(q => q.state === 'waiting').length} />
-      : <Section testID="queue-up-private"><View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="lock" size={16} color={c.muted} /><Text style={t.meta}>Queue Up only works for events at public venues.</Text></View></Section>}
+      : <Section testID="queue-up-private"><View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="lock" size={16} color={c.muted} /><Text style={t.meta}>Link only works for events at public venues.</Text></View></Section>}
     {!hangout ? <FriendQueues queues={data.friendQueues} variant="list" nowMs={data.nowMs} eventTitle={e.title} /> : null}
     {!hangout ? <Section title="Meet people with Glance" testID="glance-join">
       <Button icon="eye" onPress={() => openGlance(glanceJoinHref(e, data.me.name))} testID="glance-join-button">Join with Glance</Button>

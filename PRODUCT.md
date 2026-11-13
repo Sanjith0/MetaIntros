@@ -1,8 +1,8 @@
-# PRODUCT.md: Queue Up
+# PRODUCT.md: Link
 
 ## What it is
 
-Queue Up is a feature inside Facebook Events. You queue for an event, and Queue Up forms a
+Link is a feature inside Facebook Events. You queue for an event, and Link forms a
 small **squad** of people near you who'll get along. It opens a short-lived squad chat with
 an AI host and helps you find each other at the venue. Afterwards, you can add each other as
 friends if you both want to.
@@ -19,7 +19,7 @@ attend and skip it because nobody they know is going.
   familiar words to them, not jargon.
 - They worry about safety and awkwardness more than logistics.
 
-Queue Up is 18+. Age bands are still checked inside matching as a backstop.
+Link is 18+. Age bands are still checked inside matching as a backstop.
 
 ## Demo persona
 
@@ -37,7 +37,7 @@ in to Facebook.
 
 | Use | Not |
 |---|---|
-| Queue Up (the feature) | Party Queue, Crews, Muse matchmaker |
+| Link (the feature) | Queue Up (old name), Party Queue, Crews, Muse matchmaker |
 | squad | party, crew, group |
 | queue, queuing | matchmaking, lobby |
 | "Your squad is ready" | Party found!, CREW FOUND, MATCH COMPLETE |
@@ -45,7 +45,7 @@ in to Facebook.
 | AI host | bot, assistant, Muse |
 | talk cards | icebreakers, intel |
 | find each other | door, arrival radar |
-| "Met through Queue Up" | — |
+| "Met through Link" | — |
 | AI, Written by AI | ✦, magic, Muse-powered |
 
 ## Voice

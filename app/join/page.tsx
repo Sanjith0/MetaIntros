@@ -44,7 +44,7 @@ export default function JoinPage() {
 
   const submit = async (sample: boolean) => {
     setError(null);
-    if (minor) return setError("Queue Up is for people 18 and over.");
+    if (minor) return setError("Link is for people 18 and over.");
     if (!basicsOk) return setError("Add your first name, age range and gender first.");
     if (!sample && interests.length < 5) return setError("Pick at least 5 interests.");
     setBusy(true);
@@ -64,7 +64,7 @@ export default function JoinPage() {
     <main className="mx-auto min-h-dvh max-w-md bg-wash pb-10" data-testid="join-page">
       <header className="sticky top-0 z-30 bg-surface">
         <div className="flex h-14 items-center border-b border-divider/60 px-4">
-          <h1 className="text-title font-semibold">Join the Queue Up demo</h1>
+          <h1 className="text-title font-semibold">Join the Link demo</h1>
         </div>
         <PrototypeLabel />
       </header>
@@ -100,7 +100,7 @@ export default function JoinPage() {
             ))}
           </div>
           {minor ? (
-            <p role="alert" className="mt-1.5 text-meta font-semibold text-badge">Queue Up is for people 18 and over.</p>
+            <p role="alert" className="mt-1.5 text-meta font-semibold text-badge">Link is for people 18 and over.</p>
           ) : (
             <p className="mt-1.5 text-meta text-muted">You&apos;re only matched with people in your own age range.</p>
           )}

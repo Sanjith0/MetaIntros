@@ -10,7 +10,7 @@ import { fmtDuration, fmtEventWhen } from "@/lib/format";
 import type { StatusCard as Card } from "@/lib/server/status";
 
 /**
- * The single Queue Up status card. One state, one line of context, one next action.
+ * The single Link status card. One state, one line of context, one next action.
  * Waiting ticks its own timer; every state refreshes when the queue or squad changes.
  */
 export function StatusCard({ card, onEventPage = false }: { card: Card; /** on the event's own page: don't repeat its title */ onEventPage?: boolean }) {

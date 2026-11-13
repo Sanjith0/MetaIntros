@@ -107,7 +107,7 @@ export default function ChatThread() {
         if (m.kind === 'host') return <View key={m.id} testID="msg-host" style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: startsRun ? 8 : 2 }}>
           <View style={{ width: 28 }}>{endsRun ? <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: c.control, alignItems: 'center', justifyContent: 'center' }}><Icon name="cpu" size={15} /></View> : null}</View>
           <View style={{ maxWidth: '75%' }}>
-            {startsRun ? <Text style={{ fontSize: 12, color: c.muted, marginLeft: 12, marginBottom: 2, fontFamily: font.body }}>Queue Up host · AI</Text> : null}
+            {startsRun ? <Text style={{ fontSize: 12, color: c.muted, marginLeft: 12, marginBottom: 2, fontFamily: font.body }}>Link host · AI</Text> : null}
             <Bubble mine={false}>{m.body}</Bubble>
           </View>
         </View>;

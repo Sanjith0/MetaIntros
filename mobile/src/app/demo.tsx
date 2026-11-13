@@ -18,7 +18,7 @@ const SCRIPT = [
   'Events feed → open Indie Night', 'Find a squad to go with → size → Find my squad', 'Queue fills (~20s): k of N found',
   'Your squad is ready → How we matched you', 'Status card on the event and Events tab', 'Open squad chat: AI host welcome',
   'Talk cards (quick reply or squad info)', 'Find each other → I\'m here', 'Fast-forward: the event ends for everyone → chat archives',
-  'Add squad as friends → Met through Queue Up', 'Join with Glance from the event page → back to the event',
+  'Add squad as friends → Met through Link', 'Join with Glance from the event page → back to the event',
 ];
 const SOURCE: Record<string, string> = { live: 'Written by AI just now', cache: 'Saved AI response', mock: 'Test model', fallback: 'Template (AI unavailable)', template: 'Template', code: 'Checked by code', mixed: 'Partly AI, partly template' };
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

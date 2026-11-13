@@ -189,7 +189,7 @@ export function ChatThread({ chat, meId, squad, rating: initialRating = null }: 
                 <span className="max-w-[75%]">
                   {startsRun && (
                     <span className="mb-0.5 ml-3 flex items-center gap-1.5 whitespace-nowrap text-[12px] text-muted">
-                      Queue Up host {m.aiSource ? <AiSourceLabel source={m.aiSource} className="text-[12px]" /> : <AiLabel className="text-[12px]">AI</AiLabel>}
+                      Link host {m.aiSource ? <AiSourceLabel source={m.aiSource} className="text-[12px]" /> : <AiLabel className="text-[12px]">AI</AiLabel>}
                     </span>
                   )}
                   <Bubble mine={false} pos={pos}>{m.body}</Bubble>

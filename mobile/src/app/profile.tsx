@@ -30,9 +30,9 @@ export default function ProfileScreen() {
       <Row icon="map-pin" title={`Lives in ${p.neighborhood ?? 'the Bay Area'}`} />
       {p.hometown ? <Row icon="home" title={`From ${p.hometown}`} /> : null}
       <Row icon="gift" title={`Age ${p.ageBand}`} />
-      <Row icon="users" title={`${p.squads} Queue Up squad${p.squads === 1 ? '' : 's'}`} onPress={() => router.push('/friends?tab=queueup')} trailing={chevron} />
+      <Row icon="users" title={`${p.squads} Link squad${p.squads === 1 ? '' : 's'}`} onPress={() => router.push('/friends?tab=queueup')} trailing={chevron} />
     </Section>
-    <Section flush title="Queue Up privacy">
+    <Section flush title="Link privacy">
       <Row testID="profile-queue-visibility" icon="eye" title="Let friends see when I'm queuing" subtitle={share ? 'Friends see which event and area. Never who else is in line.' : 'Off. Nobody sees your queues.'}
         trailing={<Switch testID="profile-queue-visibility-toggle" value={share} onValueChange={async v => { setShare(v); const r = await postJSON('/api/me/queue-visibility', { visibility: v ? 'friends' : 'off' }); if (!r.ok) setShare(!v); }} />} />
     </Section>

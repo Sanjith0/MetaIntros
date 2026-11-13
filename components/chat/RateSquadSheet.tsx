@@ -12,7 +12,7 @@ const first = (n: string) => n.split(" ")[0];
 
 /**
  * After the squad chat ends: "How was the night?" (1–5) and, per squadmate, "Squad up again?".
- * Private: only Queue Up reads the answers, to tune your next squads and event picks.
+ * Private: only Link reads the answers, to tune your next squads and event picks.
  */
 export function RateSquadSheet({
   open,
@@ -122,7 +122,7 @@ export function RateSquadSheet({
 
       <p className="mx-4 mt-2 flex gap-2 rounded-card bg-wash p-3 text-meta text-muted" data-testid="rate-privacy">
         <Lock size={14} className="mt-px shrink-0" aria-hidden />
-        <span>Only Queue Up sees your answers. Nobody is told how you rated them. We use them to pick your next squads and events, and we won&apos;t match you with anyone you said no to.</span>
+        <span>Only Link sees your answers. Nobody is told how you rated them. We use them to pick your next squads and events, and we won&apos;t match you with anyone you said no to.</span>
       </p>
     </Sheet>
   );

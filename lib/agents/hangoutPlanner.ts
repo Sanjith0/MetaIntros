@@ -37,7 +37,7 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 export const templateTitle = (spot: Spot, o: HangoutOption) =>
   `${o.matchedTags[0] ? label(o.matchedTags[0]) : "Squad"} hangout at ${spot.name}`.slice(0, 60);
 export const templatePlan = (spot: Spot, o: HangoutOption) =>
-  `${cap(spot.activity)} at ${spot.name}${o.startsAt ? `, ${when(o.startsAt)}` : ""}. Planned by Queue Up for your squad.`;
+  `${cap(spot.activity)} at ${spot.name}${o.startsAt ? `, ${when(o.startsAt)}` : ""}. Planned by Link for your squad.`;
 
 function templateReasons(o: HangoutOption, g: HangoutGroup) {
   const r = o.matchedTags.slice(0, 2).map((t) => `${g.tagCounts.get(t)}/${g.size} of you are into ${label(t).toLowerCase()}`);

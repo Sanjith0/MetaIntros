@@ -8,7 +8,7 @@ import { getClockOffsetMs } from "@/lib/server/clock";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Queue Up · hackathon prototype",
+  title: "Link · hackathon prototype",
   description: "A hackathon prototype of a Facebook Events feature: go to events with a small squad. Not Facebook.",
   // Prototype: never indexed (DESIGN.md §1.9). next.config.ts also sends X-Robots-Tag on every response.
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },

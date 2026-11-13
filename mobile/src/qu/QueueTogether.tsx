@@ -14,7 +14,7 @@ export type TogetherRole = { role: 'none' | 'host' | 'member'; joined: number };
 const first = (n: string) => n.split(' ')[0];
 const ERR: Record<string, string> = {
   not_found: "That code doesn't match a group that's still open.", full: 'That group is full.', unsafe: "You can't queue with this group.",
-  age: 'Queue Up is for people 18 and over.', self: "That's your own code.", not_friends: 'You can only invite friends. Share your code instead.',
+  age: 'Link is for people 18 and over.', self: "That's your own code.", not_friends: 'You can only invite friends. Share your code instead.',
   already_queued: 'Your group is already in the queue.',
 };
 const chevron = <Icon name="chevron-right" color={c.muted} />;

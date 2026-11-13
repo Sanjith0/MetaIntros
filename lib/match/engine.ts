@@ -12,7 +12,7 @@ import { pairAllowed, validateParty } from "./safety";
 export type FillMode = "simulated" | "mixed" | "live";
 /**
  * Which queue an entry is in. "events" = existing Facebook events (eventId set = queued from that
- * event, null = "any event"); "hangout" = Queue Up plans a brand-new hangout. Modes never mix.
+ * event, null = "any event"); "hangout" = Link plans a brand-new hangout. Modes never mix.
  */
 export type QueueMode = "events" | "hangout";
 

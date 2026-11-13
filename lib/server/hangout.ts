@@ -1,7 +1,7 @@
 /**
  * "New hangout" queue: once a squad forms, plan a hangout at a public spot that's common ground for
  * everyone, and store it as a squad-only Event (kind "hangout") so chat, check-ins, expiry and
- * "Met through Queue Up" all work exactly as for real events. It never appears in the feed.
+ * "Met through Link" all work exactly as for real events. It never appears in the feed.
  */
 import { prisma } from "@/lib/db";
 import SPOTS from "@/data/seed/spots.json";
@@ -62,7 +62,7 @@ export async function planHangout(members: Person[], cand: Candidate, bucketId: 
       capacity: members.length,
       coverColor: spot.coverColor ?? "#0f766e",
       coverPattern: spot.coverPattern ?? "dots",
-      hostName: "Queue Up",
+      hostName: "Link",
       landmarkId: spot.landmarkId,
     },
   });

@@ -22,7 +22,7 @@ export async function createSquadChat(partyId: string) {
       members: { create: party.members.map((m) => ({ userId: m.userId, lastReadAt: new Date(0) })) },
     },
   });
-  await postMessage(chat.id, null, `Queue Up formed your squad of ${party.members.length} for ${party.event.title}. This chat disappears 24h after the event.`, "system");
+  await postMessage(chat.id, null, `Link formed your squad of ${party.members.length} for ${party.event.title}. This chat disappears 24h after the event.`, "system");
   return chat;
 }
 

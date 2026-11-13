@@ -16,7 +16,7 @@ export function RealPost({ post, ago }: { post: PostView; ago: string }) {
       ago={sample ? `${ago} · Sample person` : ago}
       text={post.caption}
       audience={post.audience}
-      place={post.event ? <>is at <span className="font-semibold">{post.event.title}</span> with their Queue Up squad.</> : undefined}
+      place={post.event ? <>is at <span className="font-semibold">{post.event.title}</span> with their Link squad.</> : undefined}
       label={post.aiSource ? <CaptionSource source={post.aiSource} edited={post.aiEdited} /> : undefined}
       menu={post.mine ? <OwnPostMenu postId={post.id} kind="post" /> : undefined}
     >

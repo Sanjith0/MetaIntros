@@ -73,7 +73,7 @@ export default function QueueScreen() {
   if (party?.status === 'confirming') return <ReadyCheck party={party} meId={meId} onChange={refresh} />;
   if (party) return <SquadFound party={party} meId={meId} />;
   if (!status) return <Screen title="Finding your squad" back="/events"><Loading /></Screen>;
-  if (status.state === 'idle') return <Screen title="Queue Up" back="/events" testID="queue-idle">
+  if (status.state === 'idle') return <Screen title="Link" back="/events" testID="queue-idle">
     <Section style={{ alignItems: 'center', paddingVertical: 32, gap: 12 }}>
       {notice === 'dropped' ? <Text style={[t.body, { backgroundColor: c.wash, padding: 12, borderRadius: 8 }]}>That squad didn&apos;t come together, so you&apos;re out of the queue. Find a squad again whenever you like.</Text> : null}
       <Text style={t.body}>You&apos;re not in a queue.</Text>

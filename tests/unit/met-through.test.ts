@@ -12,7 +12,7 @@ import type { CardContent } from "@/lib/cards/claims";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-describe("Met through Queue Up", () => {
+describe("Met through Link", () => {
   beforeEach(async () => {
     await seedDatabase(prisma, { now: new Date() });
     await setSetting("simFillMs", "0");

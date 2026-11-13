@@ -4,7 +4,7 @@
  * it fills the remaining spots with compatible strangers and never splits the group.
  *
  * Safety is enforced here and again in the engine: everyone in a group must pass pairAllowed with everyone
- * else (age band, women-only, blocks in either direction), and Queue Up is 18+.
+ * else (age band, women-only, blocks in either direction), and Link is 18+.
  */
 import { prisma } from "@/lib/db";
 import { pairAllowed } from "@/lib/match/safety";

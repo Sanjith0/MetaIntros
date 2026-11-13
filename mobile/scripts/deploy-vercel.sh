@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Deploys the Expo web build to Vercel, forwarding /api and /images to the Queue Up server.
+# Deploys the Expo web build to Vercel, forwarding /api and /images to the Link server.
 # Usage: QUEUEUP_URL=https://your-server.example EXPO_PUBLIC_CONVEX_URL=https://x.convex.cloud scripts/deploy-vercel.sh [--prod]
 set -euo pipefail
 cd "$(dirname "$0")/.."
-: "${QUEUEUP_URL:?Set QUEUEUP_URL to the Queue Up server (https://...)}"
+: "${QUEUEUP_URL:?Set QUEUEUP_URL to the Link server (https://...)}"
 QUEUEUP_URL="${QUEUEUP_URL%/}"
 node -e '
   const fs = require("fs");
@@ -17,7 +17,7 @@ node -e '
 '
 npm ci
 npm run build:web
-# Ship the built files only; the rewrites point at the Queue Up server.
+# Ship the built files only; the rewrites point at the Link server.
 cp vercel.deploy.json dist/vercel.json
 cd dist
 npx -y vercel@latest link --yes --project "${VERCEL_PROJECT:-queueup-expo}"

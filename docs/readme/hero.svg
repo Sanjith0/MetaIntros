@@ -19,7 +19,7 @@
     <circle cx="18" cy="87" r="5" fill="#0866ff"/>
     <text x="32" y="92" font-size="14" font-weight="600" fill="#0064d1" letter-spacing="0.6">A FACEBOOK EVENTS FEATURE</text>
 
-    <text y="180" font-size="76" font-weight="800" fill="#050505" letter-spacing="-2.5">Queue Up</text>
+    <text y="180" font-size="76" font-weight="800" fill="#050505" letter-spacing="-2.5">Link</text>
     <text y="226" font-size="24" fill="#4b4c4f">Go to events with a squad, not alone.</text>
     <text y="268" font-size="18" fill="#65676b">AI Companions powered by Muse match you into a squad</text>
     <text y="294" font-size="18" fill="#65676b">for Facebook Events and plan the hangout.</text>

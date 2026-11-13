@@ -3,7 +3,7 @@ import { ButtonLink, Section } from "@/components/fb";
 
 /**
  * The event page's way into Glance, a separate companion app. A grey button, because
- * the page's one primary action is Queue Up. It opens in a new tab so the event stays put.
+ * the page's one primary action is Link. It opens in a new tab so the event stays put.
  *
  * One line of copy at most, like the rest of the page: the title and the button say what
  * it is. That line is the disclosure, so it stays: it tells people they are leaving for

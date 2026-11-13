@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run the app on a phone in Expo Go (no Vercel link needed on the phone).
-#   QUEUEUP_URL      the Queue Up server the phone talks to (default: the live Vercel app, which forwards /api to it)
+#   QUEUEUP_URL      the Link server the phone talks to (default: the live Vercel app, which forwards /api to it)
 #   EXPO_PUBLIC_CONVEX_URL  Glance's Convex backend
 #   MODE             --tunnel (default; works on any network) or --lan (phone and Mac on the same Wi-Fi)
 # Glance's camera, face and microphone features need a development build; in Expo Go they say so instead of crashing.

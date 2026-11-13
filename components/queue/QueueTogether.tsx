@@ -17,7 +17,7 @@ const ERR: Record<string, string> = {
   not_found: "That code doesn't match a group that's still open.",
   full: "That group is full.",
   unsafe: "You can't queue with this group.",
-  age: "Queue Up is for people 18 and over.",
+  age: "Link is for people 18 and over.",
   self: "That's your own code.",
   not_friends: "You can only invite friends. Share your code instead.",
   already_queued: "Your group is already in the queue.",
@@ -25,7 +25,7 @@ const ERR: Record<string, string> = {
 
 /**
  * Queue together, like a party in a game: invite friends or share a code, then the host taps Find my squad
- * and everyone queues as one. Queue Up fills the other spots and never splits the group.
+ * and everyone queues as one. Link fills the other spots and never splits the group.
  */
 export function QueueTogether({ onRole }: { onRole: (r: TogetherRole) => void }) {
   const router = useRouter();

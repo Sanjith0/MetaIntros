@@ -6,7 +6,7 @@ test.beforeEach(async ({ request }) => {
   await request.post("/api/demo/settings", { data: { fillMode: "simulated", simFillMs: 1500 } });
 });
 
-test("after the event: add squadmates → simulated members accept → Met through Queue Up", async ({ page }) => {
+test("after the event: add squadmates → simulated members accept → Met through Link", async ({ page }) => {
   await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
@@ -30,7 +30,7 @@ test("after the event: add squadmates → simulated members accept → Met throu
   await expect(page.getByTestId("badge-friends")).toBeVisible();
   await page.getByTestId("see-new-friends").click();
   await expect(page.getByTestId("queueup-row")).toHaveCount(3);
-  await expect(page.getByTestId("met-at").first()).toHaveText("Met through Queue Up · Indie Night: Local Bands Showcase");
+  await expect(page.getByTestId("met-at").first()).toHaveText("Met through Link · Indie Night: Local Bands Showcase");
   await expect(page.getByTestId("shared-note").first()).toContainText("You both love");
   await expect(page.getByTestId("badge-friends")).toHaveCount(0);
 });

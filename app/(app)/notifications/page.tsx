@@ -21,10 +21,10 @@ const KIND: Record<NotificationKind, { Icon: typeof Bell; tone: string }> = {
 };
 
 /**
- * Notifications, built from what Queue Up already stores. Seen state is read before this visit marks
+ * Notifications, built from what Link already stores. Seen state is read before this visit marks
  * the tab seen, so new rows stay highlighted for this view.
  */
-/** These picture Queue Up or an event, not a person: initials (or the event's photo), not a character. */
+/** These picture Link or an event, not a person: initials (or the event's photo), not a character. */
 const PICTURES_A_THING = new Set(["squad", "chat_ended", "reminder"]);
 
 export default async function NotificationsPage() {
