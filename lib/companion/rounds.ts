@@ -240,27 +240,6 @@ const conversations = (c: RoundCtx, threads: Map<string, ThreadMsg[]>, partners:
 const attributedThreads = (threads: Map<string, ThreadMsg[]>, partners: string[]) =>
   partners.map((id) => ({ id, text: threads.get(id)!.filter((m) => m.from === id).map((m) => m.say).join("\n") }));
 
-export async function followUpRound(c: RoundCtx, threads: Map<string, ThreadMsg[]>) {
-  const partners = [...threads.keys()].sort();
-  const says = new Map<string, Msg>();
-  if (!partners.length) return { says, source: "none", audit: [] as string[] };
-  const resolve = makeResolver(partners, c.people);
-  const r = await round(
-    c, "companion_followup",
-    { round: "follow_up", conversations: conversations(c, threads, partners) },
-    attributedThreads(threads, partners),
-    'Round: FOLLOW-UP with the people you are going deeper with. For EACH conversation: react to their answer, name one honest concern or possible mismatch between your person and theirs, and ask one harder question. Max 70 words each. JSON only: {"says": {"<id>": {"say": "...", "cites": []}}}.',
-    z.object({ says: z.any().optional() }), {}, partners.length,
-  );
-  const got = byPartner(r.data?.says, resolve);
-  const n = c.brief.name;
-  for (const id of partners) {
-    const o = first(c.people.get(id)!);
-    says.set(id, line(c, got.get(id), { say: `That sounds like a fit for ${n}. One thing to check: ${n} ${CHECK[c.brief.tonight.energy]}. How would ${o} feel about that?`, cites: [] }));
-  }
-  return { says, source: r.source, audit: r.audit };
-}
-
 /** Exactly `size` members including the owner, all in the circle and all allowed with each other; model picks first, then the owner's highest-scored people. */
 function repairGroup(c: RoundCtx, picked: string[], members: string[], verdicts: Map<string, Verdict>, size: number): string[] {
   const me = c.me.id;
@@ -291,7 +270,7 @@ export async function closeRound(c: RoundCtx, threads: Map<string, ThreadMsg[]>,
       circle: mates.map((id) => ({ id, name: first(c.people.get(id)!), your_score: verdicts.get(id)?.score ?? null })),
     },
     attributedThreads(threads, partners),
-    `Round: CLOSE. For EACH deeper conversation: answer their last question and say plainly what your person would need for this to work (max 70 words), and give your updated private verdict. Then PROPOSE the squad you want for your person: exactly ${targetSize} people from the circle INCLUDING your own person, with a private reason and one public line (max 30 words). JSON only: {"says": {"<id>": {"say": "...", "cites": []}}, "verdicts": {"<id>": {"score": 0, "wouldEnjoy": [], "concerns": [], "needs": [], "talkTopics": [], "opener": "", "confidence": "medium"}}, "proposal": {"members": ["<id>"], "privateReason": "...", "line": {"say": "...", "cites": []}}}.`,
+    `Round: GO DEEPER. For EACH person you are going deeper with: react to their answer, name one honest concern or possible mismatch between your person and theirs, and say plainly what your person would need for this to work (max 80 words); then give your updated private verdict. Then PROPOSE the squad you want for your person: exactly ${targetSize} people from the circle INCLUDING your own person, with a private reason and one public line (max 30 words). JSON only: {"says": {"<id>": {"say": "...", "cites": []}}, "verdicts": {"<id>": {"score": 0, "wouldEnjoy": [], "concerns": [], "needs": [], "talkTopics": [], "opener": "", "confidence": "medium"}}, "proposal": {"members": ["<id>"], "privateReason": "...", "line": {"say": "...", "cites": []}}}.`,
     z.object({ says: z.any().optional(), verdicts: z.any().optional(), proposal: z.any().optional() }), {}, Math.max(partners.length, 2),
   );
   const gotS = byPartner(r.data?.says, resolveMate);
@@ -362,48 +341,28 @@ export async function deliberate(c: RoundCtx, table: TableRow[], verdicts: Map<s
 
 /* ───────────────────────── group conversation + sign-off ───────────────────────── */
 
-export async function groupSpeak(c: RoundCtx, members: string[], intros: Map<string, OpenView>, verdicts: Map<string, Verdict>) {
-  void verdicts;
-  const others = members.filter((id) => id !== c.me.id).sort();
-  const f = openFacts(c.brief)[0];
-  const r = await round(
-    c, "companion_group1",
-    { round: "group_speak", squad: others.map((id) => intros.get(id)) },
-    others.map((id) => ({ id, text: JSON.stringify(intros.get(id)) })),
-    'The Orchestrator has proposed this squad. Round: SPEAK TO THE GROUP, once (max 70 words): what your person hopes for from this night, what they would bring to the group, and anything the group should know to make it work for them. JSON only: {"line": {"say": "...", "cites": []}}.',
-    z.object({ line: z.any().optional() }), {}, 2,
-  );
-  const n = c.brief.name;
-  return {
-    line: line(c, r.data?.line, {
-      say: `${n} is hoping for ${c.brief.tonight.hopingFor.replace(/^A /, "a ")}${f ? `, and would happily talk about ${f.text} all night` : ""}. ${n} ${CHECK[c.brief.tonight.energy]}.`,
-      cites: f ? [f.id] : [],
-    }),
-    source: r.source,
-    audit: r.audit,
-  };
-}
-
-export async function groupRespond(c: RoundCtx, members: string[], lines: { from: string; say: string }[], verdicts: Map<string, Verdict>) {
+/** One round: speak to the proposed squad about how it would work for your person, and decide. */
+export async function groupRound(c: RoundCtx, members: string[], intros: Map<string, OpenView>, verdicts: Map<string, Verdict>) {
   const others = members.filter((id) => id !== c.me.id).sort();
   const scoreOf = (id: string) => verdicts.get(id)?.score ?? fallbackVerdict(c.me, c.people.get(id)!).score;
   const objection = others.some((id) => !pairAllowed(c.me, c.people.get(id)!) || scoreOf(id) < SIGN_OFF_FLOOR);
+  const f = openFacts(c.brief)[0];
   const r = await round(
-    c, "companion_group2",
-    {
-      round: "group_respond",
-      squad: others.map((id) => ({ id, name: first(c.people.get(id)!), your_score: verdicts.get(id)?.score ?? null })),
-      said: lines.map((l) => ({ from: l.from, say: l.say })),
-    },
-    lines.filter((l) => l.from !== c.me.id).map((l) => ({ id: l.from, text: l.say })),
-    'Round: RESPOND AND DECIDE. Respond to what the group said (max 50 words), then decide for your person: "yes"; "yes_if" (put the one thing they would need in "need"); or "no". A "no" stays private: put the reason in "privateReason", it is never shown to anyone. JSON only: {"line": {"say": "...", "cites": []}, "decision": "yes|yes_if|no", "need": "", "privateReason": ""}.',
+    c, "companion_group",
+    { round: "group", squad: others.map((id) => ({ ...intros.get(id), your_score: verdicts.get(id)?.score ?? null })) },
+    others.map((id) => ({ id, text: JSON.stringify(intros.get(id)) })),
+    'The Orchestrator has proposed this squad. Round: SPEAK AND DECIDE. Speak to the whole group once (max 70 words): what your person hopes for from this night, what they would bring, and anything the group should know to make it work for them. Then decide for your person: "yes"; "yes_if" (put the one thing they would need in "need"); or "no". A "no" stays private: put the reason in "privateReason", it is never shown to anyone. JSON only: {"line": {"say": "...", "cites": []}, "decision": "yes|yes_if|no", "need": "", "privateReason": ""}.',
     z.object({ line: z.any().optional(), decision: z.any().optional(), need: z.any().optional(), privateReason: z.any().optional() }), {}, 2,
   );
   const d = r.data;
   const decision: "yes" | "yes_if" | "no" = d && (d.decision === "yes" || d.decision === "yes_if" || d.decision === "no") ? d.decision : objection ? "no" : "yes";
   const need = decision === "yes_if" && typeof d?.need === "string" && !isSensitiveText(d.need) ? d.need.trim().slice(0, 160) : "";
+  const n = c.brief.name;
   return {
-    line: line(c, d?.line, { say: `${c.brief.name}'s Companion likes the sound of this group.`, cites: [] }),
+    line: line(c, d?.line, {
+      say: `${n} is hoping for ${c.brief.tonight.hopingFor.replace(/^A /, "a ")}${f ? `, and would happily talk about ${f.text} all night` : ""}. ${n} ${CHECK[c.brief.tonight.energy]}.`,
+      cites: f ? [f.id] : [],
+    }),
     decision,
     need,
     privateReason: typeof d?.privateReason === "string" ? d.privateReason.slice(0, 300) : "",

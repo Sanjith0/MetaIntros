@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p12\", \"line\": {\"say\": \"Rosa would love low-key climbing chat and vinyl digging with Gabe and Jordan.\", \"cites\": [\"p11:likes[2]\", \"p11:groups[0]\", \"p11:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1604,
+    "completionTokens": 664
+  },
+  "savedAt": "2026-11-13T00:29:07.219Z"
+}

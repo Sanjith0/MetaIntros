@@ -1,11 +1,11 @@
 {
-  "text": "{\"choice\": \"sp-guild-vinyl\", \"title\": \"Vinyl Night at the Listening Bar\", \"plan\": \"Let's meet Fri 7pm to dig crates and share spins at the Menlo listening bar.\", \"reasons\": [\"Covers two unanimous interests: vinyl records and indie music\", \"Super close at 1.8km and great for easy conversation\"]}",
+  "text": "{\"choice\": \"sp-guild-vinyl\", \"title\": \"Vinyl Dig & Listening Bar Hang\", \"plan\": \"Let's meet at Menlo record shop listening bar Fri 7pm to crate-dig and share tracks at the listening bar.\", \"reasons\": [\"Matches 2 unanimous interests: Vinyl records and Indie music\", \"Closest option at 1.8km and perfect for easy stranger conversation\"]}",
   "task": "hangout_planner",
   "model": "muse-spark-1.1",
   "provider": "muse",
   "usage": {
     "promptTokens": 467,
-    "completionTokens": 486
+    "completionTokens": 524
   },
-  "savedAt": "2026-11-12T21:01:54.550Z"
+  "savedAt": "2026-11-13T00:29:15.219Z"
 }

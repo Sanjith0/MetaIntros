@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p12\", \"line\": {\"say\": \"Freya is in for low-key crew swapping V-Scale memes and Bay Area Concerts tips between sets.\", \"cites\": [\"p02:likes[1]\", \"p02:likes[4]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1544,
+    "completionTokens": 554
+  },
+  "savedAt": "2026-11-13T00:26:21.951Z"
+}

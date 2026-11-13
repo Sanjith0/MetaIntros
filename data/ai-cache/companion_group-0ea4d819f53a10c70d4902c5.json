@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Reza is hoping for a chill squad of 5 for Indie Night: Local Bands Showcase. They would bring easygoing vinyl chat from Peninsula Vinyl Collectors and bouldering stories from Peninsula Boulders, plus Fujifilm X photo walk vibes. They like low-key, laid-back hangs and would love to keep it relaxed together.\", \"cites\": [\"p04:socialStyle\", \"p04:groups[2]\", \"p04:likes[3]\", \"p04:likes[9]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2586,
+    "completionTokens": 490
+  },
+  "savedAt": "2026-11-13T00:27:24.084Z"
+}

@@ -3,6 +3,8 @@ import { mockProvider } from "@/lib/ai";
 import { privateTexts, sourceFacts, templateBrief } from "@/lib/companion/brief";
 import { pairKey, runRoom, sparksFor, type RoomInput, type RoomResult } from "@/lib/companion/room";
 import { validateParty } from "@/lib/match/safety";
+import { makePairScorer } from "@/lib/match/compat";
+import { SIMILARITY_GATE } from "@/lib/companion/orchestrator";
 import { loadPeopleFromFiles } from "../helpers/people";
 
 const people = loadPeopleFromFiles(); // p01 is the only non-simulated person
@@ -31,7 +33,7 @@ describe("companion room", () => {
     for (const p of r.parties) {
       expect(p.members).toHaveLength(4);
       expect(validateParty(p.members.map((m) => people.get(m)!)).ok).toBe(true);
-      expect(p.groupChat).toHaveLength(8); // two rounds, four members
+      expect(p.groupChat).toHaveLength(4); // one round, four members
       expect(p.steps[0].agent).toBe("orchestrator");
       expect(p.steps.some((s) => s.kind === "safety_check")).toBe(true);
       expect(p.steps.at(-1)!.kind).toBe("decision");
@@ -43,16 +45,31 @@ describe("companion room", () => {
     expect([...used, ...r.heldBack].sort()).toEqual(pool.slice(0, 12).sort());
   });
 
-  it("every allowed pair in a circle has a 6-message thread; deep pairs have 10", async () => {
+  it("only pairs above the similarity gate talk: 6 messages each, 8 for deep pairs", async () => {
     const r = await runRoom(input(10));
     const m = r.circles[0].members;
     expect(m).toHaveLength(10);
+    const score = makePairScorer();
+    let gated = 0;
     for (let i = 0; i < m.length; i++) for (let j = i + 1; j < m.length; j++) {
-      expect(r.threads.get(pairKey(m[i], m[j]))!.slice(0, 6).map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer"]);
+      const above = score(people.get(m[i])!, people.get(m[j])!).score >= SIMILARITY_GATE;
+      const t = r.threads.get(pairKey(m[i], m[j]));
+      if (!above) { expect(t).toBeUndefined(); continue; }
+      gated++;
+      expect(t!.slice(0, 6).map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer"]);
     }
+    expect(gated).toBeGreaterThan(0);
     expect(r.deep.length).toBeGreaterThan(0);
-    for (const k of r.deep) expect(r.threads.get(k)!.map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer", "followup", "followup", "close", "close"]);
+    for (const k of r.deep) expect(r.threads.get(k)!.map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer", "close", "close"]);
     for (const [k, t] of r.threads) if (!r.deep.includes(k)) expect(t).toHaveLength(6);
+  });
+
+  it("a person nobody is similar enough to makes no calls at all", async () => {
+    const r = await runRoom(input(10));
+    const talked = new Set([...r.threads.keys()].flatMap((k) => k.split("|")));
+    const silent = r.circles[0].members.filter((id) => !talked.has(id));
+    const asked = new Set(mockProvider().calls.filter((c) => c.task === "companion_ask").map((c) => JSON.parse(c.messages[1].content).your_brief.ownerId));
+    for (const id of silent) expect(asked.has(id)).toBe(false);
   });
 
   it("30 people: everyone is in one circle or unplaced", async () => {
@@ -76,7 +93,7 @@ describe("companion room", () => {
     const base = await runRoom(input(10));
     const vetoer = base.parties[0].members.find((m) => m !== "p01")!;
     mockProvider().reset();
-    mockProvider().on("companion_group2", (req) =>
+    mockProvider().on("companion_group", (req) =>
       JSON.stringify(owner(req) === vetoer
         ? { line: { say: "Thanks all.", cites: [] }, decision: "no", need: "", privateReason: "would not be comfortable here" }
         : { line: { say: "Sounds good.", cites: [] }, decision: "yes", need: "", privateReason: "" }));
@@ -90,7 +107,7 @@ describe("companion room", () => {
   });
 
   it("when everyone vetoes, no party forms and nobody is blamed", async () => {
-    mockProvider().on("companion_group2", () => JSON.stringify({ line: { say: "Hm.", cites: [] }, decision: "no", need: "", privateReason: "secret reason" }));
+    mockProvider().on("companion_group", () => JSON.stringify({ line: { say: "Hm.", cites: [] }, decision: "no", need: "", privateReason: "secret reason" }));
     const stages: string[] = [];
     const r = await runRoom(input(8, { onStage: (s) => void stages.push(s) }));
     expect(r.parties).toEqual([]);
@@ -110,11 +127,9 @@ describe("companion room", () => {
     mockProvider()
       .on("companion_ask", (req) => JSON.stringify({ asks: toAll(req) }))
       .on("companion_answer", (req) => JSON.stringify({ answers: toAll(req), picks: ids, verdicts: Object.fromEntries(ids.map((i) => [i, { score: 100 }])) }))
-      .on("companion_followup", (req) => JSON.stringify({ says: toAll(req) }))
       .on("companion_close", (req) => JSON.stringify({ says: toAll(req), verdicts: {}, proposal: { members: ids, line: leak(req) } }))
       .on("companion_deliberate", (req) => JSON.stringify({ action: "hold", line: leak(req) }))
-      .on("companion_group1", (req) => JSON.stringify({ line: leak(req) }))
-      .on("companion_group2", (req) => JSON.stringify({ line: leak(req), decision: "yes" }));
+      .on("companion_group", (req) => JSON.stringify({ line: leak(req), decision: "yes" }));
     const r = await runRoom({ ids, people, briefs, targetSize: 4 });
     const text = publicText(r);
     // each person's own Companion never says that person's private fact
@@ -127,7 +142,7 @@ describe("companion room", () => {
   });
 
   it("garbage from every call still completes on fallbacks", async () => {
-    for (const t of ["companion_ask", "companion_answer", "companion_followup", "companion_close", "companion_deliberate", "companion_group1", "companion_group2", "orchestrator_form"]) mockProvider().on(t, () => "not json at all");
+    for (const t of ["companion_ask", "companion_answer", "companion_close", "companion_deliberate", "companion_group", "orchestrator_form"]) mockProvider().on(t, () => "not json at all");
     const r = await runRoom(input(8));
     expect(r.parties.length).toBeGreaterThan(0);
   });

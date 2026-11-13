@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p04\", \"line\": {\"say\": \"Jordan would love this chill crew to chat vinyl, bouldering and Fujifilm X between bands.\", \"cites\": [\"p01:likes[5]\", \"p01:likes[1]\", \"p01:likes[6]\", \"p01:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1504,
+    "completionTokens": 762
+  },
+  "savedAt": "2026-11-13T00:27:15.561Z"
+}

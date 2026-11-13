@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Jordan and Yuki both follow Bouldering Daily. If they hit a bouldering night then want to dig crates at Rasputin, how would Jordan keep it low-key and chill when the group wants to stay out late?\", \"cites\": [\"p05:likes[1]\", \"p05:socialStyle\"]}, \"p02\": {\"say\": \"Freya and Yuki both like chill hangs. If they're at a Bay Area indie show and it's getting loud and crowded, how would Freya handle winding down or finding a quieter spot with Yuki?\", \"cites\": [\"p05:socialStyle\", \"p05:likes[2]\"]}, \"p03\": {\"say\": \"Zoe and Yuki both love vinyl. Imagine Record Store Day Palo Alto is packed and overwhelming — how would Zoe keep the hang relaxed and low-pressure for Yuki?\", \"cites\": [\"p05:events[0]\", \"p05:socialStyle\"]}, \"p04\": {\"say\": \"Reza and Yuki both dig Rasputin Music. If they're crate-digging together and the rest of the squad wants to turn it into a big night, how would Reza keep things chill with Yuki?\", \"cites\": [\"p05:likes[0]\", \"p05:socialStyle\"]}, \"p11\": {\"say\": \"Rosa and Yuki both like low-key plans. If a concert runs late and everyone wants an afterparty, how would Rosa navigate that with Yuki who prefers something more relaxed?\", \"cites\": [\"p05:socialStyle\", \"p05:likes[2]\"]}, \"p12\": {\"say\": \"Gabe and Yuki both follow Bouldering Daily and Pitchfork. If they're at a show that gets hectic, what would Gabe actually do to keep the night easygoing for Yuki?\", \"cites\": [\"p05:likes[1]\", \"p05:socialStyle\"]}, \"p14\": {\"say\": \"Ben and Yuki both went to Bouldering Night at Peninsula Boulders. If after climbing the group debates a loud bar versus coffee and vinyl talk, how would Ben steer it with Yuki?\", \"cites\": [\"p05:events[1]\", \"p05:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3555,
+    "completionTokens": 688
+  },
+  "savedAt": "2026-11-13T00:27:37.337Z"
+}

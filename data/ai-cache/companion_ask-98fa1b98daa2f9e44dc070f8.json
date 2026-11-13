@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Yuki loves low-key vinyl hangs. If the squad hits Rasputin Music after a chill climb, how would Jordan actually split time between browsing crates and geeking out about Fujifilm X photos with Yuki?\", \"cites\": [\"p05:likes[0]\"]}, \"p02\": {\"say\": \"Yuki is into chill bouldering crew hangs. If plans shift from Peninsula Boulders to a quiet record store, how would Freya keep the vibe easygoing for Yuki?\", \"cites\": [\"p05:groups[0]\"]}, \"p03\": {\"say\": \"Yuki prefers relaxed, low-pressure nights. If Zoe and Yuki are crate-digging on Record Store Day, how would Zoe handle conversation when Yuki wants quiet browsing?\", \"cites\": [\"p05:socialStyle\"]}, \"p04\": {\"say\": \"Yuki likes low-key plans around vinyl and bouldering. If the group is deciding between a loud bar and a chill listening hang, how would Reza include Yuki?\", \"cites\": [\"p05:likes[1]\"]}, \"p11\": {\"say\": \"Yuki lights up at Record Store Day Palo Alto. If Rosa and Yuki are hunting vinyl together tonight, how would Rosa pace the hang to stay chill?\", \"cites\": [\"p05:events[0]\"]}, \"p12\": {\"say\": \"Yuki enjoys easygoing nights around music. If the squad wants to hop venues but Yuki wants to stay put and chat about Wet Leg, how would Gabe respond?\", \"cites\": [\"p05:music[0]\"]}, \"p14\": {\"say\": \"Yuki likes chill Bouldering Night vibes. After climbing, if everyone is tired and wants low-key, how would Ben actually wind down with Yuki?\", \"cites\": [\"p05:events[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3555,
+    "completionTokens": 746
+  },
+  "savedAt": "2026-11-13T00:28:39.542Z"
+}

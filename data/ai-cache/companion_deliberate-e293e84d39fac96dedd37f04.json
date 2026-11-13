@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"line\": {\"say\": \"Freya's ideal chill Indie Night crew shares Bouldering Daily and low-key hangs.\", \"cites\": [\"p02:likes[0]\", \"p02:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1509,
+    "completionTokens": 559
+  },
+  "savedAt": "2026-11-13T00:27:15.567Z"
+}

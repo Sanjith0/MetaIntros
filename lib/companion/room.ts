@@ -14,8 +14,9 @@ import type { Person } from "@/lib/profile/load";
 import type { TraceStep } from "@/lib/server/trace";
 import { openView, privateTexts, type Brief, type OpenView } from "./brief";
 import { safeMessage, type Msg } from "./checks";
-import { deepPairs, drawCircles, formParties, wanted, type Circle, type TableResponse, type TableRow, type Verdict, type Verdicts } from "./orchestrator";
-import { askRound, answerRound, closeRound, deliberate, followUpRound, groupRespond, groupSpeak, type RoundCtx, type ThreadMsg } from "./rounds";
+import { SIMILARITY_GATE, deepPairs, drawCircles, formParties, wanted, type Circle, type TableResponse, type TableRow, type Verdict, type Verdicts } from "./orchestrator";
+import { askRound, answerRound, closeRound, deliberate, groupRound, type RoundCtx, type ThreadMsg } from "./rounds";
+import { makePairScorer } from "@/lib/match/compat";
 
 export type Stage = "briefing" | "circles" | "mingling" | "deep" | "deliberating" | "forming" | "group" | "done" | "waiting";
 
@@ -105,6 +106,9 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     if (!["template", "blocked", "none", "code"].includes(source)) calls++;
   };
   const allowed = (a: string, b: string) => pairAllowed(people.get(a)!, people.get(b)!);
+  // Vectors shortlist, Companions decide: only pairs above the similarity gate get a conversation.
+  const similarity = makePairScorer();
+  const talks = (a: string, b: string) => allowed(a, b) && similarity(people.get(a)!, people.get(b)!).score >= SIMILARITY_GATE;
 
   // ── circles ──
   const roomUsesModel = ids.some((id) => !people.get(id)!.isSimulated);
@@ -125,7 +129,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
   const circles = drawn.circles.map((circle) => {
     const members = [...circle.members].sort();
     const useModel = members.some((m) => !people.get(m)!.isSimulated);
-    const partners = (id: string) => members.filter((m) => m !== id && allowed(id, m));
+    const partners = (id: string) => members.filter((m) => m !== id && talks(id, m));
     const ctx = (id: string): RoundCtx => ({
       brief: briefs.get(id)!,
       me: people.get(id)!,
@@ -135,7 +139,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     });
     const introsFor = (id: string, of: string[] = partners(id)) => new Map(of.map((m) => [m, views.get(m)!]));
     const pairs: [string, string][] = [];
-    for (let i = 0; i < members.length; i++) for (let j = i + 1; j < members.length; j++) if (allowed(members[i], members[j])) pairs.push([members[i], members[j]]);
+    for (let i = 0; i < members.length; i++) for (let j = i + 1; j < members.length; j++) if (talks(members[i], members[j])) pairs.push([members[i], members[j]]);
     const active = members.filter((m) => partners(m).length > 0);
     return { circle, members, useModel, partners, ctx, introsFor, pairs, active, picks: new Map<string, string[]>(), deep: [] as [string, string][], table: [] as TableRow[], want: new Map<string, Set<string>>() };
   });
@@ -193,17 +197,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     const deepWith = (m: string) => cs.deep.filter((p) => p.includes(m)).map((p) => (p[0] === m ? p[1] : p[0]));
     const threadsFor = (m: string) => new Map(deepWith(m).map((p) => [p, threads.get(pairKey(m, p))!]));
     live({ type: "deep", pairs: cs.deep });
-    const follow = await Promise.all(cs.active.map((m) => followUpRound(cs.ctx(m), threadsFor(m)).then((r) => {
-      for (const [to, msg] of r.says) live({ type: "line", line: asLine(m, to, "followup", msg) });
-      return r;
-    })));
-    follow.forEach((r) => count(r.source));
-    const fOf = new Map(cs.active.map((m, i) => [m, follow[i].says]));
-    for (const [a, b] of cs.deep) {
-      post(a, b, "followup", fOf.get(a)!.get(b)!);
-      post(b, a, "followup", fOf.get(b)!.get(a)!);
-    }
-    const close = await Promise.all(cs.active.map((m) => closeRound(cs.ctx(m), threadsFor(m), cs.members, verdicts.get(m)!, targetSize).then((r) => {
+    const close = await Promise.all(cs.active.map((m) => closeRound(cs.ctx(m), threadsFor(m), [m, ...cs.partners(m)], verdicts.get(m)!, targetSize).then((r) => {
       for (const [to, msg] of r.says) live({ type: "line", line: asLine(m, to, "close", msg) });
       if (r.verdicts.size) live({ type: "notes", from: m, notes: [...r.verdicts] });
       live({ type: "proposal", row: { id: `prop-${m}`, by: m, members: r.proposal.members, line: r.proposal.line.say, backers: [] } });
@@ -250,23 +244,17 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
       await stage("group", "Each proposed squad's Companions are talking it over");
     }
     const groupId = `${cs.circle.id}:${members.join(",")}`;
-    const speak = await Promise.all(members.map((m) => groupSpeak(cs.ctx(m), members, cs.introsFor(m, members.filter((x) => x !== m)), verdicts.get(m)!).then((r) => {
-      live({ type: "group", groupId, members, line: { from: m, say: r.line.say } });
-      return r;
-    })));
-    speak.forEach((r) => count(r.source));
-    const lines = members.map((m, i) => ({ from: m, say: speak[i].line.say }));
-    const respond = await Promise.all(members.map((m) => groupRespond(cs.ctx(m), members, lines, verdicts.get(m)!).then((r) => {
+    const respond = await Promise.all(members.map((m) => groupRound(cs.ctx(m), members, cs.introsFor(m, members.filter((x) => x !== m)), verdicts.get(m)!).then((r) => {
       live({ type: "group", groupId, members, line: { from: m, say: r.line.say } });
       return r;
     })));
     respond.forEach((r) => count(r.source));
-    blocked += [...speak, ...respond].filter((r) => r.line.blocked).length;
+    blocked += respond.filter((r) => r.line.blocked).length;
     const ok = respond.every((r) => r.decision !== "no") && validateParty(members.map((m) => people.get(m)!)).ok;
     live({ type: "groupDone", groupId, members, ok });
     return {
       ok,
-      groupChat: [...lines, ...members.map((m, i) => ({ from: m, say: respond[i].line.say }))],
+      groupChat: members.map((m, i) => ({ from: m, say: respond[i].line.say })),
       needs: respond.map((r) => r.need).filter(Boolean),
     };
   };

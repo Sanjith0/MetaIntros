@@ -50,13 +50,13 @@ pnpm build && pnpm start     # then open http://localhost:3000/demo
 | `MUSE_BASE_URL` | defaults to `https://api.meta.ai/v1` (OpenAI-compatible) |
 | `MUSE_MODEL` | defaults to `muse-spark-1.1` |
 | `AI_MODE` | `cache` (default: never calls out) or `live` (cache first, then Muse on a miss) |
-| `AI_MAX_CALLS` | hard cap on live calls per server process (default 400; one Companion-engine room is about 100) |
+| `AI_MAX_CALLS` | hard cap on live calls per server process (default 400; one Companion-engine room is about 45) |
 | `FALLBACK_*` | optional second OpenAI-compatible provider, e.g. Llama API |
 
 Warm the cache once with a key, so the demo replays real Muse output with no network:
 
 ```bash
-MODEL_API_KEY=... pnpm ai:warm   # ~100 calls per squad (a room of 12 Companions), written to data/ai-cache/
+MODEL_API_KEY=... pnpm ai:warm   # ~45 calls per squad (a room of 8 Companions), written to data/ai-cache/
 ```
 
 ### Live demo with judges' phones
@@ -152,13 +152,14 @@ flowchart LR
 2. **The Companion engine decides who goes together** (`lib/companion`). Every person has a **Companion** agent that knows only its own person:
    - **Briefs.** Code builds each person's facts from their profile, with a share level per fact (share / only as a need / private). The Profile Analyst adds how the person communicates. Sensitive items never enter a brief. You choose what your Companion may share on your profile page.
    - **Circles.** The **Orchestrator** sorts the room into circles of 8–15.
+   - **Vectors shortlist, Companions decide.** Two Companions only talk if their people's similarity score (profile vectors plus overlap) is at least 65%; someone with nobody above it makes no calls.
    - **Everyone in a circle talks.** Each Companion introduces its person, asks every other Companion a scenario question, answers theirs, and privately scores each person. It describes its person in the third person and never imitates them.
-   - **Deep dives.** Pairs where a Companion asked for more (or the two scores disagree) get a follow-up and a closing exchange.
+   - **Deep dives.** Pairs where a Companion asked for more (or the two scores disagree) get one more exchange: a reaction, an honest concern, and what each person would need.
    - **Proposals and deliberation.** Each Companion proposes a squad for its person, then backs, amends or holds.
    - **Squads.** The Orchestrator forms squads of exactly the size you picked, only from people a Companion chose.
-   - **Group conversation and sign-off.** The squad's Companions talk as a group and each says yes or no. A no is binding and anonymous, and the Orchestrator revises once.
+   - **Group conversation and sign-off.** In one round, each of the squad's Companions speaks to the group and says yes or no. A no is binding and anonymous, and the Orchestrator revises once.
 
-   A Companion makes one Muse call per round and speaks to everyone in that round, so a room of 12 is about 100 calls. Code checks every line: citations must be the speaker's own shared facts, private facts and sensitive topics are blocked, and each prompt holds exactly one person's brief.
+   A Companion makes one Muse call per round and speaks to everyone in that round, so a room of 8 is about 45 calls (about 37 once each person's brief is cached). Code checks every line: citations must be the speaker's own shared facts, private facts and sensitive topics are blocked, and each prompt holds exactly one person's brief.
 3. **Code re-checks safety** on every squad before it is committed.
 4. The next step depends on the queue:
    - **Existing-events queue:** the **Event Selection Agent** chooses from events that code has already verified. Its pick is then re-validated.

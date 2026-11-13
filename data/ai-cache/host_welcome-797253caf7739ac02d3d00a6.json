@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\":\"Hey Jordan, Zoe, Yuki, Rosa, Gabe and Ben! So excited you're all matched for Indie Night: Local Bands Showcase. Plan is to meet on Sat, Nov 14 · 7:30 PM at the front entrance of The Guild Theatre before we head in together. Can't wait to enjoy the show with you! Quick question to kick us off - what's the best vinyl find you've scored recently?\",\"icebreaker\":\"What's the best vinyl find you've scored recently?\",\"interestTag\":\"vinyl\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 289,
+    "completionTokens": 731
+  },
+  "savedAt": "2026-11-13T00:26:33.022Z"
+}

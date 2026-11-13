@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Reza is hoping for a chill squad of 6 for something low-key this weekend. They'd bring their love for vinyl digging, bouldering, and Fujifilm photo walks and love swapping finds. They like low-key, chill plans and are excited to connect over shared interests.\", \"cites\": [\"p04:socialStyle\", \"p04:groups[2]\", \"p04:likes[3]\", \"p04:likes[9]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2978,
+    "completionTokens": 514
+  },
+  "savedAt": "2026-11-13T00:28:21.379Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Jordan, if Rosa wants to hang back near the sound booth and geek out over vinyl finds from Rasputin Music during sets, how would they join in? Rosa is into Vinyl Me, Please.\", \"cites\": [\"p11:likes[4]\"]}, \"p02\": {\"say\": \"Freya, if the showcase gets crowded and Rosa suggests stepping to a quieter corner to chat about Pitchfork reviews between bands, what would they do?\", \"cites\": [\"p11:likes[0]\"]}, \"p03\": {\"say\": \"Zoe, if Rosa brings their 35mm camera to capture low-light moments at Indie Night, how would they hang and share the space?\", \"cites\": [\"p11:likes[7]\"]}, \"p04\": {\"say\": \"Reza, when Rosa wants to keep it low-key and just vibe to Indie Shuffle-style discoveries instead of pushing to the front, how would they roll with that?\", \"cites\": [\"p11:likes[1]\"]}, \"p05\": {\"say\": \"Yuki, if Rosa talks about Bay Area Climbers Coalition community vibes while waiting for the next band, how would they connect during the night?\", \"cites\": [\"p11:likes[2]\"]}, \"p12\": {\"say\": \"Gabe, if Rosa prefers a chill spot and chatting about Phoebe Bridgers between sets rather than a packed pit, how would they make that work together?\", \"cites\": [\"p11:music[0]\"]}, \"p14\": {\"say\": \"Ben, if Rosa wants to grab Philz Coffee after the showcase and debrief favorite local bands quietly, how would they handle winding down?\", \"cites\": [\"p11:likes[8]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3676,
+    "completionTokens": 677
+  },
+  "savedAt": "2026-11-13T00:26:43.808Z"
+}

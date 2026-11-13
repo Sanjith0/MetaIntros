@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe is hoping for a chill, low-key hang with a squad of 6 this weekend. They would bring shared loves for vinyl digging [p03:likes[3]], bouldering [p03:likes[0]] and 35mm film photography [p03:likes[6]], plus easygoing chat about records and photo walks. They'd prefer something relaxed and not too loud.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3008,
+    "completionTokens": 401
+  },
+  "savedAt": "2026-11-13T00:28:21.435Z"
+}

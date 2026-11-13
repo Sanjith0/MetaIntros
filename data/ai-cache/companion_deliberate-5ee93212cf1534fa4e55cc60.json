@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p11\", \"line\": {\"say\": \"Gabe would love this low-key vinyl and climbing crew for Indie Night.\", \"cites\": [\"p12:likes[4]\", \"p12:likes[6]\", \"p12:likes[7]\", \"p12:groups[2]\", \"p12:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1699,
+    "completionTokens": 528
+  },
+  "savedAt": "2026-11-13T00:26:23.521Z"
+}

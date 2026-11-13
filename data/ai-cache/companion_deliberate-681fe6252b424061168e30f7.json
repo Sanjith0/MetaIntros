@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Freya loves that low-key bouldering, Rasputin dig, and photo wander plan — super chill.\", \"cites\": [\"p02:likes[0]\", \"p02:likes[3]\", \"p02:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1557,
+    "completionTokens": 756
+  },
+  "savedAt": "2026-11-13T00:28:15.152Z"
+}

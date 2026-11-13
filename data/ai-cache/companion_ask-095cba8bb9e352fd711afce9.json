@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Rosa and Jordan are between bands at Indie Night and Rosa wants to geek out over recent vinyl finds, how would Jordan actually hang - stay chatting low-key or wander off? Rosa is into vinyl collecting via Vinyl Me, Please.\", \"cites\": [\"p11:likes[4]\"]}, \"p02\": {\"say\": \"At Indie Night when the crowd gets dense, Rosa likes low-key, chill plans. How would Freya handle that moment with Rosa - find a quieter spot to talk music or push to the front?\", \"cites\": [\"p11:socialStyle\"]}, \"p03\": {\"say\": \"Rosa shoots 35mm film photography and likes capturing small moments. If Rosa pulls out a film camera between sets at Indie Night, how would Zoe react and hang out with them?\", \"cites\": [\"p11:likes[7]\"]}, \"p04\": {\"say\": \"Rosa follows Bay Area Climbers Coalition and climbing culture. If talk at Indie Night drifts to climbing gym stories between bands, how would Reza join in with Rosa?\", \"cites\": [\"p11:likes[2]\"]}, \"p05\": {\"say\": \"Rosa is a fan of Phoebe Bridgers and loves mellow indie vibes. At Indie Night, if a band plays a super quiet, emotional set, how would Yuki and Rosa experience it together?\", \"cites\": [\"p11:music[0]\"]}, \"p12\": {\"say\": \"Rosa likes low-key, chill plans over loud hangouts. If Indie Night gets unexpectedly loud and packed, what would Gabe actually do to keep things comfortable with Rosa?\", \"cites\": [\"p11:socialStyle\"]}, \"p14\": {\"say\": \"Rosa is in Peninsula Vinyl Collectors and loves digging for records. If Rosa starts talking about favorite Rasputin Music finds during a break at Indie Night, how would Ben engage?\", \"cites\": [\"p11:groups[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3676,
+    "completionTokens": 724
+  },
+  "savedAt": "2026-11-13T00:25:51.510Z"
+}

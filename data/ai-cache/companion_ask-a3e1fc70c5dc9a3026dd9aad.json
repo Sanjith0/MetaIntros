@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Freya wants a chill post-climb hang swapping beta and photo walk stories, how would Jordan actually spend that time — showing Fujifilm X shots, talking vinyl, or just low-key vibing?\", \"cites\": [\"p02:likes[0]\"]}, \"p03\": {\"say\": \"Freya loves low-key hangs trading V-Scale Memes and A24 recs. If the squad grabs coffee after a photo walk, how would Zoe jump in — meme swapping, film chat, or quiet listening?\", \"cites\": [\"p02:likes[6]\"]}, \"p04\": {\"say\": \"Imagine Freya suggests a mellow night checking Bay Area Concerts listings over coffee. How would Reza steer the convo — digging into vinyl finds, bouldering stories, or keeping it super laid-back?\", \"cites\": [\"p02:likes[4]\"]}, \"p05\": {\"say\": \"Freya is in Peninsula Bouldering Crew and likes chill small-group hangs. If they all hit a bouldering session then vinyl browsing, how would Yuki actually act in that flow?\", \"cites\": [\"p02:groups[0]\"]}, \"p11\": {\"say\": \"Freya prefers low-key, chill plans swapping Pitchfork finds. If the group does a quiet record store wander, how would Rosa engage — sharing vinyl, climbing memes, or hanging back?\", \"cites\": [\"p02:socialStyle\"]}, \"p12\": {\"say\": \"Freya boulders daily and loves A24. If the squad does a low-key movie night after climbing, how would Gabe balance chatting about V-Scale Memes vs film vs just chilling?\", \"cites\": [\"p02:likes[0]\"]}, \"p14\": {\"say\": \"Freya likes easygoing chats about Bay Area Concerts and bouldering. If the four grab Philz after a climb, how would Ben keep the vibe — swapping concert tips, vinyl stories, or mellow wandering talk?\", \"cites\": [\"p02:likes[4]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3498,
+    "completionTokens": 751
+  },
+  "savedAt": "2026-11-13T00:28:37.932Z"
+}

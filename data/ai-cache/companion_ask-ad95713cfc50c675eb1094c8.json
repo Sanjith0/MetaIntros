@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Freya loves swapping V-Scale memes between sets. If Freya and Jordan are hanging at Indie Night and Freya pulls up a meme, how does Jordan usually keep that low-key banter going?\", \"cites\": [\"p02:likes[1]\"]}, \"p03\": {\"say\": \"Freya is in Peninsula Film Club and loves A24 chat during downtime. At Indie Night, if there's a lull between bands, how would Zoe steer the conversation to stay chill?\", \"cites\": [\"p02:likes[6]\"]}, \"p04\": {\"say\": \"Freya boulders daily and likes easy photo walk stories. If Freya and Reza grab a corner spot at Indie Night, what does Reza actually do to keep things relaxed and low-key?\", \"cites\": [\"p02:likes[0]\"]}, \"p05\": {\"say\": \"Freya follows Bay Area Concerts and likes trading gig tips. When the opener finishes at Indie Night, how does Yuki usually chat about the set without making it a big scene?\", \"cites\": [\"p02:likes[4]\"]}, \"p11\": {\"say\": \"Freya prefers low-key, chill plans over loud crowds. If Indie Night gets packed up front, how does Rosa typically find a comfortable spot and keep hanging easygoing with Freya?\", \"cites\": [\"p02:socialStyle\"]}, \"p12\": {\"say\": \"Freya likes A24 and indie vibes. Between bands at Indie Night, if Freya mentions a recent film, how does Gabe usually respond to keep the night relaxed?\", \"cites\": [\"p02:likes[6]\"]}, \"p14\": {\"say\": \"Freya is into Rasputin Music and vinyl finds. If Freya and Ben are waiting for the next act at Indie Night, how does Ben share music stories in a chill way?\", \"cites\": [\"p02:likes[3]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3514,
+    "completionTokens": 757
+  },
+  "savedAt": "2026-11-13T00:25:51.250Z"
+}

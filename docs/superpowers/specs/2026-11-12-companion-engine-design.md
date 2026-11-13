@@ -270,3 +270,19 @@ The Orchestrator stays in the "How we matched you" panel.
    It is added to the prompt only when present, so cached runs without it still replay.
 
 Prompts for runs without a sentence are unchanged, so the warmed cache stays valid.
+
+## Fewer calls (added 2026-11-12)
+
+To keep live rooms affordable and fast:
+
+- **Similarity gate.** Two Companions only talk if their people's similarity score (the original
+  compatibility score: profile vectors plus overlap) is at least 65%. "Vectors shortlist,
+  Companions decide." A person with nobody above it makes no calls; Companions only propose
+  people they talked with.
+- **Rooms of 8** (was 12): the queue engine's room cap and the demo's simulated fill.
+- **One deep round** (follow-up and close merged): react, name a concern, say what the person
+  would need, update the verdict, propose.
+- **One group round** (speak and sign-off together).
+
+Measured: about 45 calls per squad (8 briefs, 8 per round × 4 rounds, 1 Orchestrator, one per
+squad member), about 37 once briefs are cached; was about 87.

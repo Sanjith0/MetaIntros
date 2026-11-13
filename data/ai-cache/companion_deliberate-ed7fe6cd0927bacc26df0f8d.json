@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p11\", \"line\": {\"say\": \"Gabe is down for low-key vinyl, climbing and indie hang. Chill and easygoing.\", \"cites\": [\"p12:socialStyle\", \"p12:groups[2]\", \"p12:groups[1]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1712,
+    "completionTokens": 565
+  },
+  "savedAt": "2026-11-13T00:28:15.913Z"
+}

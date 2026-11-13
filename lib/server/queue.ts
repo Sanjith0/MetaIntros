@@ -299,7 +299,7 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
   const delay = mode === "mixed" ? Number(await getSetting("mixedFillDelayMs", "12000")) : 0;
   const entry = await prisma.queueEntry.findUniqueOrThrow({ where: { id: entryId } });
   // The Companion engine wants a whole room to choose from, not just enough people for one squad.
-  const roomFill = Number(await getSetting("roomFill", "12"));
+  const roomFill = Number(await getSetting("roomFill", "8"));
   const rec = { timers: [] as NodeJS.Timeout[], spawned: [] as string[], readyAt: Date.now() + (opts.immediate ? 0 : delay + fillMs) + 250 };
   sims().set(entryId, rec);
 

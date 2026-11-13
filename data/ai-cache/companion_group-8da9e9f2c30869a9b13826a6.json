@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe is hoping for a chill new hangout with a squad of 4 and would bring easygoing chat about vinyl hunting, bouldering league, and 35mm film walks. They like low-key, chill plans and would prefer somewhere quieter where they can actually talk.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\", \"p03:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2326,
+    "completionTokens": 404
+  },
+  "savedAt": "2026-11-13T00:29:12.759Z"
+}

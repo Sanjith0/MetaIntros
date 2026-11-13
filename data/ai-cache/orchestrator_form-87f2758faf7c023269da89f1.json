@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p02\", \"p03\", \"p05\"], \"why\": \"You all live on Bouldering Daily and Rasputin Music — perfect for trading beta, swapping vinyl finds, and planning a Bay Area Concerts night after a chill climb.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1378,
+    "completionTokens": 515
+  },
+  "savedAt": "2026-11-13T00:29:10.863Z"
+}

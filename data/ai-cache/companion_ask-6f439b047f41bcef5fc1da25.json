@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Ben loves low-key hangs around climbing and vinyl. If they hit Bouldering Night at Peninsula Boulders then want to dig crates at Rasputin, how would Jordan balance climbing talk vs chilling?\", \"cites\": [\"p14:likes[0]\"]}, \"p02\": {\"say\": \"Ben is into Snail Mail and chill indie nights. If they go to a small Bay Area Concerts show together, how would Freya handle the crowd, chatting between sets, and winding down after?\", \"cites\": [\"p14:music[0]\"]}, \"p03\": {\"say\": \"Ben follows Vinyl Me, Please and likes Record Store Day Palo Alto. If they spend an afternoon crate-digging then grabbing coffee, how would Zoe keep conversation going?\", \"cites\": [\"p14:likes[1]\"]}, \"p04\": {\"say\": \"Ben prefers low-key, chill plans. If they plan a relaxed evening of vinyl talk and maybe a short bouldering session, how would Reza decide when to hang back vs suggest next spot?\", \"cites\": [\"p14:socialStyle\"]}, \"p05\": {\"say\": \"Ben is in Stanford Climbing Club Alumni and likes chill hangs. If they do Windy Hill Sunset Hike then vinyl browsing, how would Yuki keep energy low-key and inclusive?\", \"cites\": [\"p14:likes[0]\"]}, \"p11\": {\"say\": \"Ben listens to Snail Mail and loves Indie Night at The Guild. If the show gets crowded and loud, how would Rosa help keep things relaxed for a chill squad of 6?\", \"cites\": [\"p14:music[0]\"]}, \"p12\": {\"say\": \"Ben is into Vinyl Me, Please and Peninsula Vinyl Collectors. If they are flipping through records and someone wants to stay longer, how would Gabe navigate the group vibe?\", \"cites\": [\"p14:likes[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3647,
+    "completionTokens": 797
+  },
+  "savedAt": "2026-11-13T00:27:40.396Z"
+}

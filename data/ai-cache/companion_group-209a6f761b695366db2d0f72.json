@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Freya is hoping for a chill hangout with a squad of 4 and would bring easy chat about bouldering, film and live music. They love Bouldering Daily, A24 films, and Bay Area Concerts, plus swapping V-Scale Memes and photo walk stories. They like low-key, chill plans and small-group vibes.\", \"cites\": [\"p02:likes[0]\", \"p02:likes[6]\", \"p02:likes[4]\", \"p02:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2138,
+    "completionTokens": 418
+  },
+  "savedAt": "2026-11-13T00:29:12.785Z"
+}

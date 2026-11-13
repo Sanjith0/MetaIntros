@@ -313,7 +313,7 @@ export async function runTickAsync(
 }
 
 /** The most people one run of the Companion engine considers. */
-export const MAX_ROOM = 30;
+export const MAX_ROOM = 8;
 
 /**
  * Companion-engine tick. For each anchor (same order and rules as runTickAsync) the "room" is the

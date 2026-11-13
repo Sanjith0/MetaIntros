@@ -18,8 +18,14 @@ export const MAX_PICKS = 4;
 export const MAX_DEEP = 5;
 export const GAP = 25;
 /**
+ * Vectors shortlist, Companions decide: two Companions only talk if their people's similarity score
+ * (profile vectors plus overlap, lib/match/compat) is at least this. Saves calls and prompt size in
+ * rooms of people with unrelated interests.
+ */
+export const SIMILARITY_GATE = 0.65;
+/**
  * Below this pair score the deterministic (fallback) Companion declines a squad at sign-off (see
- * rounds.groupRespond). It matches the widest level of the queue engine's search (minPairwise 0.15
+ * rounds.groupRound). It matches the widest level of the queue engine's search (minPairwise 0.15
  * in lib/match/engine.ts LEVELS), so the stand-in never refuses a pair the baseline matcher accepts.
  * Real Muse Companions decide for themselves.
  */

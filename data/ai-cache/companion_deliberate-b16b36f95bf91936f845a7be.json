@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Reza is down for a chill back spot trading vinyl finds and bouldering beta between sets.\", \"cites\": [\"p04:socialStyle\", \"p04:groups[2]\", \"p04:likes[3]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1658,
+    "completionTokens": 868
+  },
+  "savedAt": "2026-11-13T00:26:23.522Z"
+}

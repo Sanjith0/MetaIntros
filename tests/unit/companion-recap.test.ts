@@ -26,7 +26,7 @@ describe("Companion recap and the numbers comparison", () => {
       expect(s.notes).toEqual(r.verdicts.get("p01")!.get(s.id)); // my Companion's notes about them…
       expect(s.notes).not.toBe(r.verdicts.get(s.id)!.get("p01")); // …never theirs about me
     }
-    expect(recap.talkedWith).toBe(pool.length - 1);
+    expect(recap.talkedWith).toBe([...r.threads.keys()].filter((k) => k.split("|").includes("p01")).length);
     expect(recap.groupChat).toEqual(party.groupChat);
   });
 

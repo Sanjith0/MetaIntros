@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p11\", \"line\": {\"say\": \"Yuki would love this chill crew digging vinyl and climbing chat between sets.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[3]\", \"p05:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1597,
+    "completionTokens": 639
+  },
+  "savedAt": "2026-11-13T00:26:22.105Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If the showcase gets crowded and Gabe wants to hang back near the edge chatting about climbing and vinyl between sets, how would Jordan handle that? Would they stay low-key with them?\", \"cites\": [\"p12:socialStyle\"]}, \"p02\": {\"say\": \"Gabe loves swapping V-Scale Memes and concert tips in small groups at Indie Night. If Freya and Gabe grab Philz before the show, how would Freya keep the vibe chill?\", \"cites\": [\"p12:likes[3]\"]}, \"p03\": {\"say\": \"Gabe goes to Indie Night at The Guild and likes low-key hangs. If the band is loud and Gabe steps out to chat about A24 films, would Zoe join or prefer staying in the crowd?\", \"cites\": [\"p12:events[0]\"]}, \"p04\": {\"say\": \"Gabe is in Bay Area Climbers and likes easygoing chats about bouldering and vinyl between bands. How would Reza actually spend the downtime at Indie Night with them?\", \"cites\": [\"p12:groups[2]\"]}, \"p05\": {\"say\": \"When Gabe is at Indie Night checking SF Live Music Guide recs and wants a relaxed spot away from the pit, how does Yuki usually navigate that kind of moment?\", \"cites\": [\"p12:likes[1]\"]}, \"p11\": {\"say\": \"Gabe collects vinyl and is in Peninsula Vinyl Collectors. If they start talking Rasputin finds during set breaks at Indie Night, how would Rosa engage in that low-key moment?\", \"cites\": [\"p12:groups[1]\"]}, \"p14\": {\"say\": \"Gabe prefers chill, laid-back plans at Indie Night. If the group wants to split between front row and back bar, where would Ben actually want to hang with Gabe?\", \"cites\": [\"p12:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3747,
+    "completionTokens": 680
+  },
+  "savedAt": "2026-11-13T00:25:54.295Z"
+}

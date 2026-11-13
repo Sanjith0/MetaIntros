@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe is hoping for a chill Indie Night with easygoing company for the local bands showcase. They'd bring chat about vinyl collecting, bouldering, and 35mm film photography between sets, and likes low-key, chill plans. Would prefer we keep it on the quieter side.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\", \"p03:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3010,
+    "completionTokens": 428
+  },
+  "savedAt": "2026-11-13T00:26:28.567Z"
+}

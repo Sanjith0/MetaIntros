@@ -23,10 +23,10 @@ describe("Companion engine in the queue", () => {
     await setSetting("simFillMs", "0");
   });
 
-  it("a queued user is matched through a room of 12 and the squad is exactly the chosen size", async () => {
+  it("a queued user is matched through a room of 8 and the squad is exactly the chosen size", async () => {
     await join(5);
     await wait(300);
-    expect(await prisma.queueEntry.count({ where: { status: "waiting" } })).toBe(12); // Me + 11 simulated fillers
+    expect(await prisma.queueEntry.count({ where: { status: "waiting" } })).toBe(8); // Me + 7 simulated fillers
     expect(await tick()).toBe(1);
     const party = await confirmed();
     expect(party.members).toHaveLength(5);
@@ -89,7 +89,7 @@ describe("Companion engine in the queue", () => {
 
   it("leaving the queue mid-run drops that squad and leaves nobody stuck as matched", async () => {
     let left = false;
-    mockProvider().on("companion_group2", async () => {
+    mockProvider().on("companion_group", async () => {
       if (!left) {
         left = true;
         await leaveQueue("p01");
@@ -153,7 +153,7 @@ describe("Companion engine in the queue", () => {
 
   it("the live view shows a person only their own Companion's conversations and notes", async () => {
     const seen: (Awaited<ReturnType<typeof liveViewFor>>)[] = [];
-    mockProvider().on("companion_followup", async () => {
+    mockProvider().on("companion_close", async () => {
       if (!seen.length) seen.push(await liveViewFor("p01"));
       return JSON.stringify({ says: {} });
     });
@@ -162,7 +162,8 @@ describe("Companion engine in the queue", () => {
     await tick();
     const v = seen[0]!;
     expect(v.stage).toBe("deep");
-    expect(v.conversations.length).toBe(11); // everyone else in the room of 12
+    expect(v.conversations.length).toBeGreaterThan(0);
+    expect(v.conversations.length).toBeLessThanOrEqual(7); // at most everyone else in the room of 8
     for (const c of v.conversations) {
       expect(c.with).not.toBe("p01");
       expect(c.lines.slice(0, 2).map((l) => l.kind)).toEqual(["intro", "intro"]);

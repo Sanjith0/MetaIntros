@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"At Indie Night, if Zoe wants to duck to the side between sets to trade notes on recent vinyl finds, how would Jordan actually spend that downtime with them?\", \"cites\": [\"p03:likes[3]\"]}, \"p02\": {\"say\": \"If the venue gets crowded and Zoe suggests grabbing a quieter spot to chat about bouldering and V-Scale memes between bands, what would Freya do next?\", \"cites\": [\"p03:likes[0]\"]}, \"p04\": {\"say\": \"Zoe likes bringing a film camera to shows. If they wanted to step out for a minute to shoot some 35mm candids during Indie Night, how would Reza join in?\", \"cites\": [\"p03:likes[6]\"]}, \"p05\": {\"say\": \"Between bands, Zoe loves low-key crate-digging stories from Peninsula Vinyl Collectors. How would Yuki keep that conversation going in a chill corner?\", \"cites\": [\"p03:likes[3]\"]}, \"p11\": {\"say\": \"If Zoe is geeking out over 35mm film photography and wants to compare shots from a recent photo walk during the showcase, how would Rosa respond in the moment?\", \"cites\": [\"p03:likes[6]\"]}, \"p12\": {\"say\": \"When the music pauses and Zoe starts swapping Peninsula Bouldering League stories, how would Gabe actually hang and keep it relaxed?\", \"cites\": [\"p03:likes[0]\"]}, \"p14\": {\"say\": \"Zoe prefers low-key, chill plans over big crowds. If Indie Night gets loud, how would Ben find a comfortable way to still enjoy the bands together?\", \"cites\": [\"p03:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3702,
+    "completionTokens": 756
+  },
+  "savedAt": "2026-11-13T00:25:51.190Z"
+}

@@ -126,17 +126,15 @@ describe("companion rounds", () => {
     expect(out.says.size).toBe(0);
   });
 
-  it("deep-dive rounds answer every deep partner and skip the call when there are none", async () => {
+  it("the deep round answers every deep partner, and still proposes when there are none", async () => {
     const thread = (o: string): rounds.ThreadMsg[] => [{ from: o, to: me, kind: "answer", say: "They'd stay late.", cites: [], blocked: false }];
     const threads = new Map(others.slice(0, 2).map((o) => [o, thread(o)]));
-    const f = await rounds.followUpRound(ctx(), threads);
-    expect([...f.says.keys()].sort()).toEqual(others.slice(0, 2));
     const cl = await rounds.closeRound(ctx(), threads, circle, new Map(), 4);
     expect([...cl.says.keys()].sort()).toEqual(others.slice(0, 2));
     expect([...cl.verdicts.keys()].sort()).toEqual(others.slice(0, 2));
-    mockProvider().reset();
-    expect((await rounds.followUpRound(ctx(), new Map())).says.size).toBe(0);
-    expect(mockProvider().calls).toHaveLength(0);
+    const none = await rounds.closeRound(ctx(), new Map(), circle, new Map(), 4);
+    expect(none.says.size).toBe(0);
+    expect(none.proposal.members).toHaveLength(4);
   });
 
   it("deliberate: backs a valid proposal, ignores one that leaves its person out, turns a duplicate amend into a back", async () => {
@@ -157,24 +155,24 @@ describe("companion rounds", () => {
     expect(am.members).toEqual([me, others[0], others[3], others[4]].sort());
   });
 
-  it("deliberate and groupRespond return valid enums on garbage output; useModel false makes no call", async () => {
+  it("deliberate and groupRound return valid enums on garbage output; useModel false makes no call", async () => {
     mockProvider().on("companion_deliberate", () => JSON.stringify({ action: "shout" }));
-    mockProvider().on("companion_group2", () => "definitely!");
+    mockProvider().on("companion_group", () => "definitely!");
     const table = [{ id: "prop-" + others[0], by: others[0], members: [me, ...others.slice(0, 3)], line: "x", backers: [] }];
     expect(["back", "amend", "hold"]).toContain((await rounds.deliberate(ctx(), table, new Map(), 4)).action);
-    expect(["yes", "yes_if", "no"]).toContain((await rounds.groupRespond(ctx(), circle.slice(0, 4), [], new Map())).decision);
+    expect(["yes", "yes_if", "no"]).toContain((await rounds.groupRound(ctx(), circle.slice(0, 4), intros, new Map())).decision);
     mockProvider().reset();
     expect((await rounds.askRound(ctx({ useModel: false }), intros)).source).toBe("template");
-    expect((await rounds.groupSpeak(ctx({ useModel: false }), circle.slice(0, 4), intros, new Map())).line.blocked).toBe(false);
+    expect((await rounds.groupRound(ctx({ useModel: false }), circle.slice(0, 4), intros, new Map())).line.blocked).toBe(false);
     expect(mockProvider().calls).toHaveLength(0);
   });
 
-  it("groupRespond: a model 'no' is kept with its reason private; yes_if carries a need", async () => {
-    mockProvider().on("companion_group2", () => JSON.stringify({ line: { say: "Thanks, everyone.", cites: [] }, decision: "no", privateReason: "not a fit" }));
-    const no = await rounds.groupRespond(ctx(), circle.slice(0, 4), [], new Map());
+  it("groupRound: a model 'no' is kept with its reason private; yes_if carries a need", async () => {
+    mockProvider().on("companion_group", () => JSON.stringify({ line: { say: "Thanks, everyone.", cites: [] }, decision: "no", privateReason: "not a fit" }));
+    const no = await rounds.groupRound(ctx(), circle.slice(0, 4), intros, new Map());
     expect(no).toMatchObject({ decision: "no", privateReason: "not a fit" });
     expect(no.line.say).toBe("Thanks, everyone.");
-    mockProvider().on("companion_group2", () => JSON.stringify({ line: { say: "Sounds good.", cites: [] }, decision: "yes_if", need: "somewhere we can hear each other" }));
-    expect(await rounds.groupRespond(ctx(), circle.slice(0, 4), [], new Map())).toMatchObject({ decision: "yes_if", need: "somewhere we can hear each other" });
+    mockProvider().on("companion_group", () => JSON.stringify({ line: { say: "Sounds good.", cites: [] }, decision: "yes_if", need: "somewhere we can hear each other" }));
+    expect(await rounds.groupRound(ctx(), circle.slice(0, 4), intros, new Map())).toMatchObject({ decision: "yes_if", need: "somewhere we can hear each other" });
   });
 });

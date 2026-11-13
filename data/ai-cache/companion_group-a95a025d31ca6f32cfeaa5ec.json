@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki is hoping for a chill new hangout with a squad of 4. They would bring shared love of vinyl and bouldering and indie shows, and easygoing low-key energy. They love swapping Record Store Day finds and Bouldering Night stories and would prefer to keep plans low-key and skip pub spots.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:likes[2]\", \"p05:socialStyle\", \"p05:events[0]\", \"p05:events[1]\"]}, \"decision\": \"yes_if\", \"need\": \"would prefer to avoid Rose & Crown Pub and keep it to a chill, low-key spot\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2195,
+    "completionTokens": 620
+  },
+  "savedAt": "2026-11-13T00:29:13.394Z"
+}

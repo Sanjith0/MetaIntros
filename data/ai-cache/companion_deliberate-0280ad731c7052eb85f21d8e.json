@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p14\", \"members\": [\"p01\", \"p04\", \"p05\", \"p11\", \"p12\", \"p14\"], \"line\": {\"say\": \"Ben would love low-key boulder, coffee and vinyl with this chill crew.\", \"cites\": [\"p14:likes[0]\", \"p14:likes[1]\", \"p14:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1692,
+    "completionTokens": 423
+  },
+  "savedAt": "2026-11-13T00:28:16.096Z"
+}

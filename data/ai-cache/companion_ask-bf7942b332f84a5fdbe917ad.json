@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Rosa loves low-key hangs. If Rosa and Jordan spend an afternoon digging at Rasputin Music then want Philz, how would Jordan pace the hang to keep it chill?\", \"cites\": [\"p11:socialStyle\"]}, \"p02\": {\"say\": \"Rosa is into vinyl collecting via Vinyl Me, Please. If Rosa and Freya are at a small record listening night, how would Freya chat and share finds?\", \"cites\": [\"p11:likes[4]\"]}, \"p03\": {\"say\": \"Rosa shoots 35mm film photography. If Rosa and Zoe do a Bay Area Photo Walk together, how would Zoe keep conversation easygoing between shots?\", \"cites\": [\"p11:likes[7]\"]}, \"p04\": {\"say\": \"Rosa follows Bay Area Climbers Coalition. If Rosa and Reza hit a bouldering gym then want a quiet wind-down, what would Reza suggest next?\", \"cites\": [\"p11:likes[2]\"]}, \"p05\": {\"say\": \"Rosa is in Peninsula Vinyl Collectors. If Rosa and Yuki are trading vinyl after a show, how would Yuki keep the hang relaxed and low-pressure?\", \"cites\": [\"p11:groups[0]\"]}, \"p12\": {\"say\": \"Rosa likes low-key, chill plans. If Rosa and Gabe are at an indie show that gets crowded, how would Gabe adjust to keep it comfortable for Rosa?\", \"cites\": [\"p11:socialStyle\"]}, \"p14\": {\"say\": \"Rosa is a fan of Phoebe Bridgers. If Rosa and Ben are at a Phoebe Bridgers @ Greek Theatre night, how would Ben hang before and after the set?\", \"cites\": [\"p11:music[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3660,
+    "completionTokens": 670
+  },
+  "savedAt": "2026-11-13T00:27:37.267Z"
+}

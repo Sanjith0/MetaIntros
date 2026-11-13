@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p04\", \"members\": [\"p01\", \"p02\", \"p03\", \"p04\", \"p05\", \"p14\"], \"line\": {\"say\": \"Jordan is into chill bouldering, vinyl digging, and photo walks — low-key hang sounds perfect.\", \"cites\": [\"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1552,
+    "completionTokens": 908
+  },
+  "savedAt": "2026-11-13T00:28:15.422Z"
+}

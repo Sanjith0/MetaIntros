@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki is hoping for a chill Indie Night showcase with a low-key crew. They would bring easygoing vinyl and climbing chat and love for bands like Wet Leg. They like Rasputin Music, Bouldering Daily and Bay Area Concerts, and would prefer a quieter spot for the night to keep it relaxed.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:likes[2]\", \"p05:music[0]\", \"p05:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2879,
+    "completionTokens": 698
+  },
+  "savedAt": "2026-11-13T00:26:30.664Z"
+}
