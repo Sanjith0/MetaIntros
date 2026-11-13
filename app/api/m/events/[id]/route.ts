@@ -6,6 +6,7 @@ import { now } from "@/lib/server/clock";
 import { getStatusCard } from "@/lib/server/status";
 import { pulseLine, queuePulse } from "@/lib/server/pulse";
 import { eventCoverSrc } from "@/lib/images";
+import { listFriendQueues } from "@/lib/server/friendQueues";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +17,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const e = await getEventDetail(me.id, id);
   if (!e) return NextResponse.json({ error: "not found" }, { status: 404 });
   const t = await now();
-  const [card, pulse, landmarks] = await Promise.all([
+  const [card, pulse, landmarks, friendQueues] = await Promise.all([
     getStatusCard(me.id, t, id),
     queuePulse(id),
     prisma.landmark.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, city: true } }),
+    e.kind === "hangout" ? Promise.resolve([]) : listFriendQueues(me.id, { eventId: id }),
   ]);
   return NextResponse.json({
     me: { id: me.id, name: me.name },
@@ -32,6 +34,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     card,
     pulse: pulseLine(pulse),
     landmarks,
+    friendQueues,
+    nowMs: t.getTime(),
     shareDefault: me.queueVisibility === "friends",
   });
 }

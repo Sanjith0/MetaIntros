@@ -4,7 +4,7 @@ import { getJSON, postJSON } from './api';
 import { stripCitations } from './citations';
 import { Avatar, Button, Icon, Section, c, font, t } from './ui';
 
-interface ThreadLine { from: 'me' | 'them'; kind: string; say: string; blocked: boolean }
+export interface ThreadLine { from: 'me' | 'them'; kind: string; say: string; blocked: boolean }
 interface Notes { score: number; wouldEnjoy: string[]; concerns: string[]; needs: string[] }
 type People = Record<string, { name: string; avatarColor: string; anonymous?: boolean; age?: number; about?: string; traits?: string[] }>;
 interface CheckInView {

@@ -36,7 +36,7 @@ export default function JoinScreen() {
     if (!r.ok) { setBusy(false); return setError(r.data?.error ?? 'Something went wrong. Try again.'); }
     router.replace('/events');
   };
-  return <Screen title="Join the Queue Up demo" testID="join-page">
+  return <Screen title="Join the Queue Up demo" tabs={false} testID="join-page">
     <Section style={{ gap: 8 }}>
       <Text style={t.body}>This is a demo sign-up for a hackathon prototype. It isn&apos;t Facebook and isn&apos;t connected to it. There&apos;s no password and no account.</Text>
       <Text style={t.meta}>We collect your first name, age range, gender (optional) and the interests you pick. If you&apos;re matched, your squad sees your first name and what you have in common. Everything is deleted 24 hours after you sign up, or when the demo resets.</Text>

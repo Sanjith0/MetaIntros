@@ -6,12 +6,13 @@ import { useData } from '../../qu/hooks';
 import { Avatar, Button, Cover, DateLine, Icon, IconCircle, Loading, Progress, Row, Screen, Section, c, font, t } from '../../qu/ui';
 import { first, fmtDuration } from '../../qu/format';
 import { CompanionFeed } from '../../qu/Companion';
+import { SearchMap, SquadDecision, type SearchAreaView } from '../../qu/decision';
 
 interface Status {
   state: 'idle' | 'waiting' | 'matched'; targetSize?: number; mode?: 'events' | 'hangout'; eventId?: string | null; eventTitle?: string | null;
   bucketName?: string; bucketId?: string; problem?: 'no_events' | 'event_started' | 'no_fit' | 'no_squad'; stage?: string;
   waitedMs?: number; found?: number; foundUsers?: { id: string; name: string; avatarColor: string }[];
-  together?: { id: string; name: string }[]; partyId?: string | null;
+  together?: { id: string; name: string }[]; partyId?: string | null; searchArea?: SearchAreaView | null;
 }
 interface Member { acceptedAt: string | null; shared?: string[]; user: { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean } }
 interface Party {
@@ -104,7 +105,8 @@ export default function QueueScreen() {
       </View>
       {notice === 'requeued' ? <Text style={[t.body, { backgroundColor: c.wash, padding: 12, borderRadius: 8, marginTop: 12 }]}>That squad didn&apos;t come together, so we&apos;re finding you another. You kept your place in line.</Text> : null}
       <Text testID="queue-timer" style={[t.timer, { textAlign: 'center', marginTop: 16 }]}>{fmtDuration(elapsed)}</Text>
-      <Text style={[t.meta, { textAlign: 'center' }]}>{widening}</Text>
+      <Text testID="room-stage" style={[t.meta, { textAlign: 'center' }]}>{widening}</Text>
+      {status.searchArea ? <SearchMap area={status.searchArea} me={users[0]} /> : null}
       <Text testID="players-found" style={[t.bodyBold, { marginTop: 20, marginBottom: 8 }]}>{found} of {n} found</Text>
       <Progress value={found} max={n} />
       <View testID="player-slots" style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
@@ -207,6 +209,8 @@ function SquadFound({ party, meId }: { party: Party; meId: string }) {
         </View>
       </View>
     </Section> : null}
+    <SquadDecision partyId={party.id} />
+    <View style={{ backgroundColor: c.surface }}><Row testID="trace-toggle" icon="list" title="How we matched you" subtitle="What code checked and what AI wrote" onPress={() => router.push(`/squad/${party.id}/trace`)} trailing={<Icon name="chevron-right" color={c.muted} />} /></View>
     <Section>
       {party.chat ? <Button variant="primary" size="lg" onPress={() => router.push(`/chats/${party.chat!.id}`)} testID="open-squad-chat">Open squad chat</Button>
         : <Button variant="primary" size="lg" onPress={() => router.push(`/squad/${party.id}`)}>See your squad</Button>}

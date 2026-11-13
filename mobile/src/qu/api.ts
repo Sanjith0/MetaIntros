@@ -30,3 +30,15 @@ export async function postJSON<T = unknown>(path: string, body?: unknown): Promi
   const data = (await r.json().catch(() => null)) as T | null;
   return { ok: r.ok, status: r.status, data };
 }
+
+/** Any other method (DELETE, PATCH, PUT), with the same result shape as postJSON. */
+export async function sendJSON<T = unknown>(method: string, path: string, body?: unknown) {
+  const r = await fetch(`${API_BASE}${path}`, {
+    method, credentials: 'include',
+    headers: { 'content-type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  }).catch(() => null);
+  if (!r) return { ok: false, status: 0, data: null as T | null };
+  const data = (await r.json().catch(() => null)) as T | null;
+  return { ok: r.ok, status: r.status, data };
+}

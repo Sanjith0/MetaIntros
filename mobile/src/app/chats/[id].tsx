@@ -4,6 +4,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { getJSON, postJSON } from '../../qu/api';
 import { Avatar, Button, FacePile, Icon, Loading, TopBar, c, font, t } from '../../qu/ui';
 import { first, fmtDuration, fmtEventWhen } from '../../qu/format';
+import { RateSquadSheet, type RatingState } from '../../qu/RateSquad';
 
 interface U { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean }
 interface Msg { id: string; body: string; kind: string; createdAt: string; senderId: string | null; sender: U | null; failed?: boolean; aiSource?: string | null }
@@ -11,6 +12,7 @@ interface ChatData {
   meId: string;
   chat: { id: string; type: string; title: string | null; archived: boolean; partyId: string | null; members: { user: U }[]; messages: Msg[] };
   squad: { partyId: string; expiresAt: string | null; archived?: boolean; meetingSpot: string; event: { title: string; startsAt: string } } | null;
+  rating: RatingState | null;
 }
 const isSample = (u: U | null | undefined) => Boolean(u?.isSimulated && !u.isLive);
 
@@ -27,11 +29,20 @@ export default function ChatThread() {
   const [archived, setArchived] = useState(false);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
+  const [rating, setRating] = useState<RatingState | null>(null);
+  const [rateOpen, setRateOpen] = useState(false);
   const scroll = useRef<{ scrollToEnd: (o?: { animated?: boolean }) => void } | null>(null);
 
   useEffect(() => {
-    getJSON<ChatData>(`/api/m/chats/${id}`).then(d => { setData(d); setMessages(d.chat.messages); setArchived(d.chat.archived || Boolean(d.squad?.archived)); }).catch(() => {});
+    getJSON<ChatData>(`/api/m/chats/${id}`).then(d => { setData(d); setMessages(d.chat.messages); setArchived(d.chat.archived || Boolean(d.squad?.archived)); setRating(d.rating); if (d.rating?.askNow) setRateOpen(true); }).catch(() => {});
   }, [id]);
+  // However the chat ended (polling, coming back to the screen), ask for a rating once.
+  const partyId = data?.chat.type === 'squad' ? data.chat.partyId : null;
+  const ratingEnded = Boolean(rating?.ended);
+  useEffect(() => {
+    if (!archived || ratingEnded || !partyId) return;
+    getJSON<RatingState>(`/api/squad/${partyId}/rating`).then(st => { setRating(st); if (st.askNow) setRateOpen(true); }).catch(() => {});
+  }, [archived, ratingEnded, partyId]);
   const poll = useCallback(async () => {
     const j = await getJSON<{ archived: boolean; messages: Msg[] }>(`/api/chats/${id}/messages`).catch(() => null);
     if (!j) return;
@@ -112,8 +123,11 @@ export default function ChatThread() {
       })}
     </ScrollView>
     {archived ? <View style={{ borderTopWidth: 1, borderTopColor: c.divider, padding: 12 }}>
-      <Text style={[t.meta, { textAlign: 'center' }]}>This squad chat has ended. You can still read it.</Text>
-      {chat.partyId ? <View style={{ marginTop: 8 }}><Button variant="primary" icon="user-plus" onPress={() => router.push(`/squad/${chat.partyId}/connect`)} testID="archived-connect">Add your squad as friends</Button></View> : null}
+      <View testID="read-only" style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 }}><Icon name="lock" size={12} color={c.muted} /><Text style={t.meta}>This squad chat has ended. You can still read it.</Text></View>
+      {rating?.ended ? (rating.mine?.stars
+        ? <Text testID="rated-line" style={[t.meta, { textAlign: 'center', marginTop: 8 }]}>★ Thanks. You rated this night {rating.mine.stars} of 5. <Text testID="rate-edit" onPress={() => setRateOpen(true)} style={{ color: c.link, fontFamily: font.semibold }}>Edit</Text></Text>
+        : <View style={{ marginTop: 8 }}><Button testID="rate-open" icon="star" onPress={() => setRateOpen(true)}>Rate your squad</Button></View>) : null}
+      {chat.partyId ? <View style={{ marginTop: 8 }}><Button variant="primary" icon="user-plus" onPress={() => router.push(`/squad/${chat.partyId}/connect`)} testID="stay-in-touch">Add your squad as friends</Button></View> : null}
     </View> : <View>
       {isSquad ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 12, paddingTop: 8 }}>
         <Pressable testID="ask-host" onPress={() => setDraft(d => (d.startsWith('@host') ? d : `@host ${d}`))} style={{ height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: c.control, justifyContent: 'center' }}><Text style={[t.meta, { color: c.ink, fontFamily: font.semibold }]}>Ask the host</Text></Pressable>
@@ -128,5 +142,15 @@ export default function ChatThread() {
         </Pressable>
       </View>
     </View>}
+    {rating ? <RateSquadSheet key={rating.mine ? 'edit' : 'new'} open={rateOpen} state={rating}
+      onClose={skipped => {
+        setRateOpen(false);
+        if (skipped && !rating.mine) {
+          // "Not now": the pop-up won't come back; "Rate your squad" stays in the footer.
+          postJSON(`/api/squad/${rating.partyId}/rating`, { skip: true });
+          setRating({ ...rating, mine: { stars: null, mates: {} }, askNow: false });
+        }
+      }}
+      onSaved={st => { setRating(st); setRateOpen(false); }} /> : null}
   </KeyboardAvoidingView>;
 }

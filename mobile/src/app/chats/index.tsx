@@ -12,9 +12,9 @@ interface InboxRow {
 
 export default function ChatsScreen() {
   const { data, error, reload } = useData<{ meId: string; now: string; rows: InboxRow[] }>('/api/m/chats', 3000);
-  if (!data) return <Screen title="Chats" tabs>{error ? <ErrorNote error={error} onRetry={reload} /> : <Loading />}</Screen>;
+  if (!data) return <Screen title="Chats" back="/home">{error ? <ErrorNote error={error} onRetry={reload} /> : <Loading />}</Screen>;
   const now = new Date(data.now);
-  return <Screen title="Chats" tabs testID="chats-page">
+  return <Screen title="Chats" back="/home" testID="chats-page">
     <View style={{ backgroundColor: c.surface, paddingVertical: 4, minHeight: 400 }}>
       {data.rows.map(r => {
         const squad = r.type === 'squad';
@@ -22,7 +22,7 @@ export default function ChatsScreen() {
         const snippet = `${r.lastSender ? `${r.lastSender}: ` : ''}${r.lastMessage ?? 'Say hi'} · ${timeAgo(r.lastMessageAt, now)}`;
         return <Row key={r.id} testID={`inbox-row-${r.id}`} bold={r.unread > 0} onPress={() => router.push(`/chats/${r.id}`)}
           leading={<View>
-            {squad ? <FacePile people={others.slice(0, 2)} size={40} max={2} /> : <Avatar name={r.avatar.name} color={r.avatar.color} size={56} />}
+            {squad ? <FacePile people={others.slice(0, 2)} size={40} max={2} /> : <Avatar name={r.avatar.name} color={r.avatar.color} size={56} character={r.type === 'direct'} />}
             {squad ? <View style={{ position: 'absolute', right: -4, bottom: -4, width: 20, height: 20, borderRadius: 10, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: c.surface }}><Icon name="users" size={10} color={c.surface} /></View> : null}
           </View>}
           title={<Text numberOfLines={1} style={r.unread ? t.bodyBold : [t.body]}>{r.title}{squad ? <Text style={t.meta}>  · Squad</Text> : null}</Text>}

@@ -6,6 +6,7 @@ import { getShareChoice, shareOpen } from "@/lib/server/posts";
 import { now as clockNow } from "@/lib/server/clock";
 import { prisma } from "@/lib/db";
 import { personaFrom } from "@/lib/profile/persona";
+import { albumCount } from "@/lib/server/album";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ partyId
   const people = p.members.map((m) => ({ ...m.user, checkedIn: Boolean(m.checkedInAt) }));
   const others = people.filter((u) => u.id !== me);
   const ready = p.status === "confirmed" || p.status === "completed";
-  const [choice, now] = await Promise.all([getShareChoice(partyId, me), clockNow()]);
+  const [photos, choice, now] = await Promise.all([ready ? albumCount(partyId, people.map((u) => u.id)) : 0, getShareChoice(partyId, me), clockNow()]);
   const intros = new Map(
     (await prisma.user.findMany({ where: { id: { in: others.map((u) => u.id) } }, select: { id: true, rawGraph: true } })).map((u) => [u.id, personaFrom(u.rawGraph).about]),
   );
@@ -30,6 +31,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ partyId
     status: p.status,
     chat: p.chat ? { id: p.chat.id, archived: p.chat.archived } : null,
     event: { id: ev.id, title: ev.title, startsAt: ev.startsAt, endsAt: ev.endsAt, venueName: ev.venueName, venueAddress: ev.venueAddress, lat: ev.lat, lng: ev.lng },
+    ready,
+    photos,
     sharePrompt: ready && shareOpen(p, now) && !choice,
     canLeave: p.status === "confirmed" && !p.chat?.archived,
     members: people.map((u) => ({
