@@ -20,6 +20,7 @@ import { groupmates, leaveGroup, myGroupState, startGroupQueue } from "./groups"
 import { PULSE_MIN } from "./pulse";
 import { applyAvoids, ratingAwareScorer } from "@/lib/match/ratings";
 import { ratingSignals } from "./ratings";
+import { activeSquadPairs } from "./squads";
 
 /**
  * Post-event ratings as matching signals: "not again" keeps a pair apart (except people queuing
@@ -28,7 +29,10 @@ import { ratingSignals } from "./ratings";
 async function withRatings(people: Map<string, Person>, items: Pick<QueueItem, "userId" | "groupId">[] = []) {
   const signals = await ratingSignals([...people.keys()]);
   const groupOf = new Map(items.filter((i) => i.groupId).map((i) => [i.userId, i.groupId!]));
-  applyAvoids(people, signals, (a, b) => Boolean(groupOf.get(a)) && groupOf.get(a) === groupOf.get(b));
+  const sameGroup = (a: string, b: string) => Boolean(groupOf.get(a)) && groupOf.get(a) === groupOf.get(b);
+  applyAvoids(people, signals, sameGroup);
+  // Already squadmates in another active squad: a new squad is new people (friends queuing together excepted).
+  applyAvoids(people, { again: new Map(), avoid: await activeSquadPairs([...people.keys()]) }, sameGroup);
   return { signals, score: ratingAwareScorer(makePairScorer(), signals) };
 }
 import { cleanNote } from "@/lib/companion/brief";
