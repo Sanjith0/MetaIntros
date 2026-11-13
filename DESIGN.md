@@ -62,7 +62,9 @@ Meta's public sources used:
 ## 1. Principles
 
 1. **Content carries the colour.** Chrome is white surfaces on a grey wash, with hairline
-   dividers and almost no shadow. Event covers, avatars and photos are the only colour.
+   dividers and almost no shadow. Event covers, avatars and photos are the only colour. Seeded
+   photos (`public/images`) are AI-generated stand-ins made with `scripts/gen-images.ts`: no
+   real people, venues or logos, and their accessible name ends "(AI image)".
 2. **One accent, one primary.** Blue `accent` marks the single primary action and the active
    state. Every other button is grey with black text. Each screen has one primary button and
    at most two visible secondary actions. Everything else sits behind a sheet or "See all".
@@ -178,27 +180,31 @@ only.
 | **Bubble** | 15px, 8×12 padding, `rounded-bubble`. Incoming: `bubble-in`/ink. Outgoing: `accent`/white. Runs stack 2px apart, with joined corners at 4px on the sender's side. Sender's first name (12px `muted`) sits above the first incoming bubble of a run, with a 28px avatar beside the last. Max width 75%. |
 | **Composer** | Bottom bar: a pill input (`wash`, 36px, radius 18, placeholder "Aa") and a 36px accent send icon. Enter sends. |
 | **AiLabel** | Inline `Sparkles` 12px plus "AI" (or "Written by AI") in 12px `muted`. Used wherever text is machine-written. |
-| **Avatar** | Circle with initials on the person's own colour (content), or a photo. Optional 2px white ring. A `blurred` state blurs initials and colour until the squad is confirmed. |
+| **Avatar** | Circle with a photo, or a drawn character: original art (`Character.tsx`) whose hair, skin and smile come from the name, wearing the person's own colour on a light tint of it (content). Things (a squad chat, Queue Up) keep initials on their colour (`character={false}`). Optional 2px white ring. A `blurred` state blurs a stand-in that carries nothing of the person until the squad is confirmed. |
 
 ### Feature components (built only from `components/fb/`)
 
-- **EventCard**: a white card with `rounded-card`. Cover (16:9-ish, content), then the date
-  line (13px/600 `date`, uppercase), title (17px/600, 2 lines max), venue · distance (13px
-  `muted`), "N friends interested · N going" (13px `muted`), then a full-width grey
-  "Interested" button plus a 36px share button. [inferred from EVENT_PAGE §5]
-- **EventHeader**: cover; date line; title (`text-page`); venue line; host line.
-- **ActionRow**: equal-width grey buttons, Interested (star), Going (check), Invite (mail),
-  plus a 36px "…" button. On state is `on`/`link`. [inferred from EVENT_PAGE §4]
+- **EventCard**: a white card with `rounded-card`. Cover (2:1, content: the event's photo from
+  `lib/images.ts`, else its colour and pattern), then the date line (13px/600 `date`, uppercase),
+  title (17px/600, 2 lines max), venue · distance (13px `muted`), "N friends interested · N going"
+  (13px `muted`; the friends part only when there are some), then a full-width grey "Interested"
+  button plus a 36px share button. [inferred from EVENT_PAGE §5]
+- **EventHeader**: cover; date line; title (`text-page`); venue line. No host line.
+- **ActionRow**: equal-width grey Interested (star) and Going (check), plus a 36px Invite (mail)
+  button. On state is `on`/`link`. [inferred from EVENT_PAGE §4]
 - **QueueEntry** ("Go with a squad", the Events tab feed unit and the event page unit):
-  - A 40px `on`-circle icon, a title, one line of copy, and the queue pulse. The pulse is counts
-    only, shown at 5 or more; it never shows faces of people queuing.
+  - A 40px `on`-circle icon, a title, and at most one line under it: friends in line, else the
+    queue pulse. The pulse is counts only, shown at 5 or more; it never shows faces of people
+    queuing. No explainer copy: the title and the button say what it is.
   - One primary button that opens the **QueueSheet**.
   - It shares one slot with the StatusCard; the two never stack.
 - **QueueSheet**: a two-step bottom sheet.
   - Step 1 lists the three queue modes as ListRows: an event you pick (your Interested events
     first), any event this weekend, a new hangout.
-  - Step 2 is setup: squad size chips (4, 5 or 6), "where you'll start from" (location once, or
-    choose an area), one safety line, and a sticky "Find my squad".
+  - Step 2 is setup: squad size chips (4, 5 or 6), then quiet rows: Bring friends, Starting area
+    (your location, or choose an area) and Add a note for your Companion, each opening in place,
+    and the "Let friends see you're queuing" switch. One safety line, and a sticky "Find my squad".
+    No helper paragraphs.
   - The event page opens straight at step 2.
 - **StatusCard**: the single card showing the user's Queue Up state: waiting → squad ready → at
   the venue → after. It always has exactly one next action. It appears at the top of the Events
@@ -279,7 +285,7 @@ a `contract-change` pull request.
 | Template | Stack, top to bottom | Spacing | Model route |
 |---|---|---|---|
 | **1. Tab root** | `TopBar` (section variant: page title, Search, Messages) · optional `ChipRow` of `ChipLink` filters in a white strip · `Stack` of `Section`s (title + "See all", then rows or cards) · `TabBar` | chips row 8px vertical padding; sections `py-3 px-4`; 8px wash gaps | `/events` (also `/friends`, `/notifications`, `/video`, `/profile`) |
-| **2. Detail page** | `TopBar` (back variant, truncated title) · cover (content colour, full width) · title block (`DateLine`, `text-page` title, `text-meta` lines) · action row (equal grey `Button`s plus a 36px "…") · `Section`s · at most one primary, in its own section or sticky at the bottom (`size="lg"`) · `TabBar` | title block `px-4 py-3`; action row 8px gaps | `/events/ev-indie-guild` (also `/squad/[id]`, `/queue`) |
+| **2. Detail page** | `TopBar` (back variant, truncated title) · cover (content colour, full width) · title block (`DateLine`, `text-page` title, `text-meta` lines) · action row (equal grey Interested and Going plus a 36px Invite) · `Section`s · at most one primary, in its own section or sticky at the bottom (`size="lg"`) · `TabBar` | title block `px-4 py-3`; action row 8px gaps | `/events/ev-indie-guild` (also `/squad/[id]`, `/queue`) |
 | **3. Bottom-sheet flow** | the page it starts from, under `scrim` · `Sheet`: grabber, `text-headline` title with a close button, `ListRow`s or a short form, sticky primary `Button size="lg"` in the footer | rows full width; footer `px-4 pt-2` | Find a squad sheet on `/events`; setup sheet on `/events/ev-indie-guild` |
 | **4. Chat thread** | Messenger header (back, `FacePile`, name, "N members · Ends in…", info) · `PrototypeLabel` · pinned plan strip · `Bubble` runs with `SystemLine`s · quick-reply `Chip`s · `Composer`. No `TabBar` | bubbles 2px apart in a run; list `px-3` | `/chats/[id]` |
 | **5. The full-screen moment** | `TopBar` (back) · centred accent `IconCircle` with a check · `text-page` headline · one row of faces · the event `Card` · one primary · `TabBar`. Used once: squad found | centred column, 16px gaps | `/queue` when the squad is ready |

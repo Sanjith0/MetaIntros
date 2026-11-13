@@ -29,7 +29,7 @@ export default async function ChatsPage() {
                 bold={r.unread > 0}
                 leading={
                   <span className="relative">
-                    {squad ? <FacePile people={others.slice(0, 2)} size={40} max={2} /> : <Avatar name={r.avatar.name} color={r.avatar.color} size={56} />}
+                    {squad ? <FacePile people={others.slice(0, 2)} size={40} max={2} /> : <Avatar name={r.avatar.name} color={r.avatar.color} size={56} character={r.type === "direct"} />}
                     {squad && (
                       <span className="absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-surface ring-2 ring-surface" aria-hidden>
                         <Users size={11} />

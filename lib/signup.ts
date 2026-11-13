@@ -61,7 +61,7 @@ export function graphFromSignup(id: string, input: SignupInput, now = nowDate())
     birthday: `01/01/${year}`,
     gender: input.gender === "woman" ? "female" : input.gender === "man" ? "male" : input.gender === "nonbinary" ? "custom" : null,
     location: { name: "Bay Area, California", latitude: 37.4443, longitude: -122.1611 },
-    picture: { data: { color: ["#1877f2", "#e41e3f", "#45bd62", "#7c3aed", "#ff6f00", "#0ea5e9"][hashString(id) % 6] } },
+    picture: { data: { color: ["#0866ff", "#e41e3f", "#45bd62", "#7c3aed", "#ff6f00", "#0ea5e9"][hashString(id) % 6] } },
     likes: { data: pages },
     groups: { data: groups },
     music: { data: music },

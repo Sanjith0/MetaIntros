@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Bell, Calendar, CalendarDays, Check, ChevronLeft, ChevronRight, House, Info, Mail, MapPin, MessageCircle, MonitorPlay, MoreHorizontal, Pin, Plus, Search, Star, Users, X } from "lucide-react";
+import { Bell, Calendar, CalendarDays, Check, ChevronLeft, ChevronRight, House, Info, Mail, MapPin, MessageCircle, MonitorPlay, Pin, Plus, Search, Star, Users, X } from "lucide-react";
 import { PrototypeLabel, TopBar } from "@/components/fb/TopBar";
 import {
   AiLabel,
@@ -281,8 +281,8 @@ export default function DesignPage() {
               <Badge dot />
             </div>
           </Spec>
-          <Spec name="Avatar" note="initials on the person's colour; 24 tab · 32 pile · 40 row · 56 list">
-            <div className="flex items-center gap-3">
+          <Spec name="Avatar" note="drawn character in the person's colour (initials for things); 24 tab · 32 pile · 40 row · 56 list">
+            <div className="flex flex-wrap items-center gap-3">
               <Avatar name="Jordan Lee" color="var(--color-accent)" size={24} />
               <Avatar name="Jordan Lee" color="var(--color-accent)" size={32} />
               <span data-testid="spec-avatar-40">
@@ -292,6 +292,9 @@ export default function DesignPage() {
               <Avatar name="Yuki Dubois" color="var(--color-badge)" ring />
               <Avatar name="Yuki Dubois" color="var(--color-badge)" blurred />
               <Avatar name="Yuki Dubois" color="var(--color-badge)" dim />
+              <Avatar name="Indie Night Squad" color="var(--color-link)" character={false} />
+              <Avatar name="Indie Night Squad" color="var(--color-link)" character={false} blurred />
+              <Avatar name="Bay Area Indie Shows" color="var(--color-link)" photoUrl="/images/pages/indie-shows.webp" />
             </div>
           </Spec>
           <Spec name="FacePile" note="white ring, overlap, +N; blurred until the squad is ready">
@@ -408,8 +411,7 @@ export default function DesignPage() {
               <div className="mt-2 flex gap-2">
                 <Button className="min-w-0 flex-1" icon={<Star size={16} />}><span className="truncate">Interested</span></Button>
                 <Button className="min-w-0 flex-1" icon={<Check size={16} />}><span className="truncate">Going</span></Button>
-                <Button className="min-w-0 flex-1" icon={<Mail size={16} />}><span className="truncate">Invite</span></Button>
-                <IconButton label="More"><MoreHorizontal size={20} /></IconButton>
+                <Button aria-label="Invite" className="w-9 shrink-0 px-0"><Mail size={16} /></Button>
               </div>
             </div>
             <Section className="mt-2" title="Going alone?">

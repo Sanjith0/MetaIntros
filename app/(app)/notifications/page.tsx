@@ -7,6 +7,7 @@ import { listNotifications, type NotificationKind } from "@/lib/server/notificat
 import { getTabSeen } from "@/lib/server/badges";
 import { now as clockNow } from "@/lib/server/clock";
 import { timeAgo } from "@/lib/format";
+import { eventCoverSrc } from "@/lib/images";
 
 const KIND: Record<NotificationKind, { Icon: typeof Bell; tone: string }> = {
   squad: { Icon: Users, tone: "bg-accent" },
@@ -23,6 +24,9 @@ const KIND: Record<NotificationKind, { Icon: typeof Bell; tone: string }> = {
  * Notifications, built from what Queue Up already stores. Seen state is read before this visit marks
  * the tab seen, so new rows stay highlighted for this view.
  */
+/** These picture Queue Up or an event, not a person: initials (or the event's photo), not a character. */
+const PICTURES_A_THING = new Set(["squad", "chat_ended", "reminder"]);
+
 export default async function NotificationsPage() {
   const userId = await getCurrentUserId();
   const [items, seen, now] = await Promise.all([clockNow().then((n) => listNotifications(userId, n)), getTabSeen(userId, "notifications"), clockNow()]);
@@ -34,7 +38,7 @@ export default async function NotificationsPage() {
       <li>
         <Link href={n.href} data-testid={`notif-${n.kind}`} className={cn("flex items-start gap-3 px-4 py-2.5 hover:bg-press", unread && "bg-unread")}>
           <span className="relative shrink-0">
-            <Avatar name={n.avatar.name} color={n.avatar.color} size={56} />
+            <Avatar name={n.avatar.name} color={n.avatar.color} photoUrl={n.kind === "reminder" ? eventCoverSrc(n.href.split("/")[2] ?? "") : undefined} size={56} character={!PICTURES_A_THING.has(n.kind)} />
             <span className={cn("absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full text-surface ring-2 ring-surface", tone)} aria-hidden>
               <Icon size={13} />
             </span>

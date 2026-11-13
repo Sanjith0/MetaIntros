@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Mail, MoreHorizontal, Share2, Star } from "lucide-react";
+import { Check, Mail, Share2, Star } from "lucide-react";
 import { Button, cn } from "@/components/fb";
 import { useToast } from "@/components/fb/Toast";
 
@@ -17,14 +17,14 @@ function useRsvp(eventId: string, initial: string | null) {
   return [status, set] as const;
 }
 
-/** Event page action row: equal-width Interested, Going, Invite + "…" (EVENT_PAGE.md §4). */
+/** Event page action row: equal-width Interested and Going, plus a square Invite (after EVENT_PAGE.md §4). */
 export function ActionRow({ eventId, initial }: { eventId: string; initial: string | null }) {
   const [status, set] = useRsvp(eventId, initial);
   const [ready, setReady] = useState(false);
   const toast = useToast();
   useEffect(() => setReady(true), []);
   return (
-    // The three buttons may shrink and truncate, so a wider system font never pushes "…" off a 390px screen.
+    // Two answers get the room; Invite is a square icon button. The "…" (nothing behind it here) is gone.
     <div className="flex gap-2" data-testid="rsvp" data-ready={ready}>
       <Button className="min-w-0 flex-1" variant={status === "interested" ? "on" : "secondary"} aria-pressed={status === "interested"} data-testid="rsvp-interested" icon={<Star size={16} fill={status === "interested" ? "currentColor" : "none"} />} onClick={() => set("interested")}>
         <span className="truncate">Interested</span>
@@ -32,11 +32,8 @@ export function ActionRow({ eventId, initial }: { eventId: string; initial: stri
       <Button className="min-w-0 flex-1" variant={status === "going" ? "on" : "secondary"} aria-pressed={status === "going"} data-testid="rsvp-going" icon={<Check size={16} />} onClick={() => set("going")}>
         <span className="truncate">Going</span>
       </Button>
-      <Button className="min-w-0 flex-1" icon={<Mail size={16} />} onClick={() => toast("Invites are off in this prototype.")}>
-        <span className="truncate">Invite</span>
-      </Button>
-      <Button aria-label="More" className="w-9 shrink-0 px-0" onClick={() => toast("More options are off in this prototype.")}>
-        <MoreHorizontal size={18} />
+      <Button aria-label="Invite" className="w-9 shrink-0 px-0" onClick={() => toast("Invites are off in this prototype.")}>
+        <Mail size={16} />
       </Button>
     </div>
   );
