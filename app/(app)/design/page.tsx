@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Calendar, Check, ChevronLeft, ChevronRight, Info, MapPin, MessageCircle, Pin, Plus, Search, Star, Users } from "lucide-react";
+import { Bell, Calendar, CalendarDays, Check, ChevronLeft, ChevronRight, House, Info, Mail, MapPin, MessageCircle, MonitorPlay, MoreHorizontal, Pin, Plus, Search, Star, Users, X } from "lucide-react";
 import { PrototypeLabel, TopBar } from "@/components/fb/TopBar";
 import {
   AiLabel,
@@ -32,6 +32,7 @@ import { DateLine } from "@/components/events/DateLine";
 /**
  * /design: every components/fb part in every state, and one example of each page template (DESIGN.md
  * "Page templates"). tests/e2e/design.spec.ts measures the specimens here against the tokens.
+ * Template: detail page (back TopBar, then a Stack of Sections).
  */
 export const metadata: Metadata = {
   title: "Design system · Queue Up prototype",
@@ -106,17 +107,18 @@ function Spec({ name, note, children }: { name: string; note?: string; children:
 }
 
 /** A page template drawn small: the real parts, inert (not focusable, not in the accessibility tree). */
-function Template({ id, name, model, stack, children }: { id: string; name: string; model: string; stack: string; children: ReactNode }) {
+function Template({ id, name, href, model, stack, tall = false, children }: { id: string; name: string; href: string; model: string; stack: string; tall?: boolean; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-2 py-3" data-testid={`template-${id}`}>
-      <div className="flex items-baseline justify-between gap-3">
+      <div className="flex items-baseline justify-between gap-3 px-4">
         <p className="text-title font-semibold">{name}</p>
-        <Link href={model} className="text-meta text-link">
+        <Link href={href} className="text-meta text-link">
           Model: {model}
         </Link>
       </div>
-      <p className="text-meta text-muted">{stack}</p>
-      <div inert className="relative h-96 transform-gpu overflow-hidden rounded-card border border-divider bg-wash">
+      <p className="px-4 text-meta text-muted">{stack}</p>
+      {/* Full width, so each template is drawn at the real 390px screen width. */}
+      <div inert className={`relative ${tall ? "h-112" : "h-96"} transform-gpu overflow-hidden border-y border-divider bg-wash`}>
         {children}
       </div>
     </div>
@@ -124,13 +126,25 @@ function Template({ id, name, model, stack, children }: { id: string; name: stri
 }
 
 function StaticTabBar() {
+  const tabs = [
+    ["Home", House],
+    ["Video", MonitorPlay],
+    ["Friends", Users],
+    ["Events", CalendarDays],
+    ["Notifications", Bell],
+  ] as const;
   return (
-    <div className="absolute inset-x-0 bottom-0 grid h-12 grid-cols-6 border-t border-divider bg-surface text-tab text-muted">
-      {["Home", "Video", "Friends", "Events", "Alerts", "Profile"].map((t) => (
-        <span key={t} className={t === "Events" ? "flex items-center justify-center font-semibold text-accent" : "flex items-center justify-center"}>
-          {t}
+    <div className="absolute inset-x-0 bottom-0 grid h-13 grid-cols-6 border-t border-divider bg-surface text-tab text-muted">
+      {tabs.map(([label, Icon]) => (
+        <span key={label} className={`flex min-w-0 flex-col items-center justify-center gap-0.5 ${label === "Events" ? "font-semibold text-accent" : ""}`}>
+          <Icon size={24} strokeWidth={label === "Events" ? 2.4 : 1.8} />
+          <span className="max-w-full truncate">{label}</span>
         </span>
       ))}
+      <span className="flex flex-col items-center justify-center gap-0.5">
+        <Avatar name="Jordan Lee" color="var(--color-accent)" size={24} />
+        <span>Profile</span>
+      </span>
     </div>
   );
 }
@@ -142,14 +156,14 @@ export default function DesignPage() {
       <Stack className="pb-6">
         <Section>
           <p className="text-body">
-            Every part in <code>components/fb</code>, in every state, and one example of each page template. The rules are in
+            Every part in <span className="font-semibold">components/fb</span>, in every state, and one example of each page template. The rules are in
             DESIGN.md: build pages only from these parts, and keep one primary button per screen.
           </p>
           <p className="mt-2 text-meta text-muted">This page shows several primary buttons on purpose; it is a specimen sheet, not a screen.</p>
         </Section>
 
         <Section title="Colour" testId="spec-colours">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {COLOURS.map(([name, cls]) => (
               <div key={name} className="flex items-center gap-2">
                 <span className={`h-8 w-8 shrink-0 rounded-card border border-divider ${cls}`} data-testid={`spec-color-${name}`} />
@@ -359,16 +373,17 @@ export default function DesignPage() {
           </div>
         </Section>
 
-        <Section title="Page templates">
-          <p className="text-meta text-muted">A new page is one of these five. A sixth needs a contract-change pull request.</p>
+        <Section title="Page templates" flush>
+          <p className="px-4 text-meta text-muted">A new page is one of these five. A sixth needs a contract-change pull request.</p>
 
-          <Template id="tab-root" name="1. Tab root" model="/events" stack="TopBar (section) · ChipRow · Stack of Sections · TabBar">
+          <Template id="tab-root" name="1. Tab root" href="/events" model="/events" stack="TopBar (section) · ChipRow · Stack of Sections · TabBar">
             <TopBar title="Events" />
             <div className="bg-surface px-4 py-2">
-              <div className="flex gap-2">
-                <Chip on>For you</Chip>
-                <Chip on={false}>Local</Chip>
-              </div>
+              <ChipRow label="Event filters (example)">
+                <ChipLink on href="/events">For you</ChipLink>
+                <ChipLink on={false} href="/events?tab=nearby">Local</ChipLink>
+                <ChipLink on={false} href="/events?tab=weekend">This weekend</ChipLink>
+              </ChipRow>
             </div>
             <Stack className="mt-2">
               <Section title="Go with a squad">
@@ -384,16 +399,17 @@ export default function DesignPage() {
             <StaticTabBar />
           </Template>
 
-          <Template id="detail" name="2. Detail page" model="/events/ev-indie-guild" stack="TopBar (back) · cover · title block · ActionRow · Sections · one primary · TabBar">
+          <Template id="detail" name="2. Detail page" href="/events/ev-indie-guild" model="/events/ev-indie-guild" stack="TopBar (back) · cover · title block · ActionRow · Sections · one primary · TabBar">
             <TopBar back title="Indie Night" />
             <div className="h-12 bg-control" />
             <div className="bg-surface px-4 py-3">
               <DateLine start={SAMPLE_START} />
               <p className="text-page font-bold">Indie Night</p>
-              <div className="mt-2 grid grid-cols-3 gap-2">
-                <Button icon={<Star size={16} />}>Interested</Button>
-                <Button icon={<Check size={16} />}>Going</Button>
-                <Button>Invite</Button>
+              <div className="mt-2 flex gap-2">
+                <Button className="flex-1" icon={<Star size={16} />}>Interested</Button>
+                <Button className="flex-1" icon={<Check size={16} />}>Going</Button>
+                <Button className="flex-1" icon={<Mail size={16} />}>Invite</Button>
+                <IconButton label="More"><MoreHorizontal size={20} /></IconButton>
               </div>
             </div>
             <Section className="mt-2" title="Going alone?">
@@ -404,15 +420,25 @@ export default function DesignPage() {
             <StaticTabBar />
           </Template>
 
-          <Template id="sheet" name="3. Bottom-sheet flow" model="/events (Find a squad)" stack="the page under a scrim · Sheet: grabber, title, ListRows, sticky primary">
-            <TopBar title="Events" />
+          <Template id="sheet" name="3. Bottom-sheet flow" href="/events/ev-indie-guild" model="/events/ev-indie-guild, Queue Up" stack="the page under a scrim · Sheet: grabber, title and close, a short form, sticky primary" tall>
+            <TopBar back title="Indie Night" />
             <div className="absolute inset-0 bg-scrim" />
             <div className="absolute inset-x-0 bottom-0 rounded-t-sheet bg-surface pb-3 shadow-elevated">
               <span className="mx-auto mt-2 block h-1 w-9 rounded-full bg-divider" />
-              <p className="px-4 pt-2 pb-1 text-headline font-bold">Find a squad</p>
-              <ListRow leading={<IconCircle><Calendar size={20} /></IconCircle>} title="For an event you pick" trailing={<ChevronRight size={20} className="text-muted" />} />
-              <ListRow leading={<IconCircle><Users size={20} /></IconCircle>} title="For a new hangout" trailing={<ChevronRight size={20} className="text-muted" />} />
-              <div className="px-4 pt-2">
+              <div className="flex items-center justify-between px-4 pt-2 pb-1">
+                <p className="text-headline font-bold">Indie Night</p>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-control"><X size={20} /></span>
+              </div>
+              <div className="px-4">
+                <p className="text-body font-semibold">Squad size</p>
+                <div className="mt-1.5 flex gap-2">
+                  <Chip on={false}>4 people</Chip>
+                  <Chip on>5 people</Chip>
+                  <Chip on={false}>6 people</Chip>
+                </div>
+              </div>
+              <ListRow leading={<IconCircle><MapPin size={20} /></IconCircle>} title="Choose an area instead" trailing={<ChevronRight size={20} className="text-muted" />} />
+              <div className="px-4 pt-1">
                 <Button variant="primary" size="lg" block>
                   Find my squad
                 </Button>
@@ -420,7 +446,7 @@ export default function DesignPage() {
             </div>
           </Template>
 
-          <Template id="chat" name="4. Chat thread" model="/chats/[id]" stack="Messenger header · PrototypeLabel · pinned plan · Bubbles · quick-reply Chips · Composer (no TabBar)">
+          <Template id="chat" name="4. Chat thread" href="/chats" model="/chats/[id], any squad chat" stack="Messenger header · PrototypeLabel · pinned plan · Bubbles · quick-reply Chips · Composer (no TabBar)">
             <div className="flex h-14 items-center gap-2 border-b border-divider bg-surface px-3">
               <ChevronLeft size={28} className="text-accent" />
               <FacePile people={PEOPLE.slice(0, 2)} size={28} />
@@ -435,6 +461,9 @@ export default function DesignPage() {
               <Pin size={16} className="text-muted" /> Sat, Nov 14 · Meet at the front entrance
             </div>
             <div className="flex flex-col items-start gap-0.5 bg-surface px-3 py-3">
+              <span className="flex items-center gap-1.5 px-3 text-meta text-muted">
+                Queue Up host <AiLabel>AI</AiLabel>
+              </span>
               <Bubble mine={false}>Hi all, I&apos;m the Queue Up host, an AI.</Bubble>
               <span className="self-end pt-1">
                 <Bubble mine>See you there</Bubble>
@@ -451,14 +480,22 @@ export default function DesignPage() {
             </div>
           </Template>
 
-          <Template id="moment" name="5. The full-screen moment" model="/queue (squad found)" stack="TopBar (back) · centred check · page title · face row · event Card · one primary · TabBar">
+          <Template id="moment" name="5. The full-screen moment" href="/queue" model="/queue, when the squad is ready" stack="TopBar (back) · 88px check · page title · one row of 48px faces · event Card · one primary · TabBar" tall>
             <TopBar back title="Your squad" />
-            <div className="flex flex-col items-center gap-2 bg-surface px-4 py-4 text-center">
-              <IconCircle tone="accent" size={64}>
-                <Check size={32} strokeWidth={3} />
+            <div className="flex flex-col items-center gap-3 bg-surface px-4 py-4 text-center">
+              <IconCircle tone="accent" size={88}>
+                <Check size={44} strokeWidth={3} />
               </IconCircle>
               <p className="text-page font-bold">Your squad is ready</p>
-              <FacePile people={PEOPLE.slice(0, 5)} size={40} />
+              <div className="flex gap-2">
+                {PEOPLE.slice(0, 5).map((p) => (
+                  <Avatar key={p.id} name={p.name} color={p.avatarColor} size={48} />
+                ))}
+              </div>
+              <Card className="w-full p-3 text-left">
+                <DateLine start={SAMPLE_START} />
+                <p className="text-body font-semibold">Indie Night: Local Bands Showcase</p>
+              </Card>
               <Button variant="primary" block icon={<MessageCircle size={16} />}>
                 Open squad chat
               </Button>

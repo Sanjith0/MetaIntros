@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, ChevronRight, Users } from "lucide-react";
+import { ChevronRight, MapPin } from "lucide-react";
 import { Button, Chip, IconCircle, ListRow } from "@/components/fb";
 import { Composer } from "@/components/fb/Composer";
 import { Sheet } from "@/components/fb/Sheet";
@@ -11,6 +11,7 @@ import { useToast } from "@/components/fb/Toast";
 export function GalleryDemos() {
   const [open, setOpen] = useState(false);
   const [on, setOn] = useState(false);
+  const [size, setSize] = useState(5);
   const [draft, setDraft] = useState("");
   const [sent, setSent] = useState<string[]>([]);
   const toast = useToast();
@@ -25,7 +26,7 @@ export function GalleryDemos() {
           Show a toast
         </Button>
         <Chip on={on} onClick={() => setOn((v) => !v)} data-testid="spec-chip-toggle">
-          {on ? "Interested" : "Not interested"}
+          Interested
         </Chip>
       </div>
       <div className="overflow-hidden rounded-card border border-divider">
@@ -43,7 +44,7 @@ export function GalleryDemos() {
       <Sheet
         open={open}
         onClose={() => setOpen(false)}
-        title="Find a squad"
+        title="Indie Night"
         testId="spec-sheet"
         footer={
           <Button variant="primary" size="lg" block onClick={() => setOpen(false)}>
@@ -51,17 +52,19 @@ export function GalleryDemos() {
           </Button>
         }
       >
+        <div className="px-4">
+          <p className="text-body font-semibold">Squad size</p>
+          <div className="mt-1.5 flex gap-2">
+            {[4, 5, 6].map((n) => (
+              <Chip key={n} on={size === n} onClick={() => setSize(n)}>
+                {n} people
+              </Chip>
+            ))}
+          </div>
+        </div>
         <ListRow
-          leading={<IconCircle><Calendar size={20} /></IconCircle>}
-          title="For an event you pick"
-          subtitle="Your squad goes to that event together."
-          trailing={<ChevronRight size={20} className="text-muted" />}
-          onClick={() => setOpen(false)}
-        />
-        <ListRow
-          leading={<IconCircle><Users size={20} /></IconCircle>}
-          title="For a new hangout"
-          subtitle="We plan one at a public spot near all of you."
+          leading={<IconCircle><MapPin size={20} /></IconCircle>}
+          title="Choose an area instead"
           trailing={<ChevronRight size={20} className="text-muted" />}
           onClick={() => setOpen(false)}
         />

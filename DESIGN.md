@@ -167,11 +167,11 @@ only.
 | **PrototypeLabel** | "Hackathon prototype, not Facebook", 11px `muted` on `wash`, centred. |
 | **TabBar** | Fixed bottom, white, hairline top. Six equal tabs: Home, Video, Friends, Events, Notifications, Profile. Lucide icons at 24px with 11px labels. Active tab: `accent` icon and label, a 2.4 stroke and a light fill. Inactive: `muted`, 1.8 stroke. Badge: red pill, white 11px/700, 2px white ring, top-right of the icon. Hidden in chat threads. |
 | **Section** | Full-width white block, 16px padding. Optional header row: `text-title` title plus a blue "See all" link at the right. Sections stack on 8px of wash. |
-| **Button** | 36px, `rounded-btn`, 15px/600, icon 16–18px with a 6px gap. Variants: `primary` (accent/white), `secondary` (control/ink), `on` (on/link, for toggled states), `ghost` (transparent/link). `size="lg"` is 44px for sticky bottom CTAs. Press scales to .96; disabled uses `disabled` text on `control`. |
+| **Button** | 36px, `rounded-btn`, 15px/600, icon 16–18px with a 6px gap. Variants: `primary` (accent/white), `secondary` (control/ink), `on` (on/link, for toggled states), `ghost` (transparent/link), `positive` (positive/white, a confirmed state; unused today). `size="lg"` is 44px for sticky bottom CTAs. Press scales to .96; disabled uses `disabled` text on `control`. |
 | **Chip** | Pill, 32px tall, 12px padding, 15px/600. Off: `control`/ink. On: `on`/`link`. `aria-pressed` or `role=tab`. |
 | **ListRow** | Min-height 56px, 8×16 padding. Leading slot (avatar or 36px icon circle in `control`), title 15px/600 (500 when read), subtitle 13px `muted`, trailing slot. Pressed state uses the `wash` fill. An `unread` row uses the `unread` fill. |
 | **Sheet** | Bottom sheet, white, 12px top corners, `shadow-elevated`, grabber 36×4 `divider` pill, title `text-headline`, scrim `scrim`. It slides up in 250ms. Closes on scrim tap, Escape or drag handle. `role=dialog`, `aria-modal`, focus trapped. |
-| **Badge** | Red count pill (`badge`), min 18px. A `dot` variant is a 10px accent dot (unread). |
+| **Badge** | Red count pill (`badge`), min 18px, "9+" above nine. A `blue` tone (accent) counts unread messages in the chat list. A `dot` variant is a 10px accent dot (unread). |
 | **FacePile** | Overlapping 32px avatars with a 2px white ring at a -8px offset, then an optional "+N" in `muted`. |
 | **Skeleton** | `control` blocks, 8px radius, 1.2s opacity pulse (static under reduced motion). |
 | **Toast** | White, 8px radius, `shadow-elevated`, 12×16 padding, text `ink`, action in `link`. It sits above the tab bar, slides in, and dismisses after 4s. `role=status`. |
