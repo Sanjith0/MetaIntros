@@ -14,7 +14,7 @@ import type { Person } from "@/lib/profile/load";
 import type { TraceStep } from "@/lib/server/trace";
 import { openView, privateTexts, type Brief, type OpenView } from "./brief";
 import { safeMessage, type Msg } from "./checks";
-import { SIMILARITY_GATE, deepPairs, drawCircles, formParties, templateWhy, wanted, type Circle, type TableResponse, type TableRow, type Verdict, type Verdicts } from "./orchestrator";
+import { ALL_TALK_MAX, SIMILARITY_GATE, deepPairs, drawCircles, formParties, templateWhy, wanted, type Circle, type TableResponse, type TableRow, type Verdict, type Verdicts } from "./orchestrator";
 import { askRound, answerRound, closeRound, deliberate, groupRound, replyRound, type Objection, type RoundCtx, type ThreadMsg } from "./rounds";
 import { makePairScorer } from "@/lib/match/compat";
 import { combineSources, type AgentSource } from "@/lib/ai/status";
@@ -85,6 +85,8 @@ export interface RoomInput {
   similarity?: (a: Person, b: Person) => { score: number };
   /** pairs in a group who said they'd squad up again after a past night (post-event ratings) */
   againPairs?: (members: string[]) => number;
+  /** the weakest pair score a squad should have (relaxes with wait time; see orchestrator PAIR_FLOORS) */
+  floor?: number;
 }
 
 /**
@@ -186,7 +188,8 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
   let calls = 0;
   const sources: AgentSource[] = [];
   const count = (source: string) => {
-    if (!["template", "blocked", "none", "code"].includes(source)) calls++;
+    // Only calls that produced model words count: a fallback (cache miss, timeout) is a template.
+    if (["live", "cache", "mock"].includes(source)) calls++;
     if (source !== "none" && source !== "code") sources.push(source === "blocked" ? "template" : (source as AgentSource));
   };
   // Queue together: a person's whole group (including them), within this room.
@@ -220,10 +223,11 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     // Vectors shortlist: everyone above the gate talks, and nobody is stranded — each Companion also
     // talks to its closest few (enough for a squad) even if they fall below it.
     const floor = Math.max(targetSize - 1, 2);
+    const everyone = members.length <= ALL_TALK_MAX; // small room: every allowed pair talks (no extra calls)
     const talking = new Set<string>();
     for (const id of members) {
       const allowedOthers = members.filter((m) => m !== id && allowed(id, m));
-      for (const m of allowedOthers) if (talks(id, m)) talking.add(pairKey(id, m));
+      for (const m of allowedOthers) if (everyone || talks(id, m)) talking.add(pairKey(id, m));
       const closest = [...allowedOthers].sort((a, b) => similarity(people.get(id)!, people.get(b)!).score - similarity(people.get(id)!, people.get(a)!).score || a.localeCompare(b));
       for (const m of closest.slice(0, floor)) talking.add(pairKey(id, m));
       for (const m of mates(id)) if (members.includes(m)) talking.add(pairKey(id, m)); // they queued together: they always talk
@@ -362,9 +366,10 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
   await Promise.all(choosing.map(async (cs) => {
     cs.deep = deepPairs(cs.picks, verdicts, cs.members, people).filter(([a, b]) => !dropped.has(pairKey(a, b)));
     const deepWith = (m: string) => cs.deep.filter((p) => p.includes(m)).map((p) => (p[0] === m ? p[1] : p[0]));
-    const threadsFor = (m: string) => new Map(deepWith(m).map((p) => [p, threads.get(pairKey(m, p))!]));
+    // Every conversation goes back to its Companion, so each partner is re-scored after their answers were read.
+    const threadsFor = (m: string) => new Map(cs.partners(m).filter(cs.keep(m)).map((p) => [p, threads.get(pairKey(m, p))!]));
     live({ type: "deep", pairs: cs.deep });
-    const close = await Promise.all(cs.active.map((m) => closeRound(cs.ctx(m), threadsFor(m), [m, ...cs.partners(m).filter(cs.keep(m))], verdicts.get(m)!, targetSize, mates(m)).then((r) => {
+    const close = await Promise.all(cs.active.map((m) => closeRound(cs.ctx(m), threadsFor(m), [m, ...cs.partners(m).filter(cs.keep(m))], verdicts.get(m)!, targetSize, mates(m), deepWith(m)).then((r) => {
       for (const [to, msg] of r.says) live({ type: "line", line: asLine(m, to, "close", msg) });
       if (r.verdicts.size) live({ type: "notes", from: m, notes: [...r.verdicts] });
       live({ type: "proposal", row: { id: `prop-${m}`, by: m, members: r.proposal.members, line: r.proposal.line.say, backers: [] } });
@@ -459,7 +464,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
         ? { parties: [{ members: pool, why: templateWhy(pool, people) }], heldBack: [], source: "code" }
         : cs.onlyOne
           ? { parties: [], heldBack: pool, source: "code" }
-          : await formParties({ circle: { ...cs.circle, members: pool }, table: cs.table, want: cs.want, verdicts, briefs, people, targetSize, exclude, attempt, useModel: cs.useModel, priority: input.priority, onlyPriority: input.onlyPriority, feasible: canGroup, unitOf, againPairs: input.againPairs });
+          : await formParties({ circle: { ...cs.circle, members: pool }, table: cs.table, want: cs.want, verdicts, briefs, people, targetSize, exclude, attempt, useModel: cs.useModel, priority: input.priority, onlyPriority: input.onlyPriority, feasible: canGroup, unitOf, againPairs: input.againPairs, floor: input.floor });
       count(formed.source);
       let anyVeto = false;
       for (const p of formed.parties) {

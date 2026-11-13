@@ -76,9 +76,20 @@ function refFor(p: Person, tag: string): string | null {
   return null;
 }
 
+/**
+ * How a Companion scores a pair, 0-100. Muse gets this rubric so its scores spread out instead of
+ * bunching at 70-85, and the deterministic stand-in maps the profile score onto the same scale
+ * (verdictScale), so a Muse score and a stand-in score can sit side by side in one squad.
+ */
+export const SCORE_RUBRIC =
+  "Score on this scale: 85-100 they would clearly hit it off (specific shared interests AND compatible energy and plans); 65-84 a good fit; 50-64 fine, nothing special; 35-49 likely awkward (little in common, or different ideas of a night out); 0-34 a clash (one of them avoids what the other is into, or opposite energy). Most pairs are not a 75: use the whole scale.";
+
+/** Profile compatibility (0-1, lib/match/compat) on the Companion verdict scale. 0.3 (a typical pair) → 49. */
+export const verdictScale = (compat: number) => clamp(25 + compat * 80);
+
 /** Deterministic verdict of `a`'s Companion on `b`, from the existing compatibility score. */
 export function fallbackVerdict(a: Person, b: Person): Verdict {
-  const score = clamp(makePairScorer()(a, b).score * 100);
+  const score = verdictScale(makePairScorer()(a, b).score);
   const bTags = new Set(b.profile.interestTags.map((t) => t.tag));
   const shared = a.profile.interestTags.filter((t) => bTags.has(t.tag)).map((t) => t.tag);
   const aAvoid = new Set(a.profile.dislikes.map((d) => d.tag).filter((t): t is string => Boolean(t)));
@@ -285,7 +296,7 @@ export async function answerRound(c: RoundCtx, intros: Map<string, OpenView>, qu
       })),
     },
     partners.map((id) => ({ id, text: JSON.stringify(intros.get(id)) + (questions.get(id) ?? "") + (threads.get(id) ?? []).filter((l) => l.from === id).map((l) => l.say).join("\n") })),
-    `Round: ANSWER AND JUDGE. (1) For each circle-mate whose Companion asked you a question (their_companion_asks is not null), answer it honestly in about 40-80 words, citing your fact ids, replying to what they actually asked. ${OBJECTION_RULE} (2) For EVERY circle-mate, having read the whole conversation, give your PRIVATE verdict on how your person and theirs would get along: score 0-100, wouldEnjoy (1-2 short lines), concerns (0-2), needs (0-2), talkTopics (fact ids from either side), opener (one line your person could say to theirs), confidence (low|medium|high). The verdict is never shown to them. Then list in "picks" up to ${MAX_PICKS} ids you want a deeper conversation with. JSON only: {"answers": {"<id>": {"say": "...", "cites": [], "objection": null}}, "verdicts": {"<id>": {"score": 0, "wouldEnjoy": [], "concerns": [], "needs": [], "talkTopics": [], "opener": "", "confidence": "medium"}}, "picks": ["<id>"]}.`,
+    `Round: ANSWER AND JUDGE. (1) For each circle-mate whose Companion asked you a question (their_companion_asks is not null), answer it honestly in about 40-80 words, citing your fact ids, replying to what they actually asked. ${OBJECTION_RULE} (2) For EVERY circle-mate, having read the whole conversation, give your PRIVATE verdict on how your person and theirs would get along (you will revise it in the next round): score 0-100 (${SCORE_RUBRIC}), wouldEnjoy (1-2 short lines), concerns (0-2), needs (0-2), talkTopics (fact ids from either side), opener (one line your person could say to theirs), confidence (low|medium|high). The verdict is never shown to them. Then list in "picks" up to ${MAX_PICKS} ids you want a deeper conversation with. JSON only: {"answers": {"<id>": {"say": "...", "cites": [], "objection": null}}, "verdicts": {"<id>": {"score": 0, "wouldEnjoy": [], "concerns": [], "needs": [], "talkTopics": [], "opener": "", "confidence": "medium"}}, "picks": ["<id>"]}.`,
     z.object({ answers: z.any().optional(), verdicts: z.any().optional(), picks: z.any().optional() }), {}, partners.length,
   );
   const gotA = byPartner(r.data?.answers, resolve);
@@ -327,8 +338,16 @@ function repairGroup(c: RoundCtx, picked: string[], members: string[], verdicts:
   return [me, ...out].sort();
 }
 
-export async function closeRound(c: RoundCtx, threads: Map<string, ThreadMsg[]>, members: string[], verdicts: Map<string, Verdict>, targetSize: number, withMe: string[] = []) {
+/**
+ * Round 2. The Companion reads every conversation it had (its partners' answers to its questions
+ * included) and re-scores each partner: the first verdict was written before those answers existed,
+ * so this is where what the Companions said actually moves the scores. It speaks again only to
+ * `deep` partners (the pairs picked for a longer conversation), then proposes a squad.
+ */
+export async function closeRound(c: RoundCtx, threads: Map<string, ThreadMsg[]>, members: string[], verdicts: Map<string, Verdict>, targetSize: number, withMe: string[] = [], deep?: string[]) {
   const partners = [...threads.keys()].sort();
+  const deepSet = new Set(deep ?? partners);
+  const deepOnes = partners.filter((id) => deepSet.has(id));
   const mates = members.filter((id) => id !== c.me.id && pairAllowed(c.me, c.people.get(id)!)).sort();
   const resolveMate = makeResolver(mates, c.people);
   const resolveAny = makeResolver([...mates, c.me.id], c.people);
@@ -337,11 +356,11 @@ export async function closeRound(c: RoundCtx, threads: Map<string, ThreadMsg[]>,
     {
       round: "close",
       squad_size: targetSize,
-      conversations: conversations(c, threads, partners),
-      circle: mates.map((id) => ({ id, name: first(c.people.get(id)!), your_score: verdicts.get(id)?.score ?? null })),
+      conversations: conversations(c, threads, partners).map((x) => ({ ...x, go_deeper: deepSet.has(x.with) })),
+      circle: mates.map((id) => ({ id, name: first(c.people.get(id)!), your_first_score: verdicts.get(id)?.score ?? null })),
     },
     attributedThreads(threads, partners),
-    `Round: GO DEEPER. For EACH person you are going deeper with: react to their answer, name one honest concern or possible mismatch between your person and theirs, and say plainly what your person would need for this to work (max 80 words); then give your updated private verdict. Then PROPOSE the squad you want for your person: exactly ${targetSize} people from the circle INCLUDING your own person, with a private reason and one public line (max 30 words). JSON only: {"says": {"<id>": {"say": "...", "cites": []}}, "verdicts": {"<id>": {"score": 0, "wouldEnjoy": [], "concerns": [], "needs": [], "talkTopics": [], "opener": "", "confidence": "medium"}}, "proposal": {"members": ["<id>"], "privateReason": "...", "line": {"say": "...", "cites": []}}}.`,
+    `Round: GO DEEPER AND DECIDE. You have now read how every circle-mate's Companion answered your question. (1) Give your UPDATED private verdict on EVERY person in "conversations": move the score up or down based on what their answer revealed about how the night would actually go for your person, not just shared interests. ${SCORE_RUBRIC} (2) For each conversation marked go_deeper: react to their answer, name one honest concern or possible mismatch, and say plainly what your person would need for this to work (max 80 words). (3) PROPOSE the squad you want for your person: exactly ${targetSize} people from the circle INCLUDING your own person, favouring the people you now score highest and who would also suit each other, with a private reason and one public line (max 30 words). JSON only: {"says": {"<id>": {"say": "...", "cites": []}}, "verdicts": {"<id>": {"score": 0, "wouldEnjoy": [], "concerns": [], "needs": [], "talkTopics": [], "opener": "", "confidence": "medium"}}, "proposal": {"members": ["<id>"], "privateReason": "...", "line": {"say": "...", "cites": []}}}.`,
     z.object({ says: z.any().optional(), verdicts: z.any().optional(), proposal: z.any().optional() }), {}, Math.max(partners.length, 2),
   );
   const gotS = byPartner(r.data?.says, resolveMate);
@@ -349,10 +368,13 @@ export async function closeRound(c: RoundCtx, threads: Map<string, ThreadMsg[]>,
   const says = new Map<string, Msg>();
   const updated = new Map<string, Verdict>();
   const n = c.brief.name;
-  for (const id of partners) {
+  for (const id of deepOnes) {
     says.set(id, line(c, gotS.get(id), { say: `${n} would be glad to meet ${first(c.people.get(id)!)}. What ${n} needs is a plan that leaves room to actually talk.`, cites: [] }));
+  }
+  for (const id of partners) {
     const base = verdicts.get(id) ?? fallbackVerdict(c.me, c.people.get(id)!);
-    updated.set(id, gotV.has(id) ? coerceVerdict(gotV.get(id), base, new Set(base.talkTopics)) : base);
+    if (gotV.has(id)) updated.set(id, coerceVerdict(gotV.get(id), base, new Set(base.talkTopics)));
+    else if (deepSet.has(id) || !verdicts.has(id)) updated.set(id, base);
   }
   const merged = new Map([...verdicts, ...updated]);
   const p = (r.data?.proposal ?? {}) as { members?: unknown; privateReason?: unknown; line?: unknown };

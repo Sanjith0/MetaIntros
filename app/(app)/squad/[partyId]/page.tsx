@@ -11,6 +11,7 @@ import { fmtEventWhen, fmtTime } from "@/lib/format";
 import { albumCount } from "@/lib/server/album";
 import { getShareChoice, shareOpen } from "@/lib/server/posts";
 import { now as clockNow } from "@/lib/server/clock";
+import { LeaveSquad } from "@/components/queueup/LeaveSquad";
 
 function RoundAction({ href, label, icon, testId }: { href: string; label: string; icon: React.ReactNode; testId?: string }) {
   return (
@@ -34,6 +35,8 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
   const ready = p.status === "confirmed" || p.status === "completed";
   const [photos, choice, now] = await Promise.all([ready ? albumCount(partyId, people.map((u) => u.id)) : 0, getShareChoice(partyId, me), clockNow()]);
   const sharePrompt = ready && shareOpen(p, now) && !choice;
+  // you can leave while the squad is on; once its chat has ended there's nothing left to leave
+  const canLeave = p.status === "confirmed" && !p.chat?.archived;
   return (
     <div data-testid="squad-info-page">
       <TopBar back={p.chat ? `/chats/${p.chat.id}` : "/events"} title="Squad info" />
@@ -72,7 +75,7 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
           <TraceRow partyId={partyId} />
         </Section>
 
-        <Section flush title={`Members · ${people.length}`} className="pb-4">
+        <Section flush title={`Members · ${people.length}`} className={canLeave ? undefined : "pb-4"}>
           <ul data-testid="squad-members">
             {people.map((u) => (
               <li key={u.id}>
@@ -88,6 +91,12 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
             ))}
           </ul>
         </Section>
+
+        {canLeave && (
+          <Section flush className="pb-4">
+            <LeaveSquad partyId={partyId} />
+          </Section>
+        )}
       </Stack>
     </div>
   );

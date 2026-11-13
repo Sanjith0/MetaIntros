@@ -7,12 +7,12 @@ import { toJson } from "@/lib/json";
 import { pairKey, runRoom, sparksFor, type HumanCheckIns, type LiveEvent, type ObjectionAnswer, type ObjectionOffer, type PicksAnswer, type PicksOffer, type RoomParty } from "@/lib/companion/room";
 import { cleanNote } from "@/lib/companion/brief";
 import { buildRecap, type Recap } from "@/lib/companion/recap";
-import type { TableRow, Verdict } from "@/lib/companion/orchestrator";
+import { pairFloorFor, type TableRow, type Verdict } from "@/lib/companion/orchestrator";
 import type { ThreadMsg } from "@/lib/companion/rounds";
 import type { QueueContext } from "@/lib/companion/brief";
 import { groupCohesion } from "@/lib/match/cohesion";
 import { makePairScorer } from "@/lib/match/compat";
-import type { Candidate, QueueItem } from "@/lib/match/engine";
+import { levelFor, type Candidate, type QueueItem } from "@/lib/match/engine";
 import type { Person } from "@/lib/profile/load";
 import { rankEvents, type GroupContext } from "@/lib/match/eventFit";
 import { rankHangouts } from "@/lib/match/hangoutFit";
@@ -20,7 +20,8 @@ import { dislikeTags } from "@/lib/profile/builder";
 import { ensureBriefs, rememberTold } from "./briefs";
 import { ratingSignals } from "./ratings";
 import { againPairsIn, type PairSignals } from "@/lib/match/ratings";
-import { getSetting } from "./settings";
+import { getFillMode, getSetting } from "./settings";
+import { nowMs } from "@/lib/clock";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { HANGOUT_SPOTS, hangoutHorizon } from "./hangout";
@@ -180,6 +181,8 @@ export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Ma
       similarity,
       // post-event ratings: pairs who said they'd squad up again (counts only, never names)
       againPairs: againPairsFor(await ratingSignals(userIds)),
+      // the bar a squad's weakest pair should clear: strict at first, relaxing the longer the anchor waits
+      floor: pairFloorFor(levelFor(nowMs() - anchor.joinedAt, { fillMode: await getFillMode() }).index),
       onStage: async (stage, note) => {
         if (stage === "done" || stage === "waiting") return;
         await prisma.matchRoom.update({ where: { id: row.id }, data: { stage, note } });
