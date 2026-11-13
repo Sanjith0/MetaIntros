@@ -226,6 +226,14 @@ describe("Companion engine in the queue", () => {
     await setSetting("checkinMs", "0");
   });
 
+  it("when the Companions talk but no squad forms, the queue screen says so", async () => {
+    mockProvider().on("companion_group", () => JSON.stringify({ line: { say: "Not for us.", cites: [] }, decision: "no", privateReason: "x" }));
+    await join(4);
+    await wait(300);
+    expect(await tick()).toBe(0);
+    expect(await getQueueStatus("p01")).toMatchObject({ state: "waiting", problem: "no_squad" });
+  });
+
   it("a room of only simulated people spends no model calls", async () => {
     const lm = await prisma.landmark.findUniqueOrThrow({ where: { id: "lm-downtown-pa" } });
     const sims = (await prisma.user.findMany({ where: { isSimulated: true, ageBand: "18-24", womenOnlyParty: false }, orderBy: { id: "asc" }, take: 8 })).map((u) => u.id);

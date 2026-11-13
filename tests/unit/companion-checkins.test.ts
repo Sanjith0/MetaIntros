@@ -25,6 +25,15 @@ describe("human check-ins", () => {
     expect(asked.every((a) => a.endsWith("p01"))).toBe(true);
   });
 
+  it("no picks check-in when there's nobody to choose between", async () => {
+    const ids = pool.slice(0, 2);
+    const asked: string[] = [];
+    const r = await runRoom({ ids, people, briefs: new Map(ids.map((i) => [i, templateBrief(people.get(i)!, qctx)])), targetSize: 2,
+      human: { picks: async (u) => { asked.push(`picks:${u}`); return null; }, signoff: async (u) => { asked.push(`signoff:${u}`); return { decision: "yes" }; } } });
+    expect(asked).toEqual(["signoff:p01"]);
+    expect(r.parties).toHaveLength(1);
+  });
+
   it("nobody answering changes nothing: same prompts, same squads (so cached runs still replay)", async () => {
     mockProvider().on("companion_ask", () => JSON.stringify({ asks: {} }));
     const plain = await runRoom(input());

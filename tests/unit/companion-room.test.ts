@@ -45,31 +45,36 @@ describe("companion room", () => {
     expect([...used, ...r.heldBack].sort()).toEqual(pool.slice(0, 12).sort());
   });
 
-  it("only pairs above the similarity gate talk: 6 messages each, 8 for deep pairs", async () => {
+  it("pairs above the similarity gate talk (6 messages, 8 for deep pairs), and nobody is stranded below it", async () => {
     const r = await runRoom(input(10));
     const m = r.circles[0].members;
     expect(m).toHaveLength(10);
     const score = makePairScorer();
-    let gated = 0;
     for (let i = 0; i < m.length; i++) for (let j = i + 1; j < m.length; j++) {
-      const above = score(people.get(m[i])!, people.get(m[j])!).score >= SIMILARITY_GATE;
-      const t = r.threads.get(pairKey(m[i], m[j]));
-      if (!above) { expect(t).toBeUndefined(); continue; }
-      gated++;
-      expect(t!.slice(0, 6).map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer"]);
+      if (score(people.get(m[i])!, people.get(m[j])!).score < SIMILARITY_GATE) continue;
+      expect(r.threads.get(pairKey(m[i], m[j]))!.slice(0, 6).map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer"]);
     }
-    expect(gated).toBeGreaterThan(0);
+    // everyone talks to at least their closest few (enough for a squad), even below the gate
+    for (const id of m) expect([...r.threads.keys()].filter((k) => k.split("|").includes(id)).length).toBeGreaterThanOrEqual(3);
     expect(r.deep.length).toBeGreaterThan(0);
     for (const k of r.deep) expect(r.threads.get(k)!.map((x) => x.kind)).toEqual(["intro", "intro", "ask", "ask", "answer", "answer", "close", "close"]);
     for (const [k, t] of r.threads) if (!r.deep.includes(k)) expect(t).toHaveLength(6);
   });
 
-  it("a person nobody is similar enough to makes no calls at all", async () => {
-    const r = await runRoom(input(10));
-    const talked = new Set([...r.threads.keys()].flatMap((k) => k.split("|")));
-    const silent = r.circles[0].members.filter((id) => !talked.has(id));
-    const asked = new Set(mockProvider().calls.filter((c) => c.task === "companion_ask").map((c) => JSON.parse(c.messages[1].content).your_brief.ownerId));
-    for (const id of silent) expect(asked.has(id)).toBe(false);
+  it("two people with unrelated interests still get to talk and can form a squad of 2, fast", async () => {
+    const score = makePairScorer();
+    let pair: [string, string] | null = null;
+    for (const a of pool) for (const b of pool) if (!pair && a < b && score(people.get(a)!, people.get(b)!).score < SIMILARITY_GATE) pair = [a, b];
+    expect(pair).not.toBeNull();
+    const ids = pair!;
+    const stages: string[] = [];
+    const r = await runRoom({ ids, people, briefs: new Map(ids.map((i) => [i, templateBrief(people.get(i)!, qctx)])), targetSize: 2, onStage: (s) => void stages.push(s) });
+    expect(r.parties.map((p) => p.members)).toEqual([[...ids].sort()]);
+    expect(r.threads.get(pairKey(ids[0], ids[1]))!.length).toBe(6);
+    // only one squad is possible: no deep round, proposals, deliberation or Orchestrator call
+    expect(stages).toEqual(["circles", "mingling", "forming", "group", "done"]);
+    const tasks = new Set(mockProvider().calls.map((c) => c.task));
+    for (const t of ["companion_close", "companion_deliberate", "orchestrator_form", "orchestrator_circles"]) expect(tasks.has(t)).toBe(false);
   });
 
   it("30 people: everyone is in one circle or unplaced", async () => {

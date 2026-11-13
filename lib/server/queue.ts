@@ -9,7 +9,7 @@ import { publish } from "./bus";
 import { setAiMode } from "@/lib/ai";
 import { getFillMode, getSetting } from "./settings";
 import { formParty } from "./pipeline";
-import { matchRoom, roomStageFor } from "./rooms";
+import { lastRoomFoundNoSquad, matchRoom, roomStageFor } from "./rooms";
 import { checkStalls } from "./host";
 import { sweepExpiredChats } from "./expiry";
 import { now as clockNow } from "./clock";
@@ -95,7 +95,7 @@ export async function leaveQueue(userId: string) {
  * - event_started: queued from an event that has already started
  * - no_fit: a squad formed but no event/spot fit everyone; retried after a cooldown
  */
-export type QueueProblem = "no_events" | "event_started" | "no_fit";
+export type QueueProblem = "no_events" | "event_started" | "no_fit" | "no_squad";
 
 export interface QueueStatus {
   state: "idle" | "waiting" | "matched";
@@ -138,7 +138,8 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
     eventId: entry.eventId,
     bucketName: entry.bucketLandmark.name,
     bucketId: entry.bucketLandmarkId,
-    problem: problems.get(entry.id),
+    // no_squad is only shown, never used to hold someone back: a new person joining starts a fresh room.
+    problem: problems.get(entry.id) ?? (!room && (await lastRoomFoundNoSquad(userId, entry.joinedAt)) ? "no_squad" : undefined),
     waitedMs: nowMs() - entry.joinedAt.getTime(),
     found: pf.found,
     foundUsers: pf.userIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean),

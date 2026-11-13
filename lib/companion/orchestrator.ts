@@ -270,7 +270,7 @@ export function validateParties(proposed: ProposedParty[], circle: string[], wan
   return kept;
 }
 
-function templateWhy(members: string[], people: Map<string, Person>) {
+export function templateWhy(members: string[], people: Map<string, Person>) {
   const counts = new Map<string, number>();
   for (const m of members) for (const t of people.get(m)!.profile.interestTags) counts.set(t.tag, (counts.get(t.tag) ?? 0) + 1);
   const shared = [...counts.entries()].filter(([, n]) => n >= Math.ceil(members.length / 2)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 3).map(([t]) => label(t).toLowerCase());

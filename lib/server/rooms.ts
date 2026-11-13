@@ -217,6 +217,12 @@ export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Ma
   }
 }
 
+/** Did this person's latest room (since they joined the queue) end without a squad? */
+export async function lastRoomFoundNoSquad(userId: string, since: Date): Promise<boolean> {
+  const row = await prisma.matchRoom.findFirst({ where: { userIds: { contains: `,${userId},` }, createdAt: { gte: since } }, orderBy: { createdAt: "desc" }, select: { stage: true, result: true } });
+  return row?.stage === "waiting" && !(row.result as { error?: boolean } | null)?.error;
+}
+
 /** What the engine is doing right now for a waiting user, if a room is running for them. */
 export async function roomStageFor(userId: string): Promise<{ stage: string; note: string } | null> {
   const row = await prisma.matchRoom.findFirst({

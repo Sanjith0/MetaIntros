@@ -17,7 +17,7 @@ interface Status {
   eventId?: string | null;
   bucketName?: string;
   bucketId?: string;
-  problem?: "no_events" | "event_started" | "no_fit";
+  problem?: "no_events" | "event_started" | "no_fit" | "no_squad";
   waitedMs?: number;
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
@@ -97,7 +97,10 @@ export function QueueScreen() {
   const n = status.targetSize ?? 6;
   const found = Math.min(status.found ?? 1, n);
   const users = status.foundUsers ?? [];
-  const widening = elapsed > 16_000 ? "Expanding search to nearby areas…" : elapsed > 8_000 ? "Widening the match…" : "Looking for your best matches…";
+  const widening =
+    status.problem === "no_squad" ? "Waiting for someone new to join…"
+    : status.stage ? "Your Companion is on it…"
+    : elapsed > 16_000 ? "Expanding search to nearby areas…" : elapsed > 8_000 ? "Widening the match…" : "Looking for your best matches…";
 
   return (
     <div data-testid="queue-screen" className="relative min-h-[80dvh] overflow-hidden bg-gradient-to-b from-[#0b1640] via-[#1b1464] to-[#2a0f5c] px-4 pb-8 pt-6 text-white">
@@ -163,6 +166,7 @@ const PROBLEM_TEXT: Record<NonNullable<Status["problem"]>, string> = {
   no_events: "There are no upcoming events left this weekend to sort your squad into.",
   event_started: "This event has already started, so we can't form a squad for it.",
   no_fit: "We found people, but no event works for everyone's free time and tastes yet. We'll keep trying.",
+  no_squad: "Your Companion talked with everyone here, but the Companions didn't settle on a squad. You'll be matched as soon as someone new joins the queue.",
 };
 
 function QueueProblemBanner({ status }: { status: Status }) {
@@ -180,7 +184,7 @@ function QueueProblemBanner({ status }: { status: Status }) {
   return (
     <div className="mt-5 rounded-xl bg-amber-400/15 p-3 text-sm text-amber-100 ring-1 ring-amber-300/40" data-testid="queue-problem" data-problem={status.problem}>
       <p>{text}</p>
-      {!hangout && (
+      {!hangout && status.problem !== "no_squad" && (
         <button type="button" disabled={busy} onClick={switchToHangout} data-testid="switch-to-hangout"
           className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-white py-2 font-bold text-[#3b0f7a] disabled:opacity-60">
           <Sparkles size={15} /> Plan a new hangout instead

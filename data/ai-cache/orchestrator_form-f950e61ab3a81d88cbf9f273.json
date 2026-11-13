@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": []}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 394,
+    "completionTokens": 326
+  },
+  "savedAt": "2026-11-13T01:00:15.872Z"
+}
