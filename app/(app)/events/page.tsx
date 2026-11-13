@@ -34,9 +34,11 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
   // Queuing again would replace a queue you're in or skip a ready check, so the entry waits until those are done.
   // With a squad on, it stays (grey): you can be in more than one squad.
   const showEntry = !card || card.state === "ready" || card.state === "venue" || card.state === "after";
-  // The status card shows one squad; list them all when it can't cover every squad you're in.
-  const carded = card && "partyId" in card && card.state !== "accept" ? card.partyId : null;
-  const showSquads = mySquads.some((s) => s.partyId !== carded);
+  // One squad: its status card says it all. Two or more: "Your squads" lists them all and the squad card
+  // steps aside, so no squad shows twice. A queue or ready-check card always stays (it isn't a squad yet).
+  const squadCard = card?.state === "ready" || card?.state === "venue" || card?.state === "after";
+  const showSquads = mySquads.length >= 2 || (mySquads.length === 1 && !squadCard);
+  const showCard = Boolean(card) && !(squadCard && mySquads.length >= 2);
   // "An event you pick": public events, the ones you're interested in first (Jordan's story).
   const pickable = upcoming
     .filter((e) => e.isPublicVenue)
@@ -59,7 +61,7 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
           </ChipRow>
         </div>
 
-        {card && <StatusCard card={card} />}
+        {showCard && card && <StatusCard card={card} />}
         {showSquads && <MySquads squads={mySquads} />}
         {/* The squad card keeps the one primary action; under it, queuing for another squad is grey. */}
         {showEntry && (
@@ -68,8 +70,8 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
             events={pickable}
             landmarks={landmarks}
             shareDefault={me.queueVisibility === "friends"}
-            again={card?.state === "after"}
-            also={card?.state === "ready" || card?.state === "venue"}
+            again={showCard && card?.state === "after"}
+            also={(showCard && (card?.state === "ready" || card?.state === "venue")) || mySquads.length >= 2}
             autoOpen={sp.queue === "1"}
           />
         )}

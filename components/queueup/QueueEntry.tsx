@@ -13,7 +13,7 @@ type Step = { kind: "modes" } | { kind: "pick" } | { kind: "setup"; mode: "event
 
 /**
  * "Go with a squad": one native feed unit with one primary button. It opens a two-step sheet:
- * step 1 = the three queue modes as rows, step 2 = setup (size, where, one safety line, Find my squad).
+ * step 1 = the event queue modes as rows, step 2 = setup (size, where, one safety line, Find my squad).
  * On an event page (`event` set) the sheet opens straight at step 2 for that event.
  * On the Events tab a second, grey "Plan a new hangout" button opens step 2 for a new hangout directly.
  */
@@ -56,7 +56,7 @@ export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault 
         </p>
       )}
       <Button variant={again || also ? "secondary" : "primary"} block className="mt-3" data-testid={event ? "queue-up-button" : "queue-entry-open"} onClick={() => openAt(first)}>
-        {again || also ? "Find another squad" : event ? "Find a squad to go with" : "Find a squad"}
+        {again || also ? "Find another squad for an event" : event ? "Find a squad to go with" : "Find a squad for an event"}
       </Button>
       {!event && (
         <Button block className="mt-2" data-testid="queue-entry-hangout" icon={<MapPinned size={16} />} onClick={() => openAt({ kind: "setup", mode: "hangout", event: null })}>
@@ -65,7 +65,7 @@ export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault 
       )}
 
       <Sheet open={open} onClose={close} title={title} testId="queue-sheet">
-        {step.kind !== "modes" && !event && (
+        {step.kind !== "modes" && !event && !(step.kind === "setup" && step.mode === "hangout") && (
           <button type="button" onClick={() => setStep(step.kind === "setup" && step.event ? { kind: "pick" } : { kind: "modes" })} className="-mt-1 mb-1 flex items-center gap-1 px-4 text-meta font-semibold text-link">
             <ChevronLeft size={16} aria-hidden /> Back
           </button>
@@ -77,9 +77,6 @@ export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault 
             </li>
             <li>
               <ListRow onClick={() => setStep({ kind: "setup", mode: "events", event: null })} testId="queue-anything" leading={<IconCircle><CalendarDays size={20} /></IconCircle>} title="For any event this weekend" subtitle="We match your squad, then pick an event you'll all like." trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
-            </li>
-            <li>
-              <ListRow onClick={() => setStep({ kind: "setup", mode: "hangout", event: null })} testId="queue-hangout" leading={<IconCircle><MapPinned size={20} /></IconCircle>} title="For a new hangout" subtitle="No event needed. We plan one at a public spot near all of you." trailing={<ChevronRight size={20} className="text-muted" aria-hidden />} />
             </li>
           </ul>
         )}

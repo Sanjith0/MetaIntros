@@ -63,8 +63,7 @@ test("the chat ends → the rating pop-up opens; ratings save privately and tune
   await shot(page, "04-for-you");
 
   // Next squad: never the person you said no to; the trace says ratings were used, with no names
-  await page.getByTestId("queue-entry-open").click();
-  await page.getByTestId("queue-hangout").click();
+  await page.getByTestId("queue-entry-hangout").click();
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-rwc-courthouse").click();

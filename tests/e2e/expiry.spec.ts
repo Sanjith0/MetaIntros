@@ -105,7 +105,9 @@ test("after the event: the squad card stays and you can queue again (Events tab 
   await expect(page.getByTestId("squad-banner")).toBeVisible();
   await page.getByTestId("find-another-squad").click();
   await expect(page.getByTestId("queue-sheet")).toBeVisible(); // lands on Events with the queue sheet open
-  await page.getByTestId("queue-hangout").click();
+  await expect(page.getByTestId("queue-hangout")).toHaveCount(0); // the sheet is for events; a new hangout has its own button
+  await page.keyboard.press("Escape");
+  await page.getByTestId("queue-entry-hangout").click();
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-downtown-pa").click();

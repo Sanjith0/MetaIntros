@@ -28,8 +28,11 @@ async function queueNewHangout(page: Page) {
 test("Events: plan a new hangout in one tap, keep queuing while in a squad, see every squad, leave one", async ({ page }) => {
   const errors = trackConsoleErrors(page);
   await gotoReady(page, "/events");
-  // one blue button ("Find a squad"); "Plan a new hangout" sits under it in grey
-  await expect(page.getByTestId("queue-entry-open")).toBeVisible();
+  // one blue button ("Find a squad for an event"); "Plan a new hangout" sits under it in grey
+  await expect(page.getByTestId("queue-entry-open")).toHaveText("Find a squad for an event");
+  await page.getByTestId("queue-entry-open").click();
+  await expect(page.getByTestId("queue-hangout")).toHaveCount(0); // hangouts have their own button, not a row in this sheet
+  await page.keyboard.press("Escape");
   await expect(page.getByTestId("queue-entry-hangout")).toBeVisible();
   await expect(page.getByTestId("my-squads")).toHaveCount(0);
   await shot(page, "50-events-plan-hangout");
@@ -39,7 +42,7 @@ test("Events: plan a new hangout in one tap, keep queuing while in a squad, see 
   await gotoReady(page, "/events");
   await expect(page.getByTestId("squad-banner")).toHaveAttribute("data-status", /^(ready|venue)$/);
   await expect(page.getByTestId("queue-entry")).toContainText("Go with another squad");
-  await expect(page.getByTestId("queue-entry-open")).toHaveText("Find another squad");
+  await expect(page.getByTestId("queue-entry-open")).toHaveText("Find another squad for an event");
   await expect(page.getByTestId("my-squads")).toHaveCount(0); // the card covers the only squad
   await shot(page, "51-events-with-squad");
 
@@ -56,6 +59,7 @@ test("Events: plan a new hangout in one tap, keep queuing while in a squad, see 
   await expect(rows).toHaveCount(2);
   await expect(page.getByTestId("my-squads")).toContainText("Your squads · 2");
   await expect(page.locator('[data-testid^="my-squad-"][data-hangout="true"]')).toHaveCount(1);
+  await expect(page.getByTestId("squad-banner")).toHaveCount(0); // the list covers both squads; no squad shows twice
   await shot(page, "52-events-your-squads");
 
   // leave the hangout squad from Squad info
