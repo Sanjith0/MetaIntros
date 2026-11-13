@@ -6,7 +6,7 @@ import { Avatar, Cover, ErrorNote, Icon, Loading, Screen, c, t } from '../qu/ui'
 
 interface Video { id: string; page: string; color: string; avatar: string; thumb: string; title: string; views: string; ago: string }
 
-/** Seeded mock of the Video tab (app/(app)/video/page.tsx): outside the Queue Up path, but it doesn't dead-end. */
+/** Seeded mock of the Video tab (app/(app)/video/page.tsx): outside the Link path, but it doesn't dead-end. */
 export default function VideoScreen() {
   const { data, error, reload } = useData<{ videos: Video[] }>('/api/m/video');
   return <Screen title="Video" testID="video-page">

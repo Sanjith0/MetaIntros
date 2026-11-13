@@ -75,7 +75,7 @@ describe("queue service (DB)", () => {
     const ev = party.event!;
     expect(ev.kind).toBe("hangout");
     expect(ev.isPublicVenue).toBe(true);
-    expect(ev.hostName).toBe("Queue Up");
+    expect(ev.hostName).toBe("Link");
     expect(ev.startsAt.getTime()).toBeGreaterThan(Date.now() - 1);
     expect(party.chat).toBeTruthy(); // squad chat, host, cards all run as usual
     // every queuer in this party was in the hangout queue

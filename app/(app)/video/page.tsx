@@ -4,7 +4,7 @@ import { Avatar, ChipLink, ChipRow, Stack } from "@/components/fb";
 import { EventCover } from "@/components/events/EventCover";
 import { VIDEOS } from "@/lib/mock/feed";
 
-/** Seeded mock of the Video tab: outside the Queue Up hero path, but it doesn't dead-end. */
+/** Seeded mock of the Video tab: outside the Link hero path, but it doesn't dead-end. */
 export default function VideoPage() {
   return (
     <div data-testid="video-page">

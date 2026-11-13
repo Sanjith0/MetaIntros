@@ -8,7 +8,7 @@ export type StatusCardData =
   | { state: 'accept'; title: string; accepted: boolean; inCount: number; size: number; action: { label: string; href: string } }
   | { state: 'ready' | 'venue' | 'after'; title: string; startsAt: string; venueName: string; checkedIn?: boolean; faces: { id: string; name: string; avatarColor: string }[]; action: { label: string; href: string }; secondary?: { label: string; href: string } };
 
-/** The single Queue Up status card: one state, one line of context, one next action. */
+/** The single Link status card: one state, one line of context, one next action. */
 export function StatusCard({ card, onEventPage = false }: { card: StatusCardData; onEventPage?: boolean }) {
   const [elapsed, setElapsed] = useState(card.state === 'waiting' ? card.waitedMs : 0);
   const base = useRef({ at: Date.now(), waited: card.state === 'waiting' ? card.waitedMs : 0 });

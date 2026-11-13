@@ -4,8 +4,8 @@ import { listFriendQueues } from "./friendQueues";
 import { squadPostsFor } from "./posts";
 
 /**
- * The Notifications tab, derived from data Queue Up already keeps (no new table): squads formed, chats
- * that ended, friend requests, friendships made through Queue Up, and upcoming events you're interested in.
+ * The Notifications tab, derived from data Link already keeps (no new table): squads formed, chats
+ * that ended, friend requests, friendships made through Link, and upcoming events you're interested in.
  */
 export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue" | "group_invite" | "squad_post";
 
@@ -50,7 +50,7 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
     out.push({
       id: `squad-${p.id}`,
       kind: "squad",
-      avatar: { name: "Queue Up", color: p.event.coverColor },
+      avatar: { name: "Link", color: p.event.coverColor },
       bold: "Your squad is ready.",
       text: `${p.members.length} people are going to ${p.event.title} together.`,
       href: `/squad/${p.id}`,
@@ -60,7 +60,7 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       out.push({
         id: `ended-${p.id}`,
         kind: "chat_ended",
-        avatar: { name: "Queue Up", color: p.event.coverColor },
+        avatar: { name: "Link", color: p.event.coverColor },
         bold: "Your squad chat has ended.",
         text: "Add the people you'd like to see again. You only become friends if you both say yes.",
         href: `/squad/${p.id}/connect`,
@@ -74,7 +74,7 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       kind: "request",
       avatar: { name: r.from.name, color: r.from.avatarColor },
       bold: r.from.name,
-      text: r.partyId ? "sent you a friend request. You met through Queue Up." : "sent you a friend request.",
+      text: r.partyId ? "sent you a friend request. You met through Link." : "sent you a friend request.",
       href: "/friends?tab=requests",
       at: r.createdAt,
     });

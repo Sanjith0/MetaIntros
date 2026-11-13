@@ -106,7 +106,7 @@ function FriendQueueSheet({ q, onClose, nowMs }: { q: FriendQueue | null; onClos
     const j = r ? await r.json().catch(() => ({})) : {};
     if (j.ok) return router.push("/queue");
     setBusy(false);
-    setError(j.error === "age" ? "Queue Up is for people 18 and over." : j.error === "not_visible" ? `${q ? first(q.friend.name) : "They"} isn't sharing this queue anymore.` : "Couldn't join the queue. Try again.");
+    setError(j.error === "age" ? "Link is for people 18 and over." : j.error === "not_visible" ? `${q ? first(q.friend.name) : "They"} isn't sharing this queue anymore.` : "Couldn't join the queue. Try again.");
   };
 
   return (
@@ -165,7 +165,7 @@ function FriendQueueSheet({ q, onClose, nowMs }: { q: FriendQueue | null; onClos
           </div>
           {q.canJoinTogether ? (
             <p className="mt-2 text-meta text-muted" data-testid="join-together-note">
-              You&apos;ll queue together with {first(q.friend.name)} and land in the same squad. Queue Up fills the other spots.
+              You&apos;ll queue together with {first(q.friend.name)} and land in the same squad. Link fills the other spots.
             </p>
           ) : q.canJoin ? (
             <p className="mt-2 text-meta text-muted">

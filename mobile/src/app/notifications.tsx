@@ -12,7 +12,7 @@ const KIND: Record<string, { icon: IconName; tone: string }> = {
   group_invite: { icon: 'user-plus', tone: c.accent }, squad_post: { icon: 'image', tone: c.positive },
 };
 
-/** These picture Queue Up or an event, not a person: initials (or the event's photo), not a character. */
+/** These picture Link or an event, not a person: initials (or the event's photo), not a character. */
 const THINGS = new Set(['squad', 'chat_ended', 'reminder']);
 
 export default function NotificationsScreen() {

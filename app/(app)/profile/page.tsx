@@ -41,9 +41,9 @@ export default async function ProfilePage() {
           <ListRow leading={<IconCircle><MapPin size={18} /></IconCircle>} title={`Lives in ${me.neighborhood ?? "the Bay Area"}`} />
           {persona.hometown && <ListRow leading={<IconCircle><Home size={18} /></IconCircle>} title={`From ${persona.hometown}`} />}
           <ListRow leading={<IconCircle><Cake size={18} /></IconCircle>} title={`Age ${me.ageBand}`} />
-          <ListRow leading={<IconCircle><Users size={18} /></IconCircle>} title={`${squads} Queue Up squad${squads === 1 ? "" : "s"}`} href="/friends?tab=queueup" />
+          <ListRow leading={<IconCircle><Users size={18} /></IconCircle>} title={`${squads} Link squad${squads === 1 ? "" : "s"}`} href="/friends?tab=queueup" />
         </Section>
-        <Section title="Queue Up privacy" flush>
+        <Section title="Link privacy" flush>
           <QueueVisibilityToggle initial={me.queueVisibility === "friends"} />
         </Section>
         {brief && <BriefCard initial={brief.facts.map(({ id, kind, text, share }) => ({ id, kind, text, share }))} communication={brief.communication} />}

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/readme/hero.svg" alt="Queue Up: go to events with a squad, not alone. AI Companions powered by Muse match you into a squad for Facebook Events and plan the hangout." width="100%">
+  <img src="docs/readme/hero.svg" alt="Link: go to events with a squad, not alone. AI Companions powered by Muse match you into a squad for Facebook Events and plan the hangout." width="100%">
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
 
 <br>
 
-**Queue Up** is a feature inside Facebook Events for everyone who skips an event because nobody they know is going. You queue like a ranked game, and AI Companions powered by **Muse** match you into a small **squad** of people near you who'll get along. The squad gets a short-lived chat with an **AI host**, **talk cards** to break the ice, help to **find each other** at the venue, and a way to stay friends afterwards if both people want to.
+**Link** is a feature inside Facebook Events for everyone who skips an event because nobody they know is going. You queue like a ranked game, and AI Companions powered by **Muse** match you into a small **squad** of people near you who'll get along. The squad gets a short-lived chat with an **AI host**, **talk cards** to break the ice, help to **find each other** at the venue, and a way to stay friends afterwards if both people want to.
 
 Built for Meta's *Closer Together AI Hackathon*. It's a prototype with seeded data only: no Meta logos or fonts, a "Hackathon prototype, not Facebook" label on every screen, `noindex`, and it never calls, scrapes or logs in to Facebook.
 
@@ -82,7 +82,7 @@ Hangout queuers only ever match other hangout queuers. Inside the existing-event
     <td valign="top"><img src="docs/readme/icons/pin.svg" width="28" align="left" alt="">&nbsp;<b>Find each other.</b> Meet at the venue with check-ins and an opt-in "find me" photo.</td>
   </tr>
   <tr>
-    <td colspan="2" valign="top"><img src="docs/readme/icons/handshake.svg" width="28" align="left" alt="">&nbsp;<b>Stay in touch.</b> After the event, add each other as friends, only if both of you say yes. The friendship is marked "Met through Queue Up".</td>
+    <td colspan="2" valign="top"><img src="docs/readme/icons/handshake.svg" width="28" align="left" alt="">&nbsp;<b>Stay in touch.</b> After the event, add each other as friends, only if both of you say yes. The friendship is marked "Met through Link".</td>
   </tr>
 </table>
 
@@ -144,7 +144,7 @@ The app runs on a single clock: real time plus a demo offset that only ever move
   <img src="docs/readme/expo-app.png" alt="The Expo app: your squad is ready, the squad chat with the AI host, and joining with Glance" width="88%">
 </p>
 
-[`mobile/`](mobile/) is an Expo (SDK 58) app that carries every Queue Up screen across and has **Glance** built in. It talks to the Queue Up server through `/api/m/*`, and its web build can be deployed to Vercel with `mobile/scripts/deploy-vercel.sh`, which forwards `/api` and `/images` to a running Queue Up server.
+[`mobile/`](mobile/) is an Expo (SDK 58) app that carries every Link screen across and has **Glance** built in. It talks to the Link server through `/api/m/*`, and its web build can be deployed to Vercel with `mobile/scripts/deploy-vercel.sh`, which forwards `/api` and `/images` to a running Link server.
 
 <table>
   <tr>
@@ -260,7 +260,7 @@ Every person in the queue gets a **Companion**, a Muse agent that knows only its
 3. **Code re-checks safety** on every squad before it is committed.
 4. The next step depends on the queue:
    - **Existing-events queue:** the **Event Selection Agent** chooses from events that code has already verified. Its pick is then re-validated.
-   - **Hangout queue:** code builds every option: a public spot (`data/seed/spots.json`) within 12 km of *every* member's area, a slot inside everyone's shared free time and the spot's hours, and nothing anyone dislikes. The **Hangout Planner Agent** picks one and names it, in one Muse call. Its pick is re-validated, and its text is length-capped and sensitivity-filtered. The plan is saved as a squad-only event (`Event.kind = "hangout"`), so chat, check-ins, expiry and "Met through Queue Up" work unchanged.
+   - **Hangout queue:** code builds every option: a public spot (`data/seed/spots.json`) within 12 km of *every* member's area, a slot inside everyone's shared free time and the spot's hours, and nothing anyone dislikes. The **Hangout Planner Agent** picks one and names it, in one Muse call. Its pick is re-validated, and its text is length-capped and sensitivity-filtered. The plan is saved as a squad-only event (`Event.kind = "hangout"`), so chat, check-ins, expiry and "Met through Link" work unchanged.
 5. **Ready check ("I'm in").** Every real member gets 10 minutes (`acceptWindowMs` setting) to tap **I'm in** or **Not for me**. Until everyone is in, the server shows only first name, last initial and shared interests: no photos, no rationale, no trace.
 6. On the last accept, "Your squad is ready" plays, the squad chat is created and the **AI host** welcomes everyone. "How your Companions decided" shows each person their own Companion's conversations with their squadmates, and how its pick compares with ranking people by similarity.
 7. The **Companions' conversations** between squadmates feed the **talk cards** and are shown on the cards screen, labeled as AI.
@@ -299,7 +299,7 @@ Every person in the queue gets a **Companion**, a Muse agent that knows only its
   </tr>
   <tr>
     <td valign="top"><img src="docs/readme/icons/people.svg" width="28" align="left" alt="">&nbsp;<b>Product thinking and user impact</b></td>
-    <td valign="top">Going alone is the barrier, so the squad is the product. Safety is designed in from the first screen. Party size works like a game mode. Expiring chats keep it low-pressure. Mutual-consent friending turns one night into lasting connections. "Met through Queue Up" closes the loop inside Facebook. Live sign-up plus Live and Mixed modes show it working with real people in the room.</td>
+    <td valign="top">Going alone is the barrier, so the squad is the product. Safety is designed in from the first screen. Party size works like a game mode. Expiring chats keep it low-pressure. Mutual-consent friending turns one night into lasting connections. "Met through Link" closes the loop inside Facebook. Live sign-up plus Live and Mixed modes show it working with real people in the room.</td>
   </tr>
   <tr>
     <td valign="top"><img src="docs/readme/icons/play.svg" width="28" align="left" alt="">&nbsp;<b>Execution and demo</b></td>
@@ -328,7 +328,7 @@ All of these are enforced **in code**, with property-based tests. An agent can p
 - **Grounded talk cards.** Every claim cites the exact field it came from, such as `p05:groups[1]` or `mutualFriends`. Claims whose sources don't resolve are stripped, and cards are re-validated again when read.
 - **No sensitive inferences.** Politics, religion, health and sexuality are never used for matching and never shown. Sensitive pages are flagged at the vocabulary level, and a text filter backs that up. Tests run against a deliberately hostile mock model and planted sensitive data.
 - **Minimal data to the model.** Prompts contain first names and non-sensitive interest labels only. Each Companion call holds exactly one person's brief plus what the others chose to share.
-- **Location.** GPS is used only to pick a nearby landmark area, and the exact fix is never shared. Any GPS fix more than 15 km from every Queue Up area is ignored in favor of a manual pick.
+- **Location.** GPS is used only to pick a nearby landmark area, and the exact fix is never shared. Any GPS fix more than 15 km from every Link area is ignored in favor of a manual pick.
 - **Mutual-consent friending.** A friendship exists only when both people tap *Add friend*. One-sided requests stay pending, and nobody is told if you don't add them.
 - **Expiring chats.** Squad chats auto-archive 24h after the event and become read-only.
 - **Private post-event ratings.** When a squad chat ends, each member gets a pop-up to rate the night (1–5) and, optionally, say per squadmate whether they'd squad up again. Only the rater can read their answers back. Stars tune "For you" and the event pick; "again" lifts that pair's match score; "not again" keeps the pair out of future squads (never between people who queue together). The trace says ratings were used, with no names or counts, and the agent's rationale may not mention them (`lib/match/ratings.ts`, `lib/server/ratings.ts`).

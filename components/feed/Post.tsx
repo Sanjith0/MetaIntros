@@ -9,8 +9,8 @@ const AUDIENCE = {
 
 /**
  * A feed post shell (template: feat's Post.tsx), rebuilt on tokens. Actions are inert in this prototype.
- * Seeded posts pass likes/comments; real posts (Queue Up squads) pass an audience, an optional place
- * ("at <event> with their Queue Up squad"), a label slot (AI captions) and a menu (own posts).
+ * Seeded posts pass likes/comments; real posts (Link squads) pass an audience, an optional place
+ * ("at <event> with their Link squad"), a label slot (AI captions) and a menu (own posts).
  */
 export function Post({
   id,

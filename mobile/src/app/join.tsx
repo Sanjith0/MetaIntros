@@ -26,7 +26,7 @@ export default function JoinScreen() {
   const canWomenOnly = gender === 'woman';
   const submit = async (sample: boolean) => {
     setError(null);
-    if (minor) return setError('Queue Up is for people 18 and over.');
+    if (minor) return setError('Link is for people 18 and over.');
     if (!basicsOk) return setError('Add your first name, age range and gender first.');
     if (!sample && interests.length < 5) return setError('Pick at least 5 interests.');
     setBusy(true);
@@ -36,7 +36,7 @@ export default function JoinScreen() {
     if (!r.ok) { setBusy(false); return setError(r.data?.error ?? 'Something went wrong. Try again.'); }
     router.replace('/events');
   };
-  return <Screen title="Join the Queue Up demo" tabs={false} testID="join-page">
+  return <Screen title="Join the Link demo" tabs={false} testID="join-page">
     <Section style={{ gap: 8 }}>
       <Text style={t.body}>This is a demo sign-up for a hackathon prototype. It isn&apos;t Facebook and isn&apos;t connected to it. There&apos;s no password and no account.</Text>
       <Text style={t.meta}>We collect your first name, age range, gender (optional) and the interests you pick. If you&apos;re matched, your squad sees your first name and what you have in common. Everything is deleted 24 hours after you sign up, or when the demo resets.</Text>
@@ -47,7 +47,7 @@ export default function JoinScreen() {
         style={[t.body, { height: 44, borderRadius: 6, backgroundColor: c.wash, paddingHorizontal: 12 }]} />
       <Text style={[t.bodyBold, { marginTop: 8 }]}>Age range</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{BANDS.map(b => <Chip key={b.id} on={ageBand === b.id} onPress={() => setAgeBand(b.id)} testID={`join-age-${b.id}`}>{b.label}</Chip>)}</View>
-      <Text style={[t.meta, minor && { color: c.badge, fontFamily: font.semibold }]}>{minor ? 'Queue Up is for people 18 and over.' : "You're only matched with people in your own age range."}</Text>
+      <Text style={[t.meta, minor && { color: c.badge, fontFamily: font.semibold }]}>{minor ? 'Link is for people 18 and over.' : "You're only matched with people in your own age range."}</Text>
       <Text style={[t.bodyBold, { marginTop: 8 }]}>Gender</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{GENDERS.map(g => <Chip key={String(g.id)} on={gender === g.id} onPress={() => setGender(g.id)} testID={`join-gender-${g.id ?? 'none'}`}>{g.label}</Chip>)}</View>
       {canWomenOnly ? <Chip on={womenOnly} onPress={() => setWomenOnly(!womenOnly)} icon={womenOnly ? 'check-square' : 'square'}>Only match me into women-only squads</Chip> : null}

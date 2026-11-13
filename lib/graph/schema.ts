@@ -4,7 +4,7 @@ import { z } from "zod";
  * Zod schemas for our mock Graph API payloads. Fields without an `x_` prefix mirror
  * real Graph API edges (`/me`, `/me/likes`, `/me/groups`, `/me/music`, `/me/events`,
  * `/me/friends`). `x_`-prefixed edges are mock extensions for data Facebook doesn't
- * expose through Graph (dislikes, availability, Queue Up safety preferences).
+ * expose through Graph (dislikes, availability, Link safety preferences).
  */
 
 const Paging = z

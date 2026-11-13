@@ -57,7 +57,7 @@ export async function eventSelectionAgent(input: {
     steps.push({ agent: AGENT, kind: "tool_call", toolName: "checkEventFit", input: { eventId: ev.id }, output: fit,
       summary: fit.ok ? `${ev.title}: public venue, nobody dislikes it, fits the squad` : `${ev.title}: ${fit.rejections.join("; ")}` });
     if (!ev.isPublicVenue) {
-      steps.push({ agent: AGENT, kind: "safety_check", output: { rejected: true }, summary: "Private venue — Queue Up only meets at public venues" });
+      steps.push({ agent: AGENT, kind: "safety_check", output: { rejected: true }, summary: "Private venue — Link only meets at public venues" });
       return { eventId: ev.id, runnersUp: [], reasons: [], steps, source: "code" }; // caller's validateParty rejects it
     }
     const reasons = ["You all queued for this event", ...fitReasons(fit, group)].slice(0, 3);

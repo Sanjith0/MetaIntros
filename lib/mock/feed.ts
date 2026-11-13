@@ -1,5 +1,5 @@
 /**
- * Seeded content for the tabs outside the Queue Up hero path (Home, Video). Colours here are content, not
+ * Seeded content for the tabs outside the Link hero path (Home, Video). Colours here are content, not
  * design tokens; photos are Muse-generated stand-ins in public/images (scripts/gen-images.ts). Nothing here
  * comes from Facebook.
  */

@@ -21,7 +21,7 @@ test("feed renders every event for each tab with correct filtering", async ({ pa
   expect(errors).toEqual([]);
 });
 
-test("detail page opens from a card, RSVP toggles, Queue Up button present", async ({ page }) => {
+test("detail page opens from a card, RSVP toggles, Link button present", async ({ page }) => {
   await gotoReady(page, "/events");
   await page.getByTestId("event-card-ev-indie-guild").click();
   await expect(page.getByTestId("event-title")).toHaveText("Indie Night: Local Bands Showcase");

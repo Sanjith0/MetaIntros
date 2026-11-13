@@ -3,7 +3,7 @@ import { getQueueStatus } from "./queue";
 import { squadName } from "./squadChat";
 
 /**
- * The one Queue Up status card (Events tab top, and the event page it concerns). It moves through
+ * The one Link status card (Events tab top, and the event page it concerns). It moves through
  * waiting → ready → at the venue → after, and always offers exactly one next action.
  */
 export type StatusCard =

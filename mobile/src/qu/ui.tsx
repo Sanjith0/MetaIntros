@@ -8,7 +8,7 @@ import { SvgXml } from 'react-native-svg';
 import { characterSvg, characterUri } from './character';
 import { fmtEventWhen } from './format';
 
-/** Queue Up's Facebook-style tokens (app/globals.css on the web app). */
+/** Link's Facebook-style tokens (app/globals.css on the web app). */
 export const c = {
   accent: '#0866ff', link: '#0064d1', on: '#ebf5ff', ink: '#050505', muted: '#65676b', section: '#4b4c4f',
   disabled: '#bcc0c4', wash: '#f0f2f5', surface: '#ffffff', control: '#e4e6eb', divider: '#ced0d4',
@@ -70,7 +70,7 @@ function MessagesButton() {
 
 /**
  * 56px white top bar plus the prototype strip (components/fb/TopBar.tsx).
- * home: the Queue Up wordmark with Create, Search and Chats. Title only: page title with Search and Chats. back: chevron and title.
+ * home: the Link wordmark with Create, Search and Chats. Title only: page title with Search and Chats. back: chevron and title.
  */
 export function TopBar({ title, back, right, variant }: { title: string; back?: string | boolean; right?: React.ReactNode; variant?: 'home' }) {
   const goBack = () => {
@@ -86,7 +86,7 @@ export function TopBar({ title, back, right, variant }: { title: string; back?: 
         <Text numberOfLines={1} accessibilityRole="header" style={[t.title, { flex: 1 }]}>{title}</Text>
         {right ? <View style={{ flexDirection: 'row', gap: 8, paddingRight: 12 }}>{right}</View> : null}
       </> : variant === 'home' ? <>
-        <Text accessibilityRole="header" accessibilityLabel="Queue Up home (prototype)" style={{ fontFamily: font.bold, fontSize: 22, letterSpacing: -0.4, color: c.ink, flex: 1 }}>Queue Up</Text>
+        <Text accessibilityRole="header" accessibilityLabel="Link home (prototype)" style={{ fontFamily: font.bold, fontSize: 22, letterSpacing: -0.4, color: c.ink, flex: 1 }}>Link</Text>
         <RoundButton icon="plus" label="Create post" onPress={() => router.push('/home?compose=1' as never)} />
         <RoundButton icon="search" label="Search" />
         <MessagesButton />
@@ -169,7 +169,7 @@ export function initials(name: string) {
 
 /**
  * A person's circle: their photo, or their drawn character (components/fb/Avatar.tsx). `character={false}` is for
- * things (a squad chat, Queue Up itself): initials on the colour. `blurred` hides who it is until the squad is confirmed.
+ * things (a squad chat, Link itself): initials on the colour. `blurred` hides who it is until the squad is confirmed.
  */
 export function Avatar({ name, color = c.accent, photoUrl, size = 40, blurred = false, dim = false, character = true }: {
   name: string; color?: string; photoUrl?: string | null; size?: number; blurred?: boolean; dim?: boolean; character?: boolean;
@@ -241,7 +241,7 @@ export function Loading() {
 }
 
 export function ErrorNote({ error, onRetry }: { error: string; onRetry: () => void }) {
-  return <Section><Text style={t.body}>Couldn&apos;t reach Queue Up ({error}).</Text><View style={{ height: 8 }} /><Button onPress={onRetry}>Try again</Button></Section>;
+  return <Section><Text style={t.body}>Couldn&apos;t reach Link ({error}).</Text><View style={{ height: 8 }} /><Button onPress={onRetry}>Try again</Button></Section>;
 }
 
 export function Badge({ count }: { count: number }) {

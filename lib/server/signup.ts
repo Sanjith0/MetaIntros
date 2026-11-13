@@ -64,7 +64,7 @@ export async function createSampleLiveUser(
 /** What /join promises: live sign-ups are deleted 24 hours after they're created (or sooner, on request). */
 export const SIGNUP_TTL_MS = 24 * 3600_000;
 
-/** Queue Up is 18+. Age is self-declared in this demo; this is the gate at sign-up and at the queue. */
+/** Link is 18+. Age is self-declared in this demo; this is the gate at sign-up and at the queue. */
 export const isAdultBand = (band: string) => band === "18-24" || band === "25+";
 
 /**

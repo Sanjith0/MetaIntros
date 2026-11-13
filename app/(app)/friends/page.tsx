@@ -9,7 +9,7 @@ import { listFriendQueues } from "@/lib/server/friendQueues";
 const TABS = [
   { id: "friends", label: "Your friends" },
   { id: "requests", label: "Requests" },
-  { id: "queueup", label: "Met through Queue Up" },
+  { id: "queueup", label: "Met through Link" },
 ] as const;
 
 export default async function FriendsPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
@@ -86,7 +86,7 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
                   <Avatar name={r.from.name} color={r.from.avatarColor} size={72} />
                   <span className="min-w-0 flex-1">
                     <span className="block text-body font-semibold">{r.from.name}</span>
-                    {r.partyId && <span className="block text-meta text-muted">From your Queue Up squad</span>}
+                    {r.partyId && <span className="block text-meta text-muted">From your Link squad</span>}
                     <FriendRequestActions requestId={r.id} />
                   </span>
                 </li>
@@ -101,7 +101,7 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
         )}
 
         {tab === "queueup" && (
-          <Section flush title="Met through Queue Up" className="pb-4">
+          <Section flush title="Met through Link" className="pb-4">
             <ul data-testid="queueup-list">
               {queueUp.length === 0 && (
                 <li className="flex flex-col items-center px-6 py-8 text-center text-muted" data-testid="queueup-empty">
@@ -115,7 +115,7 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
                   <ListRow
                     leading={<Avatar name={q.friend.name} color={q.friend.avatarColor} size={56} />}
                     title={q.friend.name}
-                    subtitle={q.event ? <span data-testid="met-at">Met through Queue Up · {q.event.title}</span> : "Met through Queue Up"}
+                    subtitle={q.event ? <span data-testid="met-at">Met through Link · {q.event.title}</span> : "Met through Link"}
                     meta={q.sharedNote ? <span data-testid="shared-note">You both love {q.sharedNote}</span> : undefined}
                   />
                 </li>

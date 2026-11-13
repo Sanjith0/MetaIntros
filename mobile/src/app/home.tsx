@@ -24,7 +24,7 @@ export default function HomeScreen() {
   const [viewing, setViewing] = useState<number | null>(null);
   const open = (k: 'post' | 'story') => { setOpens(n => n + 1); setCompose(k); };
   useEffect(() => { if (params.compose) { open('post'); router.setParams({ compose: undefined }); } }, [params.compose]);
-  return <Screen title="Queue Up" variant="home" testID="home-page">
+  return <Screen title="Link" variant="home" testID="home-page">
     {!data ? (error ? <ErrorNote error={error} onRetry={reload} /> : <Loading />) : <>
       <View style={{ gap: 0 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.surface, paddingHorizontal: 16, paddingVertical: 8 }}>

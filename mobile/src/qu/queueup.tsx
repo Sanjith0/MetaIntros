@@ -160,7 +160,7 @@ function FriendQueueSheet({ q, onClose, nowMs }: { q: FriendQueue | null; onClos
     const r = await postJSON<{ ok?: boolean; error?: string }>(`/api/friends/queues/${q.entryId}/join`, { separate });
     if (r.data?.ok) { onClose(); router.push('/queue'); return; }
     setBusy(false);
-    setError(r.data?.error === 'age' ? 'Queue Up is for people 18 and over.' : r.data?.error === 'not_visible' ? `${first(q.friend.name)} isn't sharing this queue anymore.` : "Couldn't join the queue. Try again.");
+    setError(r.data?.error === 'age' ? 'Link is for people 18 and over.' : r.data?.error === 'not_visible' ? `${first(q.friend.name)} isn't sharing this queue anymore.` : "Couldn't join the queue. Try again.");
   };
   const progress = q && q.state === 'waiting'
     ? `${q.found ? `${Math.min(q.found, q.targetSize)} of ${q.targetSize} found` : 'Looking for matches'}${q.together > 0
@@ -187,7 +187,7 @@ function FriendQueueSheet({ q, onClose, nowMs }: { q: FriendQueue | null; onClos
         {q.canJoinTogether && q.canJoin ? <Button testID="queue-up-too" disabled={busy} onPress={() => join(true)}>Queue separately</Button> : null}
         {q.event ? <Button onPress={() => { onClose(); router.push(`/events/${q.event!.id}`); }}>View event</Button> : null}
       </View>
-      {q.canJoinTogether ? <Text testID="join-together-note" style={t.meta}>You&apos;ll queue together with {first(q.friend.name)} and land in the same squad. Queue Up fills the other spots.</Text>
+      {q.canJoinTogether ? <Text testID="join-together-note" style={t.meta}>You&apos;ll queue together with {first(q.friend.name)} and land in the same squad. Link fills the other spots.</Text>
         : q.canJoin ? <Text style={t.meta}>You&apos;ll be in the same queue, near {q.area}. You might end up in the same squad, but it isn&apos;t guaranteed.</Text> : null}
       {error ? <Text accessibilityRole="alert" style={[t.meta, { color: c.badge, fontFamily: font.semibold }]}>{error}</Text> : null}
       <View style={{ flexDirection: 'row', gap: 8 }}><Icon name="eye-off" size={14} color={c.muted} /><Text style={[t.meta, { flex: 1 }]}>{first(q.friend.name)} chose to share this with friends. You only see the area, never who else is in line.</Text></View>

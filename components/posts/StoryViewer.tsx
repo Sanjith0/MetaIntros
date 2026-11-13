@@ -114,7 +114,7 @@ export function StoryViewer({ groups, startGroup, onClose }: { groups: StoryGrou
         {(frame.photo && s.caption) || s.event || s.aiSource ? (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-ink/60 px-4 pt-3 pb-[max(env(safe-area-inset-bottom),16px)] text-surface">
             {frame.photo && s.caption && <p className="text-body">{s.caption}</p>}
-            {s.event && <p className="mt-1 text-meta text-surface/80">At {s.event.title} with {group.mine ? "your" : "their"} Queue Up squad</p>}
+            {s.event && <p className="mt-1 text-meta text-surface/80">At {s.event.title} with {group.mine ? "your" : "their"} Link squad</p>}
             {s.aiSource && <div className="mt-1"><CaptionSource source={s.aiSource} edited={s.aiEdited} className="text-surface/80" /></div>}
           </div>
         ) : null}

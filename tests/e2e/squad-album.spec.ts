@@ -67,7 +67,7 @@ test("squad album → AI-suggested post on Home → story; album stays squad-onl
   await expect(page.getByTestId("composer-selected-photo")).toHaveCount(3); // 2 own (always allowed) + the squadmate's
   await page.getByTestId("composer-remove-photo").first().click();
   await expect(page.getByTestId("composer-selected-photo")).toHaveCount(2);
-  await page.getByTestId("composer-caption").fill("Indie Night with my Queue Up squad. Great first show.");
+  await page.getByTestId("composer-caption").fill("Indie Night with my Link squad. Great first show.");
   await expect(page.getByTestId("composer-edited")).toBeVisible();
   await page.getByTestId("composer-share").click();
   await expect(page.getByTestId("share-done")).toBeVisible();
@@ -76,7 +76,7 @@ test("squad album → AI-suggested post on Home → story; album stays squad-onl
   // Home: the real post leads the feed, with its photos and an honest caption label
   const post = page.getByTestId("real-post").first();
   await expect(post).toContainText("Great first show.");
-  await expect(post).toContainText("with their Queue Up squad");
+  await expect(post).toContainText("with their Link squad");
   await expect(post.getByTestId("post-photo")).toHaveCount(2);
   await expect(post.getByTestId("caption-source")).toContainText("edited by the author");
   const postId = (await post.getAttribute("id"))!.replace("post-", "");

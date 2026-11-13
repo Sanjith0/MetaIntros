@@ -15,7 +15,7 @@ const first = (n: string) => n.split(' ')[0];
 
 /**
  * After the squad chat ends: "How was the night?" (1 to 5) and, per squadmate, "Squad up again?" (components/chat/RateSquadSheet.tsx).
- * Private: only Queue Up reads the answers, to tune your next squads and event picks.
+ * Private: only Link reads the answers, to tune your next squads and event picks.
  */
 export function RateSquadSheet({ open, state, onClose, onSaved }: { open: boolean; state: RatingState; onClose: (skipped: boolean) => void; onSaved: (s: RatingState) => void }) {
   const [stars, setStars] = useState(state.mine?.stars ?? 0);
@@ -57,7 +57,7 @@ export function RateSquadSheet({ open, state, onClose, onSaved }: { open: boolea
     </View> : null}
     <View testID="rate-privacy" style={{ flexDirection: 'row', gap: 8, marginHorizontal: 16, marginTop: 8, backgroundColor: c.wash, borderRadius: 8, padding: 12 }}>
       <Icon name="lock" size={14} color={c.muted} />
-      <Text style={[t.meta, { flex: 1 }]}>Only Queue Up sees your answers. Nobody is told how you rated them. We use them to pick your next squads and events, and we won&apos;t match you with anyone you said no to.</Text>
+      <Text style={[t.meta, { flex: 1 }]}>Only Link sees your answers. Nobody is told how you rated them. We use them to pick your next squads and events, and we won&apos;t match you with anyone you said no to.</Text>
     </View>
   </Sheet>;
 }

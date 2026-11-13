@@ -8,7 +8,7 @@
  * - direct friends only, never friends of friends
  * - no mutual rule: the viewer's own setting doesn't matter
  * - a block in either direction hides it
- * - same age band only (the engine's backstop; Queue Up itself is 18+)
+ * - same age band only (the engine's backstop; Link itself is 18+)
  * - a women-only queue is only shown to women, the people who could join it
  */
 import { pairAllowed, type SafetySubject } from "./safety";

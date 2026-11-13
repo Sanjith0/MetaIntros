@@ -1,8 +1,8 @@
 import { Platform } from 'react-native';
 
 /**
- * Where the Queue Up server is. On the web build it is the same site: Vercel forwards /api and
- * /images to the Queue Up server (vercel.json), so the session cookie stays first-party.
+ * Where the Link server is. On the web build it is the same site: Vercel forwards /api and
+ * /images to the Link server (vercel.json), so the session cookie stays first-party.
  * Native builds and local development set EXPO_PUBLIC_QUEUEUP_URL.
  */
 const configured = (process.env.EXPO_PUBLIC_QUEUEUP_URL ?? '').trim().replace(/\/+$/, '');

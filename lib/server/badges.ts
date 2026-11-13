@@ -38,7 +38,7 @@ export async function unreadByChat(userId: string): Promise<Map<string, number>>
 /**
  * Tab badges = new activity since the tab was last opened.
  * chats: chats with unread messages newer than the last Chats-tab visit.
- * friends: incoming requests + Queue Up friendships since the last Friends-tab visit.
+ * friends: incoming requests + Link friendships since the last Friends-tab visit.
  */
 export async function getBadges(userId: string): Promise<Record<Tab, number>> {
   const [chatsSeen, friendsSeen, eventsSeen, notifSeen] = await Promise.all([

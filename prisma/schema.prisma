@@ -108,7 +108,7 @@ model Friendship {
   source       String   @default("existing")
   metAtEventId String?
   metAtEvent   Event?   @relation(fields: [metAtEventId], references: [id], onDelete: SetNull)
-  /// Top shared interest surfaced when met through Queue Up
+  /// Top shared interest surfaced when met through Link
   sharedNote   String?
   createdAt    DateTime @default(now())
 
@@ -173,7 +173,7 @@ model Event {
   hostName      String
   landmarkId    String?
   landmark      Landmark? @relation(fields: [landmarkId], references: [id], onDelete: SetNull)
-  /// "event" = a real Facebook event · "hangout" = planned by Queue Up for one squad (squad-only, never in the feed)
+  /// "event" = a real Facebook event · "hangout" = planned by Link for one squad (squad-only, never in the feed)
   kind          String    @default("event")
   createdAt     DateTime  @default(now())
 
@@ -442,7 +442,7 @@ model Post {
   caption   String      @default("")
   /// "friends" | "only_me"
   audience  String      @default("friends")
-  /// the squad (and its event) this is about: "at <event> with my Queue Up squad"
+  /// the squad (and its event) this is about: "at <event> with my Link squad"
   partyId   String?
   eventId   String?
   /// when the AI host drafted it: "live" | "cache" | "mock" | "fallback"

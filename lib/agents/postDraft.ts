@@ -51,7 +51,7 @@ export const shortTitle = (title: string) => title.split(/[:—–]/)[0].trim() 
 /** Deterministic draft: own photos first, then squadmates' (upload order), and a plain caption. */
 export function postTemplate(i: PostDraftInput): PostDraft {
   const ordered = [...i.photos.filter((p) => p.own), ...i.photos.filter((p) => !p.own)];
-  return { photoIds: ordered.slice(0, MAX_DRAFT_PHOTOS).map((p) => p.id), caption: `${shortTitle(i.event.title)} with my Queue Up squad.` };
+  return { photoIds: ordered.slice(0, MAX_DRAFT_PHOTOS).map((p) => p.id), caption: `${shortTitle(i.event.title)} with my Link squad.` };
 }
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

@@ -3,7 +3,7 @@
 For every coding agent and person working here. `CLAUDE.md` imports this file.
 
 ## What this is
-Queue Up is a hackathon prototype of a Facebook Events feature: queue for an event, get matched into a
+Link is a hackathon prototype of a Facebook Events feature: queue for an event, get matched into a
 small squad going together, meet in a squad chat with an AI host. Next.js 15 App Router, Prisma on
 SQLite, Tailwind 4, pnpm. Seeded data only; it never calls, scrapes or logs in to Facebook.
 

@@ -10,8 +10,8 @@ export interface Landmark { id: string; name: string; city: string }
 export const SIZES = [4, 5, 6] as const;
 
 const ERRORS: Record<string, string> = {
-  private_event: 'Queue Up only works for events at public venues.',
-  age: 'Queue Up is for people 18 and over.',
+  private_event: 'Link only works for events at public venues.',
+  age: 'Link is for people 18 and over.',
   sensitive_tonight: "Keep it to plans and vibe: your note can't mention health, religion, politics or sexuality.",
 };
 
@@ -54,7 +54,7 @@ export function QueueSetup({ event, landmarks, initialMode = 'events', shareDefa
     const r = await postJSON<{ ok?: boolean; error?: string }>('/api/queue/join', { mode, eventId: mode === 'events' ? event?.id ?? null : null, targetSize: size, visibleToFriends: share, tonight: tonight.trim() || null, ...body });
     if (r.data?.ok) { onJoined?.(); router.push('/queue'); return; }
     setBusy(false);
-    if (r.data?.error === 'too_far') setLoc({ kind: 'manual', reason: "You're far from Queue Up areas. Pick one to find your squad" });
+    if (r.data?.error === 'too_far') setLoc({ kind: 'manual', reason: "You're far from Link areas. Pick one to find your squad" });
     else setError(ERRORS[r.data?.error ?? ''] ?? "Couldn't join the queue. Try again.");
   };
   const findSquad = async () => {
@@ -62,7 +62,7 @@ export function QueueSetup({ event, landmarks, initialMode = 'events', shareDefa
     try { const p = await getPosition(); await join({ ...p, locationSource: 'gps' }); }
     catch { setLoc({ kind: 'manual', reason: 'Location is off. Pick an area to find your squad' }); }
   };
-  if (event && !event.isPublic) return <View testID="queue-setup" style={{ backgroundColor: c.surface, padding: 16, flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="lock" size={16} color={c.muted} /><Text style={t.meta}>Queue Up only works for events at public venues.</Text></View>;
+  if (event && !event.isPublic) return <View testID="queue-setup" style={{ backgroundColor: c.surface, padding: 16, flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="lock" size={16} color={c.muted} /><Text style={t.meta}>Link only works for events at public venues.</Text></View>;
   const title = event ? event.title : mode === 'hangout' ? 'Plan a new hangout' : 'Any event this weekend';
   const chevron = <Icon name="chevron-right" color={c.muted} />;
 

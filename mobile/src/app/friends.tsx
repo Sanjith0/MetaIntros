@@ -13,7 +13,7 @@ interface Data {
   queueUp: { id: string; friend: U; event: { title: string } | null; sharedNote: string | null }[];
   suggestions: { id: string; user: U; mutual: number; squadmate?: boolean }[];
 }
-const TABS = [{ id: 'friends', label: 'Your friends' }, { id: 'requests', label: 'Requests' }, { id: 'queueup', label: 'Met through Queue Up' }];
+const TABS = [{ id: 'friends', label: 'Your friends' }, { id: 'requests', label: 'Requests' }, { id: 'queueup', label: 'Met through Link' }];
 
 export default function FriendsScreen() {
   const params = useLocalSearchParams<{ tab?: string }>();
@@ -49,7 +49,7 @@ export default function FriendsScreen() {
         <Avatar name={r.from.name} color={r.from.avatarColor} size={72} />
         <View style={{ flex: 1, gap: 6 }}>
           <Text style={t.bodyBold}>{r.from.name}</Text>
-          {r.partyId ? <Text style={t.meta}>From your Queue Up squad</Text> : null}
+          {r.partyId ? <Text style={t.meta}>From your Link squad</Text> : null}
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <View style={{ flex: 1 }}><Button testID="request-confirm" variant="primary" onPress={() => respond(r.id, true)}>Confirm</Button></View>
             <View style={{ flex: 1 }}><Button testID="request-delete" onPress={() => respond(r.id, false)}>Delete</Button></View>
@@ -57,13 +57,13 @@ export default function FriendsScreen() {
         </View>
       </View>)}
       {data.requests.outgoing.map(r => <Row key={r.id} leading={<Avatar name={r.to.name} color={r.to.avatarColor} size={56} />} title={r.to.name} subtitle="Request sent" />)}
-    </Section> : <Section flush title="Met through Queue Up">
+    </Section> : <Section flush title="Met through Link">
       {data.queueUp.length === 0 ? <View style={{ alignItems: 'center', padding: 24, gap: 12 }}>
         <Text style={[t.meta, { textAlign: 'center' }]}>People you meet through a squad and both add will show up here.</Text>
         <Button block={false} onPress={() => router.push('/events')}>Find a squad</Button>
       </View> : null}
       {data.queueUp.map(q => <Row key={q.id} leading={<Avatar name={q.friend.name} color={q.friend.avatarColor} size={56} />} title={q.friend.name}
-        subtitle={(q.event ? `Met through Queue Up · ${q.event.title}` : 'Met through Queue Up') + (q.sharedNote ? ` · You both love ${q.sharedNote}` : '')} />)}
+        subtitle={(q.event ? `Met through Link · ${q.event.title}` : 'Met through Link') + (q.sharedNote ? ` · You both love ${q.sharedNote}` : '')} />)}
     </Section>}
   </Screen>;
 }

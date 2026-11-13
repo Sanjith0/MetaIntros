@@ -23,7 +23,7 @@ test("scripted demo flow end-to-end (simulated mode, ~20s queue)", async ({ page
   // 1. events feed
   await page.getByTestId("demo-start").click();
   await expect(page.getByTestId("events-page")).toBeVisible();
-  // 2. open an event, Queue Up
+  // 2. open an event, Link
   await page.getByTestId("event-card-ev-indie-guild").click();
   await page.getByTestId("queue-up-button").click();
   await page.getByTestId("size-6").click();
@@ -69,7 +69,7 @@ test("scripted demo flow end-to-end (simulated mode, ~20s queue)", async ({ page
   const addIds = await adds.evaluateAll((els) => els.map((e) => e.getAttribute("data-testid")!));
   for (const id of addIds) await page.getByTestId(id).click();
   await expect(page.getByTestId("see-new-friends")).toBeVisible({ timeout: 20_000 });
-  // 10. Friends tab → Met through Queue Up
+  // 10. Friends tab → Met through Link
   await expect(page.getByTestId("badge-friends")).toBeVisible();
   await page.getByTestId("tab-friends").click();
   await page.getByTestId("friends-tab-queueup").click();

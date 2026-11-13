@@ -122,7 +122,7 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
   if (status.state === "idle")
     return (
       <div data-testid="queue-idle">
-        <TopBar back="/events" title="Queue Up" />
+        <TopBar back="/events" title="Link" />
         <Section className="py-8 text-center">
           {notice === "dropped" && (
             <p role="status" className="mb-3 rounded-card bg-wash p-3 text-body" data-testid="ready-check-notice" data-notice="dropped">
