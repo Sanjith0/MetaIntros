@@ -7,6 +7,8 @@ import { useDiscover } from '../../../discover/store';
 import { deploymentURL } from '../../../state';
 import { TapCounter } from '../../../secretTaps';
 
+export const unstable_settings = { initialRouteName: 'events' };
+
 export default function TabsLayout() {
   // The same three tabs carry both faces of the app; only their labels and icons change.
   const events = useDiscover().ui === 'events';
@@ -21,6 +23,9 @@ export default function TabsLayout() {
     tabBarStyle: { borderTopColor: colors.line, backgroundColor: colors.paper, height: 82, paddingTop: 8, paddingBottom: 12 },
     tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16, flexShrink: 0, marginTop: 4 },
   }}>
+    <Tabs.Screen name="back" options={{ title: 'Facebook', tabBarAccessibilityLabel: 'Back to Facebook',
+      tabBarIcon: ({ color }: { color: unknown }) => <Icon name="arrow-left" color={String(color)} /> }}
+      listeners={{ tabPress: (e) => { e.preventDefault(); router.navigate('/events'); } }} />
     <Tabs.Screen name="events" options={tab('Events', 'Discover', 'calendar', 'compass')} />
     <Tabs.Screen name="connections" options={tab('Connections', 'Going', 'users', 'check-circle')}
       listeners={{ tabPress: () => { if (deploymentURL && devTaps.tap(Date.now())) router.push('/glance/dev'); } }} />

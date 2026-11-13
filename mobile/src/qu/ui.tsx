@@ -65,7 +65,8 @@ const TABS: { href: string; icon: IconName; label: string }[] = [
   { href: '/events', icon: 'calendar', label: 'Events' },
   { href: '/chats', icon: 'message-circle', label: 'Chats' },
   { href: '/glance/events', icon: 'eye', label: 'Glance' },
-  { href: '/demo', icon: 'sliders', label: 'Demo' },
+  { href: '/notifications', icon: 'bell', label: 'Alerts' },
+  { href: '/profile', icon: 'user', label: 'Profile' },
 ];
 
 /** The bottom tab bar on the main screens. */
@@ -73,7 +74,7 @@ export function TabBar() {
   const path = usePathname();
   return <View style={{ flexDirection: 'row', backgroundColor: c.surface, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.divider, paddingBottom: 4 }}>
     {TABS.map(tab => {
-      const on = path === tab.href || (tab.href !== '/home' && path.startsWith(tab.href.replace('/events', '/events').split('/').slice(0, 2).join('/')) && tab.href.split('/')[1] === path.split('/')[1]);
+      const on = tab.href.split('/')[1] === path.split('/')[1];
       return <Pressable key={tab.href} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={tab.label}
         onPress={() => router.navigate(tab.href as never)} style={{ flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 4, gap: 2 }}>
         <Icon name={tab.icon} size={22} color={on ? c.accent : c.muted} />
