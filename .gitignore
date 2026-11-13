@@ -50,3 +50,6 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# screenshots from e2e runs (tracked ones live in docs/screens/, updated only with UPDATE_SCREENS=1)
+/.screens/
