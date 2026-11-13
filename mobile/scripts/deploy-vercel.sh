@@ -18,4 +18,5 @@ npm run build:web
 # Ship the built files only; the rewrites point at the Queue Up server.
 cp vercel.deploy.json dist/vercel.json
 cd dist
+npx -y vercel@latest link --yes --project "${VERCEL_PROJECT:-queueup-expo}"
 npx -y vercel@latest deploy ${1:-} --yes
