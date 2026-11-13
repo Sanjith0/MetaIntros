@@ -40,7 +40,7 @@ export function FriendQueues({ queues, variant = "rail", nowMs, eventTitle }: { 
     <>
       {variant === "rail" ? (
         <Section title="Friends queuing" testId="friend-queues" className="scroll-mt-14" flush>
-          <ul id="friends-queuing" className="no-scrollbar flex gap-3 overflow-x-auto px-4 pb-1">
+          <ul id="friends-queuing" className="no-scrollbar flex gap-3 overflow-x-auto px-4 py-1">
             {queues.map((q) => (
               <li key={q.entryId} className="w-20 shrink-0">
                 <button type="button" onClick={() => setOpen(q)} data-testid="friend-queue" data-friend={q.friend.id} className="press flex w-full flex-col items-center text-center">
