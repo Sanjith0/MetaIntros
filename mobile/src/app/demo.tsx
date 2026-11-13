@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Image, Platform, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useData } from '../qu/hooks';
 import { postJSON } from '../qu/api';
@@ -8,7 +8,7 @@ import { Chip } from '../qu/QueueSetup';
 
 interface Status {
   fillMode: 'simulated' | 'mixed' | 'live'; simFillMs: number; aiMode: 'mock' | 'cache' | 'live'; hasModelKey: boolean; model: string;
-  clockOffsetMs: number; liveUsers: number; joinUrl: string;
+  clockOffsetMs: number; liveUsers: number; joinUrl: string; qr: string;
   parties: { id: string; status: string; event: string | null; area: string; size: number; real: number }[];
 }
 
@@ -33,6 +33,10 @@ export default function DemoScreen() {
         <Button icon="user-x" disabled={!!busy} onPress={() => act('kick', '/api/demo/kick-live')}>{`Kick live users (${s.liveUsers})`}</Button>
         {note ? <Text style={[t.meta, { backgroundColor: c.wash, padding: 10, borderRadius: 8 }]}>{note}</Text> : null}
         <Text style={t.meta}>Global clock: {new Date(Date.now() + s.clockOffsetMs).toLocaleString()} {s.clockOffsetMs > 60_000 ? '(fast-forwarded)' : '(real time)'}</Text>
+      </Section>
+      <Section title="Judges: scan to join live" style={{ alignItems: 'center' }}>
+        {Platform.OS === 'web' && s.qr ? <Image accessibilityLabel="QR code to join" source={{ uri: `data:image/svg+xml;base64,${btoa(s.qr)}` }} style={{ width: 220, height: 220 }} /> : null}
+        <Text selectable style={[t.meta, { marginTop: 6 }]}>{s.joinUrl}</Text>
       </Section>
       <Section title="Who fills the queue?">
         <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { getJSON, postJSON } from '../../qu/api';
-import { Avatar, FacePile, Icon, Loading, TopBar, c, font, t } from '../../qu/ui';
+import { Avatar, Button, FacePile, Icon, Loading, TopBar, c, font, t } from '../../qu/ui';
 import { first, fmtDuration, fmtEventWhen } from '../../qu/format';
 
 interface U { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean }
@@ -76,14 +76,18 @@ export default function ChatThread() {
         <Text numberOfLines={1} style={t.bodyBold}>{title}</Text>
         <Text numberOfLines={1} style={t.meta}>{chat.type === 'direct' ? 'Messenger' : `${chat.members.length} members`}{expiry ? ` · ${expiry}` : ''}</Text>
       </View>
+      {isSquad && squad ? <Pressable accessibilityLabel="Squad info" testID="squad-info" onPress={() => router.push(`/squad/${squad.partyId}`)} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="info" size={22} color={c.accent} />
+      </Pressable> : null}
     </View>
-    {isSquad && squad ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: c.control }}>
+    {isSquad && squad ? <Pressable onPress={() => router.push(`/squad/${squad.partyId}`)} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: c.control }}>
       <Icon name="map-pin" size={16} color={c.muted} />
       <View style={{ flex: 1 }}>
         <Text numberOfLines={1} style={[t.meta, { color: c.ink, fontFamily: font.semibold }]}>{squad.event.title}</Text>
         <Text numberOfLines={1} style={t.meta}>{fmtEventWhen(squad.event.startsAt)} · Meet: {squad.meetingSpot}</Text>
       </View>
-    </View> : null}
+      <Icon name="chevron-right" size={18} color={c.muted} />
+    </Pressable> : null}
     <ScrollView ref={scroll as never} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })} contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 8 }} testID="messages">
       {messages.map((m, i) => {
         if (m.kind === 'system') return <Text key={m.id} style={[t.meta, { textAlign: 'center', marginVertical: 8 }]}>{m.body}</Text>;
@@ -109,9 +113,12 @@ export default function ChatThread() {
     </ScrollView>
     {archived ? <View style={{ borderTopWidth: 1, borderTopColor: c.divider, padding: 12 }}>
       <Text style={[t.meta, { textAlign: 'center' }]}>This squad chat has ended. You can still read it.</Text>
+      {chat.partyId ? <View style={{ marginTop: 8 }}><Button variant="primary" icon="user-plus" onPress={() => router.push(`/squad/${chat.partyId}/connect`)} testID="archived-connect">Add your squad as friends</Button></View> : null}
     </View> : <View>
       {isSquad ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 12, paddingTop: 8 }}>
         <Pressable testID="ask-host" onPress={() => setDraft(d => (d.startsWith('@host') ? d : `@host ${d}`))} style={{ height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: c.control, justifyContent: 'center' }}><Text style={[t.meta, { color: c.ink, fontFamily: font.semibold }]}>Ask the host</Text></Pressable>
+        <Pressable testID="open-talk-cards" onPress={() => router.push(`/squad/${squad!.partyId}/cards`)} style={{ height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: c.control, justifyContent: 'center' }}><Text style={[t.meta, { color: c.ink, fontFamily: font.semibold }]}>Talk cards</Text></Pressable>
+        <Pressable testID="open-find" onPress={() => router.push(`/squad/${squad!.partyId}/find`)} style={{ height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: c.control, justifyContent: 'center' }}><Text style={[t.meta, { color: c.ink, fontFamily: font.semibold }]}>Find each other</Text></Pressable>
       </ScrollView> : null}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8 }}>
         <TextInput value={draft} onChangeText={setDraft} onSubmitEditing={() => send()} placeholder="Aa" placeholderTextColor={c.muted} returnKeyType="send" blurOnSubmit={false}
