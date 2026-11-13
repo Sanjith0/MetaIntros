@@ -5,7 +5,7 @@ import { getCurrentUserId } from "@/lib/server/session";
 
 export const dynamic = "force-dynamic";
 
-/** "Let AI suggest a post": returns a draft only. Nothing is posted until the user taps Share. */
+/** Post ideas after the event: a squad chat recap and up to 3 drafts. Nothing is posted until the user taps Share. */
 export async function POST(_req: Request, { params }: { params: Promise<{ partyId: string }> }) {
   const { partyId } = await params;
   const r = await suggestPost(partyId, await getCurrentUserId(), await now());

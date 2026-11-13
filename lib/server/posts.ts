@@ -13,7 +13,8 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { isSensitiveTag } from "@/lib/graph/vocabulary";
 import { label } from "@/lib/agents/describe";
-import { draftPost, MAX_DRAFT_CAPTION, type DraftPhoto } from "@/lib/agents/postDraft";
+import { draftPostIdeas, MAX_CHAT_LINE, MAX_CHAT_LINES, MAX_DRAFT_CAPTION, type ChatLine, type DraftPhoto } from "@/lib/agents/postDraft";
+import { isSensitiveText } from "@/lib/cards/claims";
 import type { WeightedTag } from "@/lib/profile/builder";
 import { albumParty, albumPhotoUrl } from "./album";
 import { publish } from "./bus";
@@ -313,17 +314,47 @@ export async function squadSharedInterests(memberIds: string[], max = 3): Promis
     .map(([tag]) => label(tag));
 }
 
-/** "Let AI suggest a post": a draft only — nothing is posted until the user taps Share. */
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * What people wrote in the squad chat, for the post ideas: the last 40 user messages, oldest first.
+ * Host and system lines are left out, sensitive messages are dropped, squadmates' last names are
+ * masked, and each line is cut to 200 characters.
+ */
+async function squadChatLines(chatId: string | undefined, userId: string, members: { userId: string; user: { name: string } }[]): Promise<ChatLine[]> {
+  if (!chatId) return [];
+  const rows = await prisma.chatMessage.findMany({
+    where: { chatId, kind: "user", senderId: { not: null } },
+    orderBy: { createdAt: "desc" },
+    take: MAX_CHAT_LINES,
+    select: { senderId: true, body: true },
+  });
+  const firstOf = new Map(members.map((m) => [m.userId, m.user.name.split(" ")[0]]));
+  const lastNames = members.flatMap((m) => m.user.name.split(/\s+/).slice(1)).filter((n) => n.length > 1);
+  const mask = (t: string) => lastNames.reduce((acc, n) => acc.replace(new RegExp(`(^|[^\\p{L}])${escapeRe(n)}(?=$|[^\\p{L}])`, "giu"), "$1[name]"), t);
+  return rows
+    .reverse()
+    .filter((r) => firstOf.has(r.senderId!) && !isSensitiveText(r.body))
+    .map((r) => ({ by: r.senderId === userId ? "you" : firstOf.get(r.senderId!)!, text: mask(r.body.replace(/\s+/g, " ").trim()).slice(0, MAX_CHAT_LINE) }))
+    .filter((l) => l.text.length > 0);
+}
+
+/** Post ideas after the event: a recap of the squad chat and up to 3 drafts. Nothing is posted until the user taps Share. */
 export async function suggestPost(partyId: string, userId: string, now: Date) {
   const p = await albumParty(partyId, userId);
   if (!p?.event) return { ok: false as const, error: "not_found" };
   if (!shareOpen(p, now)) return { ok: false as const, error: "not_over" };
   const memberIds = p.members.map((m) => m.userId);
-  const [photos, friends, interests] = await Promise.all([allowedPhotos(partyId, userId, memberIds), friendIdsOf(userId), squadSharedInterests(memberIds)]);
+  const [photos, friends, interests, chat] = await Promise.all([
+    allowedPhotos(partyId, userId, memberIds),
+    friendIdsOf(userId),
+    squadSharedInterests(memberIds),
+    squadChatLines(p.chat?.id, userId, p.members),
+  ]);
   const first = (name: string) => name.split(" ")[0];
   const nameOf = new Map(p.members.map((m) => [m.userId, m.user.name]));
   const me = p.members.find((m) => m.userId === userId)!.user;
-  // squadmates who aren't the poster's friends must not be named in the caption (first or last name)
+  // squadmates who aren't the poster's friends must not be named in a caption or the recap (first or last name)
   const hiddenNames = p.members.filter((m) => m.userId !== userId && !friends.has(m.userId)).flatMap((m) => m.user.name.split(/\s+/).filter((n) => n.length > 1));
   const startMs = p.event.startsAt.getTime();
   const draftPhotos: DraftPhoto[] = photos.map((ph) => ({
@@ -333,14 +364,21 @@ export async function suggestPost(partyId: string, userId: string, now: Date) {
     minutesSinceStart: Math.round((ph.createdAt.getTime() - startMs) / 60_000),
     own: ph.uploaderId === userId,
   }));
-  const d = await draftPost({
+  const d = await draftPostIdeas({
     posterFirstName: first(me.name),
     event: { title: p.event.title, kind: p.event.kind === "hangout" ? "hangout" : "event" },
     sharedInterests: interests,
     photos: draftPhotos,
     hiddenNames,
+    chat,
   });
-  return { ok: true as const, draft: { photoIds: d.photoIds, caption: d.caption.slice(0, MAX_DRAFT_CAPTION + 1), source: d.source, stripped: d.stripped } };
+  return {
+    ok: true as const,
+    recap: d.recap,
+    ideas: d.ideas.map((i) => ({ ...i, caption: i.caption.slice(0, MAX_DRAFT_CAPTION + 1) })),
+    source: d.source,
+    stripped: d.stripped,
+  };
 }
 
 /** Albums `userId` can post from (any ready squad they're in), for the Home composer. */

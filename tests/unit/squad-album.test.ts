@@ -231,29 +231,40 @@ describe("post draft agent", () => {
     await fastForward();
   });
 
+  type Ideas = { ok: true; recap: string | null; ideas: { style: string; photoIds: string[]; caption: string }[]; source: string; stripped: number };
+  const ideasOf = async () => (await suggestPost(partyId, "p01", await now())) as Ideas;
+  async function say(userId: string | null, body: string, kind = "user") {
+    const chat = await prisma.chat.findUniqueOrThrow({ where: { partyId } });
+    await prisma.chatMessage.create({ data: { chatId: chat.id, senderId: userId, kind, body } });
+  }
+
   it("hostile model output is cleaned by code: bad photo ids, sensitive text and non-friends' names are stripped", async () => {
     const mine = await photo(partyId, "p01", { caption: "Opening band" });
     const freyas = await photo(partyId, "p02");
     const zoes = await photo(partyId, "p03");
     const locked = await photo(partyId, "p05", { shareable: false });
-    mockProvider().on("post_draft", () =>
+    await say("p02", "Tacos after?");
+    mockProvider().on("post_ideas", () =>
       JSON.stringify({
-        photoIds: [locked, "made-up-id", zoes, freyas, mine, zoes, "another-fake"],
-        caption: "Great night with Zoe and Freya. We talked about the election the whole time. The opening band was loud in the best way.",
+        recap: "We talked about the election. Zoe found the best tacos. Everyone wants a rematch at the arcade.",
+        ideas: [
+          { style: "event", photoIds: [locked, "made-up-id", zoes, freyas, mine, zoes, "another-fake"], caption: "Great night with Zoe and Freya. We talked about the election the whole time. The opening band was loud in the best way." },
+          { style: "chat", photoIds: [mine], caption: "Taco run after the show." },
+        ],
       }),
     );
-    const r = await suggestPost(partyId, "p01", await now());
+    const r = await ideasOf();
     expect(r.ok).toBe(true);
-    const d = (r as Extract<typeof r, { ok: true }>).draft;
-    expect(d.photoIds).toEqual([zoes, freyas, mine]); // not-allowed and made-up ids dropped, duplicates removed
-    expect(d.photoIds).not.toContain(locked);
-    expect(d.caption).toBe("The opening band was loud in the best way.");
-    expect(d.caption).not.toMatch(/Zoe|election/);
-    expect(d.source).toBe("mock");
-    expect(d.stripped).toBeGreaterThanOrEqual(4);
+    expect(r.source).toBe("mock");
+    expect(r.recap).toBe("Everyone wants a rematch at the arcade.");
+    expect(r.ideas[0].photoIds).toEqual([zoes, freyas, mine]); // not-allowed and made-up ids dropped, duplicates removed
+    expect(r.ideas[0].caption).toBe("The opening band was loud in the best way.");
+    expect(r.ideas[0].style).toBe("event");
+    expect(r.ideas[1]).toMatchObject({ style: "chat", photoIds: [mine], caption: "Taco run after the show." });
+    expect(r.stripped).toBeGreaterThanOrEqual(6);
 
-    // what the model saw: ids + metadata only. No image bytes, no last names, no consent-off photos.
-    const call = mockProvider().calls.find((c) => c.task === "post_draft")!;
+    // what the model saw: ids + metadata + chat lines only. No image bytes, no last names, no consent-off photos.
+    const call = mockProvider().calls.find((c) => c.task === "post_ideas")!;
     const sent = call.messages.map((m) => m.content).join("\n");
     expect(sent).not.toContain("data:image");
     expect(sent).not.toContain("base64");
@@ -265,25 +276,69 @@ describe("post draft agent", () => {
     expect(payload.photos.find((p: { id: string }) => p.id === freyas)).toMatchObject({ by: "Freya" });
   });
 
-  it("caps at 4 photos, and keeps a friend's name", async () => {
-    const ids: string[] = [];
-    for (const u of ["p01", "p01", "p02", "p02", "p03", "p05"]) ids.push(await photo(partyId, u));
-    mockProvider().on("post_draft", () => JSON.stringify({ photoIds: ids, caption: "Indie Night with Freya and the squad." }));
-    const d = (await suggestPost(partyId, "p01", await now())) as { ok: true; draft: { photoIds: string[]; caption: string; source: string } };
-    expect(d.draft.photoIds).toEqual(ids.slice(0, 4));
-    expect(d.draft.caption).toBe("Indie Night with Freya and the squad."); // Freya is Jordan's friend
+  it("sends only what people wrote in the squad chat: no host or system lines, no sensitive messages, first names only", async () => {
+    await photo(partyId, "p01");
+    await say(null, "Welcome to your squad! I'm your host.", "host");
+    await say("p02", "Tacos after?");
+    await say("p05", "Church after?");
+    await say("p01", "I'm in. Rossi's is open late.");
+    await say(null, "Yuki left the chat", "system");
+    await say("p03", "x".repeat(300));
+    mockProvider().on("post_ideas", () => JSON.stringify({ recap: "Tacos were the plan.", ideas: [{ style: "chat", photoIds: [], caption: "Tacos with the squad." }] }));
+    await ideasOf();
+    const payload = JSON.parse(mockProvider().calls.find((c) => c.task === "post_ideas")!.messages[1].content);
+    expect(payload.chat).toEqual([
+      { by: "Freya", text: "Tacos after?" },
+      { by: "you", text: "I'm in. [name]'s is open late." },
+      { by: "Zoe", text: "x".repeat(200) },
+    ]);
   });
 
-  it("falls back to a labeled template when the caption can't be salvaged or the model fails", async () => {
+  it("caps at 3 ideas and 4 photos each, drops repeated captions, and keeps a friend's name", async () => {
+    const ids: string[] = [];
+    for (const u of ["p01", "p01", "p02", "p02", "p03", "p05"]) ids.push(await photo(partyId, u));
+    await say("p02", "Best show this year.");
+    mockProvider().on("post_ideas", () =>
+      JSON.stringify({
+        recap: "Everyone agreed it was the best show this year.",
+        ideas: [
+          { style: "event", photoIds: ids, caption: "Indie Night with Freya and the squad." },
+          { style: "casual", photoIds: [ids[0]], caption: "indie night with freya and the squad." },
+          { style: "chat", photoIds: [ids[1]], caption: "Best show this year." },
+          { style: "weird", photoIds: [ids[2]], caption: "Good night out." },
+          { style: "event", photoIds: [ids[3]], caption: "One more." },
+        ],
+      }),
+    );
+    const r = await ideasOf();
+    expect(r.ideas).toHaveLength(3);
+    expect(r.ideas[0].photoIds).toEqual(ids.slice(0, 4));
+    expect(r.ideas.map((i) => i.caption)).toEqual(["Indie Night with Freya and the squad.", "Best show this year.", "Good night out."]); // Freya is Jordan's friend
+    expect(r.ideas[2].style).toBe("casual"); // unknown style
+  });
+
+  it("leaves the recap out when the squad chat is empty, and still gives ideas", async () => {
+    await photo(partyId, "p01");
+    mockProvider().on("post_ideas", () => JSON.stringify({ recap: "You all loved the encore.", ideas: [{ style: "event", photoIds: [], caption: "Indie Night, done right." }] }));
+    const r = await ideasOf();
+    expect(r.recap).toBeNull();
+    expect(r.ideas).toHaveLength(1);
+    expect(r.ideas[0].caption).toBe("Indie Night, done right.");
+  });
+
+  it("falls back to one labeled template idea when no caption can be salvaged or the model fails", async () => {
     const theirs = await photo(partyId, "p02");
     const mine = await photo(partyId, "p01");
-    mockProvider().on("post_draft", () => JSON.stringify({ photoIds: ["nope"], caption: "Yuki and Zoe made it. Church after?" }));
-    let d = (await suggestPost(partyId, "p01", await now())) as { ok: true; draft: { photoIds: string[]; caption: string; source: string } };
-    expect(d.draft).toMatchObject({ photoIds: [mine, theirs], caption: "Indie Night with my Link squad.", source: "fallback" });
+    await say("p02", "Tacos after?");
+    mockProvider().on("post_ideas", () => JSON.stringify({ recap: "Church after?", ideas: [{ style: "event", photoIds: ["nope"], caption: "Yuki and Zoe made it. Church after?" }] }));
+    let r = await ideasOf();
+    expect(r).toMatchObject({ recap: null, source: "fallback" });
+    expect(r.ideas).toEqual([{ style: "event", photoIds: [mine, theirs], caption: "Indie Night with my Link squad." }]);
 
     mockProvider().reset(); // no handler → the model call fails → template
-    d = (await suggestPost(partyId, "p01", await now())) as typeof d;
-    expect(d.draft).toMatchObject({ photoIds: [mine, theirs], caption: "Indie Night with my Link squad.", source: "fallback" });
+    r = await ideasOf();
+    expect(r).toMatchObject({ recap: null, source: "fallback" });
+    expect(r.ideas).toEqual([{ style: "event", photoIds: [mine, theirs], caption: "Indie Night with my Link squad." }]);
   });
 
   it("an AI-drafted post records its source and whether the caption was edited", async () => {
