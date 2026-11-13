@@ -55,7 +55,7 @@ export function BriefCard({ initial, communication }: { initial: Fact[]; communi
         {facts.map((f) => (
           <li key={f.id} className="py-2" data-testid="brief-fact" data-share={f.share}>
             <p className="text-body"><span className="text-muted">{KIND[f.kind]} · </span>{f.text}</p>
-            <div className="mt-1 flex gap-1.5" role="radiogroup" aria-label={`Sharing for ${f.text}`}>
+            <div className="mt-1 flex flex-wrap gap-1.5" role="radiogroup" aria-label={`Sharing for ${f.text}`}>
               {OPTIONS.map(({ value, label, hint, Icon }) => (
                 <button key={value} type="button" role="radio" aria-checked={f.share === value} title={hint} data-testid={`brief-share-${value}`}
                   onClick={() => choose(f, value)} className={chipClass(f.share === value, "flex-1 justify-center gap-1")}>
