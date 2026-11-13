@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { getJSON, postJSON } from './api';
-import { Avatar, Button, FacePile, Icon, Row, Sheet, c, font, t } from './ui';
+import { Avatar, Button, FacePile, Icon, OpenedHeader, Row, Sheet, c, font, t } from './ui';
 
 interface Member { id: string; name: string; avatarColor: string; status: 'joined' | 'invited' }
 interface Group { groupId: string; code: string; status: string; isHost: boolean; host: { id: string; name: string; avatarColor: string }; members: Member[] }
@@ -53,7 +53,8 @@ export function QueueTogether({ onRole, onQueued }: { onRole: (r: TogetherRole) 
     return <View testID="queue-together"><Row testID="bring-friends" icon="user-plus" title="Bring friends" onPress={() => setExpanded(true)} trailing={chevron} /></View>;
 
   return <View testID="queue-together" style={{ paddingTop: 8, paddingBottom: 4 }}>
-    <Text accessibilityRole="header" style={[t.bodyBold, { paddingHorizontal: 16 }]}>Bring friends</Text>
+    {g || s.invites.length ? <Text accessibilityRole="header" style={[t.bodyBold, { paddingHorizontal: 16 }]}>Bring friends</Text>
+      : <OpenedHeader title="Bring friends" testID="bring-friends-close" onClose={() => { setExpanded(false); setError(null); }} />}
     {s.invites.map(inv => <View key={inv.groupId} testID="group-invite" style={{ marginHorizontal: 16, marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.wash, borderRadius: 8, padding: 12 }}>
       <Avatar name={inv.host.name} color={inv.host.avatarColor} size={40} />
       <Text style={[t.meta, { flex: 1, color: c.ink }]}><Text style={{ fontFamily: font.semibold }}>{inv.host.name}</Text> invited you to queue together</Text>

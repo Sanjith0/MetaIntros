@@ -140,7 +140,11 @@ export function Composer({ albums, initialPartyId, bindParty = false, initial, i
       placeholder={kind === 'story' ? 'Add text to your story' : album ? `Say something about ${album.eventTitle}` : "What's on your mind?"} placeholderTextColor={c.muted}
       style={[t.body, { backgroundColor: c.wash, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, minHeight: 72, textAlignVertical: 'top' }]} />
     {albums.length ? (!picker ? <Button block={false} testID="composer-show-picker" onPress={() => setPicker(true)}>Choose different photos</Button> : <View>
-      <Text style={t.bodyBold}>Photos from your squad album</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={[t.bodyBold, { flex: 1 }]}>Photos from your squad album</Text>
+        <Pressable testID="composer-hide-picker" accessibilityRole="button" accessibilityLabel="Hide the album photos" onPress={() => setPicker(false)} hitSlop={8}
+          style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: c.control, alignItems: 'center', justifyContent: 'center' }}><Icon name="x" size={16} /></Pressable>
+      </View>
       {albums.length > 1 ? <ScrollView horizontal contentContainerStyle={{ gap: 8, paddingTop: 8 }}>{albums.map(a => <Chip key={a.partyId} on={a.partyId === partyId} onPress={() => { setPartyId(a.partyId); setSelected([]); }}>{a.eventTitle}</Chip>)}</ScrollView> : null}
       {album && album.photos.length ? <View testID="composer-photos" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
         {album.photos.map(p => { const n = selected.indexOf(p.id); return <Pressable key={p.id} testID="composer-photo" onPress={() => toggle(p.id)} accessibilityState={{ selected: n >= 0 }}

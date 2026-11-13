@@ -1,10 +1,11 @@
-import React from 'react';
-import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { ActivityIndicator, Animated, Image, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import { router, usePathname } from 'expo-router';
 import { asset } from './api';
 import { useAppState, useMarkTabSeen, type BadgeKey } from './appstate';
-import { characterUri } from './character';
+import { SvgXml } from 'react-native-svg';
+import { characterSvg, characterUri } from './character';
 import { fmtEventWhen } from './format';
 
 /** Queue Up's Facebook-style tokens (app/globals.css on the web app). */
@@ -175,10 +176,14 @@ export function Avatar({ name, color = c.accent, photoUrl, size = 40, blurred = 
 }) {
   const photo = !blurred && asset(photoUrl);
   const drawn = character && !photo;
-  const uri = photo || (drawn ? characterUri(blurred ? 'hidden' : name, blurred ? c.muted : color) : null);
+  const seed = blurred ? 'hidden' : name, tone = blurred ? c.muted : color;
+  // Phones (Expo Go) can't decode SVG data URIs, so they draw the character with react-native-svg.
+  const native = drawn && Platform.OS !== 'web';
+  const uri = photo || (drawn && !native ? characterUri(seed, tone) : null);
   return <View accessibilityRole="image" accessibilityLabel={blurred ? 'Hidden until your squad is confirmed' : name}
     style={{ width: size, height: size, borderRadius: size / 2, overflow: 'hidden', backgroundColor: drawn ? c.control : color, alignItems: 'center', justifyContent: 'center', opacity: dim ? 0.5 : 1, ...(dim ? { filter: 'grayscale(1)' } : {}) } as ViewStyle}>
-    {uri ? <Image source={{ uri }} style={[{ width: size, height: size }, blurred ? { filter: 'blur(3px)' } as never : null]} />
+    {native ? <SvgXml xml={characterSvg(seed, tone)} width={size} height={size} />
+      : uri ? <Image source={{ uri }} style={[{ width: size, height: size }, blurred ? { filter: 'blur(3px)' } as never : null]} />
       : <Text style={[{ color: c.surface, fontFamily: font.semibold, fontSize: Math.round(size * 0.38) }, blurred ? { filter: 'blur(5px)' } as never : null]}>{initials(name)}</Text>}
   </View>;
 }
@@ -247,22 +252,58 @@ export function Badge({ count }: { count: number }) {
 }
 
 /** Bottom sheet: scrim, white panel with rounded top corners, grabber, title and close (components/fb/Sheet.tsx). */
+/**
+ * A bottom sheet. Three ways out, always: tap the dimmed area, the X, or drag the handle/title down.
+ * Android back and Escape on the web call onClose too (onRequestClose).
+ */
 export function Sheet({ open, onClose, title, children, testID, footer }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; testID?: string; footer?: React.ReactNode }) {
+  const drag = useRef(new Animated.Value(0)).current;
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  const pan = useRef(PanResponder.create({
+    onStartShouldSetPanResponder: () => false,
+    onMoveShouldSetPanResponder: (_, g) => g.dy > 6 && Math.abs(g.dy) > Math.abs(g.dx),
+    onPanResponderMove: (_, g) => drag.setValue(Math.max(0, g.dy)),
+    onPanResponderRelease: (_, g) => {
+      if (g.dy > 80 || g.vy > 0.8) { drag.setValue(0); closeRef.current(); }
+      else Animated.spring(drag, { toValue: 0, useNativeDriver: false }).start();
+    },
+    onPanResponderTerminate: () => Animated.spring(drag, { toValue: 0, useNativeDriver: false }).start(),
+  })).current;
+  // A Modal floats above every screen, so leaving the page must take the sheet with it.
+  const path = usePathname();
+  const openedOn = useRef<string | null>(null);
+  useEffect(() => {
+    if (!open) { openedOn.current = null; return; }
+    if (openedOn.current === null) openedOn.current = path;
+    else if (openedOn.current !== path) { openedOn.current = null; closeRef.current(); }
+  }, [open, path]);
   if (!open) return null;
   return <Modal transparent visible animationType="slide" onRequestClose={onClose}>
-    <View style={{ flex: 1, justifyContent: 'flex-end', maxWidth: 480, width: '100%', alignSelf: 'center' }}>
-      <Pressable accessibilityLabel="Close" onPress={onClose} style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
-      <View testID={testID} accessibilityViewIsModal style={{ maxHeight: '88%', backgroundColor: c.surface, borderTopLeftRadius: 12, borderTopRightRadius: 12, paddingBottom: 16 }}>
-        <View style={{ alignItems: 'center', paddingTop: 8 }}><View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: c.divider }} /></View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 }}>
-          <Text accessibilityRole="header" style={t.headline}>{title}</Text>
-          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c.control, alignItems: 'center', justifyContent: 'center' }}><Icon name="x" /></Pressable>
+    <Pressable testID="sheet-backdrop" accessibilityLabel="Close" onPress={onClose} style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
+    <View pointerEvents="box-none" style={{ flex: 1, justifyContent: 'flex-end', maxWidth: 480, width: '100%', alignSelf: 'center' }}>
+      <Animated.View testID={testID} accessibilityViewIsModal style={{ maxHeight: '88%', backgroundColor: c.surface, borderTopLeftRadius: 12, borderTopRightRadius: 12, paddingBottom: 16, transform: [{ translateY: drag }] }}>
+        <View {...pan.panHandlers} testID="sheet-handle">
+          <View style={{ alignItems: 'center', paddingTop: 8 }}><View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: c.divider }} /></View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 }}>
+            <Text accessibilityRole="header" style={[t.headline, { flex: 1 }]} numberOfLines={2}>{title}</Text>
+            <Pressable testID="sheet-close" accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={8} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c.control, alignItems: 'center', justifyContent: 'center' }}><Icon name="x" /></Pressable>
+          </View>
         </View>
-        <ScrollView contentContainerStyle={{ paddingBottom: 4 }}>{children}</ScrollView>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 4 }}>{children}</ScrollView>
         {footer ? <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>{footer}</View> : null}
-      </View>
+      </Animated.View>
     </View>
   </Modal>;
+}
+
+/** The title line of a section that opened in place, with an X that folds it away again. */
+export function OpenedHeader({ title, onClose, testID }: { title: string; onClose: () => void; testID?: string }) {
+  return <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 8 }}>
+    <Text accessibilityRole="header" style={[t.bodyBold, { flex: 1 }]}>{title}</Text>
+    <Pressable testID={testID} accessibilityRole="button" accessibilityLabel={`Close ${title}`} onPress={onClose} hitSlop={8}
+      style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: c.control, alignItems: 'center', justifyContent: 'center' }}><Icon name="x" size={16} /></Pressable>
+  </View>;
 }
 
 /** AI is labeled, not themed (DESIGN.md 1.8): a sparkle and plain words. */

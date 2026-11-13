@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Platform, Pressable, Switch, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { postJSON } from './api';
-import { Button, DateLine, Icon, Row, c, font, t } from './ui';
+import { Button, DateLine, Icon, OpenedHeader, Row, c, font, t } from './ui';
 import { QueueTogether, type TogetherRole } from './QueueTogether';
 
 export interface SetupEvent { id: string; title: string; startsAt: string; venue: string; isPublic: boolean }
@@ -88,20 +88,22 @@ export function QueueSetup({ event, landmarks, initialMode = 'events', shareDefa
         ? <Row icon="map-pin" title="Starting area" subtitle="Location used once, never stored or shown" testID="choose-area"
           onPress={() => setLoc({ kind: 'manual', reason: 'Pick an area to find your squad' })} trailing={chevron} />
         : <View testID="area-picker">
-          <Text accessibilityRole="header" style={[t.bodyBold, { paddingHorizontal: 16, paddingTop: 8 }]}>{loc.reason}</Text>
+          <OpenedHeader title={loc.reason} testID="area-picker-close" onClose={() => setLoc({ kind: 'idle' })} />
           {landmarks.map(l => <Row key={l.id} icon="map-pin" title={l.name} subtitle={l.city} testID={`area-${l.id}`}
             onPress={busy ? undefined : () => join({ landmarkId: l.id, locationSource: 'manual' })} />)}
         </View>}
-      {noteOpen ? <View style={{ paddingHorizontal: 16, paddingVertical: 8, gap: 4 }}>
-        <Text style={t.bodyBold}>What do you want tonight?</Text>
+      {noteOpen ? <View style={{ paddingBottom: 8, gap: 4 }}>
+        <OpenedHeader title="What do you want tonight?" testID="companion-note-close" onClose={() => setNoteOpen(false)} />
+        <View style={{ paddingHorizontal: 16, gap: 4 }}>
         <TextInput testID="tonight" value={tonight} onChangeText={v => setTonight(v.slice(0, 200))} multiline autoFocus
           placeholder="e.g. first night out since moving, somewhere I can actually talk" placeholderTextColor={c.muted}
           style={[t.body, { backgroundColor: c.wash, borderRadius: 6, padding: 12, minHeight: 60 }]} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Icon name="lock" size={12} color={c.muted} /><Text style={t.meta}>Only your Companion reads this. </Text>
-          <Pressable testID="review-brief" onPress={() => router.push('/profile')}><Text style={[t.meta, { color: c.link, fontFamily: font.semibold }]}>What it shares</Text></Pressable>
+          <Pressable testID="review-brief" onPress={() => { onJoined?.(); router.push('/profile'); }}><Text style={[t.meta, { color: c.link, fontFamily: font.semibold }]}>What it shares</Text></Pressable>
         </View>
-      </View> : <Row testID="companion-note" icon="star" title="Add a note for your Companion" subtitle="Your AI Companion talks to others for you" onPress={() => setNoteOpen(true)} trailing={chevron} />}
+        </View>
+      </View> : <Row testID="companion-note" icon="star" title={tonight.trim() ? 'Your note for your Companion' : 'Add a note for your Companion'} subtitle={tonight.trim() ? tonight.trim() : 'Your AI Companion talks to others for you'} onPress={() => setNoteOpen(true)} trailing={chevron} />}
       <Row testID="share-with-friends" icon="eye" title="Let friends see you're queuing" subtitle="They see the event and your area" trailing={<Switch testID="share-with-friends-toggle" value={share} onValueChange={setShare} />} />
     </View>
     <View testID="safety-line" style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 16, marginTop: 8 }}>

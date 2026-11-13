@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { Image, Platform, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useData } from '../qu/hooks';
 import { postJSON } from '../qu/api';
 import { Avatar, Button, Loading, Screen, Section, c, font, t } from '../qu/ui';
 import { Chip } from '../qu/QueueSetup';
+import { SvgImage } from '../qu/SvgImage';
 
 interface Status {
   fillMode: 'simulated' | 'mixed' | 'live'; simFillMs: number; aiMode: 'mock' | 'cache' | 'live'; hasModelKey: boolean; model: string;
@@ -47,7 +48,7 @@ export default function DemoScreen() {
         <Text testID="global-clock" style={t.meta}>Global clock: <Text style={{ color: c.ink, fontFamily: font.bold }}>{fmtClock(Date.now() + s.clockOffsetMs)}</Text>{s.clockOffsetMs > 60_000 ? ` (fast-forwarded ${fmtOffset(s.clockOffsetMs)})` : ' (real time)'} · same for every phone</Text>
       </Section>
       <Section title="Judges: scan to join live" style={{ alignItems: 'center' }}>
-        {Platform.OS === 'web' && s.qr ? <Image accessibilityLabel="QR code to join" source={{ uri: `data:image/svg+xml;base64,${btoa(s.qr)}` }} style={{ width: 220, height: 220 }} /> : null}
+        {s.qr ? <SvgImage xml={s.qr} width={220} height={220} /> : null}
         <Text selectable style={[t.meta, { marginTop: 6 }]}>{s.joinUrl}</Text>
       </Section>
       <Section title="Who fills the queue?">
