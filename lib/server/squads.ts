@@ -3,6 +3,25 @@ import { publish } from "./bus";
 import { postMessage } from "./messages";
 import { squadName } from "./squadChat";
 
+/**
+ * Pairs already in a squad together right now (forming, waiting on "I'm in", or confirmed), as
+ * "a|b" keys, for these people. Matching keeps them apart: you can be in more than one squad, and
+ * each new one should be new people, not the same faces (simulated fillers included).
+ */
+export async function activeSquadPairs(userIds: string[]): Promise<Set<string>> {
+  const out = new Set<string>();
+  if (!userIds.length) return out;
+  const parties = await prisma.party.findMany({
+    where: { status: { in: ["forming", "confirming", "confirmed"] }, members: { some: { userId: { in: userIds } } } },
+    select: { members: { select: { userId: true } } },
+  });
+  for (const p of parties) {
+    const ids = p.members.map((m) => m.userId);
+    for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) out.add(ids[i] < ids[j] ? `${ids[i]}|${ids[j]}` : `${ids[j]}|${ids[i]}`);
+  }
+  return out;
+}
+
 /** Event ids where the user has a confirmed squad. */
 export async function squadEventIds(userId: string): Promise<Set<string>> {
   const ms = await prisma.partyMember.findMany({
