@@ -40,14 +40,14 @@ describe("queue service (DB)", () => {
     const trace = await prisma.agentTrace.findMany({ where: { partyId: party.id, agent: "party_formation" } });
     expect(trace.length).toBeGreaterThanOrEqual(5);
     // spare simulated joiners were withdrawn
-    expect(await prisma.queueEntry.count({ where: { status: "waiting" } })).toBe(0);
+    expect(await prisma.queueEntry.count({ where: { status: "waiting", parked: false } })).toBe(0);
   });
 
   it("live mode spawns no simulated users", async () => {
     await setSetting("fillMode", "live");
     await joinQueue("p01", { eventId: null, targetSize: 3, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(200);
-    expect(await prisma.queueEntry.count({ where: { status: "waiting" } })).toBe(1);
+    expect(await prisma.queueEntry.count({ where: { status: "waiting", parked: false } })).toBe(1);
     expect(await tickAndAccept()).toBe(0);
   });
 

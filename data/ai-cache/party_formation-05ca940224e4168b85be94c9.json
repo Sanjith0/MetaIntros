@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all vibe on Indie music, Vinyl records, Live music and Bouldering — perfect overlap! You'll have plenty to chat about from climbing walls to record crates.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 361,
+    "completionTokens": 352
+  },
+  "savedAt": "2026-11-13T00:10:37.740Z"
+}

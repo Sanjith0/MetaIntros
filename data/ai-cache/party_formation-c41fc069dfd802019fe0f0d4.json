@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all bond over Climbing and Film, with Books and Cycling overlapping too! Perfect mix for swapping trail stories and movie recs all night.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 548,
+    "completionTokens": 356
+  },
+  "savedAt": "2026-11-13T00:33:39.940Z"
+}

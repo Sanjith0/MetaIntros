@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Adi! San here is already plotting - are you more of a climb-then-coffee or cycle-then-cinema person?\"}, {\"speaker\": \"B\", \"text\": \"haha definitely climb-then-coffee, but San gets me - I'm absolutely cycle-then-cinema on weekends\"}, {\"speaker\": \"A\", \"text\": \"No way, same combo. San just finished a book that would make an amazing film, was about to ask if you've read anything like that lately?\"}, {\"speaker\": \"B\", \"text\": \"Always. Adi just finished one too - we could trade terrible film adaptations vs. ones that actually worked\"}, {\"speaker\": \"A\", \"text\": \"Perfect, let's make that our opening when we meet - bring your best and worst adaptation takes.\"}], \"sparks\": [\"Climbing + Cycling ritual - you both do the climb / ride + chill combo\", \"Books that should (or shouldn't) become Films - best and worst adaptations\", \"Weekend Cycling with a Film or Book podcast in your ears\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 201,
+    "completionTokens": 515
+  },
+  "savedAt": "2026-11-13T00:33:47.769Z"
+}

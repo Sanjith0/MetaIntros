@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Hey Ava! Adi here - heard you're into climbing too? What's your go-to wall?\"}, {\"speaker\": \"B\", \"text\": \"Hey Adi! Yes, obsessed. I'm usually at the bouldering wall pretending I'm in a film montage haha\"}, {\"speaker\": \"A\", \"text\": \"Love that - film montages are the best motivation. Adi's also deep into AI stuff, saw you're into tech talks?\"}, {\"speaker\": \"B\", \"text\": \"Oh perfect combo - we can debate whether AI could ever set a good climbing route, then watch a film about it?\"}, {\"speaker\": \"A\", \"text\": \"Deal. I'll bring book recs too if you bring vinyl recs for the post-climb chill.\"}], \"sparks\": [\"Climbing - both love climbing and could hit a session together\", \"Film - shared film buffs, great for a screening\", \"AI + Tech talks - Adi's AI interest pairs perfectly with Ava's tech talks\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 205,
+    "completionTokens": 677
+  },
+  "savedAt": "2026-11-13T00:33:56.116Z"
+}

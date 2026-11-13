@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\": \"Hey adi, Sanjith, Reza and Gabe! Welcome to your squad for the D&D One-Shot for Beginners on Sun, Nov 15 · 2 PM. Let's meet at the front entrance of Redwood City Public Library and head in together. Really looking forward to meeting you all!\", \"icebreaker\": \"Since you all share a love for vinyl, what's the best record you've found recently?\", \"interestTag\": \"vinyl\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 289,
+    "completionTokens": 746
+  },
+  "savedAt": "2026-11-13T00:13:46.311Z"
+}

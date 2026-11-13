@@ -25,6 +25,8 @@ export interface QueueItem {
   eventId: string | null;
   /** defaults to "events" */
   mode?: QueueMode;
+  /** queuing together: every item with this id lands in the same squad, or none of them does */
+  groupId?: string | null;
   joinedAt: number; // ms epoch
   isSimulated: boolean;
 }
@@ -56,6 +58,11 @@ export interface EngineOptions {
   mixedFillDelayMs?: number;
   /** Enable LIVE_FLOOR_LEVEL (defaults on for live/mixed). */
   liveFloor?: boolean;
+  /**
+   * Whether simulated users may anchor (start) a squad. Default: only in "simulated" fill mode (engine
+   * simulations). The server passes false so fillers only ever complete squads around real people.
+   */
+  simAnchors?: boolean;
   candidatesPerProposal?: number;
 }
 
@@ -104,36 +111,91 @@ export function queuesCompatible(a: Pick<QueueItem, "mode" | "eventId">, b: Pick
   return a.eventId === null || b.eventId === null || a.eventId === b.eventId;
 }
 
-/** Greedy group growth from a seed set: add whoever maximizes the group's weakest link. */
+/** People who queued together chose each other: their pair counts as a strong match. Safety still applies. */
+export const GROUP_PAIR_SCORE = 0.9;
+
+/** Wrap a scorer so pairs from the same queue-together group score at least GROUP_PAIR_SCORE. */
+function groupAwareScorer(score: Scorer, items: QueueItem[]): Scorer {
+  const groupOf = new Map<string, string>();
+  for (const it of items) if (it.groupId) groupOf.set(it.userId, it.groupId);
+  if (!groupOf.size) return score;
+  return ((a: Person, b: Person) => {
+    const r = score(a, b);
+    const ga = groupOf.get(a.id);
+    return ga && ga === groupOf.get(b.id) ? { ...r, score: Math.max(r.score, GROUP_PAIR_SCORE) } : r;
+  }) as Scorer;
+}
+
+/** The unit an item moves with: its whole queue-together group (as present in `pool`), or just itself. */
+function unitOf(item: QueueItem, pool: QueueItem[]): QueueItem[] {
+  return item.groupId ? pool.filter((p) => p.groupId === item.groupId) : [item];
+}
+
+/**
+ * Greedy group growth from a seed set: add whichever unit (one person, or a whole queue-together group)
+ * maximizes the group's weakest link. Groups are added whole or not at all — never split.
+ */
 function growGroup(seed: QueueItem[], pool: QueueItem[], size: number, people: Map<string, Person>, score: Scorer): QueueItem[] | null {
   const group = [...seed];
   const mode = modeOf(group[0]);
   let event = group.find((g) => g.eventId)?.eventId ?? null;
-  const remaining = pool.filter((p) => !group.some((g) => g.entryId === p.entryId));
+  let remaining = pool.filter((p) => !group.some((g) => g.entryId === p.entryId));
   while (group.length < size) {
-    let best: { item: QueueItem; min: number; avg: number } | null = null;
+    let best: { unit: QueueItem[]; min: number; avg: number; joinedAt: number } | null = null;
+    const seenGroups = new Set<string>();
     for (const c of remaining) {
-      if (group.some((g) => g.userId === c.userId)) continue;
-      if (!queuesCompatible({ mode, eventId: event }, c)) continue;
-      const pc = people.get(c.userId)!;
-      if (!group.every((g) => pairAllowed(people.get(g.userId)!, pc))) continue;
-      let min = 1, sum = 0;
-      for (const g of group) {
-        const s = score(people.get(g.userId)!, pc).score;
-        min = Math.min(min, s);
-        sum += s;
+      if (c.groupId) {
+        if (seenGroups.has(c.groupId)) continue;
+        seenGroups.add(c.groupId);
       }
-      const avg = sum / group.length;
-      if (!best || min > best.min + 1e-9 || (Math.abs(min - best.min) <= 1e-9 && (avg > best.avg + 1e-9 || (Math.abs(avg - best.avg) <= 1e-9 && c.joinedAt < best.item.joinedAt)))) {
-        best = { item: c, min, avg };
+      const unit = unitOf(c, remaining);
+      if (group.length + unit.length > size) continue;
+      if (unit.some((u) => group.some((g) => g.userId === u.userId))) continue;
+      const unitEvent = unit.find((u) => u.eventId)?.eventId ?? null;
+      if (!unit.every((u) => queuesCompatible({ mode, eventId: event }, u)) || (event && unitEvent && event !== unitEvent)) continue;
+      if (!unit.every((u) => group.every((g) => pairAllowed(people.get(g.userId)!, people.get(u.userId)!)))) continue;
+      let min = 1, sum = 0, n = 0;
+      for (const u of unit)
+        for (const g of group) {
+          const sc = score(people.get(g.userId)!, people.get(u.userId)!).score;
+          min = Math.min(min, sc);
+          sum += sc;
+          n++;
+        }
+      const avg = sum / n;
+      const joinedAt = Math.min(...unit.map((u) => u.joinedAt));
+      if (!best || min > best.min + 1e-9 || (Math.abs(min - best.min) <= 1e-9 && (avg > best.avg + 1e-9 || (Math.abs(avg - best.avg) <= 1e-9 && joinedAt < best.joinedAt)))) {
+        best = { unit, min, avg, joinedAt };
       }
     }
     if (!best) return null;
-    group.push(best.item);
-    event = event ?? best.item.eventId;
-    remaining.splice(remaining.indexOf(best.item), 1);
+    const chosen = best.unit;
+    group.push(...chosen);
+    event = event ?? chosen.find((u) => u.eventId)?.eventId ?? null;
+    remaining = remaining.filter((r) => !chosen.includes(r));
   }
   return group;
+}
+
+/**
+ * Who could join the anchor's squad: same size and queue, close enough, safe with every member of the
+ * anchor's own group. A queue-together group is only eligible if all of its members are.
+ */
+function eligibleFor(anchorUnit: QueueItem[], pool: QueueItem[], people: Map<string, Person>, landmarks: Map<string, { id: string; lat: number; lng: number }>, radiusKm: number, accept: (c: QueueItem) => boolean): QueueItem[] {
+  const anchor = anchorUnit[0];
+  const inUnit = new Set(anchorUnit.map((u) => u.entryId));
+  const unitUsers = new Set(anchorUnit.map((u) => u.userId));
+  const base = pool.filter((c) => {
+    if (inUnit.has(c.entryId) || unitUsers.has(c.userId)) return false;
+    if (c.targetSize !== anchor.targetSize) return false; // party size is a hard "game mode"
+    if (!queuesCompatible(anchor, c)) return false;
+    if (bucketDistanceKm(anchor.bucketId, c.bucketId, landmarks) > radiusKm) return false;
+    const cp = people.get(c.userId);
+    if (!cp || !anchorUnit.every((u) => pairAllowed(people.get(u.userId)!, cp))) return false;
+    return accept(c);
+  });
+  const ok = new Set(base.map((b) => b.entryId));
+  return base.filter((c) => !c.groupId || pool.filter((p) => p.groupId === c.groupId).every((m) => ok.has(m.entryId)));
 }
 
 /** Best safe candidate groups for one anchor at its current search level. */
@@ -150,35 +212,37 @@ export function findProposal(
   if (!anchorP) return null;
   const mixedDelay = opts.mixedFillDelayMs ?? 12_000;
 
-  const eligible = pool.filter((c) => {
-    if (c.entryId === anchor.entryId || c.userId === anchor.userId) return false;
-    if (c.targetSize !== anchor.targetSize) return false; // party size is a hard "game mode"
-    if (!queuesCompatible(anchor, c)) return false;
-    if (bucketDistanceKm(anchor.bucketId, c.bucketId, landmarks) > level.radiusKm) return false;
-    const cp = people.get(c.userId);
-    if (!cp || !pairAllowed(anchorP, cp)) return false;
+  // The anchor brings its whole queue-together group (if any); strangers fill the remaining spots.
+  const anchorUnit = [anchor, ...unitOf(anchor, pool).filter((u) => u.entryId !== anchor.entryId)];
+  if (anchorUnit.length > anchor.targetSize || anchorUnit.some((u) => !people.get(u.userId))) return null;
+  const eligible = eligibleFor(anchorUnit, pool, people, landmarks, level.radiusKm, (c) => {
     if (c.isSimulated) {
       if (opts.fillMode === "live") return false;
       if (opts.fillMode === "mixed" && !anchor.isSimulated && opts.now - anchor.joinedAt < mixedDelay) return false;
     }
     return true;
   });
-  if (eligible.length < anchor.targetSize - 1) return null;
+  if (eligible.length < anchor.targetSize - anchorUnit.length) return null;
+  const sc = groupAwareScorer(score, [...anchorUnit, ...eligible]);
 
-  // Seeds: anchor alone, plus anchor + each of its top-3 partners → diverse candidates for the agent.
-  const ranked = [...eligible].sort((a, b) => score(anchorP, people.get(b.userId)!).score - score(anchorP, people.get(a.userId)!).score);
-  const seeds: QueueItem[][] = [[anchor], ...ranked.slice(0, 3).map((r) => [anchor, r])];
+  // Seeds: the anchor's unit alone, plus with each of its top-3 partners → diverse candidates for the agent.
+  const ranked = [...eligible].sort((a, b) => sc(anchorP, people.get(b.userId)!).score - sc(anchorP, people.get(a.userId)!).score);
+  const seeds: QueueItem[][] = [anchorUnit];
+  for (const r of ranked.slice(0, 3)) {
+    const withR = [...anchorUnit, ...unitOf(r, eligible)];
+    if (withR.length <= anchor.targetSize) seeds.push(withR);
+  }
   const seen = new Set<string>();
   const candidates: Candidate[] = [];
-  for (const s of seeds) {
-    const g = growGroup(s, eligible, anchor.targetSize, people, score);
+  for (const sd of seeds) {
+    const g = growGroup(sd, eligible, anchor.targetSize, people, sc);
     if (!g) continue;
     const key = g.map((x) => x.entryId).sort().join(",");
     if (seen.has(key)) continue;
     seen.add(key);
     const members = g.map((x) => people.get(x.userId)!);
     if (!validateParty(members).ok) continue; // belt and braces
-    const cohesion = groupCohesion(members, score);
+    const cohesion = groupCohesion(members, sc);
     if (cohesion.score < level.minCohesion || cohesion.minPairwise < level.minPairwise) continue;
     candidates.push({
       entryIds: g.map((x) => x.entryId),
@@ -220,7 +284,7 @@ export function runTick(
   for (const anchor of pool) {
     if (taken.has(anchor.entryId)) continue;
     // In live/mixed modes simulated users never anchor; they only fill.
-    if (anchor.isSimulated && opts.fillMode !== "simulated") continue;
+    if (anchor.isSimulated && !(opts.simAnchors ?? opts.fillMode === "simulated")) continue;
     const avail = pool.filter((p) => !taken.has(p.entryId));
     const proposal = findProposal(anchor, avail, people, landmarks, opts, score);
     if (!proposal) continue;
@@ -250,14 +314,10 @@ export function playersFound(
   if (!anchorP) return { found: 1, userIds: [anchor.userId] };
   const { level } = levelFor(opts.now - anchor.joinedAt, opts);
   const radius = Math.max(level.radiusKm, 6);
-  const eligible = waiting.filter((c) => {
-    if (c.userId === anchor.userId || c.targetSize !== anchor.targetSize || !queuesCompatible(anchor, c)) return false;
-    if (bucketDistanceKm(anchor.bucketId, c.bucketId, landmarks) > radius) return false;
-    if (c.isSimulated && opts.fillMode === "live") return false;
-    const cp = people.get(c.userId);
-    return Boolean(cp && pairAllowed(anchorP, cp));
-  });
-  const g = growGroup([anchor], eligible, Math.min(anchor.targetSize, eligible.length + 1), people, score) ?? [anchor];
+  const anchorUnit = [anchor, ...unitOf(anchor, waiting).filter((u) => u.entryId !== anchor.entryId && people.get(u.userId))];
+  const eligible = eligibleFor(anchorUnit, waiting, people, landmarks, radius, (c) => !(c.isSimulated && opts.fillMode === "live"));
+  const sc = groupAwareScorer(score, [...anchorUnit, ...eligible]);
+  const g = growGroup(anchorUnit, eligible, Math.min(anchor.targetSize, eligible.length + anchorUnit.length), people, sc) ?? anchorUnit;
   return { found: g.length, userIds: g.map((x) => x.userId) };
 }
 
@@ -276,7 +336,7 @@ export async function runTickAsync(
   let formed = 0;
   for (const anchor of pool) {
     if (taken.has(anchor.entryId)) continue;
-    if (anchor.isSimulated && opts.fillMode !== "simulated") continue;
+    if (anchor.isSimulated && !(opts.simAnchors ?? opts.fillMode === "simulated")) continue;
     const proposal = findProposal(anchor, pool.filter((p) => !taken.has(p.entryId)), people, landmarks, opts, score);
     if (!proposal) continue;
     let chosen = await choose(proposal).catch(() => null);

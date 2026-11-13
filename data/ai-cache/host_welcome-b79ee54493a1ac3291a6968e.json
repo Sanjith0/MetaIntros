@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\":\"Hey Adi, Elena, Nate, and Ivan! Welcome to your squad for Board Game Quest at The Dice Box on Sat, Nov 14 · 1 PM. Let's plan to meet at the front entrance of The Dice Box board game café to kick things off. So glad you're here!\",\"icebreaker\":\"Since you all share a love for Anime, what's an anime you've rewatched recently or would recommend as a perfect entry point for game night vibes?\",\"interestTag\":\"anime\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 272,
+    "completionTokens": 406
+  },
+  "savedAt": "2026-11-12T23:55:00.332Z"
+}

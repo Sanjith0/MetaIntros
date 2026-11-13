@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all share a love for Anime and Video games, plus EDM and D&D / TTRPGs across the group! You'll have plenty to geek out about together on Saturday.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 364,
+    "completionTokens": 228
+  },
+  "savedAt": "2026-11-12T23:54:56.135Z"
+}

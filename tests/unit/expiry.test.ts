@@ -26,7 +26,7 @@ describe("squad chat expiry", () => {
   });
 
   it("fast-forward archives the chat, makes it read-only and shows the add-friends prompt", async () => {
-    const r = await fastForward("p01");
+    const r = await fastForward();
     expect(r.ok).toBe(true);
     const chat = await prisma.chat.findFirstOrThrow({ where: { type: "squad" }, include: { party: true } });
     expect(chat.archived).toBe(true);

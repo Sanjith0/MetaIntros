@@ -35,6 +35,10 @@ model User {
   neighborhood   String?
   /// "seed" | "gps" | "manual"
   locationSource String   @default("seed")
+  /// "off" | "friends": whether friends can see the queues you're in (opt-in, default off)
+  queueVisibility        String    @default("off")
+  /// set the first time we asked, so the queue setup prompt shows once
+  queueVisibilityAskedAt DateTime?
   /// Seed cluster label (debug/tests only; never shown to users)
   cluster        String?
   /// Raw Graph-API-shaped payload this user's profile was built from
@@ -212,6 +216,15 @@ model QueueEntry {
   matchedAt        DateTime?
   partyId          String?
   party            Party?    @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  /// snapshot at join: friends can see this queue (see lib/match/queueVisibility.ts)
+  visibleToFriends Boolean   @default(false)
+  /// set when you joined from a friend's "Queue up too"
+  viaFriendId      String?
+  /// demo only: a seeded friend's entry the matcher skips until a real person joins the same queue
+  parked           Boolean   @default(false)
+  /// queuing together: everyone with the same groupId lands in the same squad (never split)
+  groupId          String?
+  group            QueueGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   @@index([status])
 }
@@ -361,4 +374,106 @@ model DeviceSession {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   lastSeenAt DateTime @default(now())
+}
+
+/// Queue together (like a party in a game): 2+ people who enter the queue as one unit. The matcher fills the
+/// remaining spots and never splits them. Join by invite (friends) or by short code (anyone who passes safety).
+model QueueGroup {
+  id              String   @id @default(cuid())
+  hostId          String
+  /// short join code, unambiguous letters/digits
+  code            String   @unique
+  /// "open" (gathering) | "queued" | "matched" | "closed"
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+
+  members QueueGroupMember[]
+  entries QueueEntry[]
+}
+
+model QueueGroupMember {
+  id          String     @id @default(cuid())
+  groupId     String
+  group       QueueGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId      String
+  /// "invited" | "joined" | "declined" | "left"
+  status      String     @default("invited")
+  invitedById String?
+  /// "invite" | "code" | "friend_queue"
+  via         String     @default("invite")
+  createdAt   DateTime   @default(now())
+
+  @@unique([groupId, userId])
+  @@index([userId, status])
+}
+
+// ── Squad album → posts & stories ────────────────────────────────────────────────────────────
+// Standalone models: no relation fields were added to User/Party/Event (other work owns those).
+// partyId/uploaderId/authorId/eventId are plain ids: every read re-checks membership and existence,
+// and purgeSocialOrphans() (lib/server/album.ts) clears rows left behind when a user or squad is deleted.
+
+/// One photo in a squad's shared album. Squad members only; it outlives the squad chat (it's the memory).
+model AlbumPhoto {
+  id         String      @id @default(cuid())
+  partyId    String
+  uploaderId String
+  /// data:image/(png|jpeg|webp);base64,… (client-resized, server size-capped)
+  dataUrl    String
+  caption    String?
+  /// "Squadmates can include this in a post": the uploader's per-photo consent (default on)
+  shareable  Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  postPhotos PostPhoto[]
+
+  @@index([partyId, createdAt])
+  @@index([uploaderId])
+}
+
+/// A feed post or a 24h story. Audience and per-photo consent are enforced in code (lib/server/posts.ts).
+model Post {
+  id        String      @id @default(cuid())
+  authorId  String
+  /// "post" | "story"
+  kind      String      @default("post")
+  caption   String      @default("")
+  /// "friends" | "only_me"
+  audience  String      @default("friends")
+  /// the squad (and its event) this is about: "at <event> with my Queue Up squad"
+  partyId   String?
+  eventId   String?
+  /// when the AI host drafted it: "live" | "cache" | "mock" | "fallback"
+  aiSource  String?
+  /// the author changed the AI-drafted caption before posting
+  aiEdited  Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  photos    PostPhoto[]
+
+  @@index([authorId, createdAt])
+  @@index([partyId])
+}
+
+/// Ordered photo references. Deleting an album photo drops it from every post (cascade).
+model PostPhoto {
+  id       String     @id @default(cuid())
+  postId   String
+  photoId  String
+  position Int
+  post     Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  photo    AlbumPhoto @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, photoId])
+  @@index([photoId])
+}
+
+/// Each member's answer to "Share the outing" for one squad, so the prompt stops showing.
+model ShareChoice {
+  id        String   @id @default(cuid())
+  partyId   String
+  userId    String
+  /// "own" | "ai" | "none"
+  choice    String
+  postId    String?
+  createdAt DateTime @default(now())
+
+  @@unique([partyId, userId])
 }

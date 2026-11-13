@@ -3,6 +3,10 @@ import { prisma } from "@/lib/db";
 /** Wipe every table (children first). Used by DB tests for isolation. */
 export async function resetDb() {
   await prisma.$transaction([
+    prisma.postPhoto.deleteMany(),
+    prisma.post.deleteMany(),
+    prisma.albumPhoto.deleteMany(),
+    prisma.shareChoice.deleteMany(),
     prisma.agentTrace.deleteMany(),
     prisma.preChat.deleteMany(),
     prisma.talkCard.deleteMany(),
@@ -12,6 +16,8 @@ export async function resetDb() {
     prisma.friendRequest.deleteMany(),
     prisma.partyMember.deleteMany(),
     prisma.queueEntry.deleteMany(),
+    prisma.queueGroupMember.deleteMany(),
+    prisma.queueGroup.deleteMany(),
     prisma.party.deleteMany(),
     prisma.eventRsvp.deleteMany(),
     prisma.friendship.deleteMany(),

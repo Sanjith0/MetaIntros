@@ -41,7 +41,7 @@ describe("find your party", () => {
 
   it("photos are deleted when the squad chat ends", async () => {
     await setPartyPhoto(partyId, "p01", PNG);
-    await fastForward("p01");
+    await fastForward();
     expect(await getPartyPhoto(partyId, mate, "p01")).toBeNull();
   });
 

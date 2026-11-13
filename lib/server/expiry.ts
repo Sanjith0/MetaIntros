@@ -27,22 +27,23 @@ export async function sweepExpiredChats(at?: Date): Promise<string[]> {
 }
 
 /**
- * Demo Fast-forward: end the user's current squad event — for everyone. The global clock moves
- * forward (never back) to just after the event ends, so every phone, timestamp and countdown
- * agrees; then every squad at that event has its chat ended now (archive + "add your squad as
- * friends") instead of 24h later. Other events are untouched and stay aligned with the clock.
+ * Demo Fast-forward: end the next event to finish — for everyone. Among all active squads (confirmed, chat
+ * still open), pick the one whose event ends soonest (an already-finished event comes first). The global
+ * clock moves forward (never back) to just after it ends, and every squad at that event has its chat ended
+ * now (read-only + "add your squad as friends") instead of 24h later. Pressing again ends the next one, so
+ * the clock never skips past an event that hasn't been wrapped up.
  */
-export async function fastForward(userId: string) {
-  const m = await prisma.partyMember.findFirst({
-    where: { userId, party: { status: { in: ["confirmed", "completed"] }, eventId: { not: null } } },
-    orderBy: { joinedAt: "desc" },
-    include: { party: { include: { event: true } } },
+export async function fastForward() {
+  const party = await prisma.party.findFirst({
+    where: { status: "confirmed", event: { isNot: null } },
+    orderBy: [{ event: { endsAt: "asc" } }, { createdAt: "asc" }],
+    include: { event: true },
   });
-  if (!m?.party.event) return { ok: false as const, error: "no squad" };
-  const ev = m.party.event;
+  if (!party?.event) return { ok: false as const, error: "no squad" };
+  const ev = party.event;
   const now = await advanceClockTo(new Date(ev.endsAt.getTime() + 60_000));
   await prisma.chat.updateMany({ where: { type: "squad", archived: false, party: { eventId: ev.id } }, data: { expiresAt: now } });
   const archived = await sweepExpiredChats(now);
   publish("demo", { type: "fast-forward" });
-  return { ok: true as const, partyId: m.party.id, eventId: ev.id, archived, now: now.toISOString() };
+  return { ok: true as const, partyId: party.id, eventId: ev.id, eventTitle: ev.kind === "hangout" ? "the hangout" : ev.title, squads: archived.length, archived, now: now.toISOString() };
 }

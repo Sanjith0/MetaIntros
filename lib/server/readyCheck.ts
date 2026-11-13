@@ -16,6 +16,7 @@ import { nowMs } from "@/lib/clock";
 import { publish } from "./bus";
 import { getSetting } from "./settings";
 import { afterPartyConfirmed } from "./hooks";
+import { leaveGroup, markGroupsMatched } from "./groups";
 
 /** Ten minutes: long enough to notice a phone buzz (docs/SYNTHESIS.md §5). The demo can shorten it. */
 export const DEFAULT_ACCEPT_WINDOW_MS = 10 * 60_000;
@@ -45,6 +46,7 @@ export async function startReadyCheck(partyId: string, eventId: string) {
 async function finalizeParty(partyId: string) {
   const r = await prisma.party.updateMany({ where: { id: partyId, status: "confirming" }, data: { status: "confirmed", acceptBy: null } });
   if (!r.count) return "confirmed" as const;
+  await markGroupsMatched(partyId); // queue together: these groups are done
   await afterPartyConfirmed(partyId);
   const party = await prisma.party.findUniqueOrThrow({ where: { id: partyId }, include: { members: true } });
   const userIds = party.members.map((m) => m.userId);
@@ -120,6 +122,8 @@ async function dissolve(partyId: string, dropped: string[], reason: "declined" |
     prisma.queueEntry.updateMany({ where: { id: { in: back } }, data: { status: "waiting", partyId: null, matchedAt: null } }),
   ]);
   if (party.event?.kind === "hangout") await prisma.event.delete({ where: { id: party.event.id } }).catch(() => {});
+  // Queue together: whoever dropped out leaves their group; the rest stay grouped (their entries keep groupId).
+  for (const u of dropped) await leaveGroup(u, { quiet: true }).catch(() => {});
   const { scheduleSimulatedFill, ensureTicker } = await import("./queue");
   for (const id of back) await scheduleSimulatedFill(id).catch(() => {});
   if (back.length) ensureTicker();

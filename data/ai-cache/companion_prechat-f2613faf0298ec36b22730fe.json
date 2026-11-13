@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"So we both do photography — are you more 'chase perfect light at 6am' or 'oops 200 shots of my coffee'?\"}, {\"speaker\": \"B\", \"text\": \"Haha both, but mostly climbing walls with a camera stuffed in my pack. What about you?\"}, {\"speaker\": \"A\", \"text\": \"More books-and-coffee-shop people watching. I try to make my latte art look editorial, never works.\"}, {\"speaker\": \"B\", \"text\": \"We should trade - I'll bring grainy bouldering shots that look like vinyl covers, you bring the cozy cafe stories.\"}, {\"speaker\": \"A\", \"text\": \"Deal. Let's skip the loud spots and do a chill photo walk with actually good coffee after.\"}], \"sparks\": [\"Photography - climbing vs coffee shop shooting styles and gear talk\", \"Chill hang idea - photo walk + coffee + indie vinyl vibes\", \"Storytelling - books and live music moments as photo inspiration\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 218,
+    "completionTokens": 707
+  },
+  "savedAt": "2026-11-12T20:12:51.566Z"
+}

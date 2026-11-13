@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"hey Reza! Adi here — noticed we're both vinyl + indie live music people, that's dangerous combo\"}, {\"speaker\": \"B\", \"text\": \"haha right? Adi, I'm Reza - my shelves are basically vinyl with some hiking dust on them\"}, {\"speaker\": \"A\", \"text\": \"same, but replace hiking dust with climbing chalk. you still hunt for records in the wild or mostly online?\"}, {\"speaker\": \"B\", \"text\": \"always in the wild, love the hunt. and we both hate crowded bars, so maybe a chill listening spot > loud venue?\"}, {\"speaker\": \"A\", \"text\": \"perfect. we can trade bouldering beta and best live sets we caught recently\"}], \"sparks\": [\"Vinyl records hunting - favorite finds and go-to shops\", \"Indie live music you've seen lately\", \"Climbing / bouldering spots + shooting photos while out\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 236,
+    "completionTokens": 583
+  },
+  "savedAt": "2026-11-13T00:13:52.201Z"
+}

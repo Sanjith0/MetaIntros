@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Okay so you're into vinyl AND hiking too? Do you also take your camera on every trail like I do?\"}, {\"speaker\": \"B\", \"text\": \"Literally every time. Best light is on the trail, best sound is after. Are you more bouldering or climbing?\"}, {\"speaker\": \"A\", \"text\": \"Both - bouldering during the week, bigger climbs when I can get out. Always with an indie playlist for the drive.\"}, {\"speaker\": \"B\", \"text\": \"Same vibe. We should swap record recs and trail photo spots - way better than ending up at a crowded bar.\"}], \"sparks\": [\"Vinyl records + Indie music - swapping favorite finds and live music tips\", \"Hiking + Photography - sharing trail photo spots\", \"Bouldering / Climbing - chill climbing buddies\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 240,
+    "completionTokens": 507
+  },
+  "savedAt": "2026-11-13T00:10:24.510Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all share a love for Art & museums, and most of you are into Nature & parks and Photography — perfect for exploring together! You'll have plenty to bond over from climbing to camping.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 805,
+    "completionTokens": 317
+  },
+  "savedAt": "2026-11-13T00:30:43.779Z"
+}

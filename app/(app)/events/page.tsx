@@ -3,6 +3,9 @@ import { ChipLink, ChipRow, Section, Stack } from "@/components/fb";
 import { EventCard } from "@/components/events/EventCard";
 import { QueueEntry } from "@/components/queueup/QueueEntry";
 import { StatusCard } from "@/components/queueup/StatusCard";
+import { FriendQueues } from "@/components/queueup/FriendQueues";
+import { listFriendQueues } from "@/lib/server/friendQueues";
+import { getCurrentUser } from "@/lib/server/session";
 import { FEED_TABS, getFeed, type FeedTab } from "@/lib/server/events";
 import { getCurrentUserId } from "@/lib/server/session";
 import { now } from "@/lib/server/clock";
@@ -11,18 +14,20 @@ import { getStatusCard } from "@/lib/server/status";
 import { pulseLine, queuePulse } from "@/lib/server/pulse";
 import { prisma } from "@/lib/db";
 
-export default async function EventsPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+export default async function EventsPage({ searchParams }: { searchParams: Promise<{ tab?: string; queue?: string }> }) {
   const sp = await searchParams;
   const tab = (FEED_TABS.some((t) => t.id === sp.tab) ? sp.tab : "foryou") as FeedTab;
   const userId = await getCurrentUserId();
   const t = await now();
-  const [feed, squads, card, pulse, upcoming, landmarks] = await Promise.all([
+  const [feed, squads, card, pulse, upcoming, landmarks, friendQueues, me] = await Promise.all([
     getFeed(userId, tab, t),
     squadEventIds(userId),
     getStatusCard(userId, t),
     queuePulse(),
     getFeed(userId, "foryou", t),
     prisma.landmark.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, city: true } }),
+    listFriendQueues(userId),
+    getCurrentUser(),
   ]);
   // "An event you pick": public events, the ones you're interested in first (Jordan's story).
   const pickable = upcoming
@@ -46,7 +51,13 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
           </ChipRow>
         </div>
 
-        {card ? <StatusCard card={card} /> : <QueueEntry pulse={pulseLine(pulse)} events={pickable} landmarks={landmarks} />}
+        {card && <StatusCard card={card} />}
+        {/* Before/at the event the squad card is the one thing to do; once it's over, you can queue again. */}
+        {(!card || card.state === "after") && (
+          <QueueEntry pulse={pulseLine(pulse)} events={pickable} landmarks={landmarks} shareDefault={me.queueVisibility === "friends"} again={card?.state === "after"} autoOpen={sp.queue === "1"} />
+        )}
+
+        <FriendQueues queues={friendQueues} nowMs={t.getTime()} />
 
         <Section title={heading} className="pb-4">
           <ul className="flex flex-col gap-3" data-testid="event-feed" data-count={feed.length}>

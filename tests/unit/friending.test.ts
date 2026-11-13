@@ -34,7 +34,7 @@ describe("mutual opt-in friending", () => {
   });
 
   it("one-sided requests stay pending in Requests; friendship only on mutual acceptance", async () => {
-    await fastForward("p01");
+    await fastForward();
     expect(await sendSquadRequest("p01", live, partyId)).toMatchObject({ ok: true, state: "requested" });
     expect(await friendship("p01", live)).toBeNull();
     expect((await listRequests(live)).incoming.map((r) => r.fromId)).toEqual(["p01"]);
@@ -52,14 +52,14 @@ describe("mutual opt-in friending", () => {
   });
 
   it("declining leaves no friendship", async () => {
-    await fastForward("p01");
+    await fastForward();
     const r = await sendSquadRequest("p01", live, partyId);
     await respondToRequest(live, (r as { requestId: string }).requestId, false);
     expect(await friendship("p01", live)).toBeNull();
   });
 
   it("non-members can't send squad requests", async () => {
-    await fastForward("p01");
+    await fastForward();
     expect(await sendSquadRequest("p66", live, partyId)).toMatchObject({ ok: false, error: "not_in_party" });
   });
 });
@@ -73,7 +73,7 @@ describe("simulated squadmates (demo)", () => {
     await wait(300);
     await tickAndAccept();
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: true } });
-    await fastForward("p01");
+    await fastForward();
     const sim = party.members.find((m) => m.userId !== "p01")!.userId;
     await sendSquadRequest("p01", sim, party.id);
     expect((await friendship("p01", sim))?.source).toBe("queue_up");

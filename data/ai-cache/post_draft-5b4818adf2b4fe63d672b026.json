@@ -1,0 +1,11 @@
+{
+  "text": "{\"photoIds\": [\"cmwe80z8n0052xq9sk8ndab82\", \"cmwe81c8u005txq9s0hah4niz\", \"cmwe81ck5005uxq9sc9o3dzi4\", \"cmwe81cta005vxq9s4pfqnn8o\"], \"caption\": \"Spent the afternoon at the Vinyl Dig & Listen at Menlo Shop with my Queue Up squad. So nice to geek out over indie music finds together.\"}",
+  "task": "post_draft",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 341,
+    "completionTokens": 625
+  },
+  "savedAt": "2026-11-13T00:11:54.887Z"
+}

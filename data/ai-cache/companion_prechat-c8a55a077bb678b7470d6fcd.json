@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Okay so adi saw your vinyl stash interest - he's been hunting a first press of Phoebe Bridgers and also lives at the bouldering gym. Are you team early morning climb then record store?\"}, {\"speaker\": \"B\", \"text\": \"Kiara is literally that. Morning bouldering, afternoon crate digging, and yes to live indie whenever possible. Bonus points if the venue isn't a packed sweaty bar.\"}, {\"speaker\": \"A\", \"text\": \"Haha same - adi ducks crowded bars too. He was thinking you two could trade vinyl finds and beta on the new V3 wall before the event?\"}, {\"speaker\": \"B\", \"text\": \"Perfect. She'll bring her recent vinyl score and terrible-but-enthusiastic climbing beta.\"}], \"sparks\": [\"Shared vinyl hunting + live indie music obsession\", \"Bouldering buddies who both avoid crowded bars\", \"Chill live music recs swap\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 227,
+    "completionTokens": 522
+  },
+  "savedAt": "2026-11-13T00:10:47.163Z"
+}

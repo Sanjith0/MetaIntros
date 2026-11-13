@@ -40,6 +40,10 @@ async function main() {
     console.log(`path ${p.mode === "hangout" ? "hangout" : p.eventId ?? "any event"} size ${p.size}: formed ${formed}`);
     cancelAllSims();
   }
+  // Friends' queues: the "why you'd like it" line for each of Jordan's seeded friends who share their queue
+  await seedDatabase(prisma);
+  const { listFriendQueues, whyForFriendQueue } = await import("../lib/server/friendQueues");
+  for (const q of await listFriendQueues("p01")) await whyForFriendQueue("p01", q.entryId);
   for (const l of aiLog()) console.log(`  ${l.task}: ${l.source} ${l.ms}ms ${l.error ?? ""}`);
   await prisma.$disconnect();
   process.exit(0);

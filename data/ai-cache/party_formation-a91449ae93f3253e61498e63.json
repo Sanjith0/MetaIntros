@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all share Art & museums (4/4) and most of you love Photography and Nature & parks — lots to explore together! You also all overlap Sun 8am–6pm, so timing works perfectly.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 578,
+    "completionTokens": 305
+  },
+  "savedAt": "2026-11-13T00:27:57.943Z"
+}

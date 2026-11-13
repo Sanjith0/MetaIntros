@@ -53,3 +53,6 @@ next-env.d.ts
 
 # screenshots from e2e runs (tracked ones live in docs/screens/, updated only with UPDATE_SCREENS=1)
 /.screens/
+
+# agent worktrees (local only)
+.claude/worktrees/

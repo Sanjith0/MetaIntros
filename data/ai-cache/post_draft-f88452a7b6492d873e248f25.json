@@ -1,0 +1,11 @@
+{
+  "text": "{\"photoIds\": [\"cmwe85l9j008xxq9sx2tnqa50\", \"cmwe85lul008yxq9sg3x0qtnc\", \"cmwe85mad008zxq9svkso2rgo\"], \"caption\": \"Had such a great time at the D&D one-shot with my Queue Up squad. Really grateful to have found people who share my love for indie music and climbing.\"}",
+  "task": "post_draft",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 299,
+    "completionTokens": 612
+  },
+  "savedAt": "2026-11-13T00:15:02.579Z"
+}

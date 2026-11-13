@@ -16,9 +16,9 @@ type Step = { kind: "modes" } | { kind: "pick" } | { kind: "setup"; mode: "event
  * step 1 = the three queue modes as rows, step 2 = setup (size, where, one safety line, Find my squad).
  * On an event page (`event` set) the sheet opens straight at step 2 for that event.
  */
-export function QueueEntry({ pulse, events = [], event, landmarks }: { pulse: string | null; events?: PickableEvent[]; event?: SetupEvent; landmarks: Landmark[] }) {
+export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault = false, friendsInLine = 0, again = false, autoOpen = false }: { pulse: string | null; events?: PickableEvent[]; event?: SetupEvent; landmarks: Landmark[]; shareDefault?: boolean; friendsInLine?: number; /** shown under a finished squad's card: quieter copy, grey button (one primary per screen) */ again?: boolean; /** open the sheet on arrival (the event page's "Find another squad" links here) */ autoOpen?: boolean }) {
   const first: Step = event ? { kind: "setup", mode: "events", event } : { kind: "modes" };
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(autoOpen);
   const [step, setStep] = useState<Step>(first);
   const close = () => {
     setOpen(false);
@@ -32,17 +32,24 @@ export function QueueEntry({ pulse, events = [], event, landmarks }: { pulse: st
       <div className="flex items-start gap-3">
         <IconCircle tone="on" size={40}><Users size={20} /></IconCircle>
         <div className="min-w-0 flex-1">
-          <h2 className="text-title font-semibold">{event ? "Going alone? Go with a squad" : "Go with a squad"}</h2>
+          <h2 className="text-title font-semibold">{again ? "Up for another one?" : event ? "Going alone? Go with a squad" : "Go with a squad"}</h2>
           <p className="text-body text-muted">
-            {event
-              ? "We'll match you with a few people nearby who'd get along. Meet at the door, walk in together."
-              : "Queue for an event and we'll match you with a few people nearby who'd get along. Meet at the door, walk in together."}
+            {again
+              ? "Queue again for another event or a new hangout, with a new squad or friends."
+              : event
+                ? "We'll match you with a few people nearby who'd get along. Meet at the door, walk in together."
+                : "Queue for an event and we'll match you with a few people nearby who'd get along. Meet at the door, walk in together."}
           </p>
         </div>
       </div>
       {pulse && <p className="mt-2 text-meta text-muted" data-testid="queue-pulse">{pulse}</p>}
-      <Button variant="primary" block className="mt-3" data-testid={event ? "queue-up-button" : "queue-entry-open"} onClick={() => setOpen(true)}>
-        {event ? "Find a squad to go with" : "Find a squad"}
+      {friendsInLine > 0 && (
+        <p className="mt-1 text-meta font-semibold text-link" data-testid="friends-in-line">
+          {friendsInLine === 1 ? "1 friend is" : `${friendsInLine} friends are`} in line for this
+        </p>
+      )}
+      <Button variant={again ? "secondary" : "primary"} block className="mt-3" data-testid={event ? "queue-up-button" : "queue-entry-open"} onClick={() => setOpen(true)}>
+        {again ? "Find another squad" : event ? "Find a squad to go with" : "Find a squad"}
       </Button>
 
       <Sheet open={open} onClose={close} title={title} testId="queue-sheet">
@@ -81,7 +88,7 @@ export function QueueEntry({ pulse, events = [], event, landmarks }: { pulse: st
             {sorted.length === 0 && <li className="px-4 py-6 text-center text-muted">No public events coming up.</li>}
           </ul>
         )}
-        {step.kind === "setup" && <QueueSetup variant="sheet" mode={step.mode} event={step.event} landmarks={landmarks} />}
+        {step.kind === "setup" && <QueueSetup variant="sheet" mode={step.mode} event={step.event} landmarks={landmarks} shareDefault={shareDefault} />}
       </Sheet>
     </section>
   );
