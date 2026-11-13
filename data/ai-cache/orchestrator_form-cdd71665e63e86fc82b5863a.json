@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"live-be04a947\", \"live-fffb1569\"], \"why\": \"You both live for Peninsula Boulders and Bay Area Climbers Coalition — perfect match for a social climb plus food after this weekend.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 542,
+    "completionTokens": 298
+  },
+  "savedAt": "2026-11-13T00:51:09.916Z"
+}

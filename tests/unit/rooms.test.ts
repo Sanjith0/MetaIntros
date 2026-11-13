@@ -4,7 +4,7 @@ import { mockProvider } from "@/lib/ai";
 import { seedDatabase } from "@/lib/seed/seed";
 import { agentEventChooser, setEventChooser } from "@/lib/server/pipeline";
 import { getQueueStatus, joinQueue, leaveQueue, tick } from "@/lib/server/queue";
-import { liveViewFor, resetRooms } from "@/lib/server/rooms";
+import { answerCheckIn, liveViewFor, resetRooms } from "@/lib/server/rooms";
 import { setSetting } from "@/lib/server/settings";
 import { getTalkCards } from "@/lib/server/talkCards";
 import { getTrace } from "@/lib/server/trace";
@@ -183,6 +183,47 @@ describe("Companion engine in the queue", () => {
     const withNote = companionCalls.filter((c) => c.messages[1].content.includes("not drinking, want somewhere quiet"));
     expect(withNote.length).toBeGreaterThan(0);
     for (const c of withNote) expect(JSON.parse(c.messages[1].content).your_brief.ownerId).toBe("p01");
+  });
+
+  it("check-ins: the person sees their Companion's picks, can answer, and what they said is remembered", async () => {
+    await setSetting("checkinMs", "5000");
+    await join(4);
+    await wait(300);
+    const running = tick();
+    let view = await liveViewFor("p01");
+    for (let i = 0; i < 100 && !view?.checkIn; i++) { await wait(50); view = await liveViewFor("p01"); }
+    expect(view!.checkIn!.kind).toBe("picks");
+    expect(view!.stage).toBe("checkin");
+    const ci = view!.checkIn!;
+    expect(ci.picks!.picks.length).toBeGreaterThan(0);
+    expect(ci.secondsLeft).toBeGreaterThan(0);
+    expect(await answerCheckIn("p02", ci.id, { drop: [] })).toEqual({ ok: false, error: "not_found" }); // someone else's check-in
+    expect(await answerCheckIn("p01", ci.id, { told: "my therapist says go out" })).toEqual({ ok: false, error: "sensitive" });
+    const mate = ci.picks!.picks[0].id;
+    expect(await answerCheckIn("p01", ci.id, { drop: [mate, "not-in-the-offer"], told: "I want somewhere loud tonight" })).toEqual({ ok: true });
+    // then the sign-off check-in for the squad
+    for (let i = 0; i < 200 && (await liveViewFor("p01"))?.checkIn?.kind !== "signoff"; i++) await wait(50);
+    const so = (await liveViewFor("p01"))!.checkIn!;
+    expect(so.kind).toBe("signoff");
+    expect(so.signoff!.members).toContain("p01");
+    expect(so.signoff!.members).not.toContain(mate);
+    expect(await answerCheckIn("p01", so.id, { decision: "maybe" })).toEqual({ ok: false, error: "bad_answer" });
+    expect(await answerCheckIn("p01", so.id, { decision: "yes" })).toEqual({ ok: true });
+    expect(await running).toBe(1);
+    const brief = await prisma.companionBrief.findUniqueOrThrow({ where: { userId: "p01" } });
+    expect(brief.told).toEqual(["I want somewhere loud tonight"]);
+    const party = await confirmed();
+    expect(party.members.map((m) => m.userId)).not.toContain(mate);
+    await setSetting("checkinMs", "0");
+  });
+
+  it("check-ins time out and the Companion goes ahead", async () => {
+    await setSetting("checkinMs", "200");
+    await join(4);
+    await wait(300);
+    expect(await tick()).toBe(1);
+    expect((await liveViewFor("p01"))?.checkIn ?? null).toBeNull();
+    await setSetting("checkinMs", "0");
   });
 
   it("a room of only simulated people spends no model calls", async () => {

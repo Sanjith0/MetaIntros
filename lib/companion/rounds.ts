@@ -153,10 +153,14 @@ const topicsFor = (c: RoundCtx, view: OpenView | undefined) => new Set([...c.bri
 const forPrompt = (b: Brief) => ({ ownerId: b.ownerId, name: b.name, facts: b.facts, tonight: { hopingFor: b.tonight.hopingFor, energy: b.tonight.energy }, communication: b.communication, lightsUp: b.lightsUp });
 
 /** Only present when the person wrote something, so prompts (and cached replies) for everyone else are unchanged. */
-const ownWords = (b: Brief) =>
-  b.tonight.note
+const ownWords = (b: Brief) => ({
+  ...(b.tonight.note
     ? { in_their_own_words: { text: b.tonight.note, how_to_use: "Your person wrote this about tonight. Weigh it heavily when judging fit, and voice what it implies as a need. Never quote or paraphrase it closely to anyone, and never reveal the reason behind it." } }
-    : {};
+    : {}),
+  ...(b.told?.length
+    ? { your_person_told_you: { said: b.told, how_to_use: "Your person read your picks and told you this directly. It overrides anything you assumed about them: correct course, and never repeat it word for word to anyone." } }
+    : {}),
+});
 
 interface Attributed {
   id: string;

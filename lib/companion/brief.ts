@@ -37,6 +37,8 @@ export interface Brief {
   /** how the person communicates, described in the third person */
   communication: string;
   lightsUp: string[];
+  /** corrections and wants the person told their own Companion at a check-in (private to it) */
+  told?: string[];
   source: AiSource | "template";
 }
 
@@ -113,9 +115,10 @@ export function openView(b: Brief) {
 export type OpenView = ReturnType<typeof openView>;
 
 /** Text no other Companion may ever see or hear: private facts, and the person's own note for tonight. */
-export const privateTexts = (b: Pick<Brief, "facts"> & { tonight?: { note?: string } }) => [
+export const privateTexts = (b: Pick<Brief, "facts"> & { tonight?: { note?: string }; told?: string[] }) => [
   ...b.facts.filter((f) => f.share === "private").map((f) => f.text),
   ...(b.tonight?.note ? [b.tonight.note] : []),
+  ...(b.told ?? []),
 ];
 
 /** Clean a "what do you want tonight" sentence: null if empty, "sensitive" if it touches a sensitive topic. */

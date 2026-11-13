@@ -50,7 +50,7 @@ test("queueing runs the Companion engine: squad of the chosen size, visible trac
   await expect(decision).toBeVisible({ timeout: 15_000 });
   await expect(decision.getByTestId("decision-conversation")).toHaveCount(3);
   expect(await decision.getByTestId("companion-line").count()).toBeGreaterThanOrEqual(6); // first conversation is open
-  await expect(decision.getByTestId("decision-signed")).toContainText("All 4 Companions said yes");
+  await expect(decision.getByTestId("decision-signed")).toContainText("All 4 of you signed off");
   // …and the comparison with ranking people by similarity score.
   const numbers = page.getByTestId("numbers-vs-companion");
   await expect(numbers.getByTestId("similarity-pick")).toContainText("%");
@@ -69,4 +69,33 @@ test("queueing runs the Companion engine: squad of the chosen size, visible trac
   await pre.locator("summary").click();
   await expect(pre).toContainText("Each one knew only its own person");
   expect(await pre.getByTestId("prechat-thread").locator("li").count()).toBeGreaterThanOrEqual(6);
+});
+
+test("check-ins: my Companion checks its picks with me, then I sign off on the squad", async ({ page, request }) => {
+  await request.post("/api/demo/settings", { data: { checkinMs: 30_000 } });
+  try {
+    await gotoReady(page, "/queue/start?eventId=ev-indie-guild");
+    await page.getByTestId("size-4").click();
+    await page.getByTestId("choose-area").click();
+    await page.getByTestId("area-lm-downtown-pa").click();
+
+    const card = page.getByTestId("checkin-card");
+    await expect(card).toHaveAttribute("data-kind", "picks", { timeout: 30_000 });
+    await expect(card.getByTestId("checkin-pick").first()).toBeVisible();
+    await expect(card.getByTestId("checkin-countdown")).toContainText("goes ahead on its own");
+    await card.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: "docs/screens/28-checkin-picks.png" });
+    await card.getByTestId("checkin-looks-right").click();
+    // (from cache the squad forms in milliseconds, so the sign-off check-in follows right away)
+
+    await expect(page.getByTestId("checkin-card")).toHaveAttribute("data-kind", "signoff", { timeout: 30_000 });
+    await expect(page.getByTestId("checkin-recommend")).toContainText("Your Companion recommends");
+    await page.getByTestId("checkin-card").scrollIntoViewIfNeeded();
+    await page.screenshot({ path: "docs/screens/29-checkin-signoff.png" });
+    await page.getByTestId("checkin-yes").click();
+    await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId("party-members").locator("li")).toHaveCount(4);
+  } finally {
+    await request.post("/api/demo/settings", { data: { checkinMs: 0 } });
+  }
 });

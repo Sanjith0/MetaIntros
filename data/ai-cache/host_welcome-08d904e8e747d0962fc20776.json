@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\":\"Hey ekansh and afnan! Welcome to your squad chat for the Warriors Watch Party on Sat, Nov 21 · 7 PM. The plan is to meet at the front entrance of Cal Ave Plaza and head in together. Excited to meet you both! 🏀\",\"icebreaker\":\"Since you both like basketball, what's your favorite way to watch a big game - at home, at a bar, or courtside if you could?\",\"interestTag\":\"basketball\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 230,
+    "completionTokens": 359
+  },
+  "savedAt": "2026-11-13T00:51:14.605Z"
+}

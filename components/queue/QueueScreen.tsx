@@ -31,10 +31,12 @@ const STAGE_LABEL: Record<string, string> = {
   briefing: "Companions are reading profiles",
   circles: "Finding your circle",
   mingling: "Your Companion is meeting everyone",
+  checkin: "Your Companion is checking its picks with you",
   deep: "Going deeper with a few people",
   deliberating: "Companions are proposing squads",
   forming: "Forming your squad",
   group: "Your squad's Companions are talking it over",
+  signoff: "Your squad is waiting for your yes",
 };
 const STAGES = Object.keys(STAGE_LABEL);
 

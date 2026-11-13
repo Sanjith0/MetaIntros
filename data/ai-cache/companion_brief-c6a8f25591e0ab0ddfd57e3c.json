@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Ekansh likes getting out and doing something active and tends to socialize by doing things together rather than just chatting. They connect easily around group rides, climbing sessions, and other active meetups.\", \"depth\": {\"live-14e8a601:likes[0]\": \"Peninsula Boulders - a bouldering gym they like\", \"live-14e8a601:groups[0]\": \"Bay Area Climbers - local climbing community they are part of\", \"live-14e8a601:groups[1]\": \"Peninsula Weekend Riders - weekend cycling group\", \"live-14e8a601:groups[2]\": \"Palo Alto Pickleball - local pickleball group\", \"live-14e8a601:likes[6]\": \"Golden State Warriors - NBA team they follow\"}, \"lightsUp\": [\"live-14e8a601:groups[0]\", \"live-14e8a601:groups[1]\", \"live-14e8a601:groups[2]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 592,
+    "completionTokens": 877
+  },
+  "savedAt": "2026-11-13T00:39:40.985Z"
+}

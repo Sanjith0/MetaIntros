@@ -13,6 +13,7 @@ process.env.DATABASE_URL = "file:./warm.db";
 process.env.AI_MODE = "live";
 process.env.AI_TIMEOUT_MS ??= "120000"; // warming isn't live; batched Companion rounds are long answers from a reasoning model
 process.env.AI_MAX_CALLS ??= "600";
+process.env.CHECKIN_MS ??= "0"; // nobody is there to answer check-ins; the Companions go ahead (same prompts as no answer)
 
 async function main() {
   if (!process.env.MODEL_API_KEY) {

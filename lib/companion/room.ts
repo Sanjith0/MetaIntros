@@ -18,7 +18,39 @@ import { SIMILARITY_GATE, deepPairs, drawCircles, formParties, wanted, type Circ
 import { askRound, answerRound, closeRound, deliberate, groupRound, type RoundCtx, type ThreadMsg } from "./rounds";
 import { makePairScorer } from "@/lib/match/compat";
 
-export type Stage = "briefing" | "circles" | "mingling" | "deep" | "deliberating" | "forming" | "group" | "done" | "waiting";
+export type Stage = "briefing" | "circles" | "mingling" | "checkin" | "deep" | "deliberating" | "forming" | "group" | "signoff" | "done" | "waiting";
+
+/** What a person is shown at the first check-in: who their Companion would pick, and why. */
+export interface PicksOffer {
+  targetSize: number;
+  picks: { id: string; score: number; why: string }[];
+  /** everyone else their Companion talked with */
+  others: { id: string; score: number }[];
+}
+export interface PicksAnswer {
+  /** people this person does not want in their squad (enforced by code) */
+  drop: string[];
+  /** what their Companion got wrong, or what they actually want (private to their Companion) */
+  told?: string;
+}
+/** What a person is shown at sign-off: the squad, and what their Companion recommends. */
+export interface SignoffOffer {
+  members: string[];
+  recommend: "yes" | "yes_if" | "no";
+  companionSaid: string;
+  groupLines: { from: string; say: string }[];
+}
+export interface SignoffAnswer {
+  decision: "yes" | "no";
+}
+/**
+ * Asking the real people in a room. Each call resolves with their answer, or null if they didn't
+ * answer in time, in which case their Companion goes ahead on its own.
+ */
+export interface HumanCheckIns {
+  picks?: (userId: string, offer: PicksOffer) => Promise<PicksAnswer | null>;
+  signoff?: (userId: string, offer: SignoffOffer) => Promise<SignoffAnswer | null>;
+}
 
 export interface RoomInput {
   ids: string[];
@@ -35,6 +67,8 @@ export interface RoomInput {
   feasible?: (members: string[]) => boolean;
   onStage?: (s: Stage, note: string) => void | Promise<void>;
   onLive?: (e: LiveEvent) => void;
+  /** check in with the real people in the room (never simulated ones) */
+  human?: HumanCheckIns;
 }
 
 /**
@@ -88,7 +122,12 @@ export function sparksFor(a: string, b: string, r: Pick<RoomResult, "verdicts">)
 }
 
 export async function runRoom(input: RoomInput): Promise<RoomResult> {
-  const { people, briefs, targetSize } = input;
+  const { people, targetSize } = input;
+  // A person's check-in answers update their own brief for the rest of the room.
+  const briefs = new Map(input.briefs);
+  /** pairs a person said they don't want together (code-enforced) */
+  const dropped = new Set<string>();
+  const isReal = (id: string) => !people.get(id)!.isSimulated;
   const ids = [...new Set(input.ids)].sort();
   const live = (e: LiveEvent) => {
     try {
@@ -130,6 +169,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     const members = [...circle.members].sort();
     const useModel = members.some((m) => !people.get(m)!.isSimulated);
     const partners = (id: string) => members.filter((m) => m !== id && talks(id, m));
+    const keep = (id: string) => (m: string) => !dropped.has(pairKey(id, m));
     const ctx = (id: string): RoundCtx => ({
       brief: briefs.get(id)!,
       me: people.get(id)!,
@@ -141,7 +181,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     const pairs: [string, string][] = [];
     for (let i = 0; i < members.length; i++) for (let j = i + 1; j < members.length; j++) if (talks(members[i], members[j])) pairs.push([members[i], members[j]]);
     const active = members.filter((m) => partners(m).length > 0);
-    return { circle, members, useModel, partners, ctx, introsFor, pairs, active, picks: new Map<string, string[]>(), deep: [] as [string, string][], table: [] as TableRow[], want: new Map<string, Set<string>>() };
+    return { circle, members, useModel, partners, keep, ctx, introsFor, pairs, active, picks: new Map<string, string[]>(), deep: [] as [string, string][], table: [] as TableRow[], want: new Map<string, Set<string>>() };
   });
   type CS = (typeof circles)[number];
 
@@ -190,14 +230,34 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     }
   }));
 
+  // ── check-in: each real person sees who their Companion would pick, can drop people and correct it ──
+  const askPicks = input.human?.picks;
+  const realActive = circles.flatMap((cs) => cs.active.filter(isReal).map((m) => ({ cs, m })));
+  if (askPicks && realActive.length) {
+    await stage("checkin", "Your Companion is checking its picks with you");
+    await Promise.all(realActive.map(async ({ cs, m }) => {
+      const mine = verdicts.get(m)!;
+      const ranked = cs.partners(m).map((id) => ({ id, score: mine.get(id)?.score ?? 0, why: mine.get(id)?.wouldEnjoy[0] ?? mine.get(id)?.concerns[0] ?? "" })).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+      const answer = await askPicks(m, { targetSize, picks: ranked.slice(0, targetSize - 1), others: ranked.slice(targetSize - 1).map(({ id, score }) => ({ id, score })) }).catch(() => null);
+      if (!answer) return;
+      const ok = new Set(cs.partners(m));
+      for (const d of answer.drop) if (ok.has(d)) dropped.add(pairKey(m, d));
+      const told = answer.told?.trim();
+      if (told) {
+        const b = briefs.get(m)!;
+        briefs.set(m, { ...b, told: [...(b.told ?? []), told] });
+      }
+    }));
+  }
+
   // ── deep dive: picked pairs only, then each Companion proposes ──
   await stage("deep", "Going deeper where a Companion asked to");
   await Promise.all(circles.map(async (cs) => {
-    cs.deep = deepPairs(cs.picks, verdicts, cs.members, people);
+    cs.deep = deepPairs(cs.picks, verdicts, cs.members, people).filter(([a, b]) => !dropped.has(pairKey(a, b)));
     const deepWith = (m: string) => cs.deep.filter((p) => p.includes(m)).map((p) => (p[0] === m ? p[1] : p[0]));
     const threadsFor = (m: string) => new Map(deepWith(m).map((p) => [p, threads.get(pairKey(m, p))!]));
     live({ type: "deep", pairs: cs.deep });
-    const close = await Promise.all(cs.active.map((m) => closeRound(cs.ctx(m), threadsFor(m), [m, ...cs.partners(m)], verdicts.get(m)!, targetSize).then((r) => {
+    const close = await Promise.all(cs.active.map((m) => closeRound(cs.ctx(m), threadsFor(m), [m, ...cs.partners(m).filter(cs.keep(m))], verdicts.get(m)!, targetSize).then((r) => {
       for (const [to, msg] of r.says) live({ type: "line", line: asLine(m, to, "close", msg) });
       if (r.verdicts.size) live({ type: "notes", from: m, notes: [...r.verdicts] });
       live({ type: "proposal", row: { id: `prop-${m}`, by: m, members: r.proposal.members, line: r.proposal.line.say, backers: [] } });
@@ -219,7 +279,8 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
   await stage("deliberating", "Companions are backing or amending each other's proposals");
   await Promise.all(circles.map(async (cs) => {
     const proposals = [...cs.table];
-    const res = await Promise.all(cs.active.map((m) => deliberate(cs.ctx(m), proposals, verdicts.get(m)!, targetSize)));
+    // A Companion never sees (so never backs) a proposal pairing its person with someone they dropped.
+    const res = await Promise.all(cs.active.map((m) => deliberate(cs.ctx(m), proposals.filter((p) => p.members.every(cs.keep(m))), verdicts.get(m)!, targetSize)));
     res.forEach((r) => count(r.source));
     const responses = new Map<string, TableResponse>();
     cs.active.forEach((m, i) => {
@@ -238,6 +299,12 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
   const vetoed: string[][] = [];
   let groupStage = false;
 
+  /** Code rule: a squad never contains a pair someone dropped, and must be able to meet. */
+  const canGroup = (members: string[]) => {
+    for (let i = 0; i < members.length; i++) for (let j = i + 1; j < members.length; j++) if (dropped.has(pairKey(members[i], members[j]))) return false;
+    return input.feasible ? input.feasible(members) : true;
+  };
+
   const groupConversation = async (cs: CS, members: string[]) => {
     if (!groupStage) {
       groupStage = true;
@@ -250,11 +317,23 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     })));
     respond.forEach((r) => count(r.source));
     blocked += respond.filter((r) => r.line.blocked).length;
-    const ok = respond.every((r) => r.decision !== "no") && validateParty(members.map((m) => people.get(m)!)).ok;
+    // Sign-off: each real person makes the call (their Companion's recommendation shown); if they don't answer in time, their Companion's call stands.
+    const lines = members.map((m, i) => ({ from: m, say: respond[i].line.say }));
+    const askSignoff = input.human?.signoff;
+    const decisions = respond.map((r) => r.decision);
+    if (askSignoff && members.some(isReal)) {
+      await stage("signoff", "Your squad is waiting for your yes");
+      await Promise.all(members.map(async (m, i) => {
+        if (!isReal(m)) return;
+        const a = await askSignoff(m, { members, recommend: respond[i].decision, companionSaid: respond[i].line.say, groupLines: lines }).catch(() => null);
+        if (a) decisions[i] = a.decision;
+      }));
+    }
+    const ok = decisions.every((d) => d !== "no") && validateParty(members.map((m) => people.get(m)!)).ok;
     live({ type: "groupDone", groupId, members, ok });
     return {
       ok,
-      groupChat: members.map((m, i) => ({ from: m, say: respond[i].line.say })),
+      groupChat: lines,
       needs: respond.map((r) => r.need).filter(Boolean),
     };
   };
@@ -264,7 +343,7 @@ export async function runRoom(input: RoomInput): Promise<RoomResult> {
     let pool = cs.members;
     for (let attempt = 1; attempt <= 2; attempt++) {
       if (pool.length < targetSize) break;
-      const formed = await formParties({ circle: { ...cs.circle, members: pool }, table: cs.table, want: cs.want, verdicts, briefs, people, targetSize, exclude, attempt, useModel: cs.useModel, priority: input.priority, onlyPriority: input.onlyPriority, feasible: input.feasible });
+      const formed = await formParties({ circle: { ...cs.circle, members: pool }, table: cs.table, want: cs.want, verdicts, briefs, people, targetSize, exclude, attempt, useModel: cs.useModel, priority: input.priority, onlyPriority: input.onlyPriority, feasible: canGroup });
       count(formed.source);
       let anyVeto = false;
       for (const p of formed.parties) {

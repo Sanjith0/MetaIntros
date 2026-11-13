@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Eknash is hoping for an active hangout with a squad of 3 and loves getting out and doing something together. They would bring enthusiasm for climbing at Peninsula Boulders, board games like Catan, and Warriors basketball, and would have the most fun if tonight includes some physical activity, maybe shooting hoops.\", \"cites\": [\"live-eaa288e3:likes[0]\", \"live-eaa288e3:likes[2]\", \"live-eaa288e3:likes[4]\", \"live-eaa288e3:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1879,
+    "completionTokens": 408
+  },
+  "savedAt": "2026-11-13T00:39:57.756Z"
+}

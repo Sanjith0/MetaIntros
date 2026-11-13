@@ -156,8 +156,9 @@ flowchart LR
    - **Everyone in a circle talks.** Each Companion introduces its person, asks every other Companion a scenario question, answers theirs, and privately scores each person. It describes its person in the third person and never imitates them.
    - **Deep dives.** Pairs where a Companion asked for more (or the two scores disagree) get one more exchange: a reaction, an honest concern, and what each person would need.
    - **Proposals and deliberation.** Each Companion proposes a squad for its person, then backs, amends or holds.
+   - **Check-in with you.** After the first round, each real person's phone shows who their Companion would pick and why. They can drop people (code never puts them together) and tell their Companion what it got wrong or what they actually want (private to their Companion, remembered next time). If they don't answer within 45 seconds, the Companion goes ahead.
    - **Squads.** The Orchestrator forms squads of exactly the size you picked, only from people a Companion chose.
-   - **Group conversation and sign-off.** In one round, each of the squad's Companions speaks to the group and says yes or no. A no is binding and anonymous, and the Orchestrator revises once.
+   - **Group conversation and sign-off.** In one round, each of the squad's Companions speaks to the group and says yes or no. A no is binding and anonymous, and the Orchestrator revises once. Each real person makes the final call themselves (I'm in / Not this group), with their Companion's recommendation shown; after 45 seconds the Companion's call stands.
 
    A Companion makes one Muse call per round and speaks to everyone in that round, so a room of 8 is about 45 calls (about 37 once each person's brief is cached). Code checks every line: citations must be the speaker's own shared facts, private facts and sensitive topics are blocked, and each prompt holds exactly one person's brief.
 3. **Code re-checks safety** on every squad before it is committed.

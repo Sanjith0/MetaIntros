@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"ev-warriors-watch\",\"runnersUp\": [\"ev-photo-walk\",\"ev-dumpling-class\"],\"reasons\": [\"Only event matching squad's top interest Basketball (2/2) with 0.919 score\",\"Conversation-friendly alternatives but zero interest overlap\"]}",
+  "task": "event_selection",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 363,
+    "completionTokens": 508
+  },
+  "savedAt": "2026-11-13T00:51:13.538Z"
+}

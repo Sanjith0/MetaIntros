@@ -5,6 +5,7 @@ import { Bot, ChevronDown, Lock, MessagesSquare, Users } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { CompanionThread, ScorePill, type ThreadLine } from "./CompanionThread";
+import { CheckInCard, CheckInSent, type CheckInView } from "./CheckInCard";
 import { stripCitations } from "@/lib/companion/text";
 
 interface Notes {
@@ -24,6 +25,7 @@ interface View {
   conversations?: { with: string; deep: boolean; notes: Notes | null; lines: ThreadLine[] }[];
   proposals?: { by: string; members: string[]; line: string; backers: number }[];
   groups?: { members: string[]; lines: { from: string; say: string }[]; status: "talking" | "agreed" | "didnt_work" }[];
+  checkIn?: CheckInView | null;
 }
 
 const first = (n?: string) => (n ?? "Someone").split(" ")[0];
@@ -35,6 +37,12 @@ const first = (n?: string) => (n ?? "Someone").split(" ")[0];
 export function CompanionFeed({ meId }: { meId?: string }) {
   const [view, setView] = useState<View | null>(null);
   const [open, setOpen] = useState<string | null>(null);
+  const [sentAt, setSentAt] = useState(0);
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const load = useCallback(async () => {
     const v: View | null = await fetch("/api/queue/companion").then((r) => (r.ok ? r.json() : null)).catch(() => null);
@@ -66,6 +74,12 @@ export function CompanionFeed({ meId }: { meId?: string }) {
       </p>
       {scored > 0 && (
         <p className="mt-1 flex items-center gap-1 text-[11px] text-[#a5b4fc]"><Lock size={11} /> Scores are your Companion&apos;s private notes</p>
+      )}
+
+      {view.checkIn ? (
+        <CheckInCard key={view.checkIn.id} checkIn={view.checkIn} people={people} meId={meId} onSent={() => setSentAt(Date.now())} />
+      ) : (
+        sentAt > 0 && now - sentAt < 4000 && <CheckInSent />
       )}
 
       <ul className="mt-3 space-y-2" data-testid="feed-conversations">

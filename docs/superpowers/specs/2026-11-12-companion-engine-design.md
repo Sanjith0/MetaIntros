@@ -286,3 +286,19 @@ To keep live rooms affordable and fast:
 
 Measured: about 45 calls per squad (8 briefs, 8 per round × 4 rounds, 1 Orchestrator, one per
 squad member), about 37 once briefs are cached; was about 87.
+
+## Check-ins with the person (added 2026-11-13)
+
+Companions generalize from thin profiles, so each real person is asked twice:
+
+1. **Picks** (after round 1, before the deep round): who their Companion would put in their squad,
+   with its score and reason. They can drop people, which code enforces (no proposal, deep dive,
+   backing or squad pairs them), and tell their Companion what it got wrong or what they want. That
+   text reaches only their own Companion (`your_person_told_you`), is blocked if repeated verbatim,
+   refused if sensitive, and saved on their brief (last 3) for future rooms.
+2. **Sign-off**: the person, not their Companion, says I'm in / Not this group, with the Companion's
+   recommendation shown. A no is binding and anonymous, as before.
+
+Each check-in waits up to 45 seconds (`checkinMs` setting / `CHECKIN_MS`, 0 = off), then the
+Companion goes ahead. Simulated people are never asked. With no answer, prompts are exactly as
+before, so cached runs still replay. The queue tick waits while a room is checking in.

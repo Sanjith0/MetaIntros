@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Ek is outgoing and active, preferring to get out and do things with others rather than just chat online. They like swapping tips and making plans around live music, climbing, basketball, and pickleball.\",\"depth\":{\"live-4015ac32:likes[0]\":\"Follows Bay Area Concerts\",\"live-4015ac32:likes[2]\":\"Interested in Peninsula Boulders\",\"live-4015ac32:likes[4]\":\"Follows Golden State Warriors\",\"live-4015ac32:likes[6]\":\"Interested in USA Pickleball\",\"live-4015ac32:groups[0]\":\"Member of Peninsula Gig Buddies group\"},\"lightsUp\":[\"live-4015ac32:groups[0]\",\"live-4015ac32:groups[1]\",\"live-4015ac32:groups[2]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 580,
+    "completionTokens": 685
+  },
+  "savedAt": "2026-11-13T00:39:40.492Z"
+}

@@ -97,7 +97,7 @@ export function SquadDecision({ partyId }: { partyId: string }) {
               ))}
             </ul>
             <p className="mt-2 flex items-center gap-1 text-xs font-semibold text-emerald-200" data-testid="decision-signed">
-              <CheckCircle2 size={13} /> All {recap.squad.length + 1} Companions said yes
+              <CheckCircle2 size={13} /> All {recap.squad.length + 1} of you signed off
             </p>
           </div>
         )}

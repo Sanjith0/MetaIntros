@@ -4,7 +4,8 @@
  */
 import { prisma } from "@/lib/db";
 import { toJson } from "@/lib/json";
-import { pairKey, runRoom, sparksFor, type LiveEvent, type RoomParty } from "@/lib/companion/room";
+import { pairKey, runRoom, sparksFor, type HumanCheckIns, type LiveEvent, type PicksAnswer, type PicksOffer, type RoomParty, type SignoffAnswer, type SignoffOffer } from "@/lib/companion/room";
+import { cleanNote } from "@/lib/companion/brief";
 import { buildRecap, type Recap } from "@/lib/companion/recap";
 import type { TableRow, Verdict } from "@/lib/companion/orchestrator";
 import type { ThreadMsg } from "@/lib/companion/rounds";
@@ -16,7 +17,8 @@ import type { Person } from "@/lib/profile/load";
 import { rankEvents, type GroupContext } from "@/lib/match/eventFit";
 import { rankHangouts } from "@/lib/match/hangoutFit";
 import { dislikeTags } from "@/lib/profile/builder";
-import { ensureBriefs } from "./briefs";
+import { ensureBriefs, rememberTold } from "./briefs";
+import { getSetting } from "./settings";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { HANGOUT_SPOTS, hangoutHorizon } from "./hangout";
@@ -163,6 +165,7 @@ export async function matchRoom(anchor: QueueItem, room: QueueItem[], people: Ma
       onlyPriority: true,
       feasible,
       onLive: (e) => record(watch, e),
+      human: await checkInsFor(watch, real),
       onStage: async (stage, note) => {
         if (stage === "done" || stage === "waiting") return;
         await prisma.matchRoom.update({ where: { id: row.id }, data: { stage, note } });
@@ -262,6 +265,90 @@ function record(w: LiveRoom, e: LiveEvent) {
   }
 }
 
+/* ───────────────────────── check-ins ───────────────────────── */
+
+export const DEFAULT_CHECKIN_MS = 45_000;
+
+/** How long a check-in waits for a person before their Companion goes ahead (0 = no check-ins). */
+export async function checkInMs(): Promise<number> {
+  const v = Number(await getSetting("checkinMs", process.env.CHECKIN_MS ?? String(DEFAULT_CHECKIN_MS)));
+  return Number.isFinite(v) && v > 0 ? Math.min(v, 120_000) : 0;
+}
+
+type CheckIn =
+  | { id: string; roomId: string; userId: string; kind: "picks"; offer: PicksOffer; expiresAt: number; resolve: (a: PicksAnswer | null) => void }
+  | { id: string; roomId: string; userId: string; kind: "signoff"; offer: SignoffOffer; expiresAt: number; resolve: (a: SignoffAnswer | null) => void };
+
+const gc = globalThis as unknown as { __quCheckIns?: Map<string, CheckIn> };
+const checkIns = () => (gc.__quCheckIns ??= new Map());
+let seq = 0;
+
+function ask<A>(w: LiveRoom, userId: string, kind: CheckIn["kind"], offer: PicksOffer | SignoffOffer, ms: number): Promise<A | null> {
+  return new Promise((done) => {
+    const id = `ci-${Date.now().toString(36)}-${++seq}`;
+    const finish = (a: A | null) => {
+      if (!checkIns().has(id)) return;
+      checkIns().delete(id);
+      clearTimeout(timer);
+      done(a);
+      publish("queue", { type: "checkin" }, [userId]);
+    };
+    const timer = setTimeout(() => finish(null), ms);
+    checkIns().set(id, { id, roomId: w.id, userId, kind, offer, expiresAt: Date.now() + ms, resolve: finish } as CheckIn);
+    publish("queue", { type: "checkin" }, [userId]);
+  });
+}
+
+/** Check-ins for the real people in this room; none when check-ins are switched off. */
+async function checkInsFor(w: LiveRoom, real: string[]): Promise<HumanCheckIns | undefined> {
+  const ms = await checkInMs();
+  if (!ms || !real.length) return undefined;
+  return {
+    picks: (userId, offer) => ask<PicksAnswer>(w, userId, "picks", offer, ms),
+    signoff: (userId, offer) => ask<SignoffAnswer>(w, userId, "signoff", offer, ms),
+  };
+}
+
+/** Answer every pending check-in with "no answer" (demo reset). */
+export function cancelCheckIns() {
+  for (const c of [...checkIns().values()]) c.resolve(null);
+}
+
+export type CheckInReply = { drop?: unknown; told?: unknown; decision?: unknown };
+
+/** A person answers their own pending check-in. */
+export async function answerCheckIn(userId: string, id: string, reply: CheckInReply): Promise<{ ok: true } | { ok: false; error: "not_found" | "bad_answer" | "sensitive" }> {
+  const c = checkIns().get(id);
+  if (!c || c.userId !== userId) return { ok: false, error: "not_found" };
+  if (c.kind === "picks") {
+    const allowed = new Set([...c.offer.picks, ...c.offer.others].map((p) => p.id));
+    const drop = Array.isArray(reply.drop) ? reply.drop.filter((d): d is string => typeof d === "string" && allowed.has(d)) : [];
+    const told = cleanNote(reply.told);
+    if (told === "sensitive") return { ok: false, error: "sensitive" };
+    if (told) await rememberTold(userId, told).catch(() => {});
+    c.resolve({ drop, ...(told ? { told } : {}) });
+    return { ok: true };
+  }
+  if (reply.decision !== "yes" && reply.decision !== "no") return { ok: false, error: "bad_answer" };
+  c.resolve({ decision: reply.decision });
+  return { ok: true };
+}
+
+export interface CheckInView {
+  id: string;
+  kind: "picks" | "signoff";
+  secondsLeft: number;
+  picks?: PicksOffer;
+  signoff?: SignoffOffer;
+}
+
+function checkInFor(userId: string): CheckInView | null {
+  const c = [...checkIns().values()].find((x) => x.userId === userId);
+  if (!c) return null;
+  const secondsLeft = Math.max(0, Math.round((c.expiresAt - Date.now()) / 1000));
+  return c.kind === "picks" ? { id: c.id, kind: "picks", secondsLeft, picks: c.offer } : { id: c.id, kind: "signoff", secondsLeft, signoff: c.offer };
+}
+
 export interface LiveView {
   stage: string;
   note: string;
@@ -279,6 +366,8 @@ export interface LiveView {
   proposals: { by: string; members: string[]; line: string; backers: number }[];
   /** group conversations this person was part of */
   groups: { members: string[]; lines: { from: string; say: string }[]; status: "talking" | "agreed" | "didnt_work" }[];
+  /** a question this person's Companion is waiting on, if any */
+  checkIn: CheckInView | null;
 }
 
 /**
@@ -310,7 +399,9 @@ export async function liveViewFor(userId: string): Promise<LiveView | null> {
     .filter((gr) => gr.members.includes(userId))
     .map((gr) => ({ members: gr.members, lines: gr.lines, status: gr.ok === undefined ? ("talking" as const) : gr.ok ? ("agreed" as const) : ("didnt_work" as const) }));
   const circle = w.circles.find((c) => c.members.includes(userId));
-  const ids = [...new Set([userId, ...conversations.map((c) => c.with), ...proposals.flatMap((p) => p.members), ...groups.flatMap((gr) => gr.members)])];
+  const checkIn = checkInFor(userId);
+  const offered = checkIn?.picks ? [...checkIn.picks.picks, ...checkIn.picks.others].map((p) => p.id) : checkIn?.signoff?.members ?? [];
+  const ids = [...new Set([userId, ...conversations.map((c) => c.with), ...proposals.flatMap((p) => p.members), ...groups.flatMap((gr) => gr.members), ...offered])];
   const users = await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, avatarColor: true } });
   return {
     stage: w.stage,
@@ -321,5 +412,6 @@ export async function liveViewFor(userId: string): Promise<LiveView | null> {
     conversations,
     proposals,
     groups,
+    checkIn,
   };
 }

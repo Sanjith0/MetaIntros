@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-live-14e8a601\", \"line\": {\"say\": \"Eknash is up for active squad time climbing at Peninsula Boulders and Warriors talk.\", \"cites\": [\"live-eaa288e3:likes[0]\", \"live-eaa288e3:likes[4]\", \"live-eaa288e3:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1289,
+    "completionTokens": 427
+  },
+  "savedAt": "2026-11-13T00:39:53.602Z"
+}

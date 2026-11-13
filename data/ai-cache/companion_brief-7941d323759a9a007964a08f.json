@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Eknash is active and outgoing, preferring to get out and do something together rather than just chat. They light up talking about shared activities like climbing, running, board games, and Warriors basketball.\", \"depth\": {\"live-eaa288e3:likes[0]\": \"Likes Peninsula Boulders and is in Bay Area Climbers, showing a local climbing focus.\", \"live-eaa288e3:likes[2]\": \"Likes Catan and is in Palo Alto Board Gamers, pointing to regular board game nights.\", \"live-eaa288e3:likes[4]\": \"Likes Golden State Warriors and is in Warriors Fans Bay Area, following the team with other fans.\", \"live-eaa288e3:likes[6]\": \"Likes Strava and is in Palo Alto Runners, connecting running with tracking and community.\", \"live-eaa288e3:likes[8]\": \"Likes AllTrails and REI, matching an active outdoors style.\"}, \"lightsUp\": [\"live-eaa288e3:likes[0]\", \"live-eaa288e3:likes[2]\", \"live-eaa288e3:likes[4]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 572,
+    "completionTokens": 831
+  },
+  "savedAt": "2026-11-13T00:39:40.518Z"
+}

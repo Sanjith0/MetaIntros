@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-live-14e8a601\", \"line\": {\"say\": \"Ek loves Peninsula Boulders and Warriors talk - active squad of 3 sounds perfect!\", \"cites\": [\"live-4015ac32:likes[2]\", \"live-4015ac32:likes[4]\", \"live-4015ac32:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1175,
+    "completionTokens": 390
+  },
+  "savedAt": "2026-11-13T00:39:53.441Z"
+}

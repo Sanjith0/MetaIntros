@@ -367,6 +367,8 @@ model CompanionBrief {
   shares    Json
   /// { depth: { [factId]: string }, communication: string, lightsUp: string[] } written by the Profile Analyst
   generated Json?
+  /// what the person told their Companion at check-ins (string[], last few kept; private to their Companion)
+  told      Json?
   updatedAt DateTime @updatedAt
 }
 

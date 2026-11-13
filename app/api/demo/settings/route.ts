@@ -4,12 +4,14 @@ import { getSetting, setSetting } from "@/lib/server/settings";
 import { publish } from "@/lib/server/bus";
 import { setAiMode } from "@/lib/ai";
 
-const KEYS = ["fillMode", "simFillMs", "mixedFillDelayMs", "aiMode"] as const;
+const KEYS = ["fillMode", "simFillMs", "mixedFillDelayMs", "aiMode", "checkinMs"] as const;
 const Body = z.object({
   fillMode: z.enum(["simulated", "mixed", "live"]).optional(),
   simFillMs: z.number().int().min(0).max(120_000).optional(),
   mixedFillDelayMs: z.number().int().min(0).max(120_000).optional(),
   aiMode: z.enum(["cache", "live"]).optional(),
+  /** how long a Companion waits for its person at each check-in (0 = no check-ins) */
+  checkinMs: z.number().int().min(0).max(120_000).optional(),
 });
 
 export const dynamic = "force-dynamic";

@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\":\"Ekansh is chill and prefers low-key, relaxed hangouts. They tend to socialize around shared interests like anime, trivia, AI, volunteering, and EDM, keeping conversation easygoing and friendly.\",\"depth\":{\"live-f795f6e3:likes[0]\":\"Studio Ghibli interest connects to being in Bay Area Anime Watch Party and liking Crunchyroll\",\"live-f795f6e3:likes[3]\":\"Jeopardy! interest aligns with Geeks Who Drink and Peninsula Trivia Teams\",\"live-f795f6e3:likes[4]\":\"Hugging Face interest aligns with Peninsula AI Builders group and Two Minute Papers\",\"live-f795f6e3:likes[6]\":\"Second Harvest of Silicon Valley interest connects to Peninsula Volunteers and VolunteerMatch\",\"live-f795f6e3:likes[8]\":\"Insomniac Events and Electric Daisy Carnival interest matches Fred again.. and Illenium music taste\"},\"lightsUp\":[\"live-f795f6e3:groups[0]\",\"live-f795f6e3:groups[2]\",\"live-f795f6e3:likes[8]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 727,
+    "completionTokens": 837
+  },
+  "savedAt": "2026-11-13T00:45:24.712Z"
+}

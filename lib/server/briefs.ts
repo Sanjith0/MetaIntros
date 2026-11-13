@@ -3,14 +3,18 @@ import { toJson } from "@/lib/json";
 import { briefFromGenerated, generate, isShare, sourceFacts, templateBrief, type Brief, type Generated, type QueueContext, type Share } from "@/lib/companion/brief";
 import { loadPeople, type Person } from "@/lib/profile/load";
 
-type Row = { shares: unknown; generated: unknown } | null | undefined;
+type Row = { shares: unknown; generated: unknown; told?: unknown } | null | undefined;
+
+const toldOf = (row: Row) => (Array.isArray(row?.told) ? (row!.told as unknown[]).filter((t): t is string => typeof t === "string") : []);
+/** Attach what the person has told their Companion before (only when there is something, so prompts are otherwise unchanged). */
+const withTold = (b: Brief, row: Row): Brief => (toldOf(row).length ? { ...b, told: toldOf(row) } : b);
 
 const sharesOf = (row: Row) => (row?.shares ?? {}) as Record<string, Share>;
 
 async function briefFor(p: Person, ctx: QueueContext, row: Row, useModel: boolean): Promise<Brief> {
   const shares = sharesOf(row);
-  if (row?.generated) return briefFromGenerated(p, ctx, shares, row.generated as Generated, "cache");
-  if (!useModel) return templateBrief(p, ctx, shares);
+  if (row?.generated) return withTold(briefFromGenerated(p, ctx, shares, row.generated as Generated, "cache"), row);
+  if (!useModel) return withTold(templateBrief(p, ctx, shares), row);
   const { gen, source } = await generate(p);
   // Keep model output so each person is analysed once; a fallback is not stored, so a later run can retry.
   if (source !== "fallback") {
@@ -20,7 +24,7 @@ async function briefFor(p: Person, ctx: QueueContext, row: Row, useModel: boolea
       update: { generated: toJson(gen) },
     });
   }
-  return briefFromGenerated(p, ctx, shares, gen, source);
+  return withTold(briefFromGenerated(p, ctx, shares, gen, source), row);
 }
 
 /** One person's brief (their stored share choices applied). */
@@ -46,4 +50,11 @@ export async function setShare(userId: string, factId: string, share: unknown): 
   const shares = { ...sharesOf(row), [factId]: share };
   await prisma.companionBrief.upsert({ where: { userId }, create: { userId, shares: toJson(shares) }, update: { shares: toJson(shares) } });
   return { ok: true };
+}
+
+/** Remember what a person told their Companion at a check-in (last 3 kept). Private to their Companion. */
+export async function rememberTold(userId: string, text: string) {
+  const row = await prisma.companionBrief.findUnique({ where: { userId } });
+  const told = [...toldOf(row), text].slice(-3);
+  await prisma.companionBrief.upsert({ where: { userId }, create: { userId, shares: toJson({}), told: toJson(told) }, update: { told: toJson(told) } });
 }

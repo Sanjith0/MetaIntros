@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"live-4015ac32\": {\"say\": \"If Ekansh suggested starting with a session at Peninsula Boulders then catching Warriors talk after, how would ek keep a squad of 3 moving and social together?\", \"cites\": [\"live-14e8a601:likes[0]\", \"live-14e8a601:likes[6]\"]}, \"live-eaa288e3\": {\"say\": \"If Ekansh wanted an active hangout that mixes a short run and then something chill, how would eknash balance staying active with making space for the group of 3 to connect?\", \"cites\": [\"live-14e8a601:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1813,
+    "completionTokens": 605
+  },
+  "savedAt": "2026-11-13T00:39:43.501Z"
+}
