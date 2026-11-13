@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all share Indie music, Vinyl records, Climbing, Bouldering, and Photography — so much to bond over! Expect great chat about live music and vinyl finds between climbs.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 364,
+    "completionTokens": 233
+  },
+  "savedAt": "2026-11-13T00:13:43.172Z"
+}

@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/db";
 import { fmtEventWhen } from "@/lib/format";
+import { listFriendQueues } from "./friendQueues";
+import { squadPostsFor } from "./posts";
 
 /**
  * The Notifications tab, derived from data Queue Up already keeps (no new table): squads formed, chats
  * that ended, friend requests, friendships made through Queue Up, and upcoming events you're interested in.
  */
-export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder";
+export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue" | "group_invite" | "squad_post";
 
 export interface NotificationItem {
   id: string;
@@ -22,7 +24,7 @@ export interface NotificationItem {
 const DAY = 24 * 3600_000;
 
 export async function listNotifications(userId: string, now: Date): Promise<NotificationItem[]> {
-  const [memberships, requests, friendships, rsvps] = await Promise.all([
+  const [memberships, requests, friendships, rsvps, friendQueues, groupInvites, squadPosts] = await Promise.all([
     prisma.partyMember.findMany({
       where: { userId, party: { status: { in: ["confirmed", "completed"] } } },
       include: { party: { include: { event: true, chat: { select: { id: true, archived: true, expiresAt: true } }, members: true } } },
@@ -36,6 +38,9 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       where: { userId, status: { in: ["interested", "going"] }, event: { kind: "event", startsAt: { gt: now, lt: new Date(now.getTime() + 3 * DAY) } } },
       include: { event: true },
     }),
+    listFriendQueues(userId),
+    prisma.queueGroupMember.findMany({ where: { userId, status: "invited", group: { status: { in: ["open", "queued"] } } }, include: { group: true } }),
+    squadPostsFor(userId, now),
   ]);
 
   const out: NotificationItem[] = [];
@@ -95,6 +100,40 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       text: `is coming up ${fmtEventWhen(r.event.startsAt)}.`,
       href: `/events/${r.event.id}`,
       at: new Date(Math.min(now.getTime(), r.event.startsAt.getTime() - 2 * DAY)),
+    });
+  }
+  // Friends who chose to share that they're queuing (opt-in, filtered by canSeeQueue)
+  for (const q of friendQueues) {
+    if (q.state !== "waiting") continue;
+    out.push({
+      id: `fq-${q.entryId}`,
+      kind: "friend_queue",
+      avatar: { name: q.friend.name, color: q.friend.avatarColor },
+      bold: q.friend.name,
+      text: `is ${q.label.charAt(0).toLowerCase()}${q.label.slice(1)}. Queue up too?`,
+      href: "/events#friends-queuing",
+      at: new Date(q.since),
+    });
+  }
+  // Queue together: a friend invited you into their group
+  if (groupInvites.length) {
+    const hosts = await prisma.user.findMany({ where: { id: { in: groupInvites.map((i) => i.group.hostId) } }, select: { id: true, name: true, avatarColor: true } });
+    for (const inv of groupInvites) {
+      const h = hosts.find((x) => x.id === inv.group.hostId);
+      if (!h) continue;
+      out.push({ id: `gi-${inv.id}`, kind: "group_invite", avatar: { name: h.name, color: h.avatarColor }, bold: h.name, text: "invited you to queue together. You'd be in the same squad.", href: "/queue/start", at: inv.createdAt });
+    }
+  }
+  // A squadmate posted about an outing you were on (only posts you're allowed to see)
+  for (const sp of squadPosts) {
+    out.push({
+      id: `sp-${sp.id}`,
+      kind: "squad_post",
+      avatar: { name: sp.author.name, color: sp.author.avatarColor },
+      bold: sp.author.name,
+      text: sp.kind === "story" ? `added a story from ${sp.eventTitle}.` : `posted about ${sp.eventTitle}.`,
+      href: sp.kind === "story" ? "/home" : `/home#post-${sp.id}`,
+      at: sp.createdAt,
     });
   }
   return out.sort((a, b) => b.at.getTime() - a.at.getTime());

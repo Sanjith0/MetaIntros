@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": \"You and Reza could enjoy Indie Night: Local Bands Showcase together since you both share a love for indie music and vinyl records.\"}",
+  "task": "friend_queue_why",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 135,
+    "completionTokens": 440
+  },
+  "savedAt": "2026-11-13T00:31:45.404Z"
+}

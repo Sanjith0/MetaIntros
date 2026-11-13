@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"okay wait - another vinyl + bouldering + live music person? are you my double?\"}, {\"speaker\": \"B\", \"text\": \"haha I was thinking the same! what's the last record you actually hunted down in a shop?\"}, {\"speaker\": \"A\", \"text\": \"Mitski - Puberty 2, original pressing. took forever. still buzzing from finding it\"}, {\"speaker\": \"B\", \"text\": \"no way, that's legendary. we have to swap best live sets too - and maybe bouldering beta?\"}, {\"speaker\": \"A\", \"text\": \"yes! I always bring my camera to the gym too, we can trade photo spots and holds\"}], \"sparks\": [\"Hunting for vinyl + swapping favorite live indie gigs\", \"Bouldering together and trading beta\", \"Photography - especially shooting climbing / shows\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 229,
+    "completionTokens": 620
+  },
+  "savedAt": "2026-11-13T00:10:44.905Z"
+}

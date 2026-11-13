@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Ivan! I heard you're into video games and anime too — have you been playing or watching anything good lately?\"}, {\"speaker\": \"B\", \"text\": \"Adi! Yes, I just finished an anime that felt like a full D&D campaign with JRPG battles. What about you?\"}, {\"speaker\": \"A\", \"text\": \"That sounds perfect! I've been on cozy co-op games that are great for small-group hangs, and hunting thrifted stuff that looks straight out of an anime.\"}, {\"speaker\": \"B\", \"text\": \"Wait, thrifting anime-core pieces? That's elite. We definitely have to trade game recs and hidden gem anime when we meet!\"}, {\"speaker\": \"A\", \"text\": \"Yes! I can bring my trying-new-food-level enthusiasm to the game list.\"}], \"sparks\": [\"Co-op video games perfect for small-group hangs\", \"Anime with video game / D&D adventure vibes\", \"Thrifting for anime-inspired finds\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 211,
+    "completionTokens": 711
+  },
+  "savedAt": "2026-11-12T23:55:09.542Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"photoIds\": [\"cmwe8vix5008sxqih5iqkatvg\"], \"caption\": \"Caught Movies on the Square: Everything Everywhere with my Queue Up squad. Loved sharing it with fellow film fans.\"}",
+  "task": "post_draft",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 266,
+    "completionTokens": 747
+  },
+  "savedAt": "2026-11-13T00:35:44.376Z"
+}

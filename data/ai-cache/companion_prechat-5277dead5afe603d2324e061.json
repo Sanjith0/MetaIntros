@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Hey Ethan! San here — heard you're into startups too, what's the latest rabbit hole you've fallen into?\"}, {\"speaker\": \"B\", \"text\": \"Haha hey San! Currently obsessing over product design for a hackathon project — trying to make it not look like every other startup pitch deck.\"}, {\"speaker\": \"A\", \"text\": \"Love that. I usually unplug from startup brain by climbing or cycling, but I get the design struggle from watching way too many films.\"}, {\"speaker\": \"B\", \"text\": \"Oh perfect trade then — you bring the film recs for deck inspo, I bring the actually good coffee and we brainstorm startups? Just not at 7am haha.\"}, {\"speaker\": \"A\", \"text\": \"Deal. Super chill, no early alarms — just coffee and big ideas.\"}], \"sparks\": [\"Shared love for Startups\", \"Film x Product Design inspiration for hackathon pitches\", \"Coffee-fueled brainstorming as a chill hang\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 200,
+    "completionTokens": 752
+  },
+  "savedAt": "2026-11-13T00:37:08.262Z"
+}

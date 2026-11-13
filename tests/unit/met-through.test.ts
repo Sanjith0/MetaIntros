@@ -25,7 +25,7 @@ describe("Met through Queue Up", () => {
     await wait(300);
     await tickAndAccept();
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: true } });
-    await fastForward("p01");
+    await fastForward();
     expect((await getBadges("p01")).friends).toBe(0);
     const mates = party.members.filter((m) => m.userId !== "p01").map((m) => m.userId);
     for (const m of mates) await sendSquadRequest("p01", m, party.id);

@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"sp-game-cafe\", \"title\": \"Board Game Quest at The Dice Box\", \"plan\": \"Meet at The Dice Box at 1pm Saturday for board games and co-op fun with fellow anime and gaming fans.\", \"reasons\": [\"Hits top squad interests: Video games (4/4), Anime (4/4), D&D (3/4)\", \"Board games make chatting easy for strangers to team up\"]}",
+  "task": "hangout_planner",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 476,
+    "completionTokens": 442
+  },
+  "savedAt": "2026-11-12T23:54:58.067Z"
+}

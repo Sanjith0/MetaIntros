@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Okay so we both cycle — are you road, gravel, or just 'wherever the coffee is' type?\"}, {\"speaker\": \"B\", \"text\": \"Haha definitely coffee-driven cycling. Though I do long rides to train for marathons, so road mostly.\"}, {\"speaker\": \"A\", \"text\": \"Nice, endurance crew. I trade bike legs for climbing days — totally different pain, same vibe.\"}, {\"speaker\": \"B\", \"text\": \"Oh I love that trade. And when I'm not moving, I'm at hackathons doing product design — you into AI stuff too?\"}, {\"speaker\": \"A\", \"text\": \"Yes! AI + product design + film + books — we could prototype something silly and then go ride it off.\"}], \"sparks\": [\"Coffee-driven cycling routes and road ride stories\", \"Hackathons meets AI and product design brainstorm\", \"Endurance swap: marathons vs climbing\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 200,
+    "completionTokens": 578
+  },
+  "savedAt": "2026-11-13T00:37:16.617Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Hey Ethan! I'm Adi - I see you're into product design and startups, and we both have AI on our list. Have you read any good sci-fi that actually nailed where AI is going?\"}, {\"speaker\": \"B\", \"text\": \"Hey Adi! Ethan here. Totally - just finished a bunch of talks on that at a hackathon. I'm curious, do you get more AI inspo from books or films?\"}, {\"speaker\": \"A\", \"text\": \"Both, honestly! Books for the big ideas, films for the visuals. I usually process it all while cycling or climbing - best thinking time.\"}, {\"speaker\": \"B\", \"text\": \"Love that. I'm more of a coffee shop + chess board thinker. We should trade notes - I can bring the coffee, as long as it's not an early morning meetup?\"}, {\"speaker\": \"A\", \"text\": \"Deal, no early mornings. Coffee, AI rabbit holes, and maybe you can show me your product design take on it?\"}], \"sparks\": [\"AI in books & films - from sci-fi predictions to real product design\", \"Creative thinking rituals - cycling/climbing vs coffee & chess\", \"Hackathon stories & startup ideas around AI\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 196,
+    "completionTokens": 637
+  },
+  "savedAt": "2026-11-13T00:37:14.228Z"
+}

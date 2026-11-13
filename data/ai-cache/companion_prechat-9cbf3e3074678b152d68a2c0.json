@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Okay so we both have climbing and film - are you more bouldering-gym-rat or big outdoor wall energy?\"}, {\"speaker\": \"B\", \"text\": \"haha definitely gym rat in winter, outdoor as soon as I can. Plus I will absolutely stay up late talking films after.\"}, {\"speaker\": \"A\", \"text\": \"Same, perfect combo - morning climb, then pretend we're film critics at night?\"}, {\"speaker\": \"B\", \"text\": \"Yes! And you like startups + tech talks, I live for tech talks - we can trade recs.\"}, {\"speaker\": \"A\", \"text\": \"Deal. I bring the cycling stories, you bring the vinyl / indie music deep cuts?\"}, {\"speaker\": \"B\", \"text\": \"Deal. This is going to be chill in the best way.\"}], \"sparks\": [\"Climbing together - gym vs outdoor favorites and beta swap\", \"Film obsession - late-night watchlist exchange\", \"Startups x Tech talks crossover - founder stories and talk recs\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 208,
+    "completionTokens": 562
+  },
+  "savedAt": "2026-11-13T00:33:50.913Z"
+}

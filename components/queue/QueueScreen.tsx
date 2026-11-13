@@ -26,6 +26,8 @@ interface Status {
   waitedMs?: number;
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
+  /** queue together: the people you came with */
+  together?: { id: string; name: string; avatarColor: string }[];
   searchArea?: SearchAreaView;
   partyId?: string | null;
 }
@@ -130,6 +132,11 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
             <span className="min-w-0">
               <span className="block truncate text-body font-semibold">{kind}</span>
               <span className="block text-meta text-muted">Near {status.bucketName} · squad of {n}</span>
+              {status.together && status.together.length > 0 && (
+                <span className="block text-meta font-semibold text-link" data-testid="queue-together-line">
+                  Together with {status.together.map((t) => t.name.split(" ")[0]).join(", ")}
+                </span>
+              )}
             </span>
           </div>
           {notice === "requeued" && (

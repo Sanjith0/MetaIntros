@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Hey Nate! I saw we both love anime and video games - perfect combo for a small-group hang?\"}, {\"speaker\": \"B\", \"text\": \"Yes! Adi, I'm so down. Are you more cozy co-op games or competitive trivia-battle games?\"}, {\"speaker\": \"A\", \"text\": \"Cozy co-op for sure! I just binged an anime and need a game that feels just like it. Any recs?\"}, {\"speaker\": \"B\", \"text\": \"I have like 10! We should trade - you give me anime recs, I give you game recs and we test them out.\"}, {\"speaker\": \"A\", \"text\": \"Deal. And we can make it a chill thrifting-find-snacks + game night?\"}, {\"speaker\": \"B\", \"text\": \"Perfect, low-key is my favorite way to hang.\"}], \"sparks\": [\"Trading favorite anime recommendations\", \"Co-op video games that feel like anime\", \"Cozy small-group game night idea\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 214,
+    "completionTokens": 591
+  },
+  "savedAt": "2026-11-12T23:55:06.500Z"
+}

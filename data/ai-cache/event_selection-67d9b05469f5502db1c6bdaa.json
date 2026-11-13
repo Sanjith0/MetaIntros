@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"ev-movies-square\", \"runnersUp\": [\"ev-ai-build-night\", \"ev-board-game-night\"], \"reasons\": [\"Film is a top shared interest at 3/4 vs AI/Startups at 2/4\", \"Outdoor screening is low-pressure and easy for strangers to chat before/after\"]}",
+  "task": "event_selection",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 333,
+    "completionTokens": 593
+  },
+  "savedAt": "2026-11-13T00:33:42.473Z"
+}

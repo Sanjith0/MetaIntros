@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"sp-hacker-lab\", \"title\": \"Saturday Build Night at Belle Haven\", \"plan\": \"Meet at the makerspace for a mini build-night to brainstorm AI and startup ideas together.\", \"reasons\": [\"Matches 4 top squad interests: AI, Startups, Hackathons, Tech talks\", \"Closest option at 0.9km and great for stranger conversation\"]}",
+  "task": "hangout_planner",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 469,
+    "completionTokens": 374
+  },
+  "savedAt": "2026-11-13T00:37:03.490Z"
+}

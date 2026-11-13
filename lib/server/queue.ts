@@ -15,9 +15,17 @@ import { sweepReadyChecks } from "./readyCheck";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { nowMs } from "@/lib/clock";
+import { groupmates, leaveGroup, myGroupState, startGroupQueue } from "./groups";
 import { PULSE_MIN } from "./pulse";
 
 // ───────────────────────── join / leave ─────────────────────────
+
+/** Friends' pages (Events rail, Home card, Friends tab) refresh when a visible queue changes. */
+export async function notifyFriends(userId: string) {
+  const fs = await prisma.friendship.findMany({ where: { OR: [{ userAId: userId }, { userBId: userId }] }, select: { userAId: true, userBId: true } });
+  const ids = fs.map((f) => (f.userAId === userId ? f.userBId : f.userAId));
+  if (ids.length) publish("friends", { type: "friend-queue" }, ids);
+}
 
 export interface JoinInput {
   /** "events" (default) = existing events; "hangout" = plan a new hangout (eventId must be null) */
@@ -30,6 +38,10 @@ export interface JoinInput {
   /** manual area pick */
   landmarkId?: string;
   locationSource: "gps" | "manual" | "seed";
+  /** let friends see this queue; omitted = your saved setting. Given = also remembered as your setting. */
+  visibleToFriends?: boolean;
+  /** joined from this friend's "Queue up too" */
+  viaFriendId?: string;
 }
 
 export type JoinResult =
@@ -59,11 +71,31 @@ export async function joinQueue(userId: string, input: JoinInput): Promise<JoinR
     lng = bucket.lng;
   }
 
+  // Queue together: the host of an open group queues everyone (below). Anyone else queuing leaves their group.
+  const { group } = await myGroupState(userId);
+  if (group && !(group.isHost && group.status === "open")) await leaveGroup(userId);
   await prisma.queueEntry.updateMany({ where: { userId, status: "waiting" }, data: { status: "left" } });
-  const entry = await prisma.queueEntry.create({
-    data: { userId, mode, eventId: input.eventId, targetPartySize: input.targetSize, lat: lat!, lng: lng!, bucketLandmarkId: bucket.id },
-  });
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+  // Friends' queues: opt-in. The choice on the queue setup screen is remembered as your setting.
+  const visibleToFriends = input.visibleToFriends ?? user.queueVisibility === "friends";
+  if (input.visibleToFriends !== undefined && !user.isSimulated) {
+    await prisma.user.update({ where: { id: userId }, data: { queueVisibility: visibleToFriends ? "friends" : "off", queueVisibilityAskedAt: user.queueVisibilityAskedAt ?? new Date(nowMs()) } });
+  }
+  const entry = await prisma.queueEntry.create({
+    data: {
+      userId, mode, eventId: input.eventId, targetPartySize: input.targetSize, lat: lat!, lng: lng!, bucketLandmarkId: bucket.id,
+      visibleToFriends, viaFriendId: input.viaFriendId ?? null,
+    },
+  });
+  if (!user.isSimulated) {
+    // Seeded friends waiting in this exact queue (demo) start matching now that a real person is here.
+    await prisma.queueEntry.updateMany({
+      where: { parked: true, status: "waiting", mode, eventId: input.eventId, bucketLandmarkId: bucket.id, targetPartySize: input.targetSize },
+      data: { parked: false },
+    });
+  }
+  if (group?.isHost && group.status === "open") await startGroupQueue(userId, entry.id);
+  if (visibleToFriends) await notifyFriends(userId);
   if (!user.isSimulated) {
     // Location is used only to assign a bucket; the precise fix never leaves the server.
     await prisma.user.update({ where: { id: userId }, data: { locationSource: input.locationSource, homeLat: user.homeLat ?? lat, homeLng: user.homeLng ?? lng } });
@@ -79,6 +111,8 @@ export async function leaveQueue(userId: string) {
   const entries = await prisma.queueEntry.findMany({ where: { userId, status: "waiting" } });
   for (const e of entries) cancelSim(e.id);
   await prisma.queueEntry.updateMany({ where: { userId, status: "waiting" }, data: { status: "left" } });
+  if (entries.some((e) => e.groupId)) await leaveGroup(userId);
+  if (entries.some((e) => e.visibleToFriends)) await notifyFriends(userId);
   publish("demo", { type: "queue" });
 }
 
@@ -105,6 +139,8 @@ export interface QueueStatus {
   waitedMs?: number;
   found?: number;
   foundUsers?: { id: string; name: string; avatarColor: string }[];
+  /** the people you're queuing together with (queue together) */
+  together?: { id: string; name: string; avatarColor: string }[];
   /** Where the search reaches right now, for the queue screen's search map. Counts only, never faces. */
   searchArea?: SearchArea;
   partyId?: string | null;
@@ -146,6 +182,7 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
     waitedMs: nowMs() - entry.joinedAt.getTime(),
     found: pf.found,
     foundUsers: pf.userIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean),
+    together: await groupmates(userId, entry.groupId),
     searchArea,
   };
 }
@@ -183,7 +220,8 @@ function searchAreaFor(
 // ───────────────────────── tick ─────────────────────────
 
 async function waitingItems(): Promise<QueueItem[]> {
-  const rows = await prisma.queueEntry.findMany({ where: { status: "waiting" }, include: { user: { select: { isSimulated: true } } } });
+  // parked = a seeded friend's demo entry, held until a real person joins that queue (see joinQueue)
+  const rows = await prisma.queueEntry.findMany({ where: { status: "waiting", parked: false }, include: { user: { select: { isSimulated: true } } } });
   return rows.map((r) => ({
     entryId: r.id,
     userId: r.userId,
@@ -193,6 +231,7 @@ async function waitingItems(): Promise<QueueItem[]> {
     mode: r.mode as QueueMode,
     joinedAt: r.joinedAt.getTime(),
     isSimulated: r.user.isSimulated,
+    groupId: r.groupId,
   }));
 }
 
@@ -249,7 +288,8 @@ export async function tick(): Promise<number> {
       waiting,
       people,
       landmarks,
-      { now: nowMs(), fillMode, mixedFillDelayMs },
+      // fillers never start a squad of their own: they only complete squads around real people
+      { now: nowMs(), fillMode, mixedFillDelayMs, simAnchors: false },
       (p: Proposal) => chooseCandidate(p, people),
       async (p: Proposal, c: Candidate) => {
         const r = await formParty(p, c, people);
@@ -333,10 +373,12 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
     const need = Math.max(0, entry.targetPartySize - sameSizeReal);
     if (need === 0) return [];
     const sims = await prisma.user.findMany({ where: { isSimulated: true }, select: { id: true } });
-    const people = await loadPeople(prisma, [entry.userId, ...sims.map((s) => s.id)]);
+    const mates = (await groupmates(entry.userId, (await prisma.queueEntry.findUnique({ where: { id: entryId } }))?.groupId ?? null)).map((m) => m.id);
+    const people = await loadPeople(prisma, [entry.userId, ...mates, ...sims.map((s) => s.id)]);
     const me = people.get(entry.userId)!;
+    const crew = mates.map((id) => people.get(id)).filter(Boolean) as Person[];
     const score = makePairScorer();
-    const pool = [...people.values()].filter((p) => p.isSimulated && !busy.has(p.id) && pairAllowed(me, p));
+    const pool = [...people.values()].filter((p) => p.isSimulated && !busy.has(p.id) && pairAllowed(me, p) && crew.every((c) => pairAllowed(c, p)));
     // greedy: most compatible with the joiner *and* with already-picked fillers
     const picked: Person[] = [];
     while (picked.length < need + 1 && pool.length) {
@@ -345,7 +387,8 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
       if (picked.every((p) => pairAllowed(p, next))) picked.push(next);
     }
     function fitScore(c: Person) {
-      const all = [me, ...picked];
+      // fillers must suit everyone already there: the joiner, their queue-together group, earlier picks
+      const all = [me, ...crew, ...picked];
       return Math.min(...all.map((x) => score(x, c).score)) + score(me, c).score;
     }
     return picked;

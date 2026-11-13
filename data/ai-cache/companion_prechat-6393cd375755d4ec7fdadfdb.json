@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"ok so adi's entire personality is basically vinyl records and bouldering walls - please tell me Sanjith gets it?\"}, {\"speaker\": \"B\", \"text\": \"haha Sanjith 100% gets it. He's been hunting for indie vinyl all month and lives at the bouldering gym.\"}, {\"speaker\": \"A\", \"text\": \"No way, adi just scored a rare indie pressing last week. He'll have to bring recommendations.\"}, {\"speaker\": \"B\", \"text\": \"Yes! And we can skip the crowded bar after and just talk climbing beta and photography spots instead?\"}, {\"speaker\": \"A\", \"text\": \"Perfect plan. Chill, no crowds, just good music talk. They're gonna get along.\"}], \"sparks\": [\"Hunting for rare indie vinyl records\", \"Bouldering / climbing beta and gym spots\", \"Indie music + live photography\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 238,
+    "completionTokens": 509
+  },
+  "savedAt": "2026-11-13T00:13:49.070Z"
+}

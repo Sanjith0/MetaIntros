@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You both share Photography, so you'll have plenty to capture and chat about together! Your chill vibes and overlapping Saturday availability make you a great pair for the event.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 283,
+    "completionTokens": 355
+  },
+  "savedAt": "2026-11-12T20:12:45.317Z"
+}

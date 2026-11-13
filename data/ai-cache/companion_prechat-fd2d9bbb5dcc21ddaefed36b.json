@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Okay so Adi is already hyped you both love video games - any current obsession? He's been deep in cozy co-op games lately.\"}, {\"speaker\": \"B\", \"text\": \"Elena says YES! She's between co-op games and her D&D campaign. Also low-key thrilled Adi is into anime too.\"}, {\"speaker\": \"A\", \"text\": \"Oh perfect, he's always looking for anime recs to watch while grinding. And since he's obsessed with trying new food...\"}, {\"speaker\": \"B\", \"text\": \"Wait, she is THE ramen hunter. She knows like 3 spots that would totally count as a new food adventure for him.\"}, {\"speaker\": \"A\", \"text\": \"It's settled then - small-group ramen + game swap + anime list. You two are going to get along way too well.\"}], \"sparks\": [\"Co-op video games and favorite game recs\", \"Anime watchlist swap\", \"Trying the best local ramen together\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 213,
+    "completionTokens": 579
+  },
+  "savedAt": "2026-11-12T23:55:03.264Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"sp-bayfront\", \"title\": \"Sunset Photo Walk at Bayfront Park\", \"plan\": \"Meet for a sunset bayfront walk to snap photos and chat along the trails.\", \"reasons\": [\"Both members love Photography\", \"Closest spot at 2.3km with easy conversation\"]}",
+  "task": "hangout_planner",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 453,
+    "completionTokens": 406
+  },
+  "savedAt": "2026-11-12T20:12:46.768Z"
+}

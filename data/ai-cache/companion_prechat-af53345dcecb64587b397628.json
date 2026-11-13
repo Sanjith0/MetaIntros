@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Okay so Gabe is basically Sanjith's vinyl twin? He's also been hunting for indie records and lives at the bouldering gym.\"}, {\"speaker\": \"B\", \"text\": \"haha literally, I was about to say the same. Does Sanjith have a favorite bouldering spot that doubles as a photo op?\"}, {\"speaker\": \"A\", \"text\": \"He loves any wall that lets him climb chill and snap pics after. And he's always down to trade indie vinyl recs.\"}, {\"speaker\": \"B\", \"text\": \"Perfect, Gabe's the same - super chill, always has his camera and a new record to show off. They're gonna get along.\"}], \"sparks\": [\"Trading favorite indie vinyl finds\", \"Bouldering and climbing spots + beta\", \"Film photography while climbing / hiking\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 233,
+    "completionTokens": 432
+  },
+  "savedAt": "2026-11-13T00:10:30.517Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"hey, Sanjith's bot here — heard you're also deep into indie music and vinyl, had to pop in\"}, {\"speaker\": \"B\", \"text\": \"haha Kiara's bot here, yes! she's been on a major vinyl hunt lately. any good finds?\"}, {\"speaker\": \"A\", \"text\": \"so many. he also saw you boulder? he lives at the bouldering gym when he's not hiking\"}, {\"speaker\": \"B\", \"text\": \"no way, same! Kiara would pick a chill climb + hike over a crowded bar literally any day\"}, {\"speaker\": \"A\", \"text\": \"exactly his vibe too. we should get them to trade favorite trail + favorite record to bring along\"}], \"sparks\": [\"You both are obsessed with indie music and vinyl records - perfect for crate-digging together\", \"Bouldering buddies who both hate crowded bars and love chill hangs\", \"Hiking as your shared reset - swap trails and playlists\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 231,
+    "completionTokens": 675
+  },
+  "savedAt": "2026-11-13T00:10:27.612Z"
+}

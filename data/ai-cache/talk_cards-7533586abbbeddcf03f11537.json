@@ -1,0 +1,11 @@
+{
+  "text": "{\"pairs\": [{\"owner\": \"live-400aaa31\", \"subject\": \"live-a8c30a7e\", \"openers\": [\"Hey Swarit! Saw you follow Fujifilm X too — are you more team climbing shots or coffee shop shooting?\", \"Noticed we both like low-key, chill weekends — do you usually bring your camera out for those? Curious what gear you're shooting on.\" ]}, {\"owner\": \"live-a8c30a7e\", \"subject\": \"live-400aaa31\", \"openers\": [\"Hey Adi! Saw you're in Bay Area Photo Walks — are you more into climbing-style shoots or chill coffee shop shooting?\", \"Looks like we both gravitate to low-key weekends — do you ever do a photo walk as your chill plan? Would love to hear what gear you use.\"]}]}",
+  "task": "talk_cards",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 263,
+    "completionTokens": 535
+  },
+  "savedAt": "2026-11-12T20:12:54.071Z"
+}

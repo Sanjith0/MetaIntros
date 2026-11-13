@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Hey! San here is deep into startups and films, so I'm already curious — are you pitching something at this event?\"}, {\"speaker\": \"B\", \"text\": \"Haha Aisha is! She's been living at hackathons and tech talks talking startups + AI. Are you more on the builder side or the binge-watching-startup-docs side?\"}, {\"speaker\": \"A\", \"text\": \"A bit of both — loves books and startups, so founder stories are my thing. Also climbs and cycles to clear my head after pitch brainstorms.\"}, {\"speaker\": \"B\", \"text\": \"Love that. Aisha does pickleball for the same reset. We should totally trade notes — startup war stories over coffee?\"}, {\"speaker\": \"A\", \"text\": \"Perfect. And I have a feeling your manga + my film obsessions could be a fun crossover pitch too.\"}], \"sparks\": [\"Both obsessed with Startups - perfect for swapping founder stories and hackathon ideas\", \"Visual storytelling crossover: Film (San) x Manga & AI (Aisha)\", \"Active chill connection: Climbing/Cycling x Pickleball as founder brain-breaks\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 203,
+    "completionTokens": 627
+  },
+  "savedAt": "2026-11-13T00:33:53.336Z"
+}

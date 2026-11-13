@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all click over Climbing, Film, and Tech talks, plus a solid overlap on AI and Startups! You share Fri evening free and a chill vibe, so you'll have plenty to chat about.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 371,
+    "completionTokens": 248
+  },
+  "savedAt": "2026-11-13T00:36:28.918Z"
+}
