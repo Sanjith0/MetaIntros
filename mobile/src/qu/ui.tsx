@@ -4,6 +4,8 @@ import Feather from '@expo/vector-icons/Feather';
 import { router, usePathname } from 'expo-router';
 import { asset } from './api';
 import { useAppState, useMarkTabSeen, type BadgeKey } from './appstate';
+import { completesDevShortcut, DEV_TOOLS_FROM_PROFILE } from './devShortcut';
+import { openGlance } from './glanceLaunch';
 import { SvgXml } from 'react-native-svg';
 import { characterSvg, characterUri } from './character';
 import { fmtEventWhen } from './format';
@@ -121,7 +123,7 @@ export function TabBar() {
       const on = tab.key === active;
       const n = badges[tab.key] ?? 0;
       return <Pressable key={tab.key} testID={`tab-${tab.key}`} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={n ? `${tab.label}, ${n} new` : tab.label}
-        onPress={() => router.navigate(tab.href as never)} style={{ flex: 1, height: 52, alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+        onPress={() => { if (completesDevShortcut(tab.key, Date.now())) openGlance(DEV_TOOLS_FROM_PROFILE); else router.navigate(tab.href as never); }} style={{ flex: 1, height: 52, alignItems: 'center', justifyContent: 'center', gap: 2 }}>
         <View>
           {tab.icon ? <Icon name={tab.icon} size={22} color={on ? c.accent : c.muted} />
             : me ? <View testID="me-avatar" style={on ? { borderRadius: 14, borderWidth: 2, borderColor: c.accent } : undefined}><Avatar name={me.name} color={me.avatarColor} photoUrl={me.photoUrl} size={on ? 20 : 24} /></View>

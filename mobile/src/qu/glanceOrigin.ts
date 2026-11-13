@@ -28,3 +28,12 @@ export function leaveGlance() {
   // returns to Glance (a loop). dismissTo pops back to the event page already underneath, or replaces Glance with it.
   router.dismissTo((origin ? `/events/${origin.id}` : '/events') as never);
 }
+
+/** Close a Glance page that Link's Profile tab opened (Dev tools), and show Profile again. */
+export function closeGlanceToProfile() {
+  if (inLinkEmbed()) {
+    (window as unknown as EmbedWindow).ReactNativeWebView?.postMessage(JSON.stringify({ type: 'close' }));
+    return;
+  }
+  router.dismissTo('/profile' as never);
+}
