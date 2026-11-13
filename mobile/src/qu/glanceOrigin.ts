@@ -24,5 +24,7 @@ export function leaveGlance() {
     (window as unknown as EmbedWindow).ReactNativeWebView?.postMessage(JSON.stringify({ type: 'back' }));
     return;
   }
-  router.navigate((origin ? `/events/${origin.id}` : '/events') as never);
+  // dismissTo, not navigate: navigate pushes a second event page on top of Glance, whose own back arrow then
+  // returns to Glance (a loop). dismissTo pops back to the event page already underneath, or replaces Glance with it.
+  router.dismissTo((origin ? `/events/${origin.id}` : '/events') as never);
 }
