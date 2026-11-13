@@ -7,8 +7,11 @@ import { writeTrace } from "./trace";
 
 /** Generate one card per (owner, subject) pair in the party. Idempotent (upsert). */
 export async function generateTalkCards(partyId: string) {
-  const members = await prisma.partyMember.findMany({ where: { partyId }, select: { userId: true } });
+  const members = await prisma.partyMember.findMany({ where: { partyId }, select: { userId: true, groupId: true } });
   const ids = members.map((m) => m.userId);
+  // Queue with friends: no card about a friend you came with; you already know them.
+  const cameWith = new Map(members.map((m) => [m.userId, m.groupId]));
+  const together = (a: string, b: string) => cameWith.get(a) != null && cameWith.get(a) === cameWith.get(b);
   const people = await loadPeople(prisma, ids);
   const subjects = new Map<string, CardSubject>([...people.values()].map((p) => [p.id, { id: p.id, name: p.name, profile: p.profile, friends: p.friends }]));
   const friendIds = [...new Set([...people.values()].flatMap((p) => [...p.friends]))];
@@ -23,7 +26,7 @@ export async function generateTalkCards(partyId: string) {
 
   const pairs: PairInput[] = [];
   for (const a of ids) for (const b of ids) {
-    if (a === b || !subjects.has(a) || !subjects.has(b)) continue;
+    if (a === b || !subjects.has(a) || !subjects.has(b) || together(a, b)) continue;
     pairs.push({ owner: a, subject: b, subjectFirstName: subjects.get(b)!.name.split(" ")[0], claims: [...buildClaims(subjects.get(a)!, subjects.get(b)!, nameOf), ...sparkClaims(a, b)] });
   }
   const tpl = (p: PairInput) => templateOpeners(subjects.get(p.owner)!, subjects.get(p.subject)!, p.claims);

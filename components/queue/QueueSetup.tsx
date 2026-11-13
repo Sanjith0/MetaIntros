@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { CalendarDays, ChevronRight, Crosshair, Lock, MapPin, MapPinned, ShieldCheck } from "lucide-react";
-import { Button, Chip, IconCircle, ListRow } from "@/components/fb";
+import { useEffect, useState } from "react";
+import { CalendarDays, Check, ChevronDown, ChevronRight, Crosshair, Lock, MapPin, MapPinned, ShieldCheck, UserPlus } from "lucide-react";
+import { Avatar, Button, Chip, IconCircle, ListRow, cn } from "@/components/fb";
 import { DateLine } from "@/components/events/DateLine";
 
 type Mode = "events" | "hangout";
@@ -37,6 +37,8 @@ function getPosition(timeoutMs = 6000): Promise<GeolocationPosition> {
 }
 
 const ERRORS: Record<string, string> = {
+  friend_blocked: "One of the friends you picked can't be in a squad with everyone else.",
+  too_many: "Leave at least one spot open for someone new.",
   private_event: "Queue Up only works for events at public venues.",
   age: "Queue Up is for people 18 and over.",
 };
@@ -49,16 +51,23 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [share, setShare] = useState(shareDefault);
+  const [friendIds, setFriendIds] = useState<string[]>([]);
+  // At least one spot stays open for someone new, so a smaller size drops friends who no longer fit.
+  const pickSize = (n: number) => {
+    setSize(n);
+    setFriendIds((ids) => ids.slice(0, n - 2));
+  };
 
   const join = async (body: Record<string, unknown>) => {
     setBusy(true);
     setError(null);
-    const r = await fetch("/api/queue/join", {
+    const withFriends = friendIds.length > 0;
+    const r = await fetch(withFriends ? "/api/groups" : "/api/queue/join", {
       method: "POST",
-      body: JSON.stringify({ mode, eventId: mode === "events" ? event?.id ?? null : null, targetSize: size, visibleToFriends: share, ...body }),
+      body: JSON.stringify({ mode, eventId: mode === "events" ? event?.id ?? null : null, targetSize: size, visibleToFriends: share, ...body, ...(withFriends ? { friendIds } : {}) }),
     }).catch(() => null);
     const j = r ? await r.json().catch(() => ({})) : { error: "network" };
-    if (j.ok) return router.push("/queue");
+    if (j.ok) return router.push(withFriends ? `/queue/friends/${j.groupId}` : "/queue");
     setBusy(false);
     if (j.error === "too_far") setLoc({ kind: "manual", reason: "You look far from our Queue Up areas. Pick where you'll meet:" });
     else setError(ERRORS[j.error] ?? "Couldn't join the queue. Try again.");
@@ -128,7 +137,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
         <h3 id="size-label" className="text-body font-semibold">Squad size</h3>
         <div className="mt-2 flex gap-2" role="radiogroup" aria-labelledby="size-label">
           {SIZES.map((n) => (
-            <Chip key={n} on={size === n} role="radio" aria-checked={size === n} data-testid={`size-${n}`} onClick={() => setSize(n)} className="min-w-14 justify-center">
+            <Chip key={n} on={size === n} role="radio" aria-checked={size === n} data-testid={`size-${n}`} onClick={() => pickSize(n)} className="min-w-14 justify-center">
               {n} people
             </Chip>
           ))}
@@ -170,6 +179,8 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
         )}
       </section>
 
+      <FriendPicker size={size} picked={friendIds} onChange={setFriendIds} />
+
       <label className="mx-4 mt-4 flex cursor-pointer items-start gap-3" data-testid="share-with-friends">
         <span className="min-w-0 flex-1">
           <span className="block text-body font-semibold">Let friends see you&apos;re queuing</span>
@@ -190,7 +201,7 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
       <p className="mx-4 mt-3 flex items-start gap-2 rounded-card bg-wash p-3 text-meta text-muted">
         <ShieldCheck size={16} className="mt-px shrink-0 text-ink" aria-hidden />
         <span>
-          18+ only, matched within your age range{mode === "hangout" ? ", with other people planning a hangout" : ""}. Squads only meet at public places, never include anyone you&apos;ve blocked, and you can leave any time.
+          18+ only{mode === "hangout" ? ", with other people planning a hangout" : ""}. Squads only meet at public places, never include anyone you&apos;ve blocked, and you can leave any time.
         </span>
       </p>
 
@@ -203,11 +214,85 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events", var
       {loc.kind !== "manual" && (
         <div className={variant === "page" ? "sticky bottom-[calc(52px+env(safe-area-inset-bottom))] mt-4 border-t border-divider bg-surface px-4 py-3" : "px-4 pt-4 pb-1"}>
           <Button variant="primary" size="lg" block disabled={busy || loc.kind === "locating"} onClick={findSquad} data-testid="find-squad" icon={loc.kind === "locating" ? <Crosshair size={18} className="animate-spin" /> : null}>
-            {loc.kind === "locating" ? "Finding your area…" : "Find my squad"}
+            {loc.kind === "locating" ? "Finding your area…" : friendIds.length ? "Invite friends" : "Find my squad"}
           </Button>
         </div>
       )}
       {loc.kind === "manual" && <div className="h-4" />}
     </div>
+  );
+}
+
+interface QueueFriend { id: string; name: string; avatarColor: string; isSimulated: boolean; blocker: string | null }
+
+const BLOCKER: Record<string, string> = {
+  age_band: "Different age range, so you can't share a squad",
+  women_only: "Doesn't fit a women-only squad",
+  blocked: "Can't be in a squad with you",
+  busy: "Already queuing",
+  under_18: "Queue Up is 18+",
+};
+
+/**
+ * Queue with friends: an "Add friends" row that opens your friends list. Picked friends get an
+ * invite; at least one spot always stays open for someone new.
+ */
+function FriendPicker({ size, picked, onChange }: { size: number; picked: string[]; onChange: (ids: string[]) => void }) {
+  const [open, setOpen] = useState(false);
+  const [friends, setFriends] = useState<QueueFriend[] | null>(null);
+  useEffect(() => {
+    if (!open || friends) return;
+    fetch("/api/groups/friends").then((r) => r.json()).then((j) => setFriends(j.friends ?? [])).catch(() => setFriends([]));
+  }, [open, friends]);
+  const max = size - 2;
+  const names = (friends ?? []).filter((f) => picked.includes(f.id)).map((f) => f.name.split(" ")[0]);
+  const toggle = (id: string) => onChange(picked.includes(id) ? picked.filter((x) => x !== id) : picked.length < max ? [...picked, id] : picked);
+  return (
+    <section className="mt-4" aria-labelledby="friends-label" data-testid="queue-with-friends">
+      <h3 id="friends-label" className="px-4 text-body font-semibold">Queue with friends</h3>
+      <ListRow
+        onClick={() => setOpen((o) => !o)}
+        testId="add-friends"
+        leading={<IconCircle><UserPlus size={18} /></IconCircle>}
+        title={picked.length ? `With ${names.join(", ") || `${picked.length} friends`}` : "Add friends"}
+        subtitle={picked.length ? `${size - 1 - picked.length} ${size - 1 - picked.length === 1 ? "spot" : "spots"} left for new people` : "They'll get an invite. You stay together in one squad."}
+        trailing={open ? <ChevronDown size={20} className="text-muted" aria-hidden /> : <ChevronRight size={20} className="text-muted" aria-hidden />}
+      />
+      {open && (
+        <ul data-testid="friend-list" className="max-h-72 overflow-y-auto">
+          {!friends && <li className="px-4 py-2 text-meta text-muted">Loading your friends…</li>}
+          {friends?.length === 0 && <li className="px-4 py-2 text-meta text-muted">No friends to invite yet.</li>}
+          {friends?.map((f) => {
+            const on = picked.includes(f.id);
+            const full = !on && picked.length >= max;
+            return (
+              <li key={f.id}>
+                <ListRow
+                  onClick={f.blocker ? undefined : () => toggle(f.id)}
+                  disabled={Boolean(f.blocker) || full}
+                  testId={`friend-${f.id}`}
+                  data={{ picked: on, blocker: f.blocker ?? undefined }}
+                  leading={<Avatar name={f.name} color={f.avatarColor} size={40} />}
+                  title={f.name}
+                  subtitle={f.blocker ? BLOCKER[f.blocker] : full ? "Squad is full: leave a spot for someone new" : f.isSimulated ? "Sample person" : undefined}
+                  trailing={
+                    !f.blocker && (
+                      <span
+                        role="checkbox"
+                        aria-checked={on}
+                        aria-label={`Invite ${f.name}`}
+                        className={cn("flex h-6 w-6 items-center justify-center rounded-full border-2", on ? "border-accent bg-accent text-surface" : "border-divider")}
+                      >
+                        {on && <Check size={14} strokeWidth={3} aria-hidden />}
+                      </span>
+                    )
+                  }
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }

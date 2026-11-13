@@ -111,8 +111,11 @@ export async function squadConnectState(userId: string, partyId: string) {
   if (!party || !party.members.some((m) => m.userId === userId)) return null;
   const me = await subject(userId);
   const out = [];
+  // Queue with friends: the friends you came with aren't new people, so they're not listed here.
+  const myGroup = party.members.find((m) => m.userId === userId)?.groupId ?? null;
   for (const m of party.members) {
     if (m.userId === userId) continue;
+    if (myGroup && m.groupId === myGroup) continue;
     const other = await subject(m.userId);
     let state: SquadFriendState = "add";
     if (!me || !other || !friendAllowed(me, other)) state = "unavailable";

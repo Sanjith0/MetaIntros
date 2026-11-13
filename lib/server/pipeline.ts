@@ -94,6 +94,8 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
   const partyId = await prisma.$transaction(async (tx) => {
     const claimed = await tx.queueEntry.updateMany({ where: { id: { in: c.entryIds }, status: "waiting" }, data: { status: "matched", matchedAt: nowDate() } });
     if (claimed.count !== c.entryIds.length) throw new Error("entries no longer waiting");
+    // Queue with friends: remember who came together (talk cards, the AI host and Connect use it).
+    const cameWith = new Map((await tx.queueEntry.findMany({ where: { id: { in: c.entryIds } }, select: { userId: true, groupId: true } })).map((e) => [e.userId, e.groupId]));
     const party = await tx.party.create({
       data: {
         landmarkId: p.bucketId,
@@ -102,7 +104,7 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
         womenOnly: isWomenOnlyParty(members),
         cohesion: c.cohesion.score,
         status: "forming",
-        members: { create: c.userIds.map((userId) => ({ userId })) },
+        members: { create: c.userIds.map((userId) => ({ userId, groupId: cameWith.get(userId) ?? null })) },
       },
     });
     await tx.queueEntry.updateMany({ where: { id: { in: c.entryIds } }, data: { partyId: party.id } });

@@ -9,7 +9,8 @@
  * - Someone declines, or the deadline passes → the party is cancelled. Whoever declined (or never
  *   answered) leaves the queue. Every real member who did accept goes back into the queue with
  *   their original join time, so they keep their place in line, and simulated fillers are
- *   re-staged for them. A hangout planned for the squad is dropped.
+ *   re-staged for them. Friends who queued together go back together. A hangout planned for the
+ *   squad is dropped.
  */
 import { prisma } from "@/lib/db";
 import { nowMs } from "@/lib/clock";
@@ -111,8 +112,13 @@ async function dissolve(partyId: string, dropped: string[], reason: "declined" |
   });
   const drop = new Set(dropped);
   const requeue = party.members.filter((m) => !m.user.isSimulated && !drop.has(m.userId)).map((m) => m.userId);
+  // Queue with friends: friends who came with someone going back go back with them, still together
+  // (sample friends included, since they said yes on their own). A friend who passed stays out.
+  const groupsBack = new Set(party.members.filter((m) => m.groupId && requeue.includes(m.userId)).map((m) => m.groupId));
+  for (const m of party.members) if (m.groupId && groupsBack.has(m.groupId) && !drop.has(m.userId) && !requeue.includes(m.userId)) requeue.push(m.userId);
   const entries = party.queueEntries;
-  const back = entries.filter((e) => requeue.includes(e.userId)).map((e) => e.id);
+  const backEntries = entries.filter((e) => requeue.includes(e.userId));
+  const back = backEntries.map((e) => e.id);
   await prisma.$transaction([
     // Decliners and no-shows leave; simulated fillers leave too (fresh ones are staged below).
     prisma.queueEntry.updateMany({ where: { partyId, id: { notIn: back } }, data: { status: "left" } }),
@@ -121,7 +127,13 @@ async function dissolve(partyId: string, dropped: string[], reason: "declined" |
   ]);
   if (party.event?.kind === "hangout") await prisma.event.delete({ where: { id: party.event.id } }).catch(() => {});
   const { scheduleSimulatedFill, ensureTicker } = await import("./queue");
-  for (const id of back) await scheduleSimulatedFill(id).catch(() => {});
+  // One filler plan per unit: a friend group is staged once, for all of its open slots.
+  const seen = new Set<string>();
+  for (const e of backEntries) {
+    if (e.groupId && seen.has(e.groupId)) continue;
+    if (e.groupId) seen.add(e.groupId);
+    await scheduleSimulatedFill(e.id).catch(() => {});
+  }
   if (back.length) ensureTicker();
   const realIds = party.members.filter((m) => !m.user.isSimulated).map((m) => m.userId);
   publish("party", { type: "cancelled", partyId, reason }, realIds);

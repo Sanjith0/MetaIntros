@@ -8,9 +8,10 @@
  * - direct friends only, never friends of friends
  * - no mutual rule: the viewer's own setting doesn't matter
  * - a block in either direction hides it
- * - same age band only (the engine's backstop; Queue Up itself is 18+)
+ * - same match group only (all adults are one group, minors never see adults; Queue Up itself is 18+)
  * - a women-only queue is only shown to women, the people who could join it
  */
+import { matchBand } from "@/lib/domain/enums";
 import { pairAllowed, type SafetySubject } from "./safety";
 
 export interface VisibilitySubject extends SafetySubject {
@@ -22,7 +23,7 @@ export function canSeeQueue(viewer: VisibilitySubject, owner: VisibilitySubject,
   if (!areFriends) return false;
   if (owner.queueVisibility !== "friends" || !entryVisible) return false;
   if (viewer.blocked.has(owner.id) || owner.blocked.has(viewer.id)) return false;
-  if (viewer.ageBand !== owner.ageBand) return false;
+  if (matchBand(viewer.ageBand) !== matchBand(owner.ageBand)) return false;
   if (owner.womenOnlyParty && viewer.gender !== "woman") return false;
   return true;
 }
@@ -33,6 +34,6 @@ export type CantJoinReason = "women_only" | "age_band" | "blocked";
 export function canJoinFriendQueue(viewer: VisibilitySubject, owner: VisibilitySubject): { ok: true } | { ok: false; reason: CantJoinReason } {
   if (pairAllowed(viewer, owner)) return { ok: true };
   if (viewer.blocked.has(owner.id) || owner.blocked.has(viewer.id)) return { ok: false, reason: "blocked" };
-  if (viewer.ageBand !== owner.ageBand) return { ok: false, reason: "age_band" };
+  if (matchBand(viewer.ageBand) !== matchBand(owner.ageBand)) return { ok: false, reason: "age_band" };
   return { ok: false, reason: "women_only" };
 }
