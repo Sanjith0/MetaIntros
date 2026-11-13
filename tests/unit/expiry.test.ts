@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { ARCHIVE_NOTICE, fastForward, sweepExpiredChats } from "@/lib/server/expiry";
 import { postMessage } from "@/lib/server/messages";
@@ -15,7 +16,7 @@ describe("squad chat expiry", () => {
     await setSetting("simFillMs", "0");
     await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    await tick();
+    await tickAndAccept();
   });
 
   it("does not archive before 24h after the event", async () => {

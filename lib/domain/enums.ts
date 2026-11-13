@@ -39,7 +39,7 @@ export type RsvpStatus = z.infer<typeof RsvpStatus>;
 export const QueueStatus = z.enum(["waiting", "matched", "left"]);
 export type QueueStatus = z.infer<typeof QueueStatus>;
 
-export const PartyStatus = z.enum(["forming", "confirmed", "completed", "cancelled"]);
+export const PartyStatus = z.enum(["forming", "confirming", "confirmed", "completed", "cancelled"]);
 export type PartyStatus = z.infer<typeof PartyStatus>;
 
 export const TraceKind = z.enum(["tool_call", "reasoning", "decision", "safety_check"]);

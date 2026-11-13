@@ -5,7 +5,8 @@ import { seedDatabase } from "@/lib/seed/seed";
 import { advanceClockTo, getClockOffsetMs, now, setClockOffsetMs } from "@/lib/server/clock";
 import { fastForward } from "@/lib/server/expiry";
 import { postMessage } from "@/lib/server/messages";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { weekendRange } from "@/lib/server/events";
 import { createSampleLiveUser } from "@/lib/server/signup";
@@ -17,7 +18,7 @@ const close = (a: Date | number, b: Date | number, tol = 5_000) => Math.abs(new 
 async function squadFor(eventId: string, size = 4) {
   await joinQueue("p01", { eventId, targetSize: size, landmarkId: "lm-downtown-pa", locationSource: "manual" });
   await wait(300);
-  expect(await tick()).toBe(1);
+  expect(await tickAndAccept()).toBe(1);
   return prisma.party.findFirstOrThrow({ where: { status: "confirmed", eventId }, include: { event: true, chat: true, members: true } });
 }
 
@@ -70,7 +71,7 @@ describe("global clock", () => {
     await fastForward();
     await joinQueue("p01", { eventId: null, targetSize: 3, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     const second = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, orderBy: { createdAt: "desc" }, include: { event: true } });
     expect(second.event!.startsAt.getTime()).toBeGreaterThan((await now()).getTime());
     expect(await prisma.party.count({ where: { status: "cancelled" } })).toBe(0);
@@ -102,7 +103,7 @@ describe("Fast-forward from /demo always finds a squad to end", () => {
       await joinQueue(u.userId, { eventId: "ev-indie-guild", targetSize: names.length, landmarkId: "lm-downtown-pa", locationSource: "manual" });
       ids.push(u.userId);
     }
-    expect(await tick()).toBe(1);
+    expect(await tickAndAccept()).toBe(1);
     return prisma.party.findFirstOrThrow({ where: { status: "confirmed", members: { some: { userId: ids[0] } } }, include: { chat: true, event: true } });
   }
 

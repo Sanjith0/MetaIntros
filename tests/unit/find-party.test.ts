@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { arrivals, checkIn, getPartyPhoto, setPartyPhoto } from "@/lib/server/companion";
 import { subscribe } from "@/lib/server/bus";
@@ -19,7 +20,7 @@ describe("find your party", () => {
     await setSetting("simFillMs", "0");
     await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 4, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    await tick();
+    await tickAndAccept();
     const p = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: true } });
     partyId = p.id;
     mate = p.members.find((m) => m.userId !== "p01")!.userId;

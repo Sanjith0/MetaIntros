@@ -2,7 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { mockProvider } from "@/lib/ai";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { createSampleLiveUser } from "@/lib/server/signup";
 import { isSensitiveText, resolveSource, validateCard, type CardContent, type CardSubject } from "@/lib/cards/claims";
@@ -41,7 +42,7 @@ describe("talk card grounding & privacy", () => {
       await joinQueue(u.userId, { eventId: ev, targetSize: 4, landmarkId: "lm-cal-ave", locationSource: "manual" });
     }
     await wait(500);
-    await tick();
+    await tickAndAccept();
     // plus a squad that definitely contains the planted sensitive personas p03 + p06
     const party = await prisma.party.create({
       data: { landmarkId: "lm-downtown-pa", targetSize: 4, ageBand: "18-24", status: "confirmed", eventId: "ev-vinyl-swap",

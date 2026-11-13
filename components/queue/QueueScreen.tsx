@@ -12,6 +12,7 @@ import { DateLine } from "@/components/events/DateLine";
 import { TraceRow } from "@/components/trace/TraceList";
 import { fmtDuration } from "@/lib/format";
 import { SearchMap, type SearchAreaView } from "./SearchMap";
+import { nowMs } from "@/lib/clock";
 
 interface Status {
   state: "idle" | "waiting" | "matched";
@@ -33,7 +34,10 @@ interface Status {
 
 interface Party {
   id: string;
-  members: { user: { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean } }[];
+  /** "confirming" = ready check: every real member taps "I'm in" before the squad is revealed */
+  status: string;
+  acceptBy: string | null;
+  members: { acceptedAt: string | null; shared?: string[]; user: { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean } }[];
   event: { id: string; title: string; startsAt: string; venueName: string; kind?: string; description?: string; coverColor?: string; coverPattern?: string } | null;
   landmark: { name: string };
   chat: { id: string } | null;
@@ -45,26 +49,39 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
   const [status, setStatus] = useState<Status | null>(null);
   const [party, setParty] = useState<Party | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  /** A ready check fell through (someone passed, or time ran out). Who passed is never shown. */
+  const [notice, setNotice] = useState<"requeued" | "dropped" | null>(null);
   const base = useRef<{ at: number; waited: number } | null>(null);
+  const partyRef = useRef<Party | null>(null);
+  partyRef.current = party;
+  // Keep listening until the squad is revealed: the ready check changes under us.
+  const live = !party || party.status === "confirming";
 
   const refresh = useCallback(async () => {
     const s: Status | null = await fetch("/api/queue/status").then((r) => r.json()).catch(() => null);
     if (!s) return;
+    const had = partyRef.current;
+    if (had?.status === "confirming" && !(s.state === "matched" && s.partyId === had.id)) {
+      setParty(null);
+      base.current = null;
+      setNotice(s.state === "waiting" ? "requeued" : "dropped");
+    }
     setStatus(s);
     if (s.state === "waiting" && s.waitedMs != null && !base.current) base.current = { at: Date.now(), waited: s.waitedMs };
     if (s.state === "matched" && s.partyId) {
-      const p = await fetch(`/api/party/${s.partyId}`).then((r) => (r.ok ? r.json() : null));
-      if (p) setParty(p);
+      const p: Party | null = await fetch(`/api/party/${s.partyId}`).then((r) => (r.ok ? r.json() : null));
+      // "forming" = agents are still picking the event: keep showing the queue until there's something to answer.
+      if (p && p.status !== "cancelled" && p.status !== "forming") setParty(p);
     }
   }, []);
 
   useEffect(() => {
     refresh();
     const t = setInterval(() => {
-      if (!party) refresh();
+      if (live) refresh();
     }, 1200);
     return () => clearInterval(t);
-  }, [refresh, party]);
+  }, [refresh, live]);
 
   useEffect(() => {
     const t = setInterval(() => base.current && setElapsed(base.current.waited + Date.now() - base.current.at), 250);
@@ -72,9 +89,10 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
   }, []);
 
   useLiveEvents(["queue", "party"], () => {
-    if (!party) refresh();
+    if (live) refresh();
   });
 
+  if (party?.status === "confirming") return <ReadyCheck party={party} meId={meId} onChange={refresh} />;
   if (party) return <SquadFound party={party} meId={meId} />;
   if (!status)
     return (
@@ -87,6 +105,11 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
       <div data-testid="queue-idle">
         <TopBar back="/events" title="Queue Up" />
         <Section className="py-8 text-center">
+          {notice === "dropped" && (
+            <p role="status" className="mb-3 rounded-card bg-wash p-3 text-body" data-testid="ready-check-notice" data-notice="dropped">
+              That squad didn&apos;t come together, so you&apos;re out of the queue. Find a squad again whenever you like.
+            </p>
+          )}
           <p className="text-body">You&apos;re not in a queue.</p>
           <ButtonLink href="/events" className="mt-3">Browse events</ButtonLink>
         </Section>
@@ -116,6 +139,11 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
               )}
             </span>
           </div>
+          {notice === "requeued" && (
+            <p role="status" className="mt-3 rounded-card bg-wash p-3 text-body" data-testid="ready-check-notice" data-notice="requeued">
+              That squad didn&apos;t come together, so we&apos;re finding you another. You kept your place in line.
+            </p>
+          )}
           <p className="mt-4 text-center text-timer font-bold tabular-nums" data-testid="queue-timer" aria-label={`Waiting ${fmtDuration(elapsed)}`}>
             {fmtDuration(elapsed)}
           </p>
@@ -212,6 +240,100 @@ function LeaveQueue() {
     >
       Leave queue
     </Button>
+  );
+}
+
+/**
+ * Ready check: a quiet screen (the loud moment waits for the last "I'm in"). Squadmates show first
+ * name, last initial and what you share; the server leaves out photos, full names and the trace.
+ */
+function ReadyCheck({ party, meId, onChange }: { party: Party; meId: string; onChange: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const end = party.acceptBy ? new Date(party.acceptBy).getTime() : nowMs();
+  const [left, setLeft] = useState(() => end - nowMs());
+  useEffect(() => {
+    const t = setInterval(() => setLeft(end - nowMs()), 500);
+    return () => clearInterval(t);
+  }, [end]);
+  const me = party.members.find((m) => m.user.id === meId);
+  const inCount = party.members.filter((m) => m.acceptedAt).length;
+  const hangout = party.event?.kind === "hangout";
+  const answer = async (what: "accept" | "decline") => {
+    setBusy(true);
+    await fetch(`/api/party/${party.id}/${what}`, { method: "POST" }).catch(() => {});
+    if (what === "decline") {
+      window.location.href = "/events";
+      return;
+    }
+    onChange();
+    setBusy(false);
+  };
+  return (
+    <div data-testid="ready-check">
+      <TopBar back="/events" title="Your squad" />
+      <Stack>
+        <Section>
+          <h1 className="text-page font-bold">We found your squad</h1>
+          <p className="mt-1 text-body text-muted">
+            {party.event ? (hangout ? "A new hangout, just for you. " : `Going to ${party.event.title}. `) : ""}Say you&apos;re in to see who they are and open the chat.
+          </p>
+          <div className="mt-4">
+            <div className="flex items-center justify-between text-meta text-muted">
+              <span data-testid="ready-count">{inCount} of {party.members.length} in</span>
+              <span className="tabular-nums" data-testid="ready-timer" aria-label="Time left to answer">{fmtDuration(Math.max(0, left))} left</span>
+            </div>
+            {me?.acceptedAt ? (
+              <p className="mt-3 text-center text-body font-semibold" data-testid="waiting-on">
+                You&apos;re in. Waiting on {party.members.length - inCount} more.
+              </p>
+            ) : (
+              <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+                <Button variant="primary" size="lg" block disabled={busy} onClick={() => answer("accept")} data-testid="accept-party" icon={<Check size={18} />}>
+                  I&apos;m in
+                </Button>
+                <Button size="lg" disabled={busy} onClick={() => answer("decline")} data-testid="decline-party">
+                  Not for me
+                </Button>
+              </div>
+            )}
+            <p className="mt-2 text-center text-meta text-muted">Nobody is told who said no. If this squad doesn&apos;t come together, you keep your place in line.</p>
+          </div>
+        </Section>
+        <Section title="Your squad">
+          <ul data-testid="party-members">
+            {party.members.map((m) => (
+              <li key={m.user.id} className="flex items-center gap-3 py-2" data-testid="party-member" data-accepted={m.acceptedAt ? "1" : "0"}>
+                <Avatar name={m.user.name} color={m.user.avatarColor} size={40} dim={!m.acceptedAt} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-body font-semibold">
+                    {m.user.id === meId ? "You" : m.user.name}
+                    {m.user.isSimulated && !m.user.isLive && m.user.id !== meId && <span className="ml-1.5 text-[11px] font-normal text-muted" data-testid="sample-tag">Sample</span>}
+                  </span>
+                  {m.user.id !== meId && (
+                    <span className="block truncate text-meta text-muted">{m.shared?.length ? `You both like ${m.shared.join(", ")}` : "New to you"}</span>
+                  )}
+                </span>
+                {m.acceptedAt && (
+                  <span className="flex items-center gap-1 text-meta font-semibold text-positive" aria-label="In"><Check size={14} strokeWidth={3} aria-hidden /> In</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Section>
+
+        {party.event && (
+          <Section>
+            <Card testId="party-event">
+              <div className="p-3">
+                <DateLine start={new Date(party.event.startsAt)} />
+                <p className="text-title font-semibold" data-testid="party-event-title">{party.event.title}</p>
+                <p className="text-meta text-muted">{party.event.venueName}</p>
+              </div>
+            </Card>
+          </Section>
+        )}
+      </Stack>
+    </div>
   );
 }
 

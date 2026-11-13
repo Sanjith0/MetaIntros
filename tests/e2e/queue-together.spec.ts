@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
-import { resetDemo, gotoReady } from "./helpers";
+import { resetDemo, gotoReady, lockIn } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -43,7 +43,12 @@ test("queue together by code: two phones, one squad (strangers fill the rest)", 
   await expect(pal.getByTestId("queue-together-line")).toContainText("Ana");
   await expect(host.getByTestId("queue-together-line")).toContainText("Ben");
 
-  for (const p of [host, pal]) await expect(p.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  // both are real people, so both tap "I'm in"
+  for (const p of [host, pal]) {
+    await expect(p.getByTestId("ready-check")).toBeVisible({ timeout: 30_000 });
+    await p.getByTestId("accept-party").click();
+  }
+  for (const p of [host, pal]) await expect(p.getByTestId("party-found")).toBeVisible({ timeout: 15_000 });
   const a = await (await host.request.get("/api/queue/status")).json();
   const b = await (await pal.request.get("/api/queue/status")).json();
   expect(a.partyId).toBe(b.partyId);
@@ -61,5 +66,5 @@ test("invite a friend from queue setup: seeded friend accepts, group queues toge
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-downtown-pa").click();
   await expect(page.getByTestId("queue-together-line")).toBeVisible();
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page); // the invited friend is seeded and accepts on their own
 });

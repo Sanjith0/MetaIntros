@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { gotoReady, resetDemo, trackConsoleErrors } from "./helpers";
+import { gotoReady, resetDemo, trackConsoleErrors, lockIn } from "./helpers";
 
 test.setTimeout(180_000);
 
@@ -43,7 +43,9 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await expect(page.getByTestId("queue-screen")).toBeVisible();
   await expect.poll(() => page.getByTestId("player-filled").count(), { timeout: 10_000 }).toBeGreaterThanOrEqual(3);
   await shot(page, "20-queue-filling");
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("ready-check")).toBeVisible({ timeout: 30_000 });
+  await shot(page, "20b-ready-check");
+  await lockIn(page);
   await page.waitForTimeout(900);
   await shot(page, "21-squad-found");
   await page.getByTestId("trace-toggle").click();

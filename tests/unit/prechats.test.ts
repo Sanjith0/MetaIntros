@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { mockProvider } from "@/lib/ai";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { getTalkCards } from "@/lib/server/talkCards";
 
@@ -25,7 +26,7 @@ describe("companion pre-chats", () => {
     });
     await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 5, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    await tick();
+    await tickAndAccept();
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: { include: { user: true } } } });
     const rows = await prisma.preChat.findMany({ where: { partyId: party.id } });
     expect(rows).toHaveLength((5 * 4) / 2);
@@ -62,7 +63,7 @@ describe("companion pre-chats", () => {
     mockProvider().on("companion_prechat", () => JSON.stringify({ transcript: [{ speaker: "A", text: "Do you go to church?" }, { speaker: "B", text: "Yes" }], sparks: ["same church"] }));
     await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 3, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    await tick();
+    await tickAndAccept();
     const rows = await prisma.preChat.findMany();
     expect(JSON.stringify(rows.map((r) => r.transcript))).not.toMatch(/church/i);
   });

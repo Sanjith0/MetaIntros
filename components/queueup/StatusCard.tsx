@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CalendarDays, Hourglass, Images, MapPin, UserPlus } from "lucide-react";
+import { CalendarDays, Check, Hourglass, Images, MapPin, UserPlus } from "lucide-react";
 import { ButtonLink, FacePile, IconCircle } from "@/components/fb";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { fmtDuration, fmtEventWhen } from "@/lib/format";
@@ -41,6 +41,21 @@ export function StatusCard({ card }: { card: Card }) {
         </div>
         <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-control" role="progressbar" aria-valuemin={0} aria-valuemax={card.targetSize} aria-valuenow={card.found} aria-label="Squad found so far">
           <div className="h-full rounded-full bg-accent transition-[width] duration-300" style={{ width: `${pct}%` }} />
+        </div>
+        <ButtonLink href={card.action.href} variant="primary" block className="mt-3" data-testid="status-action">{card.action.label}</ButtonLink>
+      </section>
+    );
+  }
+
+  if (card.state === "accept") {
+    return (
+      <section data-testid="status-card" data-status="accept" className="bg-surface px-4 py-3">
+        <div className="flex items-center gap-3">
+          <IconCircle tone="on" size={40}><Check size={20} /></IconCircle>
+          <div className="min-w-0 flex-1">
+            <p className="text-body font-semibold">{card.accepted ? "You're in" : "We found your squad"}</p>
+            <p className="truncate text-meta text-muted">{card.title} · {card.inCount} of {card.size} in</p>
+          </div>
         </div>
         <ButtonLink href={card.action.href} variant="primary" block className="mt-3" data-testid="status-action">{card.action.label}</ButtonLink>
       </section>

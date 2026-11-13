@@ -20,6 +20,18 @@ export type StatusCard =
       action: { label: string; href: string };
     }
   | {
+      /** Ready check: a squad was found and is waiting on "I'm in" */
+      state: "accept";
+      partyId: string;
+      eventId: string;
+      title: string;
+      accepted: boolean;
+      inCount: number;
+      size: number;
+      acceptBy: string;
+      action: { label: string; href: string };
+    }
+  | {
       state: "ready" | "venue" | "after";
       partyId: string;
       eventId: string;
@@ -66,6 +78,24 @@ export async function getStatusCard(userId: string, now: Date, eventId?: string)
       faces: q.foundUsers ?? [],
       action: { label: "View queue", href: "/queue" },
     };
+  }
+
+  if (q.state === "matched" && q.partyId) {
+    const p = await prisma.party.findUnique({ where: { id: q.partyId }, include: { event: { select: { id: true, title: true } }, members: { select: { userId: true, acceptedAt: true } } } });
+    if (p?.status === "confirming" && p.event && p.acceptBy && (!eventId || p.event.id === eventId)) {
+      const accepted = Boolean(p.members.find((m) => m.userId === userId)?.acceptedAt);
+      return {
+        state: "accept",
+        partyId: p.id,
+        eventId: p.event.id,
+        title: p.event.title,
+        accepted,
+        inCount: p.members.filter((m) => m.acceptedAt).length,
+        size: p.members.length,
+        acceptBy: p.acceptBy.toISOString(),
+        action: { label: accepted ? "View squad" : "Are you in?", href: "/queue" },
+      };
+    }
   }
 
   const ms = await prisma.partyMember.findMany({

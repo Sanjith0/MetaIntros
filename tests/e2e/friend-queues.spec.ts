@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo, gotoReady } from "./helpers";
+import { resetDemo, gotoReady, lockIn } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -53,6 +53,6 @@ test("join a friend's queue: see their status, Join → same group, land in thei
   await sheet.getByTestId("join-friend-squad").click();
   await expect(page.getByTestId("queue-screen")).toBeVisible();
   await expect(page.getByTestId("queue-together-line")).toContainText("Reza");
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page); // Reza is a seeded friend, so only Jordan taps "I'm in"
   await expect(page.getByTestId("party-members")).toContainText("Reza");
 });

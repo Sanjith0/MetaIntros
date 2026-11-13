@@ -8,15 +8,13 @@ import { validateParty, isWomenOnlyParty } from "@/lib/match/safety";
 import { rankEvents, type GroupContext } from "@/lib/match/eventFit";
 import type { Person } from "@/lib/profile/load";
 import { dislikeTags } from "@/lib/profile/builder";
-import { publish } from "./bus";
 import { now as clockNow } from "./clock";
 import { weekendRange } from "./events";
 import { writeTrace, type TraceStep } from "./trace";
 import { partyFormationAgent, templateRationale } from "@/lib/agents/partyFormation";
 import { eventSelectionAgent } from "@/lib/agents/eventSelection";
-import { afterPartyConfirmed } from "./hooks";
+import { startReadyCheck } from "./readyCheck";
 import { planHangout } from "./hangout";
-import { markGroupsMatched } from "./groups";
 import { nowDate } from "@/lib/clock";
 
 const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
@@ -141,11 +139,7 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
     ]);
     return { partyId: null, reason: "no_event" };
   }
-  await prisma.party.update({ where: { id: partyId }, data: { eventId: event.id, status: "confirmed" } });
-  await markGroupsMatched(partyId);
-  await afterPartyConfirmed(partyId);
-  publish("party", { type: "formed", partyId, eventId: event.id }, c.userIds);
-  publish("badges", {}, c.userIds);
-  publish("demo", { type: "party", partyId });
+  // Ready check: real members tap "I'm in" before the squad is revealed and the chat opens (readyCheck.ts).
+  await startReadyCheck(partyId, event.id);
   return { partyId };
 }

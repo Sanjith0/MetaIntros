@@ -33,3 +33,10 @@ export async function reloadReady(page: Page) {
   await page.reload();
   await page.waitForFunction(isReady);
 }
+
+/** Ready check: tap "I'm in" on the squad you were matched with and wait for the reveal. */
+export async function lockIn(page: Page, timeout = 30_000) {
+  await expect(page.getByTestId("ready-check")).toBeVisible({ timeout });
+  await page.getByTestId("accept-party").click();
+  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+}

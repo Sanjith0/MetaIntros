@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { createSampleLiveUser } from "@/lib/server/signup";
 import { fastForward } from "@/lib/server/expiry";
@@ -24,7 +25,7 @@ describe("mutual opt-in friending", () => {
     live = (await createSampleLiveUser(prisma, { name: "Kim Live", ageBand: "18-24", gender: null, womenOnlyParty: false })).userId;
     await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 2, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await joinQueue(live, { eventId: "ev-indie-guild", targetSize: 2, landmarkId: "lm-downtown-pa", locationSource: "manual" });
-    await tick();
+    await tickAndAccept();
     partyId = (await prisma.party.findFirstOrThrow({ where: { status: "confirmed" } })).id;
   });
 
@@ -70,7 +71,7 @@ describe("simulated squadmates (demo)", () => {
     await setSetting("simAcceptMs", "0");
     await joinQueue("p01", { eventId: "ev-indie-guild", targetSize: 3, landmarkId: "lm-downtown-pa", locationSource: "manual" });
     await wait(300);
-    await tick();
+    await tickAndAccept();
     const party = await prisma.party.findFirstOrThrow({ where: { status: "confirmed" }, include: { members: true } });
     await fastForward();
     const sim = party.members.find((m) => m.userId !== "p01")!.userId;

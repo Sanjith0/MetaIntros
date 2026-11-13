@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed/seed";
-import { joinQueue, tick } from "@/lib/server/queue";
+import { joinQueue } from "@/lib/server/queue";
+import { tickAndAccept } from "../helpers/squad";
 import { setSetting } from "@/lib/server/settings";
 import { getTrace } from "@/lib/server/trace";
 import { createSampleLiveUser } from "@/lib/server/signup";
@@ -19,7 +20,7 @@ describe("agent trace", () => {
     const live = await createSampleLiveUser(prisma, { name: "Robin Live", ageBand: "18-24", gender: null, womenOnlyParty: false });
     await joinQueue(live.userId, { eventId: "ev-board-game-night", targetSize: 4, landmarkId: "lm-cal-ave", locationSource: "manual" });
     await wait(400);
-    await tick();
+    await tickAndAccept();
     const parties = await prisma.party.findMany({ where: { status: "confirmed" } });
     expect(parties.length).toBeGreaterThanOrEqual(2);
     for (const p of parties) {

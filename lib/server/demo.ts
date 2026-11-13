@@ -17,7 +17,7 @@ export async function demoStatus() {
       orderBy: { joinedAt: "asc" },
     }),
     prisma.party.findMany({
-      where: { status: { in: ["confirmed", "completed"] } },
+      where: { status: { in: ["confirming", "confirmed", "completed"] } },
       include: { members: { include: { user: { select: { name: true, isSimulated: true } } } }, event: { select: { title: true, kind: true } }, landmark: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
       take: 8,
@@ -42,7 +42,7 @@ export async function demoStatus() {
     clockOffsetMs: await getClockOffsetMs(),
     liveUsers,
     buckets,
-    parties: parties.map((p) => ({ id: p.id, status: p.status, event: p.event?.title ?? null, hangout: p.event?.kind === "hangout", area: p.landmark.name, size: p.members.length, real: p.members.filter((m) => !m.user.isSimulated).length, cohesion: p.cohesion })),
+    parties: parties.map((p) => ({ id: p.id, status: p.status, event: p.event?.title ?? null, hangout: p.event?.kind === "hangout", area: p.landmark.name, size: p.members.length, real: p.members.filter((m) => !m.user.isSimulated).length, accepted: p.members.filter((m) => m.acceptedAt).length, cohesion: p.cohesion })),
     aiLog: aiLog().slice(-12),
   };
 }

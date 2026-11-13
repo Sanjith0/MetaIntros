@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoReady, resetDemo, trackConsoleErrors } from "./helpers";
+import { gotoReady, resetDemo, trackConsoleErrors, lockIn } from "./helpers";
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
 const PNG_URL = `data:image/png;base64,${PNG.toString("base64")}`;
@@ -16,7 +16,7 @@ test("squad album → AI-suggested post on Home → story; album stays squad-onl
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-downtown-pa").click();
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page);
   const status = await (await page.request.get("/api/queue/status")).json();
   const partyId: string = status.partyId;
   const party = await (await page.request.get(`/api/party/${partyId}`)).json();

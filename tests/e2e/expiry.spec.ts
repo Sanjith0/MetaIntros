@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resetDemo, gotoReady } from "./helpers";
+import { resetDemo, gotoReady, lockIn } from "./helpers";
 
 test.beforeEach(async ({ request }) => {
   await resetDemo(request);
@@ -11,7 +11,7 @@ test("fast-forward archives the squad chat: read-only + stay-in-touch prompt", a
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-rwc-courthouse").click();
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page, 30_000);
   await page.getByTestId("open-squad-chat").click();
   await expect(page.getByTestId("msg-host").first()).toBeVisible();
   await expect(page.getByTestId("composer")).toBeVisible();
@@ -31,7 +31,7 @@ test("global clock: Fast-forward ends the event for everyone; Reset & reseed kee
     await page.getByTestId("size-4").click();
     await page.getByTestId("choose-area").click();
     await page.getByTestId("area-lm-rwc-courthouse").click();
-    await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+    await lockIn(page, 30_000);
   };
   await queueForBouldering();
   await page.getByTestId("open-squad-chat").click();
@@ -67,7 +67,13 @@ test("live demo: judges squad up, presenter presses Fast-forward on /demo, the j
     expect(r.ok()).toBe(true);
   }
   await expect.poll(async () => (await (await judges[0].request.get("/api/queue/status")).json()).state, { timeout: 20_000 }).toBe("matched");
-  await gotoReady(judges[0], "/queue");
+  // both judges are real, so both tap "I'm in" on the ready check
+  for (const p of judges) {
+    await gotoReady(p, "/queue");
+    await expect(p.getByTestId("ready-check")).toBeVisible({ timeout: 20_000 });
+    await p.getByTestId("accept-party").click();
+  }
+  await expect(judges[0].getByTestId("party-found")).toBeVisible({ timeout: 15_000 });
   await judges[0].getByTestId("open-squad-chat").click();
   await expect(judges[0].getByTestId("composer")).toBeVisible();
 
@@ -88,7 +94,7 @@ test("after the event: the squad card stays and you can queue again (Events tab 
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
   await page.getByTestId("area-lm-rwc-courthouse").click();
-  await expect(page.getByTestId("party-found")).toBeVisible({ timeout: 30_000 });
+  await lockIn(page);
   await page.request.post("/api/demo/fast-forward");
 
   await gotoReady(page, "/events");
