@@ -104,7 +104,7 @@ describe("ready check (\"I'm in\")", () => {
     await declineParty("p01", party.id);
     expect(await prisma.event.findUnique({ where: { id: party.event!.id } })).toBeNull();
     expect(await prisma.queueEntry.count({ where: { partyId: party.id, status: { not: "left" } } })).toBe(0);
-    expect(await prisma.queueEntry.count({ where: { status: "waiting", parked: false } })).toBe(0); // parked = seeded friends' demo entries
+    expect(await prisma.queueEntry.count({ where: { status: "waiting" } })).toBe(0);
   });
 
   it("times out: whoever didn't answer is dropped, the ones who said yes are re-queued", async () => {
