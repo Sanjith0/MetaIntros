@@ -59,9 +59,14 @@ export default function DemoPage() {
   }, [load]);
   useLiveEvents(["demo"], load);
 
+  const [ffNote, setFfNote] = useState<string | null>(null);
   const act = async (name: string, url: string, body?: unknown) => {
     setBusy(name);
-    await fetch(url, { method: "POST", body: body ? JSON.stringify(body) : undefined });
+    const r = await fetch(url, { method: "POST", body: body ? JSON.stringify(body) : undefined }).catch(() => null);
+    if (name === "ff") {
+      const j = r ? await r.json().catch(() => ({})) : {};
+      setFfNote(j.ok ? `Ended ${j.eventTitle} for ${j.squads} squad${j.squads === 1 ? "" : "s"}. Chats are read-only; sharing and adding friends are open.` : "No active squad to end yet. Form a squad first.");
+    }
     await load();
     setBusy(null);
   };
@@ -78,7 +83,7 @@ export default function DemoPage() {
           className="flex items-center justify-center gap-1.5 rounded-card bg-surface shadow-card py-3 font-bold"><RotateCcw size={16} /> {busy === "reset" ? "Resetting…" : "Reset & reseed"}</button>
         <Link href="/events" data-testid="demo-start" className="flex items-center justify-center gap-1.5 rounded-card bg-accent text-surface py-3 font-bold"><Play size={16} /> Start as Me</Link>
         <button type="button" data-testid="demo-ff" onClick={() => act("ff", "/api/demo/fast-forward")}
-          className="flex items-center justify-center gap-1.5 rounded-card bg-surface shadow-card py-3 text-sm font-semibold"><FastForward size={16} /> Fast-forward: end event</button>
+          className="flex items-center justify-center gap-1.5 rounded-card bg-surface shadow-card py-3 text-sm font-semibold"><FastForward size={16} /> {busy === "ff" ? "Ending event…" : "Fast-forward: end event"}</button>
         <button type="button" data-testid="demo-kick" onClick={() => act("kick", "/api/demo/kick-live")}
           className="flex items-center justify-center gap-1.5 rounded-card bg-surface shadow-card py-3 text-sm font-semibold"><UserX size={16} /> Kick live users ({s?.liveUsers ?? 0})</button>
       </section>
@@ -88,6 +93,9 @@ export default function DemoPage() {
           Global clock: <b className="text-ink">{fmtClock(Date.now() + s.clockOffsetMs)}</b>
           {s.clockOffsetMs > 60_000 ? ` (fast-forwarded ${fmtOffset(s.clockOffsetMs)})` : " (real time)"} · same for every phone
         </p>
+      )}
+      {ffNote && (
+        <p role="status" className="mt-2 rounded-card bg-surface p-3 text-meta" data-testid="ff-result">{ffNote}</p>
       )}
 
       <section className="mt-5">
