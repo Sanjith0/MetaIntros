@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"ev-indie-guild\", \"runnersUp\": [\"ev-photo-walk\", \"ev-ghibli-screening\"], \"reasons\": [\"Only option hitting 4/4 Indie music + 3/4 Live music - perfect overlap\", \"Live bands give natural conversation starters vs quiet screening or class\"]}",
+  "task": "event_selection",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 391,
+    "completionTokens": 542
+  },
+  "savedAt": "2026-11-13T00:10:20.406Z"
+}

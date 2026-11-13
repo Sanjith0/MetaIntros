@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\":\"Hi San, Adi, Ava and Aisha! So excited you're matched for Movies on the Square: Everything Everywhere. We're all set for Fri, Nov 20 · 7 PM, meeting at the front entrance of Courthouse Square before we head in together. Can't wait to meet you all!\",\"icebreaker\":\"Since a few of you are into Film, what's a recent film you watched that you couldn't stop thinking about?\",\"interestTag\":\"film\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 277,
+    "completionTokens": 424
+  },
+  "savedAt": "2026-11-13T00:33:44.282Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Hey Aisha! San here — I've been hunting for cycling routes that feel straight out of a film. What kind of riding are you into?\"}, {\"speaker\": \"B\", \"text\": \"Hey San! I'm definitely a late-morning, jazz-in-my-ears, cruise-around-the-city kind of cyclist — early mornings are not my thing haha\"}, {\"speaker\": \"A\", \"text\": \"Same, chill rides > race mode for me. I saw you're into marathons too — do you get that same flow state from cycling as you do on long runs? I get it from climbing.\"}, {\"speaker\": \"B\", \"text\": \"Totally that flow! And I love your Startups + Books combo — with my hackathons + product design brain, we could nerd out for hours.\"}, {\"speaker\": \"A\", \"text\": \"Let's do it — swap cycling playlists and builder war stories when we meet?\"}], \"sparks\": [\"Shared love of chill, city cycling with a film / jazz soundtrack vibe\", \"Endurance flow: Climbing x Marathons mindset\", \"Builder overlap: Startups x Product design & Hackathons\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 203,
+    "completionTokens": 865
+  },
+  "savedAt": "2026-11-13T00:37:11.498Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all share a love for Art & museums, with awesome overlaps in climbing, farmers markets, nature & parks, and photography! You'll have plenty to chat about and explore together on Saturday.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 356,
+    "completionTokens": 291
+  },
+  "savedAt": "2026-11-13T00:27:24.762Z"
+}

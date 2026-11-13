@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Adi's been down an AI rabbit hole all week and just finished a book that totally bent his mind — are you into that kind of sci-fi brain-twister?\"}, {\"speaker\": \"B\", \"text\": \"Oh 100% — Aisha lives for that! She literally just built an AI manga generator at a hackathon, so AI + storytelling is her sweet spot.\"}, {\"speaker\": \"A\", \"text\": \"No way, that's amazing. Adi is more into films than manga but same energy — he'd love to hear how you made it work.\"}, {\"speaker\": \"B\", \"text\": \"She'd love to swap notes! She can bring the hackathon chaos, he can bring the film recs.\"}, {\"speaker\": \"A\", \"text\": \"Deal. Chill debrief, AI nerd-out, and maybe debate if cycling to a climbing gym is a legit sport.\"}], \"sparks\": [\"AI obsession - hackathons, books, and films all colliding\", \"Manga vs Film - two different ways you both love wild stories\", \"Tech talks + Startup energy meets chill curiosity\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 199,
+    "completionTokens": 757
+  },
+  "savedAt": "2026-11-13T00:33:59.610Z"
+}

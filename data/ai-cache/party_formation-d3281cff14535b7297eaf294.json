@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all have a great overlap around AI, Cycling, Hackathons and Startups, so everyone will have something to talk about. Your chill vibes and shared Friday evening window make this a super easy hang!\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 609,
+    "completionTokens": 276
+  },
+  "savedAt": "2026-11-13T00:37:01.620Z"
+}

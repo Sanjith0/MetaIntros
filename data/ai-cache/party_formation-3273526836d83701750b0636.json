@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all share a love for Indie music, Vinyl records, and Bouldering — perfect icebreakers! With your chill styles and overlap on Climbing and Hiking too, you'll click instantly.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 364,
+    "completionTokens": 255
+  },
+  "savedAt": "2026-11-13T00:10:18.574Z"
+}

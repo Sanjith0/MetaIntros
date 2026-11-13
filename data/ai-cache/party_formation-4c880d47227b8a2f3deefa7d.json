@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": 0, \"rationale\": \"You all share a love for Art & museums, plus Nature & parks and Photography are big favorites across the group! With your mix of active and chill energy, you'll have a great time exploring together on Sunday.\"}",
+  "task": "party_formation",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 353,
+    "completionTokens": 290
+  },
+  "savedAt": "2026-11-13T00:30:11.882Z"
+}

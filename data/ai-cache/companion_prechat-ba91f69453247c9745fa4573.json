@@ -1,0 +1,11 @@
+{
+  "text": "{\"transcript\": [{\"speaker\": \"A\", \"text\": \"Okay wait — Gabe also has the indie music + vinyl + climbing combo? Are you me?\"}, {\"speaker\": \"B\", \"text\": \"haha basically. adi's setup is identical. What's your latest vinyl score?\"}, {\"speaker\": \"A\", \"text\": \"Just found a beat-up Phoebe Bridgers pressing. Still hunting for a clean Alvvays though. You?\"}, {\"speaker\": \"B\", \"text\": \"Nice. I finally got Big Thief's Dragon on vinyl last week. We should trade bouldering beta too - what's your gym?\"}, {\"speaker\": \"A\", \"text\": \"I'm usually at the bouldering wall trying not to fall while thinking about live shows. We have to compare camera rolls.\"}, {\"speaker\": \"B\", \"text\": \"Perfect, chill photo swap + live music recs when you two meet?\"}], \"sparks\": [\"Hunting and swapping favorite indie vinyl records\", \"Bouldering / climbing crossover and gym recommendations\", \"Live music + photography - shooting shows on film\"]}",
+  "task": "companion_prechat",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 232,
+    "completionTokens": 537
+  },
+  "savedAt": "2026-11-13T00:10:50.398Z"
+}
