@@ -15,6 +15,7 @@ test("after the event: add squadmates → simulated members accept → Met throu
   await page.getByTestId("open-squad-chat").click();
   await expect(page.getByTestId("composer")).toBeVisible();
   await page.request.post("/api/demo/fast-forward");
+  await page.getByTestId("rate-skip").click(); // the post-event rating pop-up opens first
   await page.getByTestId("stay-in-touch").click();
 
   await expect(page.getByTestId("squad-connect")).toBeVisible();

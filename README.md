@@ -196,6 +196,7 @@ All of these are enforced **in code**, with property-based tests. An agent can p
 - **Location.** GPS is used only to pick a nearby landmark area, and the exact fix is never shared. Any GPS fix more than 15 km from every Queue Up area is ignored in favor of a manual pick.
 - **Mutual-consent friending.** A friendship exists only when both people tap *Add friend*. One-sided requests stay pending, and nobody is told if you don't add them.
 - **Expiring chats.** Squad chats auto-archive 24h after the event and become read-only.
+- **Private post-event ratings.** When a squad chat ends, each member gets a pop-up to rate the night (1–5) and, optionally, say per squadmate whether they'd squad up again. Only the rater can read their answers back. Stars tune "For you" and the event pick; "again" lifts that pair's match score; "not again" keeps the pair out of future squads (never between people who queue together). The trace says ratings were used, with no names or counts, and the agent's rationale may not mention them (`lib/match/ratings.ts`, `lib/server/ratings.ts`).
 - **Real-person transparency.** AI-host messages, AI pre-chats and AI-written openers are labeled as AI.
 
 ---

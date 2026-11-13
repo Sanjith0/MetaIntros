@@ -60,6 +60,8 @@ test("scripted demo flow end-to-end (simulated mode, ~20s queue)", async ({ page
   await request.post("/api/demo/fast-forward");
   await page.goBack();
   await expect(page.getByTestId("read-only")).toBeVisible();
+  await expect(page.getByTestId("rate-sheet")).toBeVisible(); // post-event rating pop-up
+  await page.getByTestId("rate-skip").click();
   await page.getByTestId("stay-in-touch").click();
   await expect(page.getByTestId("squad-connect")).toBeVisible();
   const adds = page.locator('[data-testid^="add-"]'); // squadmates who were already friends show "Friends"

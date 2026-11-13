@@ -75,6 +75,9 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
   await page.goBack();
   await gotoReady(page, "/chats");
   await page.locator('[data-testid^="inbox-row-"][data-type="squad"]').click();
+  await expect(page.getByTestId("rate-sheet")).toBeVisible();
+  await shot(page, "28-rate-squad");
+  await page.getByTestId("rate-skip").click();
   await expect(page.getByTestId("stay-in-touch")).toBeVisible();
   await shot(page, "28-chat-ended");
   await page.getByTestId("stay-in-touch").click();

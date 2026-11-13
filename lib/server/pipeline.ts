@@ -16,23 +16,26 @@ import { eventSelectionAgent } from "@/lib/agents/eventSelection";
 import { startReadyCheck } from "./readyCheck";
 import { planHangout } from "./hangout";
 import { nowDate } from "@/lib/clock";
+import { againPairsIn } from "@/lib/match/ratings";
+import { ratingSignals, squadTagAffinity } from "./ratings";
 
 const pending = new Map<string, { steps: TraceStep[]; rationale: string }>();
 const candKey = (c: Candidate) => [...c.entryIds].sort().join(",");
 
 /** Party Formation Agent picks among the engine's candidates (its trace is kept until the party exists). */
 export async function chooseCandidate(p: Proposal, people: Map<string, Person>): Promise<Candidate | null> {
-  const r = await partyFormationAgent(p, people);
+  const signals = await ratingSignals([...new Set(p.candidates.flatMap((c) => c.userIds))]);
+  const r = await partyFormationAgent(p, people, signals);
   pending.set(candKey(r.candidate), { steps: r.steps, rationale: r.rationale });
   return r.candidate;
 }
 
-export function groupContext(members: Person[], cand: Candidate, center: { lat: number; lng: number }): GroupContext {
+export function groupContext(members: Person[], cand: Candidate, center: { lat: number; lng: number }, ratedTags?: Map<string, number>): GroupContext {
   const tagCounts = new Map<string, number>();
   for (const m of members) for (const t of m.profile.interestTags) tagCounts.set(t.tag, (tagCounts.get(t.tag) ?? 0) + 1);
   const dislikes = new Map<string, string[]>();
   for (const m of members) for (const t of dislikeTags(m.profile)) dislikes.set(t, [...(dislikes.get(t) ?? []), m.id]);
-  return { sharedWindows: cand.cohesion.sharedWindows, tagCounts, dislikes, center, size: members.length };
+  return { sharedWindows: cand.cohesion.sharedWindows, tagCounts, dislikes, center, size: members.length, ...(ratedTags?.size ? { ratedTags } : {}) };
 }
 
 /** Deterministic event pick (fallback + validator for the Event Selection Agent). */
@@ -45,7 +48,7 @@ export async function selectEventFallback(members: Person[], cand: Candidate, la
   }
   const { end } = weekendRange(now);
   const events = await prisma.event.findMany({ where: { kind: "event", startsAt: { gt: now, lt: end } } });
-  const ranked = rankEvents(events.map((e) => ({ ...e, tags: e.tags as string[] })), groupContext(members, cand, lm), now);
+  const ranked = rankEvents(events.map((e) => ({ ...e, tags: e.tags as string[] })), groupContext(members, cand, lm, await squadTagAffinity(members.map((m) => m.id))), now);
   const ok = ranked.filter((r) => r.ok);
   if (!ok.length) return null;
   return { eventId: ok[0].eventId, runnersUp: ok.slice(1, 3).map((r) => r.eventId), reasons: ok[0].reasons };
@@ -64,7 +67,7 @@ export const agentEventChooser: EventChooser = async (members, cand, landmarkId,
   const r = await eventSelectionAgent({
     queuedEventId: cand.eventId,
     events: rows.map((e) => ({ ...e, tags: e.tags as string[] })),
-    group: groupContext(members, cand, lm),
+    group: groupContext(members, cand, lm, await squadTagAffinity(members.map((m) => m.id))),
     cand,
     now,
   });
@@ -78,6 +81,20 @@ export function setEventChooser(fn: EventChooser) {
   eventChooser = fn;
 }
 
+
+/**
+ * "Checked by code" note when post-event ratings shaped this squad. Counts only, never names:
+ * nobody can tell who rated whom from it.
+ */
+export async function ratingSteps(userIds: string[], eventPick = true): Promise<TraceStep[]> {
+  const [signals, liked] = await Promise.all([ratingSignals(userIds), squadTagAffinity(userIds)]);
+  const parts = [againPairsIn(userIds, signals) ? "who's in this squad" : null, liked.size && eventPick ? "the event pick" : null].filter(Boolean);
+  if (!parts.length) return [];
+  return [{
+    agent: "ratings", kind: "safety_check", output: { usedRatings: true },
+    summary: `Used past squad ratings for ${parts.join(" and ")}. Ratings stay private: nobody sees who rated whom.`,
+  }];
+}
 
 export type FormFailure = "unsafe" | "claim" | "no_event";
 
@@ -122,6 +139,7 @@ export async function formParty(p: Proposal, c: Candidate, people: Map<string, P
     return { agent: "party_formation", kind: "safety_check", output: { together: ids }, summary: `Kept ${names.slice(0, -1).join(", ")} and ${names[names.length - 1]} together: they queued as a group` };
   });
   if (togetherSteps.length) await writeTrace(partyId, togetherSteps);
+  await writeTrace(partyId, await ratingSteps(c.userIds, p.mode !== "hangout"));
 
   // Existing-events queue → pick a real event; hangout queue → plan a new one at common ground.
   const choice =
