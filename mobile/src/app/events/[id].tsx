@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useData } from '../../qu/hooks';
 import { Button, Cover, DateLine, ErrorNote, FacePile, Icon, IconCircle, Loading, Screen, Section, c, font, t } from '../../qu/ui';
+import { glanceNeedsBrowser, openGlance } from '../../qu/glanceLaunch';
 import { StatusCard, type StatusCardData } from '../../qu/StatusCard';
 import { ActionRow, FriendQueues, QueueEntry, type FriendQueue } from '../../qu/queueup';
 import type { Landmark } from '../../qu/QueueSetup';
@@ -50,8 +51,8 @@ export default function EventDetail() {
       : <Section testID="queue-up-private"><View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="lock" size={16} color={c.muted} /><Text style={t.meta}>Queue Up only works for events at public venues.</Text></View></Section>}
     {!hangout ? <FriendQueues queues={data.friendQueues} variant="list" nowMs={data.nowMs} eventTitle={e.title} /> : null}
     {!hangout ? <Section title="Meet people with Glance" testID="glance-join">
-      <Button icon="eye" onPress={() => router.push(glanceJoinHref(e, data.me.name) as never)} testID="glance-join-button">Join with Glance</Button>
-      <Text style={[t.meta, { marginTop: 8 }]}>See who else turned on Glance here. Your name and this event are filled in for you.</Text>
+      <Button icon="eye" onPress={() => openGlance(glanceJoinHref(e, data.me.name))} testID="glance-join-button">Join with Glance</Button>
+      <Text style={[t.meta, { marginTop: 8 }]}>See who else turned on Glance here. Your name and this event are filled in for you.{glanceNeedsBrowser ? ' Opens in a browser window so it can use your camera.' : ''}</Text>
     </Section> : null}
     <Section title="Details">
       <View style={{ flexDirection: 'row', gap: 12, paddingVertical: 6 }}>

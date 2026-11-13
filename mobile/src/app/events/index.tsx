@@ -3,6 +3,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useData } from '../../qu/hooks';
 import { Cover, DateLine, ErrorNote, Icon, Loading, Screen, Section, c, font, t } from '../../qu/ui';
+import { openGlance } from '../../qu/glanceLaunch';
 import { StatusCard, type StatusCardData } from '../../qu/StatusCard';
 import { Chip, type Landmark } from '../../qu/QueueSetup';
 import { CardActions, FriendQueues, MySquads, QueueEntry, type ActiveSquad, type FriendQueue, type PickableEvent } from '../../qu/queueup';
@@ -61,7 +62,7 @@ export default function EventsScreen() {
 
 /** Glance lives inside this app now: one quiet row on Events, beside the event page's "Join with Glance". */
 function GlanceEntry() {
-  return <Pressable testID="glance-entry" onPress={() => router.push('/glance/events' as never)} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.surface, paddingHorizontal: 16, paddingVertical: 12 }}>
+  return <Pressable testID="glance-entry" onPress={() => openGlance('/glance/events')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.surface, paddingHorizontal: 16, paddingVertical: 12 }}>
     <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: c.control, alignItems: 'center', justifyContent: 'center' }}><Icon name="eye" /></View>
     <View style={{ flex: 1 }}><Text style={t.bodyBold}>Glance</Text><Text style={t.meta}>See who turned on Glance at events you join</Text></View>
     <Icon name="chevron-right" color={c.muted} />
