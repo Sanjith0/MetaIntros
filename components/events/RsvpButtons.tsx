@@ -24,17 +24,18 @@ export function ActionRow({ eventId, initial }: { eventId: string; initial: stri
   const toast = useToast();
   useEffect(() => setReady(true), []);
   return (
+    // The three buttons may shrink and truncate, so a wider system font never pushes "…" off a 390px screen.
     <div className="flex gap-2" data-testid="rsvp" data-ready={ready}>
-      <Button className="flex-1" variant={status === "interested" ? "on" : "secondary"} aria-pressed={status === "interested"} data-testid="rsvp-interested" icon={<Star size={16} fill={status === "interested" ? "currentColor" : "none"} />} onClick={() => set("interested")}>
-        Interested
+      <Button className="min-w-0 flex-1" variant={status === "interested" ? "on" : "secondary"} aria-pressed={status === "interested"} data-testid="rsvp-interested" icon={<Star size={16} fill={status === "interested" ? "currentColor" : "none"} />} onClick={() => set("interested")}>
+        <span className="truncate">Interested</span>
       </Button>
-      <Button className="flex-1" variant={status === "going" ? "on" : "secondary"} aria-pressed={status === "going"} data-testid="rsvp-going" icon={<Check size={16} />} onClick={() => set("going")}>
-        Going
+      <Button className="min-w-0 flex-1" variant={status === "going" ? "on" : "secondary"} aria-pressed={status === "going"} data-testid="rsvp-going" icon={<Check size={16} />} onClick={() => set("going")}>
+        <span className="truncate">Going</span>
       </Button>
-      <Button className="flex-1" icon={<Mail size={16} />} onClick={() => toast("Invites are off in this prototype.")}>
-        Invite
+      <Button className="min-w-0 flex-1" icon={<Mail size={16} />} onClick={() => toast("Invites are off in this prototype.")}>
+        <span className="truncate">Invite</span>
       </Button>
-      <Button aria-label="More" className="w-9 px-0" onClick={() => toast("More options are off in this prototype.")}>
+      <Button aria-label="More" className="w-9 shrink-0 px-0" onClick={() => toast("More options are off in this prototype.")}>
         <MoreHorizontal size={18} />
       </Button>
     </div>

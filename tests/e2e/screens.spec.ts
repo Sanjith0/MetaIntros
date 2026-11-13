@@ -3,7 +3,9 @@ import { gotoReady, resetDemo, trackConsoleErrors, lockIn } from "./helpers";
 
 test.setTimeout(180_000);
 
-const DIR = process.env.SCREENS_DIR ?? "docs/screens";
+// Runs write to .screens/ (gitignored). Tracked docs/screens/ changes only on purpose, with UPDATE_SCREENS=1,
+// in a commit whose title starts with "screens:" (AGENTS.md; CI checks the title).
+const DIR = process.env.SCREENS_DIR ?? (process.env.UPDATE_SCREENS === "1" ? "docs/screens" : ".screens");
 
 async function shot(page: Page, name: string) {
   await page.waitForTimeout(450); // let entrance animations settle
@@ -23,7 +25,7 @@ test("iPhone screenshots of every screen, no console errors, no horizontal scrol
     ["/events/ev-house-show", "06-event-private"], ["/chats", "07-chats"], ["/friends", "08-friends"],
     ["/friends?tab=requests", "09-friend-requests"], ["/friends?tab=queueup", "10-met-through-empty"],
     ["/profile", "11-profile"], ["/join", "12-join"], ["/demo", "13-demo-panel"], ["/nope", "14-not-found"],
-    ["/notifications", "15-notifications"], ["/video", "16-video"],
+    ["/notifications", "15-notifications"], ["/video", "16-video"], ["/design", "33-design"],
   ] as const) {
     await gotoReady(page, url);
     await shot(page, name);

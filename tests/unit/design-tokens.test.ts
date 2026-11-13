@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -52,4 +52,75 @@ describe("design tokens (DESIGN.md)", () => {
       expect(hits).toEqual([]);
     });
   }
+});
+
+/**
+ * Ratchet (DESIGN.md "Rules for components"): rules that existing files already break in places. Today's
+ * counts per rule and file are recorded in design-baseline.json; a new violation fails, and so does a
+ * count that went down without lowering the baseline, so the numbers can only fall. After fixing one:
+ *   UPDATE_DESIGN_BASELINE=1 pnpm vitest run tests/unit/design-tokens.test.ts
+ * components/fb/ is the design system itself and is exempt, as are event covers (content).
+ */
+const BASELINE_FILE = path.join("tests", "unit", "design-baseline.json");
+const feature = ui.filter((f) => !f.startsWith(`components${path.sep}fb${path.sep}`));
+const ALLOWED_IMPORT = /^(react|react-dom|next|next\/.+|lucide-react|@\/components\/.+|@\/lib\/.+|\.{1,2}\/.+|zod|qrcode)$/;
+
+const RATCHET: { name: string; count: (src: string, file: string) => number }[] = [
+  { name: "arbitrary Tailwind value", count: (s) => matches(s, /(?<![\w[-])-?[a-z][a-z0-9-]*-\[[^\]\s]+\]/g) },
+  {
+    name: "default palette colour",
+    count: (s) =>
+      matches(s, /\b(?:bg|text|border|ring|fill|stroke|from|to|via|outline|divide|placeholder|accent|caret|decoration|shadow)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b/g) +
+      matches(s, /\b(?:bg|text|border|ring|fill|stroke|outline|divide)-(?:white|black)\b/g),
+  },
+  { name: "default text size", count: (s) => matches(s, /\btext-(?:xs|sm|base|lg|xl|[2-9]xl)\b/g) },
+  { name: "default radius", count: (s) => matches(s, /\brounded(?:-(?:t|r|b|l|s|e|tl|tr|br|bl|ss|se|es|ee))?(?:-(?:xs|sm|md|lg|xl|2xl|3xl|4xl))?(?![\w-])/g) },
+  { name: "dark: variant", count: (s) => matches(s, /\bdark:/g) },
+  {
+    name: "interface part not from components/fb",
+    count: (s, file) =>
+      code(s).filter((l) => {
+        const m = l.match(/^\s*import\s.*?from\s+["']([^"']+)["']/);
+        return m && !ALLOWED_IMPORT.test(m[1]);
+      }).length + (file.startsWith(`app${path.sep}`) ? matches(s, /<(?:button|input|select|textarea|dialog)\b/g) : 0),
+  },
+];
+
+function code(src: string) {
+  return src.split("\n").filter((l) => !/^\s*(\/\/|\/\*|\*)/.test(l));
+}
+function matches(src: string, re: RegExp) {
+  return code(src).reduce((n, l) => n + (l.match(re)?.length ?? 0), 0);
+}
+
+function currentCounts() {
+  const out: Record<string, number> = {};
+  for (const f of feature) {
+    const src = readFileSync(f, "utf8");
+    for (const r of RATCHET) {
+      const n = r.count(src, f);
+      if (n > 0) out[`${r.name} | ${f.split(path.sep).join("/")}`] = n;
+    }
+  }
+  return Object.fromEntries(Object.entries(out).sort(([a], [b]) => a.localeCompare(b)));
+}
+
+describe("design ratchet (counts can only go down)", () => {
+  const now = currentCounts();
+  if (process.env.UPDATE_DESIGN_BASELINE === "1") writeFileSync(BASELINE_FILE, `${JSON.stringify(now, null, 2)}\n`);
+  const base: Record<string, number> = existsSync(BASELINE_FILE) ? JSON.parse(readFileSync(BASELINE_FILE, "utf8")) : {};
+
+  it("adds no new violations", () => {
+    const grew = Object.entries(now)
+      .filter(([k, n]) => n > (base[k] ?? 0))
+      .map(([k, n]) => `${k}: ${base[k] ?? 0} -> ${n}. Use the tokens and components/fb parts in DESIGN.md.`);
+    expect(grew).toEqual([]);
+  });
+
+  it("baseline matches (lower it after a fix: UPDATE_DESIGN_BASELINE=1)", () => {
+    const fell = Object.entries(base)
+      .filter(([k, n]) => (now[k] ?? 0) < n)
+      .map(([k, n]) => `${k}: ${n} -> ${now[k] ?? 0}`);
+    expect(fell).toEqual([]);
+  });
 });

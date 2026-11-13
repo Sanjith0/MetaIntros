@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: pnpm test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prisma generate
+      - run: pnpm test
+      - name: Tracked screenshots change only in "screens:" commits
+        if: github.event_name == 'pull_request'
+        run: |
+          bad=$(git log --no-merges --format='%h %s' "origin/${{ github.base_ref }}..HEAD" -- docs/screens | grep -v '^[0-9a-f]* screens:' || true)
+          if [ -n "$bad" ]; then
+            echo "These commits change docs/screens/ but their titles don't start with 'screens:':"
+            echo "$bad"
+            echo "Regenerated screenshots belong in .screens/ (gitignored). See AGENTS.md."
+            exit 1
+          fi
+
+  e2e:
+    name: pnpm test:e2e (allowed to fail)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prisma generate
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 7
