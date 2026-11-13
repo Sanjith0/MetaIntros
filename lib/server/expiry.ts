@@ -33,7 +33,7 @@ export async function sweepExpiredChats(at?: Date): Promise<string[]> {
  * now (read-only + "add your squad as friends") instead of 24h later. Pressing again ends the next one, so
  * the clock never skips past an event that hasn't been wrapped up.
  */
-export async function fastForward(_userId?: string) {
+export async function fastForward() {
   const party = await prisma.party.findFirst({
     where: { status: "confirmed", event: { isNot: null } },
     orderBy: [{ event: { endsAt: "asc" } }, { createdAt: "asc" }],

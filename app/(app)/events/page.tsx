@@ -14,7 +14,7 @@ import { getStatusCard } from "@/lib/server/status";
 import { pulseLine, queuePulse } from "@/lib/server/pulse";
 import { prisma } from "@/lib/db";
 
-export default async function EventsPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+export default async function EventsPage({ searchParams }: { searchParams: Promise<{ tab?: string; queue?: string }> }) {
   const sp = await searchParams;
   const tab = (FEED_TABS.some((t) => t.id === sp.tab) ? sp.tab : "foryou") as FeedTab;
   const userId = await getCurrentUserId();
@@ -51,7 +51,11 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
           </ChipRow>
         </div>
 
-        {card ? <StatusCard card={card} /> : <QueueEntry pulse={pulseLine(pulse)} events={pickable} landmarks={landmarks} shareDefault={me.queueVisibility === "friends"} />}
+        {card && <StatusCard card={card} />}
+        {/* Before/at the event the squad card is the one thing to do; once it's over, you can queue again. */}
+        {(!card || card.state === "after") && (
+          <QueueEntry pulse={pulseLine(pulse)} events={pickable} landmarks={landmarks} shareDefault={me.queueVisibility === "friends"} again={card?.state === "after"} autoOpen={sp.queue === "1"} />
+        )}
 
         <FriendQueues queues={friendQueues} nowMs={t.getTime()} />
 

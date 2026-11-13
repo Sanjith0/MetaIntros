@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Flag, Globe, Lock, MapPin, MapPinned, Users } from "lucide-react";
 import { TopBar } from "@/components/fb/TopBar";
-import { FacePile, IconCircle, Section, Stack } from "@/components/fb";
+import { FacePile, IconCircle, Section, Stack, ButtonLink } from "@/components/fb";
 import { EventCover } from "@/components/events/EventCover";
 import { DateLine } from "@/components/events/DateLine";
 import { ActionRow } from "@/components/events/RsvpButtons";
@@ -69,7 +69,14 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
         ) : null}
 
         {card ? (
-          <StatusCard card={card} />
+          <>
+            <StatusCard card={card} />
+            {card.state === "after" && (
+              <div className="bg-surface px-4 pb-3">
+                <ButtonLink href="/events?queue=1" variant="secondary" block data-testid="find-another-squad">Find another squad</ButtonLink>
+              </div>
+            )}
+          </>
         ) : hangout ? null : e.isPublicVenue ? (
           <QueueEntry
             pulse={pulseLine(pulse)}

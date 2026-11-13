@@ -83,7 +83,7 @@ describe("squad album", () => {
     expect((await listAlbum(partyId, "p03"))!.photos[0]).toMatchObject({ shareable: false, caption: "Encore", mine: true });
 
     await setPartyPhoto(partyId, "p01", PNG); // a find-me photo, which the chat ending deletes
-    await fastForward("p01");
+    await fastForward();
     const party = await prisma.party.findUniqueOrThrow({ where: { id: partyId }, include: { chat: true, members: true } });
     expect(party.chat!.archived).toBe(true);
     expect(party.members.every((m) => m.photoUrl === null)).toBe(true);
@@ -198,7 +198,7 @@ describe("share the outing", () => {
     expect(await declineShare(partyId, "p01", await now())).toMatchObject({ ok: false, error: "not_over" });
     expect(await suggestPost(partyId, "p01", await now())).toMatchObject({ ok: false, error: "not_over" });
     expect(await shareState(partyId, "p66", await now())).toBeNull();
-    await fastForward("p01");
+    await fastForward();
     const s = await shareState(partyId, "p01", await now());
     expect(s).toMatchObject({ open: true, choice: null });
 
@@ -228,7 +228,7 @@ describe("post draft agent", () => {
     await seedDatabase(prisma, { now: new Date() });
     mockProvider().reset();
     partyId = (await makeSquad()).id;
-    await fastForward("p01");
+    await fastForward();
   });
 
   it("hostile model output is cleaned by code: bad photo ids, sensitive text and non-friends' names are stripped", async () => {
