@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CalendarDays, Crosshair, Lock, MapPin, MessageSquareText, ShieldCheck, Sparkles, Swords, Users } from "lucide-react";
 
 type Mode = "events" | "hangout";
@@ -25,7 +25,13 @@ const SIZES = [2, 3, 4, 5, 6, 7, 8];
 function getPosition(timeoutMs = 6000): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
     if (typeof navigator === "undefined" || !navigator.geolocation || !window.isSecureContext) return reject(new Error("unavailable"));
-    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: false, timeout: timeoutMs, maximumAge: 60_000 });
+    // Safari doesn't start the timeout while its permission prompt is open, so keep our own as well.
+    const t = setTimeout(() => reject(new Error("timeout")), timeoutMs + 2000);
+    navigator.geolocation.getCurrentPosition(
+      (p) => (clearTimeout(t), resolve(p)),
+      (e) => (clearTimeout(t), reject(e)),
+      { enableHighAccuracy: false, timeout: timeoutMs, maximumAge: 60_000 },
+    );
   });
 }
 
@@ -37,6 +43,11 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: P
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [tonight, setTonight] = useState("");
+  const pickerRef = useRef<HTMLElement>(null);
+  // On a phone the area list would appear below the fold: bring it into view so it's obvious what to do next.
+  useEffect(() => {
+    if (loc.kind === "manual") pickerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [loc.kind]);
 
   const join = async (body: Record<string, unknown>) => {
     setBusy(true);
@@ -120,20 +131,10 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: P
               {loc.kind === "locating" ? <><Crosshair className="animate-spin" size={22} /> Finding your area…</> : <><Swords size={22} /> Find my squad</>}
             </button>
           )}
-          <p className="mt-4 text-center text-xs text-[#c7d2fe]" data-testid="companion-note">
-            Your Companion AI will speak for you to find people you&apos;d click with.{" "}
-            <Link href="/profile" className="underline" data-testid="review-brief">Review what it can share</Link>
-          </p>
-          {loc.kind !== "manual" && (
-            <button type="button" className="mt-3 w-full text-center text-sm text-[#c7d2fe] underline" data-testid="choose-area"
-              onClick={() => setLoc({ kind: "manual", reason: "Choose your area:" })}>
-              Choose area instead
-            </button>
-          )}
-
           {loc.kind === "manual" && (
-            <section className="mt-6" data-testid="area-picker">
-              <p className="text-sm font-semibold">{loc.reason}</p>
+            <section ref={pickerRef} className="mt-6 scroll-mt-24 rounded-2xl bg-white/5 p-3 ring-1 ring-[#a855f7]/60" data-testid="area-picker">
+              <p className="flex items-center gap-1.5 text-sm font-semibold"><MapPin size={15} /> {loc.reason}</p>
+              <p className="mt-0.5 text-xs text-[#c7d2fe]">Tap the area you&apos;ll meet from to join the queue.</p>
               <ul className="mt-2 grid grid-cols-2 gap-2">
                 {landmarks.map((l) => (
                   <li key={l.id}>
@@ -150,6 +151,17 @@ export function QueueSetup({ event, landmarks, mode: initialMode = "events" }: P
               </ul>
             </section>
           )}
+          <p className="mt-4 text-center text-xs text-[#c7d2fe]" data-testid="companion-note">
+            Your Companion AI will speak for you to find people you&apos;d click with.{" "}
+            <Link href="/profile" className="underline" data-testid="review-brief">Review what it can share</Link>
+          </p>
+          {loc.kind !== "manual" && (
+            <button type="button" className="mt-3 w-full text-center text-sm text-[#c7d2fe] underline" data-testid="choose-area"
+              onClick={() => setLoc({ kind: "manual", reason: "Choose your area:" })}>
+              Choose area instead
+            </button>
+          )}
+
           {error && <p className="mt-4 rounded-lg bg-red-500/20 p-2 text-sm" data-testid="queue-error">{error}</p>}
           <p className="mt-6 flex items-start gap-1.5 text-xs text-[#c7d2fe]">
             <ShieldCheck size={14} className="mt-0.5 shrink-0" />
