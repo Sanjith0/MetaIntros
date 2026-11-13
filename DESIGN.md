@@ -4,6 +4,35 @@ Queue Up is a layer inside the Facebook mobile app's Events tab. The phone UI sh
 the Facebook app at a glance, with our feature drawn in the same materials. This file wins
 every design conflict, including conflicts with any design skill or generator.
 
+## Read this first
+
+Ten rules that settle most questions. The sections below give the detail.
+
+1. **Build from the parts.** Pages use `components/fb` and feature components built from it.
+   Every part, in every state, is live at `/design`. A new primitive needs its own `design`
+   pull request and a gallery entry (§8).
+2. **Every page is one of five templates:** tab root, detail page, bottom-sheet flow, chat
+   thread, the full-screen moment (§6). A sixth template needs a `contract-change` pull request.
+3. **One primary button per screen.** Blue is for the single next action. Everything else is
+   grey (`secondary`), `on` for a toggled state, or a link. Identical row actions repeated down
+   a list (Confirm on each friend request) count as one.
+4. **Tokens only.** Colour, type, radius and shadow come from `app/globals.css` `@theme`. No hex,
+   no arbitrary values like `w-[13px]`, no default Tailwind palette, sizes or radii, no `dark:`.
+   Covers, photos and avatars carry the colour; chrome is white and grey.
+5. **System font, sentence case.** The only capitals are the red event date line (`DateLine`).
+6. **lucide icons at the sizes in use:** 16 in buttons, 20 in rows and bars, 24 in the tab bar,
+   stroke 2 (§8).
+7. **Words come from PRODUCT.md:** squad, queue, AI host, talk cards. Buttons start with a verb.
+   Machine-written text says "AI" or "Written by AI" (§8).
+8. **390px first.** No sideways scroll, touch targets of 44px, nothing hidden under a sticky bar.
+   On desktop it is the same 448px column, centred (§8).
+9. **Honest prototype.** "Hackathon prototype, not Facebook" and `noindex` on every page. No Meta
+   logo or wordmark, no Facebook Sans, no copied icons, CSS or code, nothing that looks like a
+   Facebook login or asks for a password. Seeded data only.
+10. **This file changes only through a `contract-change` pull request** (§10). Tests hold the
+    rest: `tests/unit/design-tokens.test.ts` (with a ratchet for older code),
+    `tests/e2e/design.spec.ts`, and the `design-reviewer` subagent before any interface PR.
+
 Every value is labeled:
 
 - **[seen]** observed directly. Sources: `reference/EVENT_PAGE.md` and
@@ -138,11 +167,11 @@ only.
 | **PrototypeLabel** | "Hackathon prototype, not Facebook", 11px `muted` on `wash`, centred. |
 | **TabBar** | Fixed bottom, white, hairline top. Six equal tabs: Home, Video, Friends, Events, Notifications, Profile. Lucide icons at 24px with 11px labels. Active tab: `accent` icon and label, a 2.4 stroke and a light fill. Inactive: `muted`, 1.8 stroke. Badge: red pill, white 11px/700, 2px white ring, top-right of the icon. Hidden in chat threads. |
 | **Section** | Full-width white block, 16px padding. Optional header row: `text-title` title plus a blue "See all" link at the right. Sections stack on 8px of wash. |
-| **Button** | 36px, `rounded-btn`, 15px/600, icon 16–18px with a 6px gap. Variants: `primary` (accent/white), `secondary` (control/ink), `on` (on/link, for toggled states), `ghost` (transparent/link). `size="lg"` is 44px for sticky bottom CTAs. Press scales to .96; disabled uses `disabled` text on `control`. |
+| **Button** | 36px, `rounded-btn`, 15px/600, icon 16–18px with a 6px gap. Variants: `primary` (accent/white), `secondary` (control/ink), `on` (on/link, for toggled states), `ghost` (transparent/link), `positive` (positive/white, a confirmed state; unused today). `size="lg"` is 44px for sticky bottom CTAs. Press scales to .96; disabled uses `disabled` text on `control`. |
 | **Chip** | Pill, 32px tall, 12px padding, 15px/600. Off: `control`/ink. On: `on`/`link`. `aria-pressed` or `role=tab`. |
 | **ListRow** | Min-height 56px, 8×16 padding. Leading slot (avatar or 36px icon circle in `control`), title 15px/600 (500 when read), subtitle 13px `muted`, trailing slot. Pressed state uses the `wash` fill. An `unread` row uses the `unread` fill. |
 | **Sheet** | Bottom sheet, white, 12px top corners, `shadow-elevated`, grabber 36×4 `divider` pill, title `text-headline`, scrim `scrim`. It slides up in 250ms. Closes on scrim tap, Escape or drag handle. `role=dialog`, `aria-modal`, focus trapped. |
-| **Badge** | Red count pill (`badge`), min 18px. A `dot` variant is a 10px accent dot (unread). |
+| **Badge** | Red count pill (`badge`), min 18px, "9+" above nine. A `blue` tone (accent) counts unread messages in the chat list. A `dot` variant is a 10px accent dot (unread). |
 | **FacePile** | Overlapping 32px avatars with a 2px white ring at a -8px offset, then an optional "+N" in `muted`. |
 | **Skeleton** | `control` blocks, 8px radius, 1.2s opacity pulse (static under reduced motion). |
 | **Toast** | White, 8px radius, `shadow-elevated`, 12×16 padding, text `ink`, action in `link`. It sits above the tab bar, slides in, and dismisses after 4s. `role=status`. |
@@ -238,3 +267,139 @@ only.
 - Use raw hex in pages or feature components (covers and avatars excepted), or one-off
   shadows.
 - Add decorative motion, or motion that ignores reduced-motion settings.
+
+## 6. Page templates
+
+A new page is one of these five. Each is drawn small, with the real parts, at the bottom of
+`/design`. All share the frame: the app is one column, `max-w-md` (448px), on `wash`; sections are
+full-width white blocks with 16px side padding and 8px of wash between them; the top bar is 56px
+plus the 20px prototype label strip; the tab bar is 52px plus the safe area. A sixth template needs
+a `contract-change` pull request.
+
+| Template | Stack, top to bottom | Spacing | Model route |
+|---|---|---|---|
+| **1. Tab root** | `TopBar` (section variant: page title, Search, Messages) · optional `ChipRow` of `ChipLink` filters in a white strip · `Stack` of `Section`s (title + "See all", then rows or cards) · `TabBar` | chips row 8px vertical padding; sections `py-3 px-4`; 8px wash gaps | `/events` (also `/friends`, `/notifications`, `/video`, `/profile`) |
+| **2. Detail page** | `TopBar` (back variant, truncated title) · cover (content colour, full width) · title block (`DateLine`, `text-page` title, `text-meta` lines) · action row (equal grey `Button`s plus a 36px "…") · `Section`s · at most one primary, in its own section or sticky at the bottom (`size="lg"`) · `TabBar` | title block `px-4 py-3`; action row 8px gaps | `/events/ev-indie-guild` (also `/squad/[id]`, `/queue`) |
+| **3. Bottom-sheet flow** | the page it starts from, under `scrim` · `Sheet`: grabber, `text-headline` title with a close button, `ListRow`s or a short form, sticky primary `Button size="lg"` in the footer | rows full width; footer `px-4 pt-2` | Find a squad sheet on `/events`; setup sheet on `/events/ev-indie-guild` |
+| **4. Chat thread** | Messenger header (back, `FacePile`, name, "N members · Ends in…", info) · `PrototypeLabel` · pinned plan strip · `Bubble` runs with `SystemLine`s · quick-reply `Chip`s · `Composer`. No `TabBar` | bubbles 2px apart in a run; list `px-3` | `/chats/[id]` |
+| **5. The full-screen moment** | `TopBar` (back) · centred accent `IconCircle` with a check · `text-page` headline · one row of faces · the event `Card` · one primary · `TabBar`. Used once: squad found | centred column, 16px gaps | `/queue` when the squad is ready |
+
+## 7. Adding a page
+
+- [ ] The file goes under `app/(app)/<route>/page.tsx` (inside the shell, with tab bar and toasts)
+      unless it is a standalone page like `/join` or `/demo`.
+- [ ] It uses one template from §6 and says which in a comment at the top.
+- [ ] It imports interface parts only from `components/fb` and feature components built on them.
+- [ ] Loading: a `loading.tsx` or skeletons (`Skeleton`, `SkeletonRow`, `SkeletonCard`) in the
+      shape of the content.
+- [ ] Empty state: centred `text-body text-muted` line with one action. Error state: a section with
+      a title, one line and a grey "Try again".
+- [ ] One primary action at most.
+- [ ] The prototype label shows (it comes with `TopBar`; standalone pages render `PrototypeLabel`)
+      and the page stays `noindex` (inherited from the root layout; don't override `robots`).
+- [ ] An entry in `tests/e2e/screens.spec.ts`, and the route in `tests/e2e/design.spec.ts`.
+- [ ] Every word checked against PRODUCT.md (vocabulary, voice, sentence case).
+- [ ] `pnpm test` and `pnpm test:e2e tests/e2e/design.spec.ts` pass; the `design-reviewer`
+      subagent has seen the diff and fresh screenshots.
+
+## 8. Rules
+
+### Components
+
+- Pages and feature components import interface parts only from `components/fb`, from feature
+  components built on them (`components/events`, `components/queue`, …), and icons from
+  `lucide-react`. No UI kits. Pages don't hand-roll `<button>`, `<input>`, `<select>` or
+  `<textarea>`; they use `Button`, `Chip`, `Composer` or a feature component.
+- A new primitive goes in `components/fb` through its own pull request labelled `design`, with a
+  spec row in §3 and an entry on `/design` in every state.
+- `components/fb` is the only place allowed to define raw sizes (the 18px badge, the 52px tab).
+- The token test enforces this. Older files that break a rule are listed in
+  `tests/unit/design-baseline.json`; the counts there may only go down. Fix one, then run
+  `UPDATE_DESIGN_BASELINE=1 pnpm vitest run tests/unit/design-tokens.test.ts`.
+
+### Icons
+
+lucide-react only; never icons copied from Meta. Sizes and strokes in use today:
+
+| Size | Where | Stroke |
+|---|---|---|
+| 12 | inline with 13px text (`AiLabel`, meta lines) | 2 |
+| 14 | inline with 15px text, chips | 2 |
+| 16 | inside buttons (`icon` prop), list hints | 2 |
+| 18–20 | `IconCircle` in rows, top-bar `IconButton`s | 2; 2.4 in the top bar |
+| 24 | tab bar | 1.8 inactive; 2.4 with a 12% fill when active |
+| 28 | back chevron | 2.2 |
+| 32–48 | only inside the full-screen moment and empty states | 2–3 |
+
+Other sizes (10, 11, 22, 26 in a few files today) are listed in `docs/DESIGN_AUDIT.md`.
+
+### Wording
+
+PRODUCT.md owns the vocabulary and voice. On screen:
+
+- **Sentence case** everywhere: "Find a squad", not "Find A Squad". No capitals except `DateLine`.
+- **Buttons start with a verb:** "Find a squad", "Open squad chat", "Add friend", "Try again". Toggles
+  that name a state are the exception: "Interested", "Going", "You're here".
+- **Counts:** numerals, with the noun: "5 people", "1 friend", "3 of 5 found", "1 of 5 here". Badges
+  show 1 to 9, then "9+".
+- **Times:** event times as `fmtEventWhen` writes them ("Sat, Nov 14 · 7:30 PM"); recent times as
+  "4m", "3h", "2d"; countdowns as "Ends in 3d 5h"; ended things as "Chat ended".
+- **AI:** "AI" beside the AI host's name, "Written by AI" on generated blocks, and where an AI line
+  came from in plain words ("Template (AI unavailable)"). Simulated people say "Sample" or "Sample
+  person". Never imply a simulated person is real.
+- No exclamation marks except the one loud moment; no emoji in chrome (people's messages can have any).
+
+### Layout
+
+- **390px first** (iPhone 14 in the e2e project). No sideways scroll; only chip rows and card rows
+  scroll sideways, inside the column (`overflow-x-auto no-scrollbar`).
+- 16px side padding (`px-4`), the 4px grid, 8px of wash between sections.
+- Sticky bars (top bar, sheet footers, the chat composer) never cover content: the newest chat
+  message and the last row of a list stay visible above them.
+- **Desktop:** the same `max-w-md` column centred on `wash`. No desktop-only layouts [inferred: the
+  feature is a mobile-app surface].
+
+### Accessibility
+
+- **Contrast:** body and meta text use `ink` or `muted` (5.0:1 or better on `surface` and `wash`).
+  `link` on white is 5.6:1; white on `accent` is 4.8:1. `date` (3.6:1) and `positive` (3.3:1) on
+  white are below 4.5:1 for small text; they are [seen] Facebook values, so keep them for short
+  semibold labels only and never for sentences.
+- **Focus:** the global 2px `accent` ring with a 2px offset (`app/globals.css`). Never remove it with
+  `outline-none` unless a `focus-visible:ring-2 ring-accent` replaces it.
+- **Targets:** at least 44×44px for icon-only controls and lone tap targets; 36px buttons and chips
+  keep 8px of clear space around them.
+- **Motion:** only the motion tokens in §2, and every animation has a reduced-motion fallback (the
+  overrides in `app/globals.css`).
+- Icon-only buttons have an `aria-label`; sheets are `role=dialog` with focus trapped; toasts are
+  `role=status`; selected chips use `aria-pressed` or `aria-selected`.
+
+## 9. Fidelity
+
+Where each surface comes from, and how sure we are. `reference/` holds two write-ups of one
+logged-out capture of a public Event page. No `~/rea-captures` folder was available when this table
+was written, so inferred values stay inferred until a new capture supports a change.
+
+| Surface | Our parts | Source | Seen | Inferred |
+|---|---|---|---|---|
+| Colours, radii, shadows, type scale | `@theme` tokens | `reference/EVENT_PAGE.md` §6 | all colour tokens, 6/8/18px radii, both shadows, 13/15/17/20/24px type, system font | 12px sheet radius, 11px tab labels, 34px timer |
+| Buttons, chips, on state, hover | `Button`, `Chip` | `EVENT_PAGE.md` §4, §6 | 6px radius, accent and grey fills, `on` colours, 5% hover overlay | 36px height on mobile, pill chips on mobile |
+| Event page | detail template, `ActionRow`, `DateLine` | `EVENT_PAGE.md` §2, §3 | order of cover, date line, title, actions; date red; guest list | mobile column widths, our Queue Up unit placement |
+| Event card, Events tab | `EventCard`, tab root template | `EVENT_PAGE.md` §5 | — (discovery returned Not Found logged out) | card anatomy, filter chips, feed order |
+| Top bar, tab bar | `TopBar`, `TabBar` | Meta newsroom post on the tab bar (Dec 2025), press coverage | — | tab set and order, 56px bar (seen on web), 52px tabs |
+| Chat thread | chat template, `Bubble`, `Composer` | `reference/MESSENGER_CHAT.md` §1–3 | bubble colours, 18px radius, padding, pill colour, header button colour | mobile header layout, runs, pinned strip, quick replies |
+| Toasts, badges, unread rows | `Toast`, `Badge`, `ListRow unread` | `MESSENGER_CHAT.md` §4 | badge red, unread fill, toast radius and shadow | toast position above the tab bar |
+| Sheets | `Sheet` | none | — | everything: grabber, 12px corners, sticky footer |
+| Notifications, Friends, Profile, Video, Home | tab root template | none | tokens only | layouts, from general knowledge of the app |
+
+## 10. How this file changes
+
+- Only through a pull request labelled `contract-change` (and `design`), because every interface
+  pull request builds on it.
+- When you open it, ask every open pull request that touches `app/` or `components/`, linking it:
+  `scripts/board ask --to '#N' --read "<the DESIGN.md diff>" --default "<what happens to their
+  screens if they don't answer>" "<question>"`.
+- Change a token value only when a new capture supports it, and update its [seen]/[inferred] label
+  and source in the same pull request. Keep every honesty rule in §1 and §5.
+- Update `/design`, the tests that measure it (`tests/e2e/design.spec.ts`) and §6 together, so the
+  gallery, the tests and this file never disagree.

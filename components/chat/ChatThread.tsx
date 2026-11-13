@@ -217,7 +217,6 @@ export function ChatThread({ chat, meId, squad, rating: initialRating = null }: 
             </li>
           );
         })}
-        <div ref={bottom} />
       </ul>
 
       {archived ? (
@@ -257,6 +256,8 @@ export function ChatThread({ chat, meId, squad, rating: initialRating = null }: 
           <Composer value={draft} onChange={setDraft} onSend={() => send()} disabled={sending} />
         </div>
       )}
+      {/* After the sticky footer: scrolling here shows the newest message above it, not under it. */}
+      <div ref={bottom} />
       {rating && (
         <RateSquadSheet
           key={rating.mine ? "edit" : "new"}

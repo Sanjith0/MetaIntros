@@ -1,0 +1,768 @@
+#!/usr/bin/env bash
+# scripts/board: the message board the coding agents (and people) on this repo use to ask each
+# other questions, especially while merging. The board is GitHub itself: asks and claims are
+# issues, challenges and answers are comments. Rules: AGENTS.md (short) and docs/BOARD.md (full).
+#
+# Needs git and gh only. JSON is read with gh's built-in --jq (no jq binary). Every GitHub call is
+# REST (`gh api`), because the GitHub proxy in Claude Code cloud sessions rejects GraphQL, which is
+# what `gh issue` and `gh pr` use. If gh is missing, signed out or GitHub is unreachable, every
+# command prints one line and exits 0, so the board can never break a session.
+#
+# Written for bash 3.2 (macOS) as well as bash 5 (Linux): no associative arrays, no mapfile.
+
+set -u
+
+usage() {
+  cat <<'EOF'
+scripts/board: the agents' message board (GitHub issues and PR comments)
+
+  inbox [--new] [--throttle SEC] [--hook-json EVENT]
+        What needs you on this branch: asks to it, unanswered ASK/CHALLENGE comments on its PR,
+        answers to asks it opened, the radar summary, and shared-contract changes on origin/main.
+        --new prints only what you have not been shown (nothing at all if nothing is new).
+  radar [REF]
+        Read-only. Files REF (default: this branch) changed that an open PR, main since the merge
+        base, or an open claim also touches, plus the conflicts a merge with origin/main would hit.
+  ask --to <branch|#PR|@person> --read "<what I read and ran>" --default "<what I do if nobody
+        answers>" [--not-checked "<...>"] "<one question>"
+  answer <N> --evidence "<file:line, commit or command output>" [--not-checked "<...>"] "<text>"
+        To decline, answer with text starting "Declined:" and say why.
+  challenge <N|#PR> --evidence "<...>" [--not-checked "<...>"] "<text>"
+  escalate <N|#PR> --owner @person --mine "<5 lines max>" --theirs "<5 lines max>"
+  claim <path>... --until HH:MM --why "<text>"        (HH:MM is your local time)
+  claims                                            open, unexpired claims
+  asks                                              every open ask on the board
+  handoff                                           PR description skeleton from this branch's diff
+  stop-check                                        Stop hook: blocks once per open ask to this branch
+  help
+EOF
+}
+
+# ---------------------------------------------------------------------------------------------
+# Paths, constants
+
+HOT_FILES="prisma/schema.prisma lib/server/queue.ts components/queue/QueueScreen.tsx lib/server/host.ts lib/server/notifications.ts lib/domain/enums.ts components/queue/QueueSetup.tsx app/demo/page.tsx tests/unit/host.test.ts app/(app)/notifications/page.tsx"
+CONTRACTS="prisma/schema.prisma prisma/migrations lib/domain/enums.ts components/fb app/globals.css DESIGN.md PRODUCT.md AGENTS.md"
+MAX_OPEN_ASKS=3
+MAX_WORDS=120
+DEADLINE_SEC=600
+CACHE_TTL=120
+EMPTY_TTL=20   # GitHub's list endpoints lag a few seconds behind writes; don't trust "nothing" for long
+INBOX_MAX_LINES=25
+
+say() { printf '%s\n' "$*"; }
+err() { printf 'board: %s\n' "$*" >&2; }
+now() { date +%s; }
+
+if ! git rev-parse --git-dir >/dev/null 2>&1; then say "board: not inside a git repository; skipping."; exit 0; fi
+
+COMMON=$(git rev-parse --git-common-dir)
+case $COMMON in /*) ;; *) COMMON="$(pwd)/$COMMON" ;; esac
+STATE="$COMMON/board"
+CACHE="$STATE/cache"
+mkdir -p "$CACHE" 2>/dev/null || { say "board: cannot write $STATE; skipping."; exit 0; }
+
+BRANCH=${BOARD_BRANCH:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null)}
+BKEY=$(printf '%s' "$BRANCH" | tr '/ ' '__')
+
+repo_from_remote() {
+  # https://github.com/O/R(.git), git@github.com:O/R.git, or a cloud proxy URL ending in /O/R
+  local url name
+  url=$(git remote get-url origin 2>/dev/null) || return 1
+  url=${url%.git}; url=${url%/}; url=$(printf '%s' "$url" | tr ':' '/')
+  name=${url##*/}; url=${url%/*}
+  printf '%s/%s' "${url##*/}" "$name"
+}
+REPO=${BOARD_REPO:-$(repo_from_remote)}
+
+
+# ---------------------------------------------------------------------------------------------
+# Time (BSD date on macOS, GNU date on Linux)
+
+fmt_hm() { date -u -r "$1" +%H:%M 2>/dev/null || date -u -d "@$1" +%H:%M; }
+iso_of() { date -u -r "$1" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d "@$1" +%Y-%m-%dT%H:%M:%SZ; }
+hm_to_epoch() {
+  local t
+  case $1 in [0-9]:[0-5][0-9] | [01][0-9]:[0-5][0-9] | 2[0-3]:[0-5][0-9]) ;; *) return 1 ;; esac
+  t=$(date -j -f "%H:%M:%S" "$1:00" +%s 2>/dev/null || date -d "$1" +%s 2>/dev/null) || return 1
+  [ "$t" -le "$(now)" ] && t=$((t + 86400))
+  printf '%s' "$t"
+}
+rel() { # seconds -> "12m" / "2h05m"
+  local s=$1 sign=""
+  [ "$s" -lt 0 ] && { sign="-"; s=$((-s)); }
+  if [ "$s" -ge 3600 ]; then printf '%s%dh%02dm' "$sign" $((s / 3600)) $(((s % 3600) / 60)); else printf '%s%dm' "$sign" $((s / 60)); fi
+}
+
+# ---------------------------------------------------------------------------------------------
+# GitHub access, cached for CACHE_TTL seconds inside the git directory
+
+fresh() { # fresh <stampfile> <ttl>
+  local at
+  [ -f "$1" ] || return 1
+  at=$(cat "$1" 2>/dev/null) || return 1
+  [ -n "$at" ] && [ $(($(now) - at)) -lt "$2" ]
+}
+
+QUIET_OFF=0
+gh_ok() {
+  if ! command -v gh >/dev/null 2>&1; then
+    [ "$QUIET_OFF" = 1 ] || say "board: gh is not installed, so the board is off for this session (install GitHub CLI to use it)."
+    return 1
+  fi
+  if [ -z "$REPO" ] || [ "$REPO" = "/" ]; then
+    [ "$QUIET_OFF" = 1 ] || say "board: no GitHub origin remote found, so the board is off (set BOARD_REPO=owner/name)."
+    return 1
+  fi
+  fresh "$CACHE/ok.at" "$CACHE_TTL" && return 0
+  if gh api "repos/$REPO" --silent >/dev/null 2>&1; then now >"$CACHE/ok.at"; return 0; fi
+  [ "$QUIET_OFF" = 1 ] || say "board: gh is not signed in or GitHub is unreachable, so the board is off (run: gh auth login)."
+  return 1
+}
+
+api_get() { # api_get <path> <jq> : cached, paginated GET; stale cache is used if GitHub fails
+  local key f
+  key=$(printf '%s|%s' "$1" "$2" | cksum | tr ' ' '_')
+  f="$CACHE/$key"
+  if [ -s "$f" ] && fresh "$f.at" "$CACHE_TTL"; then cat "$f"; return 0; fi
+  if [ -f "$f" ] && [ ! -s "$f" ] && fresh "$f.at" "$EMPTY_TTL"; then return 0; fi
+  if gh api --paginate "$1" --jq "$2" >"$f.tmp" 2>/dev/null; then
+    mv "$f.tmp" "$f"; now >"$f.at"; cat "$f"; return 0
+  fi
+  rm -f "$f.tmp"
+  [ -f "$f" ] && cat "$f"
+  return 1
+}
+
+bust() { find "$CACHE" -type f ! -name 'ok.at' -delete 2>/dev/null; }
+
+label_name() { # to:<target>, within GitHub's 50-character label limit
+  local l="to:$1"
+  printf '%s' "${l:0:50}"
+}
+
+ensure_label() { # ensure_label <name> <color> <description>
+  local have
+  have=$(api_get "repos/$REPO/labels?per_page=100" '.[].name')
+  printf '%s\n' "$have" | grep -Fxq -- "$1" && return 0
+  gh api "repos/$REPO/labels" -f name="$1" -f color="$2" -f description="$3" --silent >/dev/null 2>&1
+  rm -f "$CACHE"/*  2>/dev/null; now >"$CACHE/ok.at"
+}
+
+ensure_base_labels() {
+  ensure_label ask "fbca04" "Board: a question from one branch to another (scripts/board ask)"
+  ensure_label claim "c2e0c6" "Board: a branch is editing these files until a time (scripts/board claim)"
+  ensure_label contract-change "d93f0b" "Changes a shared contract: schema, migrations, enums, components/fb, tokens, DESIGN/PRODUCT/AGENTS"
+  ensure_label needs-human "b60205" "Agents disagree after one exchange; a person decides"
+  ensure_label design "1d76db" "Changes the design system: DESIGN.md, components/fb, tokens"
+  [ "${BOARD_TEST:-}" = 1 ] && ensure_label board-test "ededed" "Board self-test; safe to close"
+}
+
+# Issues (asks and claims) as TSV. The machine-readable part of each is an HTML comment marker:
+#   <!-- board v1 kind=ask from=<branch> to=<target> deadline=<epoch> -->
+#   <!-- board v1 kind=claim from=<branch> until=<epoch> paths=<a,b> -->
+ASK_JQ='.[] | select(.pull_request | not) | ((.body // "") | [match("kind=ask from=([^ ]+) to=([^ ]+) deadline=([0-9]+)").captures[].string]) as $m | select($m | length == 3) | [.number, .state, $m[0], $m[1], $m[2], .comments, .updated_at, (.title | gsub("[\t\n]"; " ")), .user.login, ([.labels[].name] | join(","))] | @tsv'
+CLAIM_JQ='.[] | select(.pull_request | not) | ((.body // "") | [match("kind=claim from=([^ ]+) until=([0-9]+) paths=([^ ]+)").captures[].string]) as $m | select($m | length == 3) | [.number, $m[0], $m[1], $m[2], (.title | gsub("[\t\n]"; " "))] | @tsv'
+COMMENT_JQ='.[] | [.id, .user.login, .created_at, ((.body // "") | gsub("\r"; "") | gsub("\n"; " ") | .[0:400])] | @tsv'
+
+asks_all() { # number state from to deadline comments updated title author labels
+  local since
+  since=$(iso_of $(($(now) - 14 * 86400)))
+  api_get "repos/$REPO/issues?labels=ask&state=all&per_page=100&sort=updated&direction=desc&since=$since" "$ASK_JQ"
+}
+claims_open() { api_get "repos/$REPO/issues?labels=claim&state=open&per_page=100" "$CLAIM_JQ"; }
+pr_of_branch() { # number<TAB>author for the open PR whose head is <branch>
+  api_get "repos/$REPO/pulls?state=open&per_page=100" '.[] | [.number, .head.ref, .user.login] | @tsv' | awk -F'\t' -v b="$1" '$2 == b { print $1 "\t" $3; exit }'
+}
+open_prs() { api_get "repos/$REPO/pulls?state=open&per_page=100" '.[] | [.number, .head.ref, .user.login, .draft] | @tsv'; }
+pr_files() { api_get "repos/$REPO/pulls/$1/files?per_page=100" '.[].filename'; }
+comments_of() { api_get "repos/$REPO/issues/$1/comments?per_page=100" "$COMMENT_JQ"; }
+
+# Is this ask (open, to my branch) still unanswered? An ANSWER after the newest CHALLENGE answers it.
+ask_unanswered() { # ask_unanswered <number> <comment count>
+  [ "$2" = 0 ] && return 0
+  comments_of "$1" | awk -F'\t' '{ b = $4; sub(/^<!--[^>]*-->[ ]*/, "", b) } b ~ /^\*\*CHALLENGE\*\*/ { open = 1 } b ~ /^\*\*ANSWER\*\*/ { open = 0; answered = 1 } END { exit !(open || !answered) }'
+}
+
+asks_to_me_open() { # number<TAB>deadline<TAB>title  (open asks addressed to this branch, unanswered)
+  local me n st from to dl cm up title au lb
+  me=$(label_name "$BRANCH")
+  asks_all | while IFS=$'\t' read -r n st from to dl cm up title au lb; do
+    [ "$st" = open ] || continue
+    case ",$lb," in *",$me,"*) ;; *) continue ;; esac
+    ask_unanswered "$n" "$cm" && printf '%s\t%s\t%s\n' "$n" "$dl" "$title"
+  done
+}
+
+# ---------------------------------------------------------------------------------------------
+# Git helpers
+
+refresh_main() { # fetch origin/main at most once per CACHE_TTL
+  fresh "$STATE/fetch.at" "$CACHE_TTL" && return 0
+  GIT_TERMINAL_PROMPT=0 git fetch --quiet origin main >/dev/null 2>&1 && now >"$STATE/fetch.at"
+}
+
+merge_base() { git merge-base "${1:-HEAD}" origin/main 2>/dev/null; }
+
+changed_files() { # changed_files <ref> : committed since merge base, plus uncommitted when ref is HEAD
+  local ref=$1 mb
+  mb=$(merge_base "$ref") || return 1
+  {
+    git diff --name-only "$mb" "$ref"
+    if [ "$ref" = HEAD ]; then git diff --name-only HEAD; git ls-files --others --exclude-standard; fi
+  } | sort -u
+}
+
+main_prs_for() { # merged PRs (or commits) on main since <mb> that touched <file>
+  git log --first-parent --format='%h %s' "$1..origin/main" -- "$2" 2>/dev/null | head -4 | while read -r sha subj; do
+    case $subj in
+      "Merge pull request #"*) read -r _ _ _ num _ from _ <<<"$subj"; printf '%s (%s) ' "$num" "${from#*/}" ;;
+      *) printf '%s ' "$sha" ;;
+    esac
+  done
+}
+
+paths_overlap() { # paths_overlap <path> <comma list> : either one contains the other
+  local IFS=, p
+  path_in_claim "$1" "$2" && return 0
+  for p in $2; do path_in_claim "${p//%20/ }" "$1" && return 0; done
+  return 1
+}
+
+path_in_claim() { # path_in_claim <file> <comma-separated claim paths>
+  local IFS=, p
+  for p in $2; do
+    p=${p//%20/ }
+    # shellcheck disable=SC2254 # claim paths may be globs
+    case $1 in $p | "${p%/}"/*) return 0 ;; esac
+  done
+  return 1
+}
+
+# radar_lines <ref> -> lines "KIND<TAB>file<TAB>who to ask"
+radar_lines() {
+  local ref=$1 branch mine mb mainfiles f n head author draft files c cn cfrom cuntil cpaths ctitle out t
+  branch=${ref#origin/}; [ "$ref" = HEAD ] && branch=$BRANCH
+  mb=$(merge_base "$ref") || { printf 'ERROR\t-\tno merge base with origin/main (run: git fetch origin main)\n'; return; }
+  mine=$(changed_files "$ref")
+  [ -n "$mine" ] || return 0
+
+  # 1. conflicts a merge with origin/main would hit (merge-tree writes no refs, index or files)
+  out=$(git merge-tree --write-tree --name-only "$ref" origin/main 2>/dev/null)
+  if [ $? -eq 1 ]; then
+    printf '%s\n' "$out" | awk 'NR == 1 { next } /^$/ { exit } { print }' | sort -u | while IFS= read -r f; do
+      t=$(printf '%s\n' "$out" | grep -F "CONFLICT (" | grep -F -- " $f" | head -1 | sed 's/^CONFLICT (\([^)]*\)).*/\1/')
+      printf 'CONFLICT\t%s\t%s; main side: %s\n' "$f" "${t:-content}" "$(main_prs_for "$mb" "$f")"
+    done
+  fi
+  # 2. changed on main since the merge base
+  mainfiles=$(git diff --name-only "$mb" origin/main 2>/dev/null)
+  printf '%s\n' "$mine" | while IFS= read -r f; do
+    printf '%s\n' "$mainfiles" | grep -Fxq -- "$f" && printf 'MAIN\t%s\tmerged since base: %s\n' "$f" "$(main_prs_for "$mb" "$f")"
+  done
+  # 3. open pull requests (fetched in parallel, cached)
+  open_prs | {
+    while IFS=$'\t' read -r n head author draft; do
+      [ "$head" = "$branch" ] && continue
+      pr_files "$n" >/dev/null 2>&1 &
+    done
+    wait
+  }
+  open_prs | while IFS=$'\t' read -r n head author _; do
+    [ "$head" = "$branch" ] && continue
+    files=$(pr_files "$n")
+    printf '%s\n' "$mine" | while IFS= read -r f; do
+      printf '%s\n' "$files" | grep -Fxq -- "$f" && printf 'PR\t%s\topen #%s (%s, @%s)\n' "$f" "$n" "$head" "$author"
+    done
+  done
+  # 4. open, unexpired claims by other branches
+  claims_open | while IFS=$'\t' read -r cn cfrom cuntil cpaths ctitle; do
+    [ "$cfrom" = "$branch" ] && continue
+    [ "$cuntil" -gt "$(now)" ] || continue
+    printf '%s\n' "$mine" | while IFS= read -r f; do
+      path_in_claim "$f" "$cpaths" && printf 'CLAIM\t%s\tclaimed by %s until %s UTC (#%s)\n' "$f" "$cfrom" "$(fmt_hm "$cuntil")" "$cn"
+    done
+  done
+}
+
+# ---------------------------------------------------------------------------------------------
+# Commands
+
+cmd_radar() {
+  local ref=${1:-HEAD} mb ahead behind lines branch
+  gh_ok || true   # radar's git half works offline; GitHub parts are skipped when gh is off
+  refresh_main
+  branch=${ref#origin/}; [ "$ref" = HEAD ] && branch=$BRANCH
+  git rev-parse --verify --quiet "$ref" >/dev/null || { say "radar: unknown ref $ref"; return 0; }
+  mb=$(merge_base "$ref") || { say "radar: $ref has no merge base with origin/main (run: git fetch origin main)"; return 0; }
+  ahead=$(git rev-list --count "origin/main..$ref"); behind=$(git rev-list --count "$ref..origin/main")
+  say "radar: $branch vs origin/main @ $(git rev-parse --short origin/main) (merge base $(git rev-parse --short "$mb"); $ahead ahead, $behind behind)"
+  lines=$(radar_lines "$ref")
+  if [ -z "$lines" ]; then say "nothing overlaps: no open PR, main change, claim or merge conflict touches this branch's files."; return 0; fi
+  printf '%s\n' "$lines" | awk -F'\t' '{ printf "%-9s %s  <- %s\n", $1, $2, $3 }'
+  say "$(printf '%s\n' "$lines" | cut -f1 | sort | uniq -c | awk '{ printf "%s%s %s", (NR > 1 ? ", " : ""), $1, $2 } END { print "" }')"
+  say "next: read the HANDOFF of each PR named, then ask its branch: scripts/board ask --to '#N' --read ... --default ... \"question\""
+}
+
+inbox_items() { # prints "key<TAB>text" lines
+  local recent me pr prn n st from to dl cm up title au lb id who at body kind left mb f c lines nconf nmain npr nclaim h
+  me=$(label_name "$BRANCH")
+  pr=$(pr_of_branch "$BRANCH"); prn=${pr%%$'\t'*}
+  # asks addressed to this branch
+  asks_all | while IFS=$'\t' read -r n st from to dl cm up title au lb; do
+    [ "$st" = open ] || continue
+    case ",$lb," in *",$me,"*) ;; *) continue ;; esac
+    ask_unanswered "$n" "$cm" || continue
+    left=$((dl - $(now)))
+    if [ "$left" -gt 0 ]; then h="deadline $(fmt_hm "$dl") UTC, $(rel "$left") left"; else h="deadline passed $(rel $((-left))) ago; the asker will apply their default"; fi
+    printf 'ask#%s:%s\tASK #%s from %s: %s (%s). Reply: scripts/board answer %s --evidence "..." "..."\n' "$n" "$cm" "$n" "$from" "${title#*: }" "$h" "$n"
+  done
+  # unanswered ASK or CHALLENGE comments on this branch's PR
+  if [ -n "$prn" ]; then
+    comments_of "$prn" | awk -F'\t' '{ b = $4; sub(/^<!--[^>]*-->[ ]*/, "", b) }
+      b ~ /^\*\*(ASK|CHALLENGE)\*\*/ { pend[++np] = $0 }
+      b ~ /^\*\*ANSWER\*\*/ { np = 0 }
+      END { for (i = 1; i <= np; i++) print pend[i] }' | while IFS=$'\t' read -r id who at body; do
+      body=${body#<!--*-->}; body=${body# }
+      kind=${body%%\*\* *}; kind=${kind#\*\*}
+      printf 'prc:%s\t%s on your PR #%s by @%s: %s\n' "$id" "$kind" "$prn" "$who" "$(printf '%s' "$body" | sed 's/^\*\*[A-Z]*\*\*[^:]*: *//' | cut -c1-160)"
+    done
+  fi
+  # answers and challenges on asks this branch opened
+  recent=$(iso_of $(($(now) - 86400)))
+  asks_all | while IFS=$'\t' read -r n st from to dl cm up title au lb; do
+    [ "$from" = "$BRANCH" ] || continue
+    [ "$st" = open ] || [ "$up" \> "$recent" ] || continue
+    if [ "$cm" = 0 ]; then
+      [ "$st" = open ] && [ "$dl" -le "$(now)" ] && printf 'late#%s\tYour ASK #%s to %s passed its deadline unanswered: do your default, record it in your PR, then close the ask with: scripts/board answer %s --evidence "deadline passed" "Default applied: ..."\n' "$n" "$n" "$to" "$n"
+      continue
+    fi
+    comments_of "$n" | while IFS=$'\t' read -r id who at body; do
+      body=${body#<!--*-->}; body=${body# }
+      case $body in "**ANSWER**"* | "**CHALLENGE**"*) ;; *) continue ;; esac
+      kind=${body%%\*\* *}; kind=${kind#\*\*}
+      printf 'c:%s\t%s on your ask #%s (%s) by @%s: %s\n' "$id" "$kind" "$n" "$st" "$who" "$(printf '%s' "$body" | sed 's/^\*\*[A-Z]*\*\*[^:]*: *//' | cut -c1-160)"
+    done
+  done
+  # radar summary
+  lines=$(radar_lines HEAD)
+  if [ -n "$lines" ]; then
+    nconf=$(printf '%s\n' "$lines" | grep -c '^CONFLICT'); nmain=$(printf '%s\n' "$lines" | grep -c '^MAIN')
+    npr=$(printf '%s\n' "$lines" | grep -c '^PR'); nclaim=$(printf '%s\n' "$lines" | grep -c '^CLAIM')
+    h=$(printf '%s\n' "$lines" | cksum | cut -d' ' -f1)
+    printf 'radar:%s\tradar: %s conflicts with origin/main, %s files changed on main since your base, %s shared with open PRs, %s claimed. Details: scripts/board radar\n' "$h" "$nconf" "$nmain" "$npr" "$nclaim"
+    printf '%s\n' "$lines" | grep -E '^(CONFLICT|CLAIM|PR)' | head -3 | while IFS=$'\t' read -r kind f who; do
+      printf 'radar:%s:%s:%s\t  %s %s <- %s\n' "$h" "$kind" "$f" "$kind" "$f" "$who"
+    done
+  fi
+  # shared contracts changed on origin/main since this branch's merge base
+  mb=$(merge_base HEAD) || return 0
+  # shellcheck disable=SC2086
+  f=$(git diff --name-only "$mb" origin/main -- $CONTRACTS 2>/dev/null | sed 's|^prisma/migrations/\([^/]*\)/.*|migration \1|' | sort -u)
+  if [ -n "$f" ]; then
+    # shellcheck disable=SC2086
+    c=$(git log -1 --format='%h %s' "$mb..origin/main" -- $CONTRACTS)
+    printf 'contract:%s\tshared contracts changed on main since your base (newest: %s): %s. Merge origin/main before you build on them.\n' \
+      "$(printf '%s %s' "$f" "$c" | cksum | cut -d' ' -f1)" "$(printf '%s' "$c" | cut -c1-60)" "$(printf '%s' "$f" | paste -sd, - | sed 's/,/, /g' | cut -c1-300)"
+  fi
+}
+
+cmd_inbox() {
+  local new=0 throttle=0 hookjson="" items out seen total shown
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --new) new=1 ;;
+      --throttle) throttle=${2:-0}; shift ;;
+      --hook-json) hookjson=${2:-}; shift ;;
+      *) err "inbox: unknown option $1"; return 0 ;;
+    esac
+    shift
+  done
+  if [ "$throttle" -gt 0 ]; then
+    fresh "$STATE/throttle-$BKEY.at" "$throttle" && return 0
+    now >"$STATE/throttle-$BKEY.at"
+  fi
+  seen="$STATE/seen-$BKEY"; touch "$seen"
+  if ! QUIET_OFF=1 gh_ok; then
+    # Say it once per branch under --new, always otherwise.
+    if [ "$new" = 0 ] || ! grep -Fxq "gh-off" "$seen"; then out=$(gh_ok); echo "gh-off" >>"$seen"; fi
+  else
+    refresh_main
+    items=$(inbox_items)
+    if [ "$new" = 1 ]; then items=$(printf '%s\n' "$items" | awk -F'\t' 'FILENAME == ARGV[1] { s[$0] = 1; next } $1 != "" && !($1 in s)' "$seen" -); fi
+    printf '%s\n' "$items" | cut -f1 | grep -v '^$' >>"$seen"
+    total=$(printf '%s\n' "$items" | grep -c .)
+    if [ "$total" -gt 0 ]; then
+      shown=$((INBOX_MAX_LINES - 2))
+      out=$( {
+        say "Board inbox for $BRANCH$( [ "$new" = 1 ] && printf ' (new since last check)'):"
+        printf '%s\n' "$items" | grep . | head -"$shown" | cut -f2-
+        [ "$total" -gt "$shown" ] && say "... $((total - shown)) more: scripts/board inbox"
+        say "Rules: AGENTS.md > Board. Evidence or it is ignored; nobody waits past a deadline."
+      } )
+    elif [ "$new" = 0 ]; then
+      out="Board inbox for $BRANCH: nothing needs you. Before editing a hot file: scripts/board claim. Before a PR or merge: scripts/board radar."
+    fi
+  fi
+  [ -n "${out:-}" ] || return 0
+  if [ -n "$hookjson" ]; then
+    printf '{"hookSpecificOutput":{"hookEventName":"%s","additionalContext":"%s"}}\n' "$hookjson" "$(printf '%s' "$out" | json_escape)"
+  else
+    printf '%s\n' "$out"
+  fi
+}
+
+json_escape() {
+  local s
+  s=$(tr -d '\000-\010\013\014\016-\037')
+  s=${s//\\/\\\\}; s=${s//\"/\\\"}; s=${s//$'\t'/\\t}; s=${s//$'\r'/}; s=${s//$'\n'/\\n}
+  printf '%s' "$s"
+}
+
+words() { printf '%s ' "$@" | wc -w | tr -d ' '; }
+
+parse_msg_args() { # sets TO READ DEFAULT EVIDENCE NOTCHECKED OWNER MINE THEIRS UNTIL WHY TEXT POS
+  TO="" READ="" DEFAULT="" EVIDENCE="" NOTCHECKED="" OWNER_="" MINE="" THEIRS="" UNTIL="" WHY="" POS=""
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --to) TO=${2:-}; shift ;;
+      --read) READ=${2:-}; shift ;;
+      --default) DEFAULT=${2:-}; shift ;;
+      --evidence) EVIDENCE=${2:-}; shift ;;
+      --not-checked) NOTCHECKED=${2:-}; shift ;;
+      --owner) OWNER_=${2:-}; shift ;;
+      --mine) MINE=${2:-}; shift ;;
+      --theirs) THEIRS=${2:-}; shift ;;
+      --until) UNTIL=${2:-}; shift ;;
+      --why) WHY=${2:-}; shift ;;
+      --*) err "unknown option $1"; return 1 ;;
+      *) POS="$POS${POS:+$'\n'}$1" ;;
+    esac
+    shift
+  done
+}
+
+resolve_target() { # sets TLABEL (to: label) TNAME (display) TASSIGNEE (login or empty)
+  local t=$1 pr
+  TASSIGNEE=""
+  case $t in
+    \#*)
+      pr=$(gh api "repos/$REPO/pulls/${t#\#}" --jq '[.head.ref, .user.login] | @tsv' 2>/dev/null) || { err "no pull request $t"; return 1; }
+      TNAME=${pr%%$'\t'*}; TASSIGNEE=${pr#*$'\t'} ;;
+    @*) TNAME=$t; TASSIGNEE=${t#@} ;;
+    *)
+      TNAME=${t#origin/}
+      pr=$(pr_of_branch "$TNAME")
+      if [ -n "$pr" ]; then TASSIGNEE=${pr#*$'\t'}; else TASSIGNEE=$(gh api "repos/$REPO/commits/$TNAME" --jq '.author.login // ""' 2>/dev/null) || TASSIGNEE=""; fi ;;
+  esac
+  case $TASSIGNEE in *[!A-Za-z0-9-]*) TASSIGNEE="" ;; esac
+  TLABEL=$(label_name "$TNAME")
+}
+
+create_issue() { # create_issue <title> <body> <labels...> ; prints number<TAB>url
+  local title=$1 body=$2 args="" l out
+  shift 2
+  set -f
+  for l in "$@"; do args="$args -f labels[]=$l"; done
+  [ "${BOARD_TEST:-}" = 1 ] && args="$args -f labels[]=board-test"
+  # shellcheck disable=SC2086
+  out=$(gh api "repos/$REPO/issues" -f title="$title" -f body="$body" $args ${ASSIGN:+-f assignees[]=$ASSIGN} --jq '[.number, .html_url] | @tsv' 2>/dev/null) \
+    || out=$(gh api "repos/$REPO/issues" -f title="$title" -f body="$body" $args --jq '[.number, .html_url] | @tsv' 2>/dev/null)
+  set +f
+  [ -n "$out" ] && printf '%s' "$out"
+}
+
+pr_link() { local p; p=$(pr_of_branch "$BRANCH"); [ -n "$p" ] && printf ' (PR #%s)' "${p%%$'\t'*}"; }
+
+cmd_ask() {
+  parse_msg_args "$@" || return 1
+  local q=$POS mine_open nwords dl title body res num url tag
+  [ -n "$TO" ] || { err 'ask: refused: --to <branch|#PR|@person> is required'; return 1; }
+  [ -n "$READ" ] || { err 'ask: refused: --read "<what you read and ran>" is required (evidence or it is ignored)'; return 1; }
+  [ -n "$DEFAULT" ] || { err 'ask: refused: --default "<what you will do if nobody answers>" is required (nobody waits)'; return 1; }
+  [ -n "$q" ] || { err 'ask: refused: the question is missing'; return 1; }
+  nwords=$(words "$q" "$READ" "$DEFAULT" "$NOTCHECKED")
+  [ "$nwords" -le "$MAX_WORDS" ] || { err "ask: refused: $nwords words; the limit is $MAX_WORDS. Link to context instead of pasting it."; return 1; }
+  gh_ok || return 0
+  mine_open=$(asks_all | awk -F'\t' -v b="$BRANCH" '$2 == "open" && $3 == b' | grep -c .)
+  [ "$mine_open" -lt "$MAX_OPEN_ASKS" ] || { err "ask: refused: $BRANCH already has $mine_open open asks (limit $MAX_OPEN_ASKS). Close one first."; return 1; }
+  resolve_target "$TO" || return 1
+  ensure_base_labels
+  ensure_label "$TLABEL" "c5def5" "Board: addressed to $TNAME"
+  dl=$(($(now) + DEADLINE_SEC))
+  tag=""; [ "${BOARD_TEST:-}" = 1 ] && tag="[board-test] "
+  title="${tag}ASK to $TNAME: $(printf '%s' "$q" | tr '\n' ' ' | cut -c1-90)"
+  body="<!-- board v1 kind=ask from=$BRANCH to=$TNAME deadline=$dl -->
+**ASK** from \`$BRANCH\`$(pr_link) to \`$TNAME\`
+
+**Question:** $q
+
+**Read and ran:** $READ
+
+**Default if nobody answers by $(fmt_hm "$dl") UTC:** $DEFAULT
+
+Not checked: ${NOTCHECKED:-not stated by the asker.}
+
+<sub>Reply with \`scripts/board answer <this number> --evidence \"file:line, commit or command output\" \"text\"\`, or decline with text starting \"Declined:\". Rules: AGENTS.md > Board.</sub>"
+  res=$(ASSIGN=$TASSIGNEE create_issue "$title" "$body" ask "$TLABEL") || true
+  [ -n "$res" ] || { say "board: could not open the ask on GitHub; nothing was posted."; return 0; }
+  num=${res%%$'\t'*}; url=${res#*$'\t'}
+  bust
+  say "ASK #$num opened for $TNAME${TASSIGNEE:+ (assigned @$TASSIGNEE)}: $url"
+  say "Deadline $(fmt_hm "$dl") UTC. Keep working; after the deadline do your default and record it in your PR."
+}
+
+post_comment() { # post_comment <number> <body> ; prints url
+  gh api "repos/$REPO/issues/$1/comments" -f body="$2" --jq '.html_url' 2>/dev/null
+}
+
+issue_meta() { # state<TAB>is_pr<TAB>labels
+  gh api "repos/$REPO/issues/$1" --jq '[.state, (.pull_request != null), ([.labels[].name] | join(","))] | @tsv' 2>/dev/null
+}
+
+cmd_answer() {
+  parse_msg_args "$@" || return 1
+  local n=${POS%%$'\n'*} text=${POS#*$'\n'} meta st ispr url
+  [ "$n" != "$POS" ] || text=""
+  n=${n#\#}
+  case $n in '' | *[!0-9]*) err 'answer: usage: scripts/board answer <N> --evidence "..." "text"'; return 1 ;; esac
+  [ -n "$EVIDENCE" ] || { err 'answer: refused: --evidence "<file:line, commit or command output>" is required. Agreeing without reading the code is not allowed.'; return 1; }
+  [ -n "$text" ] || { err 'answer: refused: the answer text is missing'; return 1; }
+  gh_ok || return 0
+  meta=$(issue_meta "$n") || { say "board: #$n not found."; return 0; }
+  st=$(printf '%s' "$meta" | cut -f1); ispr=$(printf '%s' "$meta" | cut -f2)
+  url=$(post_comment "$n" "<!-- board v1 kind=answer from=$BRANCH -->
+**ANSWER** from \`$BRANCH\`$(pr_link): $text
+
+**Evidence:** $EVIDENCE
+
+Not checked: ${NOTCHECKED:-not stated.}") || { say "board: could not post the answer."; return 0; }
+  if [ "$ispr" = false ] && [ "$st" = open ]; then
+    gh api -X PATCH "repos/$REPO/issues/$n" -f state=closed -f state_reason=completed --silent >/dev/null 2>&1
+  fi
+  bust
+  say "ANSWER posted on #$n: $url"
+  [ "$ispr" = false ] && say "The ask is closed. The asker sees your answer in their inbox; one CHALLENGE may follow."
+}
+
+cmd_challenge() {
+  parse_msg_args "$@" || return 1
+  local n=${POS%%$'\n'*} text=${POS#*$'\n'} meta st ispr prior url
+  [ "$n" != "$POS" ] || text=""
+  n=${n#\#}
+  case $n in '' | *[!0-9]*) err 'challenge: usage: scripts/board challenge <N|#PR> --evidence "..." "text"'; return 1 ;; esac
+  [ -n "$EVIDENCE" ] || { err 'challenge: refused: --evidence is required (cite file:line, a commit, or command output)'; return 1; }
+  [ -n "$text" ] || { err 'challenge: refused: the challenge text is missing'; return 1; }
+  gh_ok || return 0
+  meta=$(issue_meta "$n") || { say "board: #$n not found."; return 0; }
+  st=$(printf '%s' "$meta" | cut -f1); ispr=$(printf '%s' "$meta" | cut -f2)
+  prior=$(comments_of "$n" | awk -F'\t' -v b="$BRANCH" 'index($4, "kind=challenge from=" b " ") { c++ } END { print c + 0 }')
+  if [ "$prior" -ge 1 ]; then
+    err "challenge: refused: $BRANCH already challenged #$n once. One exchange per disagreement: escalate it:"
+    err "  scripts/board escalate $n --owner @person --mine \"<5 lines>\" --theirs \"<5 lines>\""
+    return 1
+  fi
+  url=$(post_comment "$n" "<!-- board v1 kind=challenge from=$BRANCH -->
+**CHALLENGE** from \`$BRANCH\`$(pr_link): $text
+
+**Evidence:** $EVIDENCE
+
+Not checked: ${NOTCHECKED:-not stated.}
+
+<sub>Accepting this takes the same evidence: recheck the code and say what you rechecked (scripts/board answer).</sub>") || { say "board: could not post the challenge."; return 0; }
+  [ "$ispr" = false ] && [ "$st" = closed ] && gh api -X PATCH "repos/$REPO/issues/$n" -f state=open --silent >/dev/null 2>&1
+  bust
+  say "CHALLENGE posted on #$n: $url"
+}
+
+cmd_escalate() {
+  parse_msg_args "$@" || return 1
+  local n=${POS%%$'\n'*} url lm lt
+  n=${n#\#}
+  case $n in '' | *[!0-9]*) err 'escalate: usage: scripts/board escalate <N|#PR> --owner @person --mine "..." --theirs "..."'; return 1 ;; esac
+  [ -n "$OWNER_" ] && [ -n "$MINE" ] && [ -n "$THEIRS" ] || { err 'escalate: refused: --owner, --mine and --theirs are all required'; return 1; }
+  lm=$(printf '%s\n' "$MINE" | grep -c .); lt=$(printf '%s\n' "$THEIRS" | grep -c .)
+  [ "$lm" -le 5 ] && [ "$lt" -le 5 ] || { err "escalate: refused: each position must be five lines or fewer ($lm and $lt)"; return 1; }
+  gh_ok || return 0
+  ensure_base_labels
+  url=$(post_comment "$n" "<!-- board v1 kind=escalate from=$BRANCH -->
+**NEEDS HUMAN** from \`$BRANCH\`: one exchange did not settle this. @${OWNER_#@}, please decide.
+
+**Position A ($BRANCH):**
+$MINE
+
+**Position B:**
+$THEIRS") || { say "board: could not post."; return 0; }
+  gh api "repos/$REPO/issues/$n/labels" -f "labels[]=needs-human" --silent >/dev/null 2>&1
+  gh api "repos/$REPO/issues/$n/assignees" -f "assignees[]=${OWNER_#@}" --silent >/dev/null 2>&1
+  bust
+  say "Escalated #$n to @${OWNER_#@} (label needs-human): $url"
+}
+
+cmd_claim() {
+  parse_msg_args "$@" || return 1
+  local until paths p conflicts cn cfrom cuntil cpaths ctitle title body res list
+  [ -n "$POS" ] || { err 'claim: usage: scripts/board claim <path>... --until HH:MM --why "text"'; return 1; }
+  [ -n "$WHY" ] || { err 'claim: refused: --why is required'; return 1; }
+  until=$(hm_to_epoch "$UNTIL") || { err 'claim: refused: --until HH:MM (your local time) is required'; return 1; }
+  [ $((until - $(now))) -le $((12 * 3600)) ] || { err 'claim: refused: claims last 12 hours at most'; return 1; }
+  paths=$(printf '%s\n' "$POS" | tr ', ' '\n\n' | grep . | sed 's/ /%20/g' | paste -sd, -)
+  gh_ok || return 0
+  conflicts=$(claims_open | while IFS=$'\t' read -r cn cfrom cuntil cpaths ctitle; do
+    [ "$cfrom" = "$BRANCH" ] && continue
+    [ "$cuntil" -gt "$(now)" ] || continue
+    printf '%s\n' "$POS" | tr ', ' '\n\n' | grep . | while IFS= read -r p; do
+      paths_overlap "$p" "$cpaths" && printf '%s is claimed by %s until %s UTC (#%s)\n' "$p" "$cfrom" "$(fmt_hm "$cuntil")" "$cn"
+    done
+  done)
+  if [ -n "$conflicts" ]; then
+    err "claim: refused:"; printf '%s\n' "$conflicts" >&2
+    err "Ask that branch instead: scripts/board ask --to <branch> --read ... --default ... \"question\""
+    return 1
+  fi
+  # close this branch's own expired claims first
+  claims_open | while IFS=$'\t' read -r cn cfrom cuntil cpaths ctitle; do
+    [ "$cfrom" = "$BRANCH" ] && [ "$cuntil" -le "$(now)" ] && gh api -X PATCH "repos/$REPO/issues/$cn" -f state=closed --silent >/dev/null 2>&1
+  done
+  ensure_base_labels
+  list=$(printf '%s\n' "$POS" | tr ', ' '\n\n' | grep . | sed 's/^/- `/; s/$/`/')
+  title="$( [ "${BOARD_TEST:-}" = 1 ] && printf '[board-test] ')CLAIM by $BRANCH until $(fmt_hm "$until") UTC: $(printf '%s' "$paths" | sed 's/%20/ /g; s/,/, /g' | cut -c1-120)"
+  body="<!-- board v1 kind=claim from=$BRANCH until=$until paths=$paths -->
+**CLAIM** by \`$BRANCH\`$(pr_link) until $(fmt_hm "$until") UTC
+
+$list
+
+**Why:** $WHY
+
+<sub>Other branches: don't edit these until then; ask this branch instead (scripts/board ask). The claim lapses on its own.</sub>"
+  res=$(create_issue "$title" "$body" claim) || true
+  [ -n "$res" ] || { say "board: could not post the claim."; return 0; }
+  bust
+  say "CLAIM #${res%%$'\t'*} until $(fmt_hm "$until") UTC: ${res#*$'\t'}"
+  say "GitHub lists lag a few seconds: if scripts/board claims shows an older claim on these files in a minute, close yours and ask."
+}
+
+cmd_claims() {
+  local cn cfrom cuntil cpaths ctitle any=0 expired=0
+  gh_ok || return 0
+  while IFS=$'\t' read -r cn cfrom cuntil cpaths ctitle; do
+    [ -n "$cn" ] || continue
+    if [ "$cuntil" -le "$(now)" ]; then expired=$((expired + 1)); continue; fi
+    any=1
+    say "#$cn $cfrom until $(fmt_hm "$cuntil") UTC ($(rel $((cuntil - $(now)))) left): $(printf '%s' "$cpaths" | sed 's/%20/ /g; s/,/, /g')"
+  done <<EOF
+$(claims_open)
+EOF
+  [ "$any" = 1 ] || say "No open claims."
+  [ "$expired" -gt 0 ] && say "($expired expired claims still open; they are ignored. Their owners or the board keeper close them.)"
+  return 0
+}
+
+cmd_asks() {
+  local n st from to dl cm up title au lb any=0 left
+  gh_ok || return 0
+  while IFS=$'\t' read -r n st from to dl cm up title au lb; do
+    [ "$st" = open ] || continue
+    any=1; left=$((dl - $(now)))
+    say "#$n $from -> $to, $( [ "$left" -gt 0 ] && printf '%s left' "$(rel "$left")" || printf 'deadline passed %s ago' "$(rel $((-left)))"), $cm comments: ${title#*: }"
+  done <<EOF
+$(asks_all)
+EOF
+  [ "$any" = 1 ] || say "No open asks."
+  return 0
+}
+
+cmd_handoff() {
+  local mb files hot f migr contracts routes specs conflicts asks n st from to dl cm up title au lb
+  refresh_main
+  mb=$(merge_base HEAD) || { say "handoff: no merge base with origin/main (run: git fetch origin main)"; return 0; }
+  files=$(changed_files HEAD)
+  hot=""; for f in $HOT_FILES; do printf '%s\n' "$files" | grep -Fxq -- "$f" && hot="$hot- \`$f\` (claim: )
+"; done
+  migr=$(printf '%s\n' "$files" | grep '^prisma/migrations/' | sed 's|/migration.sql$||' | sort -u | sed 's/^/- added `/; s/$/`/')
+  # shellcheck disable=SC2086
+  contracts=$(for f in $CONTRACTS; do printf '%s\n' "$files" | grep -E "^$f(/|$)"; done | sort -u | sed 's/^/- `/; s/$/`/')
+  routes=$(printf '%s\n' "$files" | grep -E '^app/.*page\.tsx$' | sed -E 's|^app||; s|/page\.tsx$||; s|/\([^)]*\)||g; s|^$|/|' | sed 's/^/- `/; s/$/`/')
+  specs=$(printf '%s\n' "$files" | grep -E '^tests/e2e/.*\.spec\.ts$' | tr '\n' ' ')
+  conflicts=$(radar_lines HEAD | awk -F'\t' '$1 == "CONFLICT" { printf "| `%s` | textual or behavioural? | how it was resolved | who confirmed (ask #) |\n", $2 }')
+  asks=""
+  if QUIET_OFF=1 gh_ok; then
+    asks=$(asks_all | while IFS=$'\t' read -r n st from to dl cm up title au lb; do [ "$from" = "$BRANCH" ] && [ "$st" = open ] && printf -- '- #%s to %s: %s\n' "$n" "$to" "${title#*: }"; done)
+  fi
+  cat <<EOF
+## What changed
+
+$(git log --no-merges --format='- %s' "$mb..HEAD")
+
+## Files touched ($(printf '%s\n' "$files" | grep -c .))
+
+$(printf '%s\n' "$files" | grep . | head -60 | sed 's/^/- `/; s/$/`/')
+
+**Hot files touched:** $( [ -n "$hot" ] && printf '\n\n%s' "$hot" || printf 'none')
+
+## Schema and contract changes
+
+${migr:-- no new migrations}
+${contracts:-- no shared contract files touched}
+
+## Screens touched
+
+${routes:-- no page files changed (check components: list the screens they appear on)}
+
+## How to verify
+
+\`\`\`sh
+pnpm install --frozen-lockfile
+pnpm test
+pnpm test:e2e${specs:+ $specs}
+\`\`\`
+
+## Conflicts with origin/main @ $(git rev-parse --short origin/main)
+
+$( [ -n "$conflicts" ] && printf '| File | Kind | Resolution | Confirmed by |\n|---|---|---|---|\n%s' "$conflicts" || printf 'None: `git merge-tree` finds no conflicts with origin/main.')
+
+## Open asks
+
+${asks:-- none}
+
+## Not checked
+
+-
+EOF
+}
+
+cmd_stop_check() {
+  local input sid open mark
+  input=$(cat 2>/dev/null || true)
+  case $input in *'"stop_hook_active":true'* | *'"stop_hook_active": true'*) return 0 ;; esac
+  QUIET_OFF=1 gh_ok || return 0
+  open=$(asks_to_me_open | head -1 | cut -f1)
+  [ -n "$open" ] || return 0
+  sid=$(printf '%s' "$input" | tr ',' '\n' | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  mark="$STATE/stop-$BKEY-${sid:-nosession}"
+  grep -Fxq "$open" "$mark" 2>/dev/null && return 0
+  echo "$open" >>"$mark"
+  printf '{"decision":"block","reason":"answer or decline ask #%s"}\n' "$open"
+}
+
+# ---------------------------------------------------------------------------------------------
+
+cmd=${1:-help}
+[ $# -gt 0 ] && shift
+case $cmd in
+  inbox) cmd_inbox "$@" ;;
+  radar) cmd_radar "$@" ;;
+  ask) cmd_ask "$@" ;;
+  answer) cmd_answer "$@" ;;
+  challenge) cmd_challenge "$@" ;;
+  escalate) cmd_escalate "$@" ;;
+  claim) cmd_claim "$@" ;;
+  claims) cmd_claims ;;
+  asks) cmd_asks ;;
+  handoff) cmd_handoff ;;
+  stop-check) cmd_stop_check ;;
+  labels) gh_ok && ensure_base_labels && say "labels ok" ;;
+  help | -h | --help) usage ;;
+  *) err "unknown command: $cmd"; usage >&2; exit 1 ;;
+esac
+exit $?

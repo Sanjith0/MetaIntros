@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CalendarDays, Check, Hourglass, Images, MapPin, UserPlus } from "lucide-react";
+import { CalendarDays, Check, Hourglass, Images, MapPin, MessageCircle, UserPlus } from "lucide-react";
 import { ButtonLink, FacePile, IconCircle } from "@/components/fb";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { fmtDuration, fmtEventWhen } from "@/lib/format";
@@ -71,6 +71,8 @@ export function StatusCard({ card }: { card: Card }) {
       ? { title: `How was ${card.title}?`, sub: "Share photos from your squad album, or skip it.", Icon: Images }
       : { title: `How was ${card.title}?`, sub: "Add the people you'd like to see again. Only mutual adds become friends.", Icon: UserPlus },
   }[card.state];
+  // The button's icon names its action (open the chat), not the card's state (a date).
+  const ActionIcon = card.action.href.startsWith("/chats/") ? MessageCircle : copy.Icon;
 
   return (
     <section data-testid="squad-banner" data-status={card.state} className="bg-surface px-4 py-3">
@@ -81,7 +83,7 @@ export function StatusCard({ card }: { card: Card }) {
           <p className="text-meta text-muted">{copy.sub}</p>
         </div>
       </div>
-      <ButtonLink href={card.action.href} variant="primary" block className="mt-3" data-testid="status-action" icon={<copy.Icon size={16} />}>
+      <ButtonLink href={card.action.href} variant="primary" block className="mt-3" data-testid="status-action" icon={<ActionIcon size={16} />}>
         {card.action.label}
       </ButtonLink>
       {card.secondary && (
