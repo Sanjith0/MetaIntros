@@ -1,0 +1,8 @@
+{
+  "name": "glance-glasses",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Meta glasses camera for Glance inside Link (Meta Wearables Device Access Toolkit 1.0.1)",
+  "license": "MIT",
+  "main": "index.ts"
+}

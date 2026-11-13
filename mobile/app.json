@@ -4,7 +4,10 @@
     "slug": "glancear",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "glance",
+    "scheme": [
+      "glance",
+      "link-glasses"
+    ],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
@@ -13,7 +16,33 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Take your attendee portrait and detect the optional three-finger end gesture during a consented conversation.",
         "NSMicrophoneUsageDescription": "Record a conversation only after both participants agree. Either person can stop.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSBluetoothAlwaysUsageDescription": "Connect to your paired Meta glasses so Glance can use them as its camera.",
+        "NSLocalNetworkUsageDescription": "Receive live video frames from your paired Meta glasses.",
+        "NSBonjourServices": [
+          "_bonjour._tcp"
+        ],
+        "UIBackgroundModes": [
+          "bluetooth-central"
+        ],
+        "UISupportedExternalAccessoryProtocols": [
+          "com.meta.ar.wearable"
+        ],
+        "LSApplicationQueriesSchemes": [
+          "fb-viewapp"
+        ],
+        "MWDAT": {
+          "AppLinkURLScheme": "link-glasses://",
+          "MetaAppID": "0",
+          "ClientToken": "",
+          "TeamID": "$(DEVELOPMENT_TEAM)",
+          "Analytics": {
+            "OptOut": true
+          },
+          "CrashReporting": {
+            "OptOut": true
+          }
+        }
       }
     },
     "android": {
@@ -41,7 +70,15 @@
       ],
       "expo-secure-store",
       "expo-font",
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.2"
+          }
+        }
+      ]
     ]
   }
 }

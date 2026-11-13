@@ -1,0 +1,2 @@
+# Meta's DAT binaries are fetched by scripts/fetch-meta-dat.sh, not committed (about 40 MB).
+ios/Frameworks/

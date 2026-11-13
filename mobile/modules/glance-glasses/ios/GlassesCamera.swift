@@ -1,0 +1,285 @@
+import Combine
+import Foundation
+import MWDATCamera
+import MWDATCore
+import UIKit
+
+/// Meta glasses live camera over DAT 1.0.1, ported from ios-glasses-live/Sources/GlassesCamera.swift.
+/// Video only: frames become JPEG for the Glance page embedded in Link. Nothing is saved or uploaded.
+@MainActor
+final class GlassesCamera: ObservableObject {
+  @Published private(set) var status = "Tap Connect Meta AI to set up your glasses."
+  @Published private(set) var registered = false
+  @Published private(set) var cameraAllowed = false
+  @Published private(set) var streaming = false
+
+  private(set) var configured = false
+  /// Called whenever status, registration, permission or streaming changes.
+  var onChange: (() -> Void)?
+  private var changeSink: AnyCancellable?
+  private var session: DeviceSession?
+  private var camera: Camera?
+  private var tokens = ListenerTokenBag()
+  private var epoch = UUID()
+  private let encoder = FrameEncoder()
+  private var onFailure: ((String) -> Void)?
+  private var onPause: ((Bool) -> Void)?
+  /// The glasses paused the session or stream. Meta's contract: hold, keep the
+  /// connection and wait; the device resumes by itself or stops.
+  private var paused = false
+
+  init() {
+    changeSink = objectWillChange.sink { [weak self] _ in
+      DispatchQueue.main.async { self?.onChange?() }
+    }
+    // Meta's SDK is configured lazily (configureIfNeeded), so opening Glance never depends on it.
+  }
+
+  /// Sets up Meta's SDK the first time the glasses are used. Failures become the status, never a crash.
+  @discardableResult func configureIfNeeded() -> Bool {
+    if configured { return true }
+    do {
+      try Wearables.configure()
+      configured = true
+    } catch {
+      status = "Meta SDK setup failed: \(error.localizedDescription)"
+    }
+    return configured
+  }
+
+  func refresh() {
+    guard configured else { return }
+    registered = Wearables.shared.registrationState == .registered
+    Task {
+      let granted = (try? await Wearables.shared.checkPermissionStatus(.camera)) == .granted
+      cameraAllowed = granted
+      if !streaming {
+        status = !registered ? "Step 1: connect Glance to Meta AI"
+          : !granted ? "Step 2: allow the glasses camera"
+          : Wearables.shared.devices.isEmpty ? "Glasses not found. Turn them on and open Meta AI."
+          : "Glasses ready. Pick Ray-Ban Meta as the camera."
+      }
+    }
+  }
+
+  func register() async {
+    guard configureIfNeeded() else { return }
+    do {
+      if Wearables.shared.registrationState != .registered {
+        try await Wearables.shared.startRegistration()
+        status = "Finish in Meta AI, then come back here."
+      }
+    } catch { status = "Meta AI connection failed: \(error.localizedDescription)" }
+    refresh()
+  }
+
+  func handleURL(_ url: URL) async {
+    guard url.scheme == "link-glasses", configureIfNeeded() else { return }
+    do { _ = try await Wearables.shared.handleUrl(url) } catch {
+      status = "Meta AI callback failed: \(error.localizedDescription)"
+    }
+    refresh()
+  }
+
+  func allowCamera() async {
+    guard configureIfNeeded(), Wearables.shared.registrationState == .registered else {
+      status = "Connect to Meta AI first."
+      return
+    }
+    do {
+      let permission = try await Wearables.shared.requestPermission(.camera)
+      if permission != .granted { status = "Glasses camera permission was denied." }
+    } catch { status = "Camera permission failed: \(error.localizedDescription)" }
+    refresh()
+  }
+
+  /// Starts the glasses camera. `onFrame` receives base64 JPEG on the main actor.
+  /// `onPause` reports the glasses pausing (true) and resuming (false) the video.
+  func start(onFrame: @escaping (String) -> Void, onFailure: @escaping (String) -> Void,
+             onPause: @escaping (Bool) -> Void = { _ in }) async {
+    stop()
+    let current = UUID()
+    epoch = current
+    self.onFailure = onFailure
+    self.onPause = onPause
+    func failed(_ message: String) { fail(message, for: current) }
+    guard configureIfNeeded(), Wearables.shared.registrationState == .registered else {
+      return failed("Connect your glasses to Meta AI first (Glasses button).")
+    }
+    guard (try? await Wearables.shared.checkPermissionStatus(.camera)) == .granted else {
+      return failed("Allow the glasses camera first (Glasses button).")
+    }
+    guard epoch == current else { return }
+    guard !Wearables.shared.devices.isEmpty else {
+      return failed("No Meta glasses found. Turn them on, pair them in Meta AI, then retry.")
+    }
+    do {
+      // The auto selector can still be empty when created, so give it a moment, then fall back to
+      // pinning a device that is connected and compatible right now.
+      let auto = AutoDeviceSelector(wearables: Wearables.shared)
+      var waited = 0
+      while auto.activeDevice == nil, waited < 30 {
+        try await Task.sleep(nanoseconds: 100_000_000)
+        waited += 1
+      }
+      guard epoch == current else { return }
+      let selector: any DeviceSelector
+      if auto.activeDevice != nil {
+        selector = auto
+      } else if let id = Wearables.shared.devices.first(where: { id in
+        guard let d = Wearables.shared.deviceForIdentifier(id) else { return false }
+        return d.linkState == .connected && d.compatibility() == .compatible
+      }) {
+        selector = SpecificDeviceSelector(device: id)
+      } else {
+        selector = auto
+      }
+      let session = try Wearables.shared.createSession(deviceSelector: selector)
+      self.session = session
+      let tokens = ListenerTokenBag()
+      self.tokens = tokens
+      session.errorPublisher.listen { error in
+        Task { @MainActor [weak self] in self?.fail("Glasses session error: \(error.localizedDescription)", for: current) }
+      }.store(in: tokens)
+      session.statePublisher.listen { state in
+        Task { @MainActor [weak self] in
+          guard let self, self.epoch == current else { return }
+          if state == .stopped { self.fail("Glasses disconnected.", for: current) }
+          else if state == .paused { self.setPaused(true) }
+          else if state == .started { self.setPaused(false) }
+        }
+      }.store(in: tokens)
+
+      // DAT 1.0.1: synchronous start(), then wait for .started.
+      try session.start()
+      status = "Connecting to glasses…"
+      let deadline = ProcessInfo.processInfo.systemUptime + 10
+      while session.state != .started {
+        guard epoch == current else { return }
+        guard session.state != .stopped, ProcessInfo.processInfo.systemUptime < deadline else {
+          return failed("Glasses session did not start. Check Meta AI, firmware and Bluetooth.")
+        }
+        try await Task.sleep(nanoseconds: 100_000_000)
+      }
+      guard epoch == current else { return }
+      guard let device = session.device, device.compatibility() == .compatible else {
+        return failed("These glasses need a firmware or Meta AI update for camera access.")
+      }
+      guard let camera = try session.addCamera(config:
+        StreamConfiguration(videoCodec: .raw, audioCodec: nil, resolution: .medium, frameRate: 15)
+      ) else { return failed("These glasses did not offer a camera stream.") }
+      self.camera = camera
+
+      let encoder = self.encoder
+      camera.stream.videoFramePublisher.listen { frame in
+        encoder.encode(frame) { base64 in
+          Task { @MainActor [weak self] in
+            guard let self, self.epoch == current else { return }
+            if !self.streaming { self.streaming = true; self.status = "Live: Meta glasses camera" }
+            // A frame is proof the video is flowing again, whatever the state callbacks said.
+            if self.paused { self.setPaused(false) }
+            onFrame(base64)
+          }
+        }
+      }.store(in: tokens)
+      camera.stream.errorPublisher.listen { error in
+        Task { @MainActor [weak self] in self?.fail("Glasses video error: \(error.localizedDescription)", for: current) }
+      }.store(in: tokens)
+      camera.stream.statePublisher.listen { state in
+        Task { @MainActor [weak self] in
+          guard let self, self.epoch == current, self.streaming else { return }
+          // A pause is not a failure: the glasses resume the video themselves (for example
+          // after an audio route change). Only a stop ends the camera.
+          if state == .stopped { self.fail("Glasses video stopped.", for: current) }
+          else if state == .paused { self.setPaused(true) }
+          else if state == .streaming { self.setPaused(false) }
+        }
+      }.store(in: tokens)
+      status = "Starting glasses video…"
+      camera.stream.start()
+    } catch {
+      if (error as? DeviceSessionError) == .noEligibleDevice {
+        failed("No eligible glasses. \(deviceReport())")
+      } else {
+        failed("Could not start the glasses camera: \(error.localizedDescription)")
+      }
+    }
+  }
+
+  /// Says why each paired device was rejected (connection, firmware/SDK compatibility), so the
+  /// failure is actionable instead of a generic "no eligible device".
+  private func deviceReport() -> String {
+    let ids = Wearables.shared.devices
+    guard !ids.isEmpty else { return "No glasses are paired." }
+    return ids.map { id -> String in
+      guard let device = Wearables.shared.deviceForIdentifier(id) else { return "A paired device is unavailable." }
+      let link: String
+      switch device.linkState {
+      case .connected: link = "connected"
+      case .connecting: link = "connecting"
+      case .disconnected: link = "not connected (turn them on, open or wear them, check Meta AI)"
+      }
+      let fit: String
+      switch device.compatibility() {
+      case .compatible: fit = "compatible"
+      case .deviceUpdateRequired: fit = "glasses firmware update required"
+      case .sdkUpdateRequired: fit = "Glance needs a newer Meta SDK"
+      case .undefined: fit = "compatibility not reported yet"
+      }
+      let worn = device.donState == .donned ? "worn" : device.donState == .doffed ? "not worn" : "wear state unknown"
+      let hinge = device.hingeState == .open ? "open" : device.hingeState == .closed ? "folded" : "hinge unknown"
+      return "\(device.name): \(link); \(fit); \(worn); \(hinge)."
+    }.joined(separator: " ")
+  }
+
+  private func setPaused(_ value: Bool) {
+    guard paused != value else { return }
+    paused = value
+    status = value ? "Glasses video paused. Waiting for the glasses to resume…" : "Live: Meta glasses camera"
+    onPause?(value)
+  }
+
+  private func fail(_ message: String, for current: UUID) {
+    guard epoch == current else { return }
+    let report = onFailure
+    stop()
+    status = message
+    report?(message)
+  }
+
+  func stop() {
+    epoch = UUID()
+    onFailure = nil
+    onPause = nil
+    paused = false
+    camera?.stream.stop()
+    camera?.stop()
+    let oldSession = session, oldTokens = tokens
+    camera = nil
+    session = nil
+    tokens = ListenerTokenBag()
+    oldSession?.stop()
+    if streaming { streaming = false; status = "Glasses camera off" }
+    Task { await oldTokens.cancelAll() }
+  }
+}
+
+/// One frame at a time; frames that arrive while encoding are dropped, never queued.
+private final class FrameEncoder: @unchecked Sendable {
+  private let queue = DispatchQueue(label: "glance.glasses.jpeg", qos: .userInitiated)
+  private let lock = NSLock()
+  private var busy = false
+
+  func encode(_ frame: VideoFrame, completion: @escaping (String) -> Void) {
+    lock.lock()
+    guard !busy else { lock.unlock(); return }
+    busy = true
+    lock.unlock()
+    queue.async { [self] in
+      defer { lock.lock(); busy = false; lock.unlock() }
+      let image: UIImage? = frame.makeUIImage()
+      guard let data = image?.jpegData(compressionQuality: 0.85) else { return }
+      completion(data.base64EncodedString())
+    }
+  }
+}
