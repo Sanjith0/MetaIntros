@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p14\", \"members\": [\"p01\", \"p05\", \"p14\", \"p15\"], \"line\": {\"say\": \"Arjun would love chill Philz lattes, vinyl digging and climbing stories with Jordan, Yuki and Kwame.\", \"cites\": [\"p14:likes[6]\", \"p14:groups[2]\", \"p14:groups[0]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1465,
+    "completionTokens": 1155
+  },
+  "savedAt": "2026-11-13T06:30:31.398Z"
+}

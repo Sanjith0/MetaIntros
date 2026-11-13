@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Rosa is eager and kind but a bit nervous in crowds at first, and really appreciates being included. They prefer low-key, chill plans and, as someone new to the Bay, are looking for climbing partners and people to go to gigs with.\", \"depth\": {\"p11:likes[2]\": \"Follows Bay Area Climbers Coalition, alongside Climbing Magazine and Peninsula Bouldering League\", \"p11:music[0]\": \"Listens to Phoebe Bridgers, Snail Mail and Mitski\", \"p11:events[2]\": \"Interested in Phoebe Bridgers @ Greek Theatre, matching interest in Phoebe Bridgers\", \"p11:groups[0]\": \"In Peninsula Vinyl Collectors, alongside interest in Vinyl Me, Please and Rasputin Music\", \"p11:groups[1]\": \"In Bay Area Indie Shows, alongside interest in Pitchfork and Indie Shuffle\"}, \"lightsUp\": [\"p11:likes[2]\", \"p11:events[2]\", \"p11:groups[1]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 778,
+    "completionTokens": 1664
+  },
+  "savedAt": "2026-11-13T05:44:16.050Z"
+}

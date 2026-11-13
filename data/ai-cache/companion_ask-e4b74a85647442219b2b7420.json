@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Zoe shoots 35mm at every gig, hanging low-key on the edges — what would Jordan actually do during sets, stick nearby chatting between bands or drift off to explore solo?\", \"cites\": [\"p03:likes[6]\"]}, \"p13\": {\"say\": \"Zoe is into Bay Area concerts but stays low-key in crowds — how would Leo spend gaps between bands at Indie Night, find a quieter spot for thoughtful chat or stay planted in the crowd?\", \"cites\": [\"p03:likes[5]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1768,
+    "completionTokens": 936
+  },
+  "savedAt": "2026-11-13T05:44:37.915Z"
+}

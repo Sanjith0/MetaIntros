@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Leo joins Jordan for a chill indie show night and mostly listens at first, how would Jordan keep Leo comfortable until Leo opens up about KEXP live sessions?\", \"cites\": [\"p13:likes[2]\"]}, \"p05\": {\"say\": \"If Leo and Yuki end up at a Bay Area Indie Shows night together, how would Yuki share vivid stories while leaving room for Leo to settle in and chat later?\", \"cites\": [\"p13:groups[0]\"]}, \"p11\": {\"say\": \"If Leo who likes low-key chill plans meets Rosa at a crowded gig, how would Rosa handle nerves while making space for Leo to listen then open up late?\", \"cites\": [\"p13:socialStyle\"]}, \"p14\": {\"say\": \"If Leo hangs with Arjun for a chill Record Store Day Palo Alto style night, how would Arjun's puns and lively debate style land with Leo who listens more than talks?\", \"cites\": [\"p13:events[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2302,
+    "completionTokens": 1615
+  },
+  "savedAt": "2026-11-13T06:02:53.968Z"
+}

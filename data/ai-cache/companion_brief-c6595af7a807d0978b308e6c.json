@@ -1,0 +1,11 @@
+{
+  "text": "{\"communication\": \"Yuki is chill and easy to hang out with, telling vivid, thoughtful stories that bounce a little chaotically between climbing and concert photography while already planning the next trip.\", \"depth\": {\"p05:likes[5]\": \"Always carries a Fujifilm X in the bag for concert photography\", \"p05:groups[0]\": \"Boulders with the Peninsula Bouldering Crew\", \"p05:events[1]\": \"Goes to Bouldering Night at Peninsula Boulders\", \"p05:events[2]\": \"Goes to Outside Lands\"}, \"lightsUp\": [\"p05:likes[5]\", \"p05:events[1]\", \"p05:groups[2]\"]}",
+  "task": "companion_brief",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 669,
+    "completionTokens": 1472
+  },
+  "savedAt": "2026-11-13T05:44:10.913Z"
+}

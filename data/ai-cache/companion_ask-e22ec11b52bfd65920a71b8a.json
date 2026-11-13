@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p03\": {\"say\": \"When Rosa is feeling nervous in a crowd at first at a gig, how does Zoe actually include them and keep things chill one-on-one?\", \"cites\": [\"p11:socialStyle\"]}, \"p05\": {\"say\": \"If Rosa suggests a Rasputin Music dig after bouldering, how does Yuki actually move between climbing chat and photo stops to keep the night chill?\", \"cites\": [\"p11:likes[5]\"]}, \"p12\": {\"say\": \"When Rosa is new and nervous trying a climb or chatting between sets, how does Gabe cheer them on without making it loud or overwhelming?\", \"cites\": [\"p11:events[1]\"]}, \"p14\": {\"say\": \"If Rosa grabs Philz Coffee before a show, how does Arjun keep the Philz vs Blue Bottle debate playful and inclusive on a low-key night?\", \"cites\": [\"p11:likes[8]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2488,
+    "completionTokens": 937
+  },
+  "savedAt": "2026-11-13T06:02:27.377Z"
+}

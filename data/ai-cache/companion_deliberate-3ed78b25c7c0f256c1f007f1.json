@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"line\": {\"say\": \"Yuki would enjoy chill climbing photo crew swapping shots between sets.\", \"cites\": [\"p05:likes[5]\", \"p05:events[1]\", \"p05:groups[2]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1397,
+    "completionTokens": 1305
+  },
+  "savedAt": "2026-11-13T05:47:43.036Z"
+}

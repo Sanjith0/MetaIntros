@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Gabe loves low-key chill plans and cheers loudly in climbing slang. How does Jordan warm up and join in when hanging out at a bouldering session together?\", \"cites\": [\"p12:socialStyle\"]}, \"p03\": {\"say\": \"When Gabe shares V-Scale Memes and keeps things chill with goofy encouragement, how does Zoe respond one-on-one versus in a big group of six?\", \"cites\": [\"p12:likes[3]\"]}, \"p05\": {\"say\": \"If Gabe brings up Vinyl Me, Please finds and SF Live Music stories, how does Yuki share stories and plan the next trip during a chill vinyl dig?\", \"cites\": [\"p12:likes[5]\"]}, \"p13\": {\"say\": \"Gabe enjoys Peninsula Film Club chats and low-key hangs. How does Leo, who listens more than talks, open up with Gabe during a late chill night after an indie show?\", \"cites\": [\"p12:groups[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2457,
+    "completionTokens": 1048
+  },
+  "savedAt": "2026-11-13T06:02:45.039Z"
+}

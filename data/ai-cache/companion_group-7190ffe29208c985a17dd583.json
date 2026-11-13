@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Leo hopes for a chill Indie Night Local Bands Showcase with this squad of 6. They would bring love of KEXP live sessions, Rasputin Music finds, and Letterboxd film talk, plus Bay Area Indie Shows energy. They thrive in low-key, chill plans and tend to listen then open up late-night.\", \"cites\": [\"p13:likes[2]\", \"p13:likes[1]\", \"p13:likes[5]\", \"p13:groups[0]\", \"p13:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2717,
+    "completionTokens": 801
+  },
+  "savedAt": "2026-11-13T05:49:14.366Z"
+}

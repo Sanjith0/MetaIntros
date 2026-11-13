@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p05\", \"p11\", \"p13\", \"p15\"], \"why\": \"You all live at the intersection of bouldering and Bay Area music — swapping Bouldering Daily and V-Scale Memes alongside Rasputin Music digs, Vinyl Me, Please finds, and Indie Shuffle gigs. Perfect crew for a chill weekend of climbing chat, vinyl and shows together!\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1349,
+    "completionTokens": 2240
+  },
+  "savedAt": "2026-11-13T06:09:21.746Z"
+}

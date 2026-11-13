@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"line\": {\"say\": \"Yuki enjoys low-key bouldering nights and Bay Area indie shows with Fujifilm photo chat.\", \"cites\": [\"p05:events[1]\", \"p05:groups[2]\", \"p05:likes[5]\", \"p05:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1407,
+    "completionTokens": 1100
+  },
+  "savedAt": "2026-11-13T06:08:11.314Z"
+}

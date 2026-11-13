@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Arjun hopes for a chill squad of 5 for Indie Night Local Bands Showcase. They would bring crate-digging stories, climbing chat, and terrible puns to keep things moving. They love low-key plans and a friendly Philz vs Blue Bottle debate. Excited to connect with fellow vinyl and climbing folks!\", \"cites\": [\"p14:events[1]\", \"p14:socialStyle\", \"p14:likes[6]\", \"p14:likes[5]\", \"p14:groups[2]\", \"p14:groups[0]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2490,
+    "completionTokens": 755
+  },
+  "savedAt": "2026-11-13T06:01:46.061Z"
+}

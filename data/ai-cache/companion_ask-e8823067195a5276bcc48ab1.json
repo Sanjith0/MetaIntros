@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Zoe shoots 35mm at every gig and stays quiet in big groups but chatty one-on-one — if they hang back near the back with a camera, how would Jordan actually share that set with them?\", \"cites\": [\"p03:likes[6]\"]}, \"p13\": {\"say\": \"Zoe likes low-key, chill plans and sharp one-on-one humour — if they slip to the edge for a breather between bands, how would Leo actually spend that moment with them?\", \"cites\": [\"p03:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1768,
+    "completionTokens": 1354
+  },
+  "savedAt": "2026-11-13T05:51:38.670Z"
+}

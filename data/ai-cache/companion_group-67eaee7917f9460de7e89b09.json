@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan hopes for a new chill hangout as a squad of 4. They would bring chat about Japanese Breakfast and Alvvays, record-store finds, bouldering and photo walks. They are easygoing but a little shy at first and prefer low-key plans, warming up with curious follow-up questions.\", \"cites\": [\"p01:music[0]\", \"p01:music[1]\", \"p01:events[0]\", \"p01:events[1]\", \"p01:groups[0]\", \"p01:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2047,
+    "completionTokens": 994
+  },
+  "savedAt": "2026-11-13T06:19:55.301Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p15\", \"members\": [\"p01\", \"p05\", \"p13\", \"p15\"], \"line\": {\"say\": \"Kwame would love calm lattes, vinyl and film logs with Jordan, Yuki and Leo.\", \"cites\": [\"p15:likes[5]\", \"p15:likes[0]\", \"p15:likes[4]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1345,
+    "completionTokens": 1485
+  },
+  "savedAt": "2026-11-13T06:19:16.254Z"
+}

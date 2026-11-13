@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p11\", \"p15\"], \"why\": \"You all share a love of Vinyl Me, Please and Indie Shuffle, so settle in for swapping Rasputin Music finds and Bay Area show plans!\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1279,
+    "completionTokens": 1494
+  },
+  "savedAt": "2026-11-13T06:19:32.661Z"
+}

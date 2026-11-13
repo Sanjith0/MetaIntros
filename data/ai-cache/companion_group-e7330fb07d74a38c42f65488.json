@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe hopes for a chill Indie Night with local bands and good company. Zoe would bring 35mm gig photography, stories from projecting the same V4, and vinyl finds. Zoe is quiet in big groups but sharp and funny one-on-one, and likes low-key chill plans to keep things easy.\", \"cites\": [\"p03:likes[6]\", \"p03:likes[0]\", \"p03:likes[3]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2899,
+    "completionTokens": 889
+  },
+  "savedAt": "2026-11-13T06:22:03.631Z"
+}

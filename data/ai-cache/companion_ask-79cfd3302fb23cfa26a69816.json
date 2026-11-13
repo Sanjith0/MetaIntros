@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Leo and Jordan meet for a chill record dig before a gig, Leo loves Bay Area Indie Shows, how does Jordan hang out, chat, and warm up in that low-key setting?\", \"cites\": [\"p13:groups[0]\"]}, \"p05\": {\"say\": \"When Leo and Yuki are at a mellow listening night, Leo likes low-key chill plans, what is Yuki like telling stories and planning next trips alongside them?\", \"cites\": [\"p13:socialStyle\"]}, \"p11\": {\"say\": \"If Leo and Rosa share a quiet coffee before a show, Leo follows Letterboxd film logs, how does Rosa act joining in and looking for gig buddies in that chill moment?\", \"cites\": [\"p13:likes[5]\"]}, \"p14\": {\"say\": \"If Leo and Arjun hang for late-night chat after a show, Leo loves KEXP live sessions, how does Arjun keep conversation moving with puns and debates with them?\", \"cites\": [\"p13:likes[2]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2302,
+    "completionTokens": 1113
+  },
+  "savedAt": "2026-11-13T06:12:27.315Z"
+}
