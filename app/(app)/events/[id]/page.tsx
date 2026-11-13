@@ -7,9 +7,6 @@ import { DateLine } from "@/components/events/DateLine";
 import { ActionRow } from "@/components/events/RsvpButtons";
 import { QueueEntry } from "@/components/queueup/QueueEntry";
 import { StatusCard } from "@/components/queueup/StatusCard";
-import { FriendQueues } from "@/components/queueup/FriendQueues";
-import { listFriendQueues } from "@/lib/server/friendQueues";
-import { getCurrentUser } from "@/lib/server/session";
 import { prisma } from "@/lib/db";
 import { getEventDetail } from "@/lib/server/events";
 import { getCurrentUserId } from "@/lib/server/session";
@@ -32,13 +29,10 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   const e = await getEventDetail(userId, id);
   if (!e) notFound();
   const hangout = e.kind === "hangout";
-  const t = await now();
-  const [card, pulse, landmarks, friendQueues, me] = await Promise.all([
-    getStatusCard(userId, t, id),
+  const [card, pulse, landmarks] = await Promise.all([
+    getStatusCard(userId, await now(), id),
     queuePulse(id),
     prisma.landmark.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, city: true } }),
-    e.kind === "hangout" ? Promise.resolve([]) : listFriendQueues(userId, { eventId: id }),
-    getCurrentUser(),
   ]);
   const friendsGoing = e.friendRsvps.filter((f) => f.status === "going").length;
 
@@ -75,16 +69,12 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
             pulse={pulseLine(pulse)}
             event={{ id: e.id, title: e.title, startsAt: e.startsAt.toISOString(), venue: e.venueName, isPublic: e.isPublicVenue }}
             landmarks={landmarks}
-            shareDefault={me.queueVisibility === "friends"}
-            friendsInLine={friendQueues.filter((q) => q.state === "waiting").length}
           />
         ) : (
           <p data-testid="queue-up-private" className="flex items-center gap-2 bg-surface px-4 py-3 text-meta text-muted">
             <Lock size={16} aria-hidden /> Queue Up only works for events at public venues.
           </p>
         )}
-
-        {!hangout && <FriendQueues queues={friendQueues} variant="list" nowMs={t.getTime()} eventTitle={e.title} />}
 
         <Section title="Details">
           <ul>

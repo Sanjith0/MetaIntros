@@ -16,7 +16,7 @@ type Step = { kind: "modes" } | { kind: "pick" } | { kind: "setup"; mode: "event
  * step 1 = the three queue modes as rows, step 2 = setup (size, where, one safety line, Find my squad).
  * On an event page (`event` set) the sheet opens straight at step 2 for that event.
  */
-export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault = false, friendsInLine = 0 }: { pulse: string | null; events?: PickableEvent[]; event?: SetupEvent; landmarks: Landmark[]; shareDefault?: boolean; friendsInLine?: number }) {
+export function QueueEntry({ pulse, events = [], event, landmarks }: { pulse: string | null; events?: PickableEvent[]; event?: SetupEvent; landmarks: Landmark[] }) {
   const first: Step = event ? { kind: "setup", mode: "events", event } : { kind: "modes" };
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>(first);
@@ -41,11 +41,6 @@ export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault 
         </div>
       </div>
       {pulse && <p className="mt-2 text-meta text-muted" data-testid="queue-pulse">{pulse}</p>}
-      {friendsInLine > 0 && (
-        <p className="mt-1 text-meta font-semibold text-link" data-testid="friends-in-line">
-          {friendsInLine === 1 ? "1 friend is" : `${friendsInLine} friends are`} in line for this
-        </p>
-      )}
       <Button variant="primary" block className="mt-3" data-testid={event ? "queue-up-button" : "queue-entry-open"} onClick={() => setOpen(true)}>
         {event ? "Find a squad to go with" : "Find a squad"}
       </Button>
@@ -86,7 +81,7 @@ export function QueueEntry({ pulse, events = [], event, landmarks, shareDefault 
             {sorted.length === 0 && <li className="px-4 py-6 text-center text-muted">No public events coming up.</li>}
           </ul>
         )}
-        {step.kind === "setup" && <QueueSetup variant="sheet" mode={step.mode} event={step.event} landmarks={landmarks} shareDefault={shareDefault} />}
+        {step.kind === "setup" && <QueueSetup variant="sheet" mode={step.mode} event={step.event} landmarks={landmarks} />}
       </Sheet>
     </section>
   );

@@ -1,13 +1,11 @@
 import { prisma } from "@/lib/db";
 import { fmtEventWhen } from "@/lib/format";
-import { listFriendQueues } from "./friendQueues";
-import { pendingInvites } from "./queueGroups";
 
 /**
  * The Notifications tab, derived from data Queue Up already keeps (no new table): squads formed, chats
  * that ended, friend requests, friendships made through Queue Up, and upcoming events you're interested in.
  */
-export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder" | "friend_queue" | "queue_invite";
+export type NotificationKind = "squad" | "chat_ended" | "request" | "met" | "reminder";
 
 export interface NotificationItem {
   id: string;
@@ -24,7 +22,7 @@ export interface NotificationItem {
 const DAY = 24 * 3600_000;
 
 export async function listNotifications(userId: string, now: Date): Promise<NotificationItem[]> {
-  const [memberships, requests, friendships, rsvps, friendQueues] = await Promise.all([
+  const [memberships, requests, friendships, rsvps] = await Promise.all([
     prisma.partyMember.findMany({
       where: { userId, party: { status: { in: ["confirmed", "completed"] } } },
       include: { party: { include: { event: true, chat: { select: { id: true, archived: true, expiresAt: true } }, members: true } } },
@@ -38,24 +36,9 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       where: { userId, status: { in: ["interested", "going"] }, event: { kind: "event", startsAt: { gt: now, lt: new Date(now.getTime() + 3 * DAY) } } },
       include: { event: true },
     }),
-    listFriendQueues(userId),
   ]);
 
   const out: NotificationItem[] = [];
-  // Queue with friends: open invites to queue together.
-  for (const inv of await pendingInvites(userId)) {
-    const ev = inv.group.eventId ? await prisma.event.findUnique({ where: { id: inv.group.eventId }, select: { title: true } }) : null;
-    const what = inv.group.mode === "hangout" ? "a new hangout" : ev ? ev.title : "an event this weekend";
-    out.push({
-      id: `qinv-${inv.id}`,
-      kind: "queue_invite",
-      avatar: { name: inv.group.host.name, color: inv.group.host.avatarColor },
-      bold: inv.group.host.name,
-      text: `wants to find a squad with you for ${what}.`,
-      href: `/queue/friends/${inv.groupId}`,
-      at: inv.invitedAt,
-    });
-  }
   for (const m of memberships) {
     const p = m.party;
     if (!p.event) continue;
@@ -112,19 +95,6 @@ export async function listNotifications(userId: string, now: Date): Promise<Noti
       text: `is coming up ${fmtEventWhen(r.event.startsAt)}.`,
       href: `/events/${r.event.id}`,
       at: new Date(Math.min(now.getTime(), r.event.startsAt.getTime() - 2 * DAY)),
-    });
-  }
-  // Friends who chose to share that they're queuing (opt-in, filtered by canSeeQueue)
-  for (const q of friendQueues) {
-    if (q.state !== "waiting") continue;
-    out.push({
-      id: `fq-${q.entryId}`,
-      kind: "friend_queue",
-      avatar: { name: q.friend.name, color: q.friend.avatarColor },
-      bold: q.friend.name,
-      text: `is ${q.label.charAt(0).toLowerCase()}${q.label.slice(1)}. Queue up too?`,
-      href: "/events#friends-queuing",
-      at: new Date(q.since),
     });
   }
   return out.sort((a, b) => b.at.getTime() - a.at.getTime());

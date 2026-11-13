@@ -7,12 +7,6 @@ export type AgeBand = z.infer<typeof AgeBand>;
 export const MINOR_BANDS: readonly AgeBand[] = ["13-15", "16-17"];
 export const isMinorBand = (b: AgeBand) => MINOR_BANDS.includes(b);
 
-/**
- * The group people are matched within. Everyone 18+ is one group (Afnan, Nov 12: friends of 24 and 26
- * must be able to queue together); each minor band stays its own group and never meets adults.
- */
-export const matchBand = (b: string) => (MINOR_BANDS.includes(b as AgeBand) ? b : "18+");
-
 export function ageBandFor(age: number): AgeBand {
   if (age < 13) throw new Error("Users must be at least 13");
   if (age <= 15) return "13-15";
@@ -61,7 +55,3 @@ export function normalizePair(a: string, b: string): [string, string] {
   if (a === b) throw new Error("Cannot pair a user with themselves");
   return a < b ? [a, b] : [b, a];
 }
-
-/** Who can see the queues you're in. Opt-in: "off" until you turn it on. */
-export const QueueVisibility = z.enum(["off", "friends"]);
-export type QueueVisibility = z.infer<typeof QueueVisibility>;

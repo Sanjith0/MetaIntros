@@ -15,14 +15,6 @@ import { setWorldWeekendInMemory } from "@/lib/clock";
 
 export { ME_ID };
 
-/** Seeded friends of Jordan (ME_ID) already in a queue. Reza's is the demo path: Indie Night. */
-export const FRIEND_QUEUES: { userId: string; mode: "events" | "hangout"; eventId: string | null; landmarkId: string; minutesAgo: number; visible: boolean }[] = [
-  { userId: "p04", mode: "events", eventId: "ev-indie-guild", landmarkId: "lm-menlo-caltrain", minutesAgo: 4, visible: true },
-  { userId: "p02", mode: "events", eventId: "ev-photo-walk", landmarkId: "lm-shoreline", minutesAgo: 11, visible: true },
-  { userId: "p45", mode: "hangout", eventId: null, landmarkId: "lm-downtown-pa", minutesAgo: 23, visible: true },
-  { userId: "p50", mode: "events", eventId: "ev-baylands-birding", landmarkId: "lm-shoreline", minutesAgo: 7, visible: false },
-];
-
 /** Friday 00:00 local of "this weekend" (today if Fri/Sat/Sun, else the coming Friday). */
 export function weekendFriday(now: Date): Date {
   const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -72,7 +64,7 @@ export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {})
       // children first
       for (const m of [
         "agentTrace", "preChat", "talkCard", "chatMessage", "chatMember", "chat", "friendRequest",
-        "partyMember", "queueEntry", "queueGroupMember", "queueGroup", "party", "eventRsvp", "friendship", "event", "landmark", "block",
+        "partyMember", "queueEntry", "party", "eventRsvp", "friendship", "event", "landmark", "block",
         "availability", "tasteProfile", "deviceSession", "user", "appSetting",
       ] as const) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -176,28 +168,6 @@ export async function seedDatabase(prisma: PrismaClient, opts: SeedOptions = {})
           };
         }),
       });
-
-      // Friends' queues (demo): three of Jordan's friends are queuing and share it; one queues privately.
-      // Parked, so the matcher leaves them alone until a real person joins the same queue.
-      for (const f of FRIEND_QUEUES) {
-        const lm = LANDMARKS.find((l) => l.id === f.landmarkId)!;
-        if (f.visible) await tx.user.update({ where: { id: f.userId }, data: { queueVisibility: "friends", queueVisibilityAskedAt: now } });
-        await tx.queueEntry.create({
-          data: {
-            id: `fq-${f.userId}`,
-            userId: f.userId,
-            mode: f.mode,
-            eventId: f.eventId,
-            targetPartySize: 5,
-            lat: lm.lat,
-            lng: lm.lng,
-            bucketLandmarkId: lm.id,
-            joinedAt: new Date(now.getTime() - f.minutesAgo * 60_000),
-            visibleToFriends: f.visible,
-            parked: true,
-          },
-        });
-      }
 
       await tx.eventRsvp.createMany({
         data: RSVPS.map((r) => ({ id: `rsvp-${r.eventId}-${r.userId}`, ...r })),

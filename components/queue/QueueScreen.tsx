@@ -28,8 +28,6 @@ interface Status {
   foundUsers?: { id: string; name: string; avatarColor: string }[];
   searchArea?: SearchAreaView;
   partyId?: string | null;
-  /** Queue with friends: the friends queuing with you, shown with faces */
-  friends?: { id: string; name: string; avatarColor: string; isSimulated: boolean }[];
 }
 
 interface Party {
@@ -37,7 +35,7 @@ interface Party {
   /** "confirming" = ready check: every real member taps "I'm in" before the squad is revealed */
   status: string;
   acceptBy: string | null;
-  members: { groupId?: string | null; acceptedAt: string | null; shared?: string[]; user: { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean } }[];
+  members: { acceptedAt: string | null; shared?: string[]; user: { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean } }[];
   event: { id: string; title: string; startsAt: string; venueName: string; kind?: string; description?: string; coverColor?: string; coverPattern?: string } | null;
   landmark: { name: string };
   chat: { id: string } | null;
@@ -118,16 +116,7 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
 
   const n = status.targetSize ?? 5;
   const found = Math.min(status.found ?? 1, n);
-  // You first, then the friends you queued with (faces and names: you know them), then people found (counts only).
-  const friends = status.friends ?? [];
-  const friendIds = new Set(friends.map((f) => f.id));
-  const meUser = (status.foundUsers ?? [])[0];
-  const strangers = (status.foundUsers ?? []).slice(1).filter((u) => !friendIds.has(u.id));
-  const users: { id: string; name: string; avatarColor: string; friend?: boolean }[] = [
-    ...(meUser ? [meUser] : []),
-    ...friends.map((f) => ({ ...f, friend: true })),
-    ...strangers,
-  ];
+  const users = status.foundUsers ?? [];
   const widening = elapsed > 16_000 ? "Looking in nearby areas too" : elapsed > 8_000 ? "Widening the search a little" : "Looking for people you'd get along with";
   const kind = status.mode === "hangout" ? "New hangout" : status.eventId ? eventTitle ?? "This event" : "Any event this weekend";
 
@@ -166,22 +155,18 @@ export function QueueScreen({ meId, eventTitle }: { meId: string; eventTitle: st
               return (
                 <li key={u?.id ?? `empty-${i}`} className="flex w-12 flex-col items-center gap-1">
                   {u ? (
-                    <span className="animate-slot-in" data-testid={u.friend ? "player-friend" : "player-filled"}>
-                      <Avatar name={i === 0 || u.friend ? u.name : "Someone nearby"} color={u.avatarColor} size={48} blurred={i !== 0 && !u.friend} />
+                    <span className="animate-slot-in" data-testid="player-filled">
+                      <Avatar name={i === 0 ? u.name : "Someone nearby"} color={u.avatarColor} size={48} blurred={i !== 0} />
                     </span>
                   ) : (
                     <span className="h-12 w-12 rounded-full border-2 border-dashed border-divider" data-testid="player-empty" aria-label="Open spot" />
                   )}
-                  <span className="w-full truncate text-center text-[11px] text-muted">{u ? (i === 0 ? "You" : u.friend ? first(u.name) : "Found") : ""}</span>
+                  <span className="w-full truncate text-center text-[11px] text-muted">{u ? (i === 0 ? "You" : "Found") : ""}</span>
                 </li>
               );
             })}
           </ul>
-          <p className="mt-3 text-meta text-muted">
-            {friends.length
-              ? `You're queuing with ${friends.map((f) => first(f.name)).join(" and ")}. You'll see who the new people are once your squad is ready.`
-              : "You'll see who they are once your squad is ready."}
-          </p>
+          <p className="mt-3 text-meta text-muted">You&apos;ll see who they are once your squad is ready.</p>
           {status.problem && <QueueProblem status={status} />}
         </Section>
         <Section flush title="While you wait">
@@ -350,9 +335,6 @@ function SquadFound({ party, meId }: { party: Party; meId: string }) {
   const hangout = party.event?.kind === "hangout";
   const others = party.members.filter((m) => m.user.id !== meId);
   const hasSample = party.members.some((m) => m.user.isSimulated && !m.user.isLive && m.user.id !== meId);
-  // Queue with friends: who you came with, and how many new people joined you.
-  const myGroup = party.members.find((m) => m.user.id === meId)?.groupId ?? null;
-  const cameWith = myGroup ? others.filter((m) => m.groupId === myGroup) : [];
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus(), []);
   return (
@@ -379,11 +361,6 @@ function SquadFound({ party, meId }: { party: Party; meId: string }) {
               </li>
             ))}
           </ul>
-          {cameWith.length > 0 && (
-            <p className="mt-3 text-body" data-testid="came-with">
-              You{cameWith.length > 1 ? ", " : " and "}{cameWith.map((m) => first(m.user.name)).join(cameWith.length > 1 ? ", " : " and ").replace(/, ([^,]*)$/, " and $1")} + {others.length - cameWith.length} new {others.length - cameWith.length === 1 ? "person" : "people"}
-            </p>
-          )}
           {hasSample && <p className="mt-2 text-meta text-muted">Sample people are simulated so the demo works with a small crowd.</p>}
         </Section>
 
