@@ -66,6 +66,8 @@ export default function GlanceEmbed() {
       return;
     }
     if (message.type === 'back') back();
+    // Dev tools, opened from the Profile tab, closes back to it.
+    if (message.type === 'close') router.dismissTo('/profile' as never);
   };
   const target = `${WEB_APP}/#${path.startsWith('/glance') ? path : '/glance/connections'}`;
   // Tells the page it is inside Link before its code runs (it hides web-only chrome and routes "back" here), and
