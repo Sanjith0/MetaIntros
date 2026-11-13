@@ -241,8 +241,9 @@ describe("Companion engine in the queue", () => {
     const item = ci.objection!.items[0];
     expect(item).toMatchObject({ activity: "karaoke", companionThinks: NO });
     expect(item.asked.length).toBeGreaterThan(0);
-    // until the squad is ready, the other person is "Person A…" on this card too
-    expect(view!.people[item.with].name).toMatch(/^Person [A-Z]/);
+    // until the squad is ready, the other person is a first name with a blurred photo on this card too
+    expect(view!.people[item.with]).toMatchObject({ anonymous: true });
+    expect(view!.people[item.with].name).not.toContain(" ");
     expect(await answerCheckIn("p01", ci.id, { up: "everyone" })).toEqual({ ok: false, error: "bad_answer" });
     expect(await answerCheckIn("p01", ci.id, { up: [item.with, "not-in-the-offer"] })).toEqual({ ok: true });
     // keep answering any later cards so the room finishes quickly

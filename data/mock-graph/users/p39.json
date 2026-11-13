@@ -146,23 +146,23 @@
       },
       {
         "id": "p30",
-        "name": "Diego Cohen"
+        "name": "Diego Ramírez"
       },
       {
         "id": "p31",
-        "name": "Isaac Moreau"
+        "name": "Isaac Wright"
       },
       {
         "id": "p43",
-        "name": "Emma Patel"
+        "name": "Emma Lindgren"
       },
       {
         "id": "p53",
-        "name": "Nate Kim"
+        "name": "Tyler Han"
       },
       {
         "id": "p58",
-        "name": "Kai Patel"
+        "name": "Kai Mehta"
       }
     ],
     "summary": {
@@ -206,6 +206,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Bike rides, sunrise runs, dog pics. Not a night person.",
+  "x_profile": {
+    "work": "Environmental science student",
+    "hometown": "São Paulo, Brazil",
+    "traits": [
+      "sunny",
+      "easygoing",
+      "early riser"
+    ],
+    "voice": "Noah is sunny and easygoing, but fades fast after 10pm."
   },
   "x_cluster": "run-coffee"
 }

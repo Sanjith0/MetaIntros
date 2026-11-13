@@ -1,8 +1,8 @@
 {
   "id": "p12",
-  "name": "Gabe Chen",
+  "name": "Gabe Kahale",
   "first_name": "Gabe",
-  "last_name": "Chen",
+  "last_name": "Kahale",
   "birthday": "06/03/2003",
   "gender": "male",
   "location": {
@@ -180,11 +180,11 @@
       },
       {
         "id": "p14",
-        "name": "Ben Patel"
+        "name": "Arjun Patel"
       },
       {
         "id": "p15",
-        "name": "Ravi Mensah"
+        "name": "Kwame Mensah"
       }
     ],
     "summary": {
@@ -222,6 +222,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "I set routes at a climbing gym. I'll tell you which one is sandbagged.",
+  "x_profile": {
+    "work": "Route setter at a climbing gym",
+    "hometown": "Honolulu, Hawaii",
+    "traits": [
+      "laid-back",
+      "goofy",
+      "encouraging"
+    ],
+    "voice": "Gabe is relaxed and silly, cheers loudly for other people and speaks fluent climbing slang."
   },
   "x_cluster": "indie-climb"
 }

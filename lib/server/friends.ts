@@ -1,3 +1,4 @@
+import { personaFrom } from "@/lib/profile/persona";
 import { prisma } from "@/lib/db";
 import { friendIdsOf } from "./events";
 import { suggestFriends } from "@/lib/match/friendSafety";
@@ -6,11 +7,11 @@ const userSel = { id: true, name: true, avatarColor: true, neighborhood: true } 
 
 export async function listFriends(userId: string) {
   const mine = await friendIdsOf(userId);
-  const users = await prisma.user.findMany({ where: { id: { in: [...mine] } }, select: userSel, orderBy: { name: "asc" } });
+  const users = await prisma.user.findMany({ where: { id: { in: [...mine] } }, select: { ...userSel, rawGraph: true }, orderBy: { name: "asc" } });
   const out = [];
-  for (const u of users) {
+  for (const { rawGraph, ...u } of users) {
     const theirs = await friendIdsOf(u.id);
-    out.push({ ...u, mutual: [...theirs].filter((x) => mine.has(x)).length });
+    out.push({ ...u, work: personaFrom(rawGraph).work, mutual: [...theirs].filter((x) => mine.has(x)).length });
   }
   return out;
 }

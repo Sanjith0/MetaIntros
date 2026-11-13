@@ -1,8 +1,8 @@
 {
   "id": "p44",
-  "name": "Kai Cohen",
-  "first_name": "Kai",
-  "last_name": "Cohen",
+  "name": "Eli Rosen",
+  "first_name": "Eli",
+  "last_name": "Rosen",
   "birthday": "06/05/2001",
   "gender": "male",
   "location": {
@@ -147,15 +147,15 @@
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       },
       {
         "id": "p48",
-        "name": "Hugo Andersen"
+        "name": "Hugo Laurent"
       },
       {
         "id": "p68",
-        "name": "Tomás Ali"
+        "name": "Tomás Herrera"
       }
     ],
     "summary": {
@@ -183,6 +183,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Film photographer, open space hiker, NYT Cooking on weeknights.",
+  "x_profile": {
+    "work": "High school science teacher",
+    "hometown": "Brooklyn, New York",
+    "traits": [
+      "chatty",
+      "funny",
+      "curious"
+    ],
+    "voice": "Eli is chatty and funny, a teacher who explains things with real enthusiasm."
   },
   "x_cluster": "hike-photo"
 }

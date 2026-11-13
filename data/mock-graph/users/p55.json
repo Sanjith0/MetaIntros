@@ -1,8 +1,8 @@
 {
   "id": "p55",
-  "name": "Kiara Chen",
-  "first_name": "Kiara",
-  "last_name": "Chen",
+  "name": "Grace Lin",
+  "first_name": "Grace",
+  "last_name": "Lin",
   "birthday": "06/07/2000",
   "gender": "female",
   "location": {
@@ -141,23 +141,23 @@
       },
       {
         "id": "p24",
-        "name": "Ivan Mensah"
+        "name": "Ivan Petrov"
       },
       {
         "id": "p30",
-        "name": "Diego Cohen"
+        "name": "Diego Ramírez"
       },
       {
         "id": "p36",
-        "name": "Ben Müller"
+        "name": "Ben Fischer"
       },
       {
         "id": "p56",
-        "name": "Noor Adeyemi"
+        "name": "Amara Obi"
       },
       {
         "id": "p58",
-        "name": "Kai Patel"
+        "name": "Kai Mehta"
       }
     ],
     "summary": {
@@ -196,6 +196,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Latent Space listener, hackathon regular, unofficial coffee tour guide.",
+  "x_profile": {
+    "work": "ML engineer",
+    "hometown": "Taipei, Taiwan",
+    "traits": [
+      "sharp",
+      "warm",
+      "driven"
+    ],
+    "voice": "Grace is sharp and warm, and explains technical things simply."
   },
   "x_cluster": "builders"
 }

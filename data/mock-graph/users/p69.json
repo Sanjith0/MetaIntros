@@ -1,8 +1,8 @@
 {
   "id": "p69",
-  "name": "Ivan Hughes",
-  "first_name": "Ivan",
-  "last_name": "Hughes",
+  "name": "Callum Reid",
+  "first_name": "Callum",
+  "last_name": "Reid",
   "birthday": "06/06/2000",
   "gender": "male",
   "location": {
@@ -149,19 +149,19 @@
     "data": [
       {
         "id": "p54",
-        "name": "Owen Lindqvist"
+        "name": "Nils Lindqvist"
       },
       {
         "id": "p58",
-        "name": "Kai Patel"
+        "name": "Kai Mehta"
       },
       {
         "id": "p65",
-        "name": "Emerson Shah"
+        "name": "Emerson Gray"
       },
       {
         "id": "p71",
-        "name": "Freya Sato"
+        "name": "Aiko Mori"
       }
     ],
     "summary": {
@@ -199,6 +199,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Joshua Weissman recipes, farmers market hauls, museum afternoons.",
+  "x_profile": {
+    "work": "Food scientist",
+    "hometown": "Edinburgh, Scotland",
+    "traits": [
+      "nerdy",
+      "friendly",
+      "precise"
+    ],
+    "voice": "Callum is friendly and precise, and explains the science behind every dish."
   },
   "x_cluster": "food"
 }

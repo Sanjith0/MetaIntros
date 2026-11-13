@@ -1,8 +1,8 @@
 {
   "id": "p33",
-  "name": "Caleb Wong",
+  "name": "Caleb Turner",
   "first_name": "Caleb",
-  "last_name": "Wong",
+  "last_name": "Turner",
   "birthday": "06/24/1997",
   "gender": "male",
   "location": {
@@ -131,23 +131,23 @@
     "data": [
       {
         "id": "p25",
-        "name": "Ivan Castillo"
+        "name": "Luis Castillo"
       },
       {
         "id": "p31",
-        "name": "Isaac Moreau"
+        "name": "Isaac Wright"
       },
       {
         "id": "p36",
-        "name": "Ben Müller"
+        "name": "Ben Fischer"
       },
       {
         "id": "p38",
-        "name": "Nadia Adeyemi"
+        "name": "Nadia Okoro"
       },
       {
         "id": "p60",
-        "name": "Aisha Müller"
+        "name": "Hana Weber"
       }
     ],
     "summary": {
@@ -180,6 +180,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Bike commuter, run club regular, weekend shelter-dog walker.",
+  "x_profile": {
+    "work": "Civil engineer",
+    "hometown": "Eugene, Oregon",
+    "traits": [
+      "kind",
+      "steady",
+      "nerdy"
+    ],
+    "voice": "Caleb is steady and kind, and can talk bike lanes and dogs for hours."
   },
   "x_cluster": "run-coffee"
 }

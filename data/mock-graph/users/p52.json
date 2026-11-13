@@ -132,19 +132,19 @@
     "data": [
       {
         "id": "p43",
-        "name": "Emma Patel"
+        "name": "Emma Lindgren"
       },
       {
         "id": "p51",
-        "name": "Ethan Novak"
+        "name": "Ethan Walsh"
       },
       {
         "id": "p57",
-        "name": "Aaron Castillo"
+        "name": "Aaron Mitchell"
       },
       {
         "id": "p61",
-        "name": "Milo Chen"
+        "name": "Milo Brennan"
       }
     ],
     "summary": {
@@ -188,6 +188,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Product designer who plays chess on the train. Two Minute Papers addict.",
+  "x_profile": {
+    "work": "Product designer",
+    "hometown": "Garden Grove, California",
+    "traits": [
+      "thoughtful",
+      "precise",
+      "dry"
+    ],
+    "voice": "Jonah is precise and thoughtful, with a dry wit and strong opinions about fonts."
   },
   "x_cluster": "builders"
 }

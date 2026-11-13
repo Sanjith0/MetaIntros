@@ -1,8 +1,8 @@
 {
   "id": "p70",
-  "name": "Dev Johnson",
+  "name": "Dev Malhotra",
   "first_name": "Dev",
-  "last_name": "Johnson",
+  "last_name": "Malhotra",
   "birthday": "06/03/1999",
   "gender": "male",
   "location": {
@@ -131,19 +131,19 @@
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       },
       {
         "id": "p51",
-        "name": "Ethan Novak"
+        "name": "Ethan Walsh"
       },
       {
         "id": "p61",
-        "name": "Milo Chen"
+        "name": "Milo Brennan"
       },
       {
         "id": "p75",
-        "name": "Ivy Costa"
+        "name": "Ivy Lam"
       }
     ],
     "summary": {
@@ -181,6 +181,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Bon Appétit test kitchen wannabe. Also plays a mean D&D bard.",
+  "x_profile": {
+    "work": "Software engineer",
+    "hometown": "Jersey City, New Jersey",
+    "traits": [
+      "goofy",
+      "warm",
+      "creative"
+    ],
+    "voice": "Dev is goofy and warm, and turns any meal into a friendly cooking contest."
   },
   "x_cluster": "food"
 }

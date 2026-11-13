@@ -1,8 +1,8 @@
 {
   "id": "p74",
-  "name": "Isabel Ibrahim",
+  "name": "Isabel Moreno",
   "first_name": "Isabel",
-  "last_name": "Ibrahim",
+  "last_name": "Moreno",
   "birthday": "06/14/2005",
   "gender": "female",
   "location": {
@@ -104,7 +104,7 @@
     "data": [
       {
         "id": "p14",
-        "name": "Ben Patel"
+        "name": "Arjun Patel"
       }
     ],
     "summary": {
@@ -149,6 +149,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Raves, Warriors games and 1am food runs.",
+  "x_profile": {
+    "work": "Communications student",
+    "hometown": "Orlando, Florida",
+    "traits": [
+      "outgoing",
+      "spontaneous",
+      "fun"
+    ],
+    "voice": "Isabel is outgoing and spontaneous, and always knows where the after-party is."
   },
   "x_cluster": "outlier-nightlife"
 }

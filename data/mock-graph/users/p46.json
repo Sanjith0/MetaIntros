@@ -1,7 +1,7 @@
 {
   "id": "p46",
-  "name": "Noor Martinez",
-  "first_name": "Noor",
+  "name": "Lucía Martinez",
+  "first_name": "Lucía",
   "last_name": "Martinez",
   "birthday": "06/10/1997",
   "gender": "female",
@@ -126,7 +126,7 @@
     "data": [
       {
         "id": "p08",
-        "name": "Jin Costa"
+        "name": "Hiro Tanaka"
       },
       {
         "id": "p11",
@@ -138,31 +138,31 @@
       },
       {
         "id": "p25",
-        "name": "Ivan Castillo"
+        "name": "Luis Castillo"
       },
       {
         "id": "p34",
-        "name": "Jade Sato"
+        "name": "Jade Okafor"
       },
       {
         "id": "p40",
-        "name": "Owen Sato"
+        "name": "Owen Fletcher"
       },
       {
         "id": "p42",
-        "name": "Felix Brooks"
+        "name": "Felix Grant"
       },
       {
         "id": "p44",
-        "name": "Kai Cohen"
+        "name": "Eli Rosen"
       },
       {
         "id": "p47",
-        "name": "Mira Dubois"
+        "name": "Mira Kowalski"
       },
       {
         "id": "p70",
-        "name": "Dev Johnson"
+        "name": "Dev Malhotra"
       }
     ],
     "summary": {
@@ -201,6 +201,17 @@
   },
   "x_preferences": {
     "women_only_party": true
+  },
+  "about": "Open space trails, Fujifilm, birding with Merlin. I bike to the trailhead.",
+  "x_profile": {
+    "work": "Research scientist",
+    "hometown": "Albuquerque, New Mexico",
+    "traits": [
+      "independent",
+      "thoughtful",
+      "dry"
+    ],
+    "voice": "Lucía is independent and thoughtful, and prefers small groups and deep conversations."
   },
   "x_cluster": "hike-photo"
 }

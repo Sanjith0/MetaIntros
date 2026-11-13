@@ -167,11 +167,11 @@
       },
       {
         "id": "p12",
-        "name": "Gabe Chen"
+        "name": "Gabe Kahale"
       },
       {
         "id": "p15",
-        "name": "Ravi Mensah"
+        "name": "Kwame Mensah"
       },
       {
         "id": "p20",
@@ -179,19 +179,19 @@
       },
       {
         "id": "p40",
-        "name": "Owen Sato"
+        "name": "Owen Fletcher"
       },
       {
         "id": "p46",
-        "name": "Noor Martinez"
+        "name": "Lucía Martinez"
       },
       {
         "id": "p55",
-        "name": "Kiara Chen"
+        "name": "Grace Lin"
       },
       {
         "id": "p67",
-        "name": "Rosa Ferreira"
+        "name": "Camila Souza"
       }
     ],
     "summary": {
@@ -235,6 +235,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "New to the Bay. Looking for climbing partners and people to go to gigs with.",
+  "x_profile": {
+    "work": "First-year student",
+    "hometown": "Chicago, Illinois",
+    "traits": [
+      "eager",
+      "kind",
+      "nervous in crowds"
+    ],
+    "voice": "Rosa is new in town, a bit nervous at first and really grateful when someone includes them."
   },
   "x_cluster": "indie-climb"
 }

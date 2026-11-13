@@ -12,6 +12,8 @@ import { albumCount } from "@/lib/server/album";
 import { getShareChoice, shareOpen } from "@/lib/server/posts";
 import { now as clockNow } from "@/lib/server/clock";
 import { LeaveSquad } from "@/components/queueup/LeaveSquad";
+import { prisma } from "@/lib/db";
+import { personaFrom } from "@/lib/profile/persona";
 
 function RoundAction({ href, label, icon, testId }: { href: string; label: string; icon: React.ReactNode; testId?: string }) {
   return (
@@ -35,6 +37,9 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
   const ready = p.status === "confirmed" || p.status === "completed";
   const [photos, choice, now] = await Promise.all([ready ? albumCount(partyId, people.map((u) => u.id)) : 0, getShareChoice(partyId, me), clockNow()]);
   const sharePrompt = ready && shareOpen(p, now) && !choice;
+  const intros = new Map(
+    (await prisma.user.findMany({ where: { id: { in: others.map((u) => u.id) } }, select: { id: true, rawGraph: true } })).map((u) => [u.id, personaFrom(u.rawGraph).about]),
+  );
   // you can leave while the squad is on; once its chat has ended there's nothing left to leave
   const canLeave = p.status === "confirmed" && !p.chat?.archived;
   return (
@@ -84,7 +89,7 @@ export default async function SquadInfo({ params }: { params: Promise<{ partyId:
                   testId={`member-avatar-${u.id}`}
                   leading={<Avatar name={u.name} color={u.avatarColor} size={40} />}
                   title={u.id === me ? `${u.name} (you)` : u.name}
-                  subtitle={[u.checkedIn ? "Here" : null, u.id !== me && u.isSimulated && !u.isLive ? "Sample person" : null].filter(Boolean).join(" · ") || undefined}
+                  subtitle={[u.checkedIn ? "Here" : null, intros.get(u.id) ?? null, u.id !== me && u.isSimulated && !u.isLive ? "Sample person" : null].filter(Boolean).join(" · ") || undefined}
                   trailing={u.id === me ? null : <ChevronRight size={20} className="text-muted" aria-hidden />}
                 />
               </li>

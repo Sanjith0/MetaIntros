@@ -1,8 +1,8 @@
 {
   "id": "p41",
-  "name": "Rafael Nguyen",
+  "name": "Rafael Torres",
   "first_name": "Rafael",
-  "last_name": "Nguyen",
+  "last_name": "Torres",
   "birthday": "06/21/2002",
   "gender": "male",
   "location": {
@@ -149,19 +149,19 @@
     "data": [
       {
         "id": "p21",
-        "name": "Omar Nguyen"
+        "name": "Omar Haddad"
       },
       {
         "id": "p23",
-        "name": "Marcus Kim"
+        "name": "Marcus Bell"
       },
       {
         "id": "p42",
-        "name": "Felix Brooks"
+        "name": "Felix Grant"
       },
       {
         "id": "p48",
-        "name": "Hugo Andersen"
+        "name": "Hugo Laurent"
       }
     ],
     "summary": {
@@ -200,6 +200,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Big Basin is my happy place. Film photos, Cantor Arts Center on Sundays.",
+  "x_profile": {
+    "work": "Architecture student",
+    "hometown": "Monterey, California",
+    "traits": [
+      "artistic",
+      "reflective",
+      "friendly"
+    ],
+    "voice": "Rafael is reflective and artistic, and talks about light and composition like other people talk about the weather."
   },
   "x_cluster": "hike-photo"
 }

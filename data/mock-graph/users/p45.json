@@ -160,39 +160,39 @@
       },
       {
         "id": "p36",
-        "name": "Ben Müller"
+        "name": "Ben Fischer"
       },
       {
         "id": "p38",
-        "name": "Nadia Adeyemi"
+        "name": "Nadia Okoro"
       },
       {
         "id": "p44",
-        "name": "Kai Cohen"
+        "name": "Eli Rosen"
       },
       {
         "id": "p47",
-        "name": "Mira Dubois"
+        "name": "Mira Kowalski"
       },
       {
         "id": "p49",
-        "name": "Valeria Kim"
+        "name": "Valeria Ruiz"
       },
       {
         "id": "p50",
-        "name": "Oscar Park"
+        "name": "Sam Park"
       },
       {
         "id": "p54",
-        "name": "Owen Lindqvist"
+        "name": "Nils Lindqvist"
       },
       {
         "id": "p67",
-        "name": "Rosa Ferreira"
+        "name": "Camila Souza"
       },
       {
         "id": "p68",
-        "name": "Tomás Ali"
+        "name": "Tomás Herrera"
       }
     ],
     "summary": {
@@ -231,6 +231,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Merlin Bird ID is my most-used app. 35mm, REI, camping trips.",
+  "x_profile": {
+    "work": "Wildlife biologist",
+    "hometown": "Santa Cruz, California",
+    "traits": [
+      "quiet",
+      "observant",
+      "adventurous"
+    ],
+    "voice": "Ari is quiet and observant, and comes alive on a trail spotting birds."
   },
   "x_cluster": "hike-photo"
 }

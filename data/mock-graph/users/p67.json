@@ -1,8 +1,8 @@
 {
   "id": "p67",
-  "name": "Rosa Ferreira",
-  "first_name": "Rosa",
-  "last_name": "Ferreira",
+  "name": "Camila Souza",
+  "first_name": "Camila",
+  "last_name": "Souza",
   "birthday": "06/12/1996",
   "gender": "female",
   "location": {
@@ -136,7 +136,7 @@
       },
       {
         "id": "p32",
-        "name": "Noor Johnson"
+        "name": "Noor Siddiqui"
       },
       {
         "id": "p45",
@@ -144,23 +144,23 @@
       },
       {
         "id": "p62",
-        "name": "Reza Ibrahim"
+        "name": "Yusuf Ibrahim"
       },
       {
         "id": "p63",
-        "name": "Rowan Brooks"
+        "name": "Quinn Foster"
       },
       {
         "id": "p66",
-        "name": "Julia Chen"
+        "name": "Sofia Alvarez"
       },
       {
         "id": "p71",
-        "name": "Freya Sato"
+        "name": "Aiko Mori"
       },
       {
         "id": "p72",
-        "name": "Anika Patel"
+        "name": "Anika Desai"
       }
     ],
     "summary": {
@@ -204,6 +204,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Ramen hunter, karaoke regular, thrift store treasure finder.",
+  "x_profile": {
+    "work": "Medical resident",
+    "hometown": "Rio de Janeiro, Brazil",
+    "traits": [
+      "lively",
+      "warm",
+      "funny"
+    ],
+    "voice": "Camila is lively and warm, laughs loudly and adopts every newcomer."
   },
   "x_cluster": "food"
 }

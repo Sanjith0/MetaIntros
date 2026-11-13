@@ -1,8 +1,8 @@
 {
   "id": "p71",
-  "name": "Freya Sato",
-  "first_name": "Freya",
-  "last_name": "Sato",
+  "name": "Aiko Mori",
+  "first_name": "Aiko",
+  "last_name": "Mori",
   "birthday": "06/10/2002",
   "gender": "female",
   "location": {
@@ -167,23 +167,23 @@
     "data": [
       {
         "id": "p57",
-        "name": "Aaron Castillo"
+        "name": "Aaron Mitchell"
       },
       {
         "id": "p64",
-        "name": "Zoe Chen"
+        "name": "Lily Zhou"
       },
       {
         "id": "p67",
-        "name": "Rosa Ferreira"
+        "name": "Camila Souza"
       },
       {
         "id": "p68",
-        "name": "Tomás Ali"
+        "name": "Tomás Herrera"
       },
       {
         "id": "p69",
-        "name": "Ivan Hughes"
+        "name": "Callum Reid"
       }
     ],
     "summary": {
@@ -221,6 +221,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Ramen, pastries and NYT Cooking. Brunch planner of the friend group.",
+  "x_profile": {
+    "work": "Event planner",
+    "hometown": "Kyoto, Japan",
+    "traits": [
+      "organised",
+      "cheerful",
+      "foodie"
+    ],
+    "voice": "Aiko is cheerful and organised, and is usually the one who already made the reservation."
   },
   "x_cluster": "food"
 }

@@ -140,7 +140,7 @@
       },
       {
         "id": "p63",
-        "name": "Rowan Brooks"
+        "name": "Quinn Foster"
       }
     ],
     "summary": {
@@ -174,6 +174,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Everything I own is thrifted. Bouldering, Pitchfork reviews, the occasional A24 cry.",
+  "x_profile": {
+    "work": "Product design student",
+    "hometown": "Vancouver, Canada",
+    "traits": [
+      "bubbly",
+      "creative",
+      "indecisive"
+    ],
+    "voice": "Ava is chatty and enthusiastic, compliments everyone's outfit and needs help picking a restaurant."
   },
   "x_cluster": "indie-climb"
 }

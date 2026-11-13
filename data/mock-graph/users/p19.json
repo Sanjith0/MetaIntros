@@ -155,11 +155,11 @@
     "data": [
       {
         "id": "p23",
-        "name": "Marcus Kim"
+        "name": "Marcus Bell"
       },
       {
         "id": "p27",
-        "name": "Leo Andersen"
+        "name": "Søren Andersen"
       }
     ],
     "summary": {
@@ -197,6 +197,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "One Piece is the greatest story ever told and I will defend it. 5e DM.",
+  "x_profile": {
+    "work": "Elementary school teacher",
+    "hometown": "Atlanta, Georgia",
+    "traits": [
+      "passionate",
+      "nurturing",
+      "storyteller"
+    ],
+    "voice": "Aisha tells big, animated stories and makes sure the new person gets a turn."
   },
   "x_cluster": "games-anime"
 }

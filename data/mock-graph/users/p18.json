@@ -1,7 +1,7 @@
 {
   "id": "p18",
-  "name": "Jin Shah",
-  "first_name": "Jin",
+  "name": "Rohan Shah",
+  "first_name": "Rohan",
   "last_name": "Shah",
   "birthday": "06/22/2007",
   "gender": "male",
@@ -157,27 +157,27 @@
       },
       {
         "id": "p24",
-        "name": "Ivan Mensah"
+        "name": "Ivan Petrov"
       },
       {
         "id": "p27",
-        "name": "Leo Andersen"
+        "name": "Søren Andersen"
       },
       {
         "id": "p40",
-        "name": "Owen Sato"
+        "name": "Owen Fletcher"
       },
       {
         "id": "p51",
-        "name": "Ethan Novak"
+        "name": "Ethan Walsh"
       },
       {
         "id": "p58",
-        "name": "Kai Patel"
+        "name": "Kai Mehta"
       },
       {
         "id": "p62",
-        "name": "Reza Ibrahim"
+        "name": "Yusuf Ibrahim"
       }
     ],
     "summary": {
@@ -216,6 +216,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "I DM a weekly D&D group. Catan strategist, Chess.com 1400.",
+  "x_profile": {
+    "work": "Maths student",
+    "hometown": "Austin, Texas",
+    "traits": [
+      "imaginative",
+      "strategic",
+      "talkative"
+    ],
+    "voice": "Rohan narrates everything like a D&D session, loves arguing the rules and gives everyone a nickname."
   },
   "x_cluster": "games-anime"
 }

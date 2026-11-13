@@ -1,8 +1,8 @@
 {
   "id": "p32",
-  "name": "Noor Johnson",
+  "name": "Noor Siddiqui",
   "first_name": "Noor",
-  "last_name": "Johnson",
+  "last_name": "Siddiqui",
   "birthday": "06/11/1996",
   "gender": "female",
   "location": {
@@ -137,31 +137,31 @@
     "data": [
       {
         "id": "p31",
-        "name": "Isaac Moreau"
+        "name": "Isaac Wright"
       },
       {
         "id": "p36",
-        "name": "Ben Müller"
+        "name": "Ben Fischer"
       },
       {
         "id": "p38",
-        "name": "Nadia Adeyemi"
+        "name": "Nadia Okoro"
       },
       {
         "id": "p53",
-        "name": "Nate Kim"
+        "name": "Tyler Han"
       },
       {
         "id": "p61",
-        "name": "Milo Chen"
+        "name": "Milo Brennan"
       },
       {
         "id": "p67",
-        "name": "Rosa Ferreira"
+        "name": "Camila Souza"
       },
       {
         "id": "p79",
-        "name": "Leila Johnson"
+        "name": "Leila Karimi"
       }
     ],
     "summary": {
@@ -199,6 +199,17 @@
   },
   "x_preferences": {
     "women_only_party": true
+  },
+  "about": "Running my sixth CIM. Radiolab on long runs. Proud dog aunt.",
+  "x_profile": {
+    "work": "ER nurse",
+    "hometown": "Irvine, California",
+    "traits": [
+      "calm",
+      "dependable",
+      "wry"
+    ],
+    "voice": "Noor is calm under pressure, dependable, and has the wry humour of someone who works night shifts."
   },
   "x_cluster": "run-coffee"
 }

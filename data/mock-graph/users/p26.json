@@ -119,19 +119,19 @@
     "data": [
       {
         "id": "p21",
-        "name": "Omar Nguyen"
+        "name": "Omar Haddad"
       },
       {
         "id": "p22",
-        "name": "Kai Rossi"
+        "name": "Kenji Nakamura"
       },
       {
         "id": "p25",
-        "name": "Ivan Castillo"
+        "name": "Luis Castillo"
       },
       {
         "id": "p76",
-        "name": "Priya Bauer"
+        "name": "Priya Nair"
       }
     ],
     "summary": {
@@ -175,6 +175,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Nintendo kid forever. Jeopardy! at home, trivia nights out.",
+  "x_profile": {
+    "work": "Pharmacy technician",
+    "hometown": "Stockton, California",
+    "traits": [
+      "quick",
+      "competitive",
+      "cheerful"
+    ],
+    "voice": "Chloe is quick with facts, competitive in a friendly way and laughs easily."
   },
   "x_cluster": "games-anime"
 }

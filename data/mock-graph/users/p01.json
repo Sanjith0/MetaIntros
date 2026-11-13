@@ -144,7 +144,7 @@
       },
       {
         "id": "p30",
-        "name": "Diego Cohen"
+        "name": "Diego Ramírez"
       },
       {
         "id": "p45",
@@ -152,15 +152,15 @@
       },
       {
         "id": "p50",
-        "name": "Oscar Park"
+        "name": "Sam Park"
       },
       {
         "id": "p66",
-        "name": "Julia Chen"
+        "name": "Sofia Alvarez"
       },
       {
         "id": "p75",
-        "name": "Ivy Costa"
+        "name": "Ivy Lam"
       }
     ],
     "summary": {
@@ -198,6 +198,17 @@
   },
   "x_preferences": {
     "women_only_party": false
+  },
+  "about": "Bouldering after work, record stores on weekends. Always down for a show.",
+  "x_profile": {
+    "work": "Junior UX designer",
+    "hometown": "San Jose, California",
+    "traits": [
+      "curious",
+      "easygoing",
+      "a little shy at first"
+    ],
+    "voice": "Jordan warms up slowly, asks good follow-up questions and lights up when a new album comes up."
   },
   "x_cluster": "indie-climb"
 }
