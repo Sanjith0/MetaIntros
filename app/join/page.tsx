@@ -88,7 +88,7 @@ export default function JoinPage() {
             placeholder="First name"
             autoComplete="given-name"
             maxLength={40}
-            className="mt-1.5 h-11 w-full rounded-btn border border-divider bg-surface px-3 text-body outline-none focus-visible:border-accent"
+            className="mt-1.5 h-11 w-full rounded-btn bg-wash px-3 text-body placeholder:text-muted"
           />
           <p className="mt-4 text-body font-semibold">Age range</p>
           <div className="mt-1.5 flex flex-wrap gap-2">

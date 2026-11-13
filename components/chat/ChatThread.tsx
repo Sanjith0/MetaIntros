@@ -198,7 +198,6 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
             </li>
           );
         })}
-        <div ref={bottom} />
       </ul>
 
       {archived ? (
@@ -226,6 +225,8 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
           <Composer value={draft} onChange={setDraft} onSend={() => send()} disabled={sending} />
         </div>
       )}
+      {/* After the sticky footer: scrolling here shows the newest message above it, not under it. */}
+      <div ref={bottom} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { UserPlus, Users } from "lucide-react";
 import { TopBar } from "@/components/fb/TopBar";
-import { Avatar, Badge, Button, ChipLink, ChipRow, IconCircle, ListRow, Section, Stack } from "@/components/fb";
+import { Avatar, Badge, Button, ButtonLink, ChipLink, ChipRow, IconCircle, ListRow, Section, Stack } from "@/components/fb";
 import { FriendRequestActions } from "@/components/FriendRequestActions";
 import { listFriends, listQueueUpFriends, listRequests, listSuggestions } from "@/lib/server/friends";
 import { getCurrentUserId } from "@/lib/server/session";
@@ -107,6 +107,7 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
                 <li className="flex flex-col items-center px-6 py-8 text-center text-muted" data-testid="queueup-empty">
                   <IconCircle size={48}><Users size={22} /></IconCircle>
                   <span className="mt-2">People you meet through a squad and both add will show up here.</span>
+                  <ButtonLink href="/events" className="mt-3" data-testid="queueup-empty-action">Find a squad</ButtonLink>
                 </li>
               )}
               {queueUp.map((q) => (
