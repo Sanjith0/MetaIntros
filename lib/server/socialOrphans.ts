@@ -9,4 +9,6 @@ export async function purgeSocialOrphans(db: PrismaClient) {
   await db.$executeRawUnsafe(`DELETE FROM "AlbumPhoto" WHERE "uploaderId" NOT IN (SELECT "id" FROM "User") OR "partyId" NOT IN (SELECT "id" FROM "Party")`);
   await db.$executeRawUnsafe(`DELETE FROM "Post" WHERE "authorId" NOT IN (SELECT "id" FROM "User")`);
   await db.$executeRawUnsafe(`DELETE FROM "ShareChoice" WHERE "userId" NOT IN (SELECT "id" FROM "User") OR "partyId" NOT IN (SELECT "id" FROM "Party")`);
+  await db.$executeRawUnsafe(`DELETE FROM "SquadRating" WHERE "raterId" NOT IN (SELECT "id" FROM "User")`);
+  await db.$executeRawUnsafe(`DELETE FROM "MateRating" WHERE "raterId" NOT IN (SELECT "id" FROM "User") OR "rateeId" NOT IN (SELECT "id" FROM "User")`);
 }

@@ -477,3 +477,40 @@ model ShareChoice {
 
   @@unique([partyId, userId])
 }
+
+// ── Post-event squad ratings ─────────────────────────────────────────────────────────────────
+// Standalone models (plain ids, no relation fields on User/Party), like the album above.
+// Private by design: a rating is only ever read back by its own rater, or as an anonymous signal in
+// matching and event picks. Nobody is shown who rated whom (lib/server/ratings.ts).
+
+/// One member's answer to "How was the night?" after a squad chat ends.
+model SquadRating {
+  id        String   @id @default(cuid())
+  partyId   String
+  raterId   String
+  eventId   String?
+  /// 1–5; null when they tapped "Not now"
+  stars     Int?
+  /// snapshot of the event's tags (string[]), so learning survives a deleted hangout
+  tags      Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([partyId, raterId])
+  @@index([raterId])
+}
+
+/// "Squad up with them again?" for one squadmate. Never shown to the person rated.
+model MateRating {
+  id        String   @id @default(cuid())
+  partyId   String
+  raterId   String
+  rateeId   String
+  /// "again" | "not_again"
+  verdict   String
+  createdAt DateTime @default(now())
+
+  @@unique([partyId, raterId, rateeId])
+  @@index([raterId])
+  @@index([rateeId])
+}

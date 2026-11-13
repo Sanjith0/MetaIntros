@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { Star, Users } from "lucide-react";
+import { RATED_FEED_LABEL_MIN } from "@/lib/match/ratings";
 import { EventCover } from "./EventCover";
 import { DateLine } from "./DateLine";
 import { CardActions } from "./RsvpButtons";
@@ -15,6 +16,8 @@ export interface EventCardData {
   goingCount: number;
   distanceKm: number | null;
   myRsvp?: string | null;
+  /** from your post-event ratings (see lib/server/events.ts) */
+  ratedBoost?: number;
 }
 
 /** Facebook-style event card: cover, red date line, title, venue · distance, counts, Interested + share. */
@@ -33,6 +36,11 @@ export function EventCard({ e, squad }: { e: EventCardData; squad?: boolean }) {
           <p className="text-meta text-muted" data-testid="friends-interested">
             {e.friendsInterested} friend{e.friendsInterested === 1 ? "" : "s"} interested · {e.goingCount} going
           </p>
+          {!squad && (e.ratedBoost ?? 0) >= RATED_FEED_LABEL_MIN && (
+            <p className="mt-1 flex items-center gap-1 text-meta text-muted" data-testid="rated-reason">
+              <Star size={14} aria-hidden /> Like nights you rated highly
+            </p>
+          )}
           {squad && (
             <p className="mt-1 flex items-center gap-1 text-meta font-semibold text-link">
               <Users size={14} aria-hidden /> Your squad is going

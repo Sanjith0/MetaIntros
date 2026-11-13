@@ -24,6 +24,7 @@ const AGENT: Record<string, string> = {
   host: "AI host",
   talk_cards: "Talk cards",
   companion: "Pre-chats",
+  ratings: "Past ratings",
 };
 
 

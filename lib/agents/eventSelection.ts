@@ -6,7 +6,7 @@
 import { z } from "zod";
 import { runAi } from "@/lib/ai";
 import type { Candidate } from "@/lib/match/engine";
-import { rankEvents, scoreEvent, type EventFit, type EventLike, type GroupContext } from "@/lib/match/eventFit";
+import { RATED_REASON_MIN, rankEvents, scoreEvent, type EventFit, type EventLike, type GroupContext } from "@/lib/match/eventFit";
 import type { TraceStep } from "@/lib/server/trace";
 import { fmtWindow, label } from "./describe";
 
@@ -30,7 +30,13 @@ const when = (d: Date) => `${DAYS[d.getDay()]} ${d.getHours() % 12 || 12}${d.get
 
 function fitReasons(f: EventFit, g: GroupContext) {
   const tags = f.matchedTags.slice(0, 2).map((t) => `${g.tagCounts.get(t)}/${g.size} of you are into ${label(t).toLowerCase()}`);
-  return tags.length ? tags : ["It's close by and everyone is free then"];
+  if (f.rated >= RATED_REASON_MIN) tags.unshift("Your squad rated nights like this highly");
+  return tags.length ? tags.slice(0, 2) : ["It's close by and everyone is free then"];
+}
+
+/** Tags the squad rated well after past nights out (labels only, no names: ratings stay private). */
+function squadLiked(g: GroupContext) {
+  return [...(g.ratedTags ?? new Map<string, number>()).entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([t]) => label(t));
 }
 
 export async function eventSelectionAgent(input: {
@@ -85,7 +91,8 @@ export async function eventSelectionAgent(input: {
     task: "event_selection",
     system:
       "You are the Event Selection Agent for Queue Up on Facebook Events. Choose the single best event for this squad of strangers from the options (all already verified safe and in everyone's free time). Favor events that most members are into and that make conversation easy. Reply with JSON only: {\"choice\": \"<event id>\", \"runnersUp\": [\"<id>\", \"<id>\"], \"reasons\": [\"<short reason>\", \"<short reason>\"]}.",
-    user: JSON.stringify({ squadSize: group.size, squadInterests: groupInterests, options }),
+    // Only present when someone in the squad has rated a past night (keeps saved replies valid otherwise).
+    user: JSON.stringify({ squadSize: group.size, squadInterests: groupInterests, ...(squadLiked(group).length ? { squadRatedHighly: squadLiked(group) } : {}), options }),
     schema: Pick,
     fallback,
     maxTokens: 220,

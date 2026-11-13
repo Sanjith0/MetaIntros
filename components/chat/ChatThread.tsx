@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Bot, ChevronLeft, ChevronRight, Info, Lock, Pin } from "lucide-react";
-import { AiLabel, Avatar, Bubble, FacePile, SystemLine, type RunPos } from "@/components/fb";
+import { Bot, ChevronLeft, ChevronRight, Info, Lock, Pin, Star } from "lucide-react";
+import { AiLabel, Avatar, Bubble, Button, FacePile, SystemLine, type RunPos } from "@/components/fb";
 import { AiSourceLabel } from "@/components/ai/AiSource";
 import { Composer } from "@/components/fb/Composer";
 import { PrototypeLabel } from "@/components/fb/TopBar";
@@ -13,6 +13,8 @@ import { fmtDuration, fmtEventWhen } from "@/lib/format";
 import { nowDate, nowMs } from "@/lib/clock";
 import { ArchivedPrompt } from "./ArchivedPrompt";
 import type { SquadHeaderInfo } from "@/lib/server/squadChat";
+import type { RatingState } from "@/lib/server/ratings";
+import { RateSquadSheet } from "./RateSquadSheet";
 
 interface U { id: string; name: string; avatarColor: string; isSimulated?: boolean; isLive?: boolean }
 export interface ThreadMessage { id: string; body: string; kind: string; createdAt: string; senderId: string | null; sender: U | null; failed?: boolean; aiSource?: string | null }
@@ -38,9 +40,12 @@ function runPos(list: ThreadMessage[], i: number): RunPos {
   return prev && next ? "middle" : prev ? "last" : next ? "first" : "single";
 }
 
-export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: string; squad?: SquadHeaderInfo | null }) {
+export function ChatThread({ chat, meId, squad, rating: initialRating = null }: { chat: ThreadChat; meId: string; squad?: SquadHeaderInfo | null; rating?: RatingState | null }) {
   const [messages, setMessages] = useState<ThreadMessage[]>(chat.messages);
   const [archived, setArchived] = useState(chat.archived || Boolean(squad?.archived));
+  // Post-event rating pop-up: opens by itself once the chat has ended and you haven't answered yet.
+  const [rating, setRating] = useState<RatingState | null>(initialRating);
+  const [rateOpen, setRateOpen] = useState(Boolean(initialRating?.askNow));
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [now, setNow] = useState<number | null>(null);
@@ -61,6 +66,20 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
     if (chat.archived) setArchived(true);
     setMessages((ms) => (chat.messages.length > ms.length ? chat.messages : ms));
   }, [chat.archived, chat.messages]);
+
+  // However the chat ended (live event, polling, coming back to the page), ask for a rating once.
+  const ratingEnded = Boolean(rating?.ended);
+  useEffect(() => {
+    if (!archived || ratingEnded || !chat.partyId || chat.type !== "squad") return;
+    fetch(`/api/squad/${chat.partyId}/rating`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((st: RatingState | null) => {
+        if (!st) return;
+        setRating(st);
+        if (st.askNow) setRateOpen(true);
+      })
+      .catch(() => {});
+  }, [archived, ratingEnded, chat.partyId, chat.type]);
 
   useLiveEvents(
     ["chat", "chat-archived"],
@@ -206,6 +225,18 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
           <p className="mb-2 flex items-center justify-center gap-1.5 text-meta text-muted" data-testid="read-only">
             <Lock size={12} aria-hidden /> This squad chat has ended. You can still read it.
           </p>
+          {rating?.ended && (
+            rating.mine?.stars ? (
+              <p className="mb-2 flex items-center justify-center gap-1.5 text-meta text-muted" data-testid="rated-line">
+                <Star size={12} className="fill-muted" aria-hidden /> Thanks. You rated this night {rating.mine.stars} of 5.{" "}
+                <button type="button" className="font-semibold text-link" onClick={() => setRateOpen(true)} data-testid="rate-edit">Edit</button>
+              </p>
+            ) : (
+              <Button block className="mb-2" icon={<Star size={16} />} onClick={() => setRateOpen(true)} data-testid="rate-open">
+                Rate your squad
+              </Button>
+            )
+          )}
           {chat.partyId && <ArchivedPrompt partyId={chat.partyId} />}
         </div>
       ) : (
@@ -225,6 +256,25 @@ export function ChatThread({ chat, meId, squad }: { chat: ThreadChat; meId: stri
           )}
           <Composer value={draft} onChange={setDraft} onSend={() => send()} disabled={sending} />
         </div>
+      )}
+      {rating && (
+        <RateSquadSheet
+          key={rating.mine ? "edit" : "new"}
+          open={rateOpen}
+          state={rating}
+          onClose={(skipped) => {
+            setRateOpen(false);
+            if (skipped && !rating.mine) {
+              // "Not now": the pop-up won't come back; "Rate your squad" stays in the footer.
+              fetch(`/api/squad/${rating.partyId}/rating`, { method: "POST", body: JSON.stringify({ skip: true }) }).catch(() => {});
+              setRating({ ...rating, mine: { stars: null, mates: {} }, askNow: false });
+            }
+          }}
+          onSaved={(st) => {
+            setRating(st);
+            setRateOpen(false);
+          }}
+        />
       )}
     </div>
   );

@@ -4,6 +4,8 @@ import { haversineKm } from "@/lib/geo";
 import { weekendFriday } from "@/lib/seed/seed";
 import type { WeightedTag } from "@/lib/profile/builder";
 import { worldWeekendStartMs } from "@/lib/clock";
+import { RATED_FEED_WEIGHT, eventAffinity } from "@/lib/match/ratings";
+import { tagAffinities } from "./ratings";
 
 export type FeedTab = "foryou" | "nearby" | "weekend";
 export const FEED_TABS: { id: FeedTab; label: string }[] = [
@@ -20,8 +22,12 @@ export interface FeedEvent extends Event {
   interestedCount: number;
   distanceKm: number | null;
   relevance: number;
+  /** learned from your post-event star ratings: > 0 means "like nights you rated highly" */
+  ratedBoost: number;
   myRsvp: string | null;
 }
+
+
 
 /**
  * "This weekend": the demo world's seeded weekend (see seedWeekendFriday) while `now` is in the
@@ -41,19 +47,22 @@ export async function friendIdsOf(userId: string): Promise<Set<string>> {
 }
 
 export async function decorateEvents(userId: string, events: Event[]): Promise<FeedEvent[]> {
-  const [me, tp, friends, rsvps] = await Promise.all([
+  const [me, tp, friends, rsvps, learned] = await Promise.all([
     prisma.user.findUniqueOrThrow({ where: { id: userId } }),
     prisma.tasteProfile.findUnique({ where: { userId } }),
     friendIdsOf(userId),
     prisma.eventRsvp.findMany({ where: { eventId: { in: events.map((e) => e.id) } } }),
+    tagAffinities([userId]),
   ]);
+  const affinity = learned.get(userId) ?? new Map<string, number>();
   const weights = new Map(((tp?.interestTags ?? []) as unknown as WeightedTag[]).map((t) => [t.tag, t.weight]));
   return events.map((e) => {
     const rs = rsvps.filter((r) => r.eventId === e.id);
     const tagsList = e.tags as string[];
     const friendsInterested = rs.filter((r) => friends.has(r.userId)).length;
     const distanceKm = me.homeLat != null && me.homeLng != null ? haversineKm({ lat: me.homeLat, lng: me.homeLng }, e) : null;
-    const relevance = tagsList.reduce((s, t) => s + (weights.get(t) ?? 0), 0) + friendsInterested * 0.5;
+    const ratedBoost = affinity.size ? eventAffinity(tagsList, affinity) : 0;
+    const relevance = tagsList.reduce((s, t) => s + (weights.get(t) ?? 0), 0) + friendsInterested * 0.5 + ratedBoost * RATED_FEED_WEIGHT;
     return {
       ...e,
       tagsList,
@@ -62,6 +71,7 @@ export async function decorateEvents(userId: string, events: Event[]): Promise<F
       interestedCount: rs.filter((r) => r.status === "interested").length,
       distanceKm,
       relevance,
+      ratedBoost,
       myRsvp: rs.find((r) => r.userId === userId)?.status ?? null,
     };
   });
