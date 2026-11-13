@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki hopes for a chill squad of 6 for an event this weekend, bringing shared love of vinyl digging, bouldering, and indie shows. Yuki would bring easygoing vinyl and climbing chat plus Wet Leg / boygenius energy. To make it work, keep plans low-key and relaxed.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:likes[2]\", \"p05:music[0]\", \"p05:music[1]\", \"p05:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2867,
+    "completionTokens": 785
+  },
+  "savedAt": "2026-11-13T04:12:32.600Z"
+}

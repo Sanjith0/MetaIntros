@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Yuki and Jordan meet for a low-key record store browse then coffee, how does Jordan keep conversation going when digging through crates? Yuki likes Rasputin Music and Peninsula Vinyl Collectors.\", \"cites\": [\"p05:likes[0]\"]}, \"p03\": {\"say\": \"If Yuki invites Zoe to a chill Bouldering Night hang at Peninsula Boulders, how would Zoe act between climbs with Yuki who follows Bouldering Daily?\", \"cites\": [\"p05:likes[1]\"]}, \"p11\": {\"say\": \"If Yuki and Rosa catch a small Bay Area indie show together, what does Rosa do to keep things relaxed and low-pressure with Yuki who likes Bay Area Concerts?\", \"cites\": [\"p05:likes[2]\"]}, \"p12\": {\"say\": \"If Yuki and Gabe share a quiet night swapping Wet Leg and boygenius tracks, how does Gabe participate when Yuki plays favorites?\", \"cites\": [\"p05:music[0]\"]}, \"p13\": {\"say\": \"If Yuki invites Leo for chill vinyl digging plus easy show talk, how would Leo share recommendations with Yuki in Bay Area Indie Shows?\", \"cites\": [\"p05:groups[2]\"]}, \"p14\": {\"say\": \"If Yuki and Ben do Record Store Day Palo Alto together, how does Ben navigate crowds and downtime with Yuki who likes low-key, chill plans?\", \"cites\": [\"p05:socialStyle\"]}, \"p15\": {\"say\": \"If Yuki and Ravi plan a relaxed photo and bouldering crew hang, how does Ravi keep conversation wandering with Yuki who follows Bouldering Daily?\", \"cites\": [\"p05:likes[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3535,
+    "completionTokens": 1109
+  },
+  "savedAt": "2026-11-13T04:13:05.066Z"
+}

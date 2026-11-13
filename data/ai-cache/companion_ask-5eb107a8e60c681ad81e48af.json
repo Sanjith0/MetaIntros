@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Leo keeps Indie Night low-key and chill swapping recommendations, how does Jordan actually spend time between sets — chatting climbing and vinyl or wandering for photos?\", \"cites\": [\"p13:socialStyle\"]}, \"p03\": {\"say\": \"If Leo brings up Peninsula Film Club chat during a mellow moment at the showcase, how does Zoe join in while keeping things relaxed and low-pressure?\", \"cites\": [\"p13:groups[1]\"]}, \"p05\": {\"say\": \"As fellow Bay Area Indie Shows members, how would Yuki and Leo actually hang together at the showcase — posted up chatting or drifting between bands?\", \"cites\": [\"p13:groups[0]\"]}, \"p11\": {\"say\": \"When Leo is digging through Rasputin Music finds talk before the bands, how does Rosa actually engage — swapping picks quietly or geeking out at length?\", \"cites\": [\"p13:likes[1]\"]}, \"p12\": {\"say\": \"When Leo keeps the night chill and Mitski or Phoebe Bridgers comes up between sets, how does Gabe actually react and carry the conversation?\", \"cites\": [\"p13:music[1]\"]}, \"p14\": {\"say\": \"If Leo chats about Record Store Day Palo Alto finds during downtime, how does Ben actually hang — swapping vinyl stories or steering toward climbing and coffee talk?\", \"cites\": [\"p13:events[1]\"]}, \"p15\": {\"say\": \"When Leo wants a low-key night swapping Letterboxd picks between bands, how does Ravi actually join in while keeping the vibe relaxed?\", \"cites\": [\"p13:likes[5]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3499,
+    "completionTokens": 1023
+  },
+  "savedAt": "2026-11-13T04:04:15.082Z"
+}

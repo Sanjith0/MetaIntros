@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p13\", \"members\": [\"p03\", \"p05\", \"p11\", \"p13\", \"p15\"], \"line\": {\"say\": \"Leo would love chill back-spot chat on indie shows, film picks and hiking with this crew.\", \"cites\": [\"p13:groups[0]\", \"p13:groups[1]\", \"p13:likes[4]\", \"p13:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1342,
+    "completionTokens": 991
+  },
+  "savedAt": "2026-11-13T04:22:06.988Z"
+}

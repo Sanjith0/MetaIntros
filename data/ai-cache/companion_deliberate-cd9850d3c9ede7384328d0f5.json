@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p05\", \"line\": {\"say\": \"Jordan would enjoy chill vinyl and climbing chat with Zoe, Yuki, Ben and Rosa between sets.\", \"cites\": [\"p01:likes[5]\", \"p01:likes[1]\", \"p01:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1380,
+    "completionTokens": 1205
+  },
+  "savedAt": "2026-11-13T04:21:56.024Z"
+}

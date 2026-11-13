@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Gabe is posted up at Indie Night chatting between sets about vinyl finds, how would Jordan actually hang with them in that low-key moment?\", \"cites\": [\"p12:likes[4]\"]}, \"p03\": {\"say\": \"If Gabe is at Indie Night swapping V-Scale Memes between bands to keep things chill, how would Zoe join in and spend time with them?\", \"cites\": [\"p12:likes[3]\"]}, \"p05\": {\"say\": \"When Gabe steps aside at Indie Night to talk climbing beta from Bay Area Climbers, how would Yuki actually hang with them there?\", \"cites\": [\"p12:groups[2]\"]}, \"p11\": {\"say\": \"If Gabe is digging through Indie Shuffle discoveries at Indie Night, how would Rosa share that moment and keep conversation going with them?\", \"cites\": [\"p12:likes[6]\"]}, \"p13\": {\"say\": \"When Gabe is chatting about a recent Peninsula Film Club pick during a set break, how would Leo actually hang out with them?\", \"cites\": [\"p12:groups[0]\"]}, \"p14\": {\"say\": \"If Gabe is at Bouldering Night at Peninsula Boulders resting between climbs and talking music, how would Ben spend that downtime with them?\", \"cites\": [\"p12:events[2]\"]}, \"p15\": {\"say\": \"When Gabe wants a chill corner at Indie Night to talk Mitski and Alvvays between sets, how would Ravi actually join them?\", \"cites\": [\"p12:music[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3727,
+    "completionTokens": 794
+  },
+  "savedAt": "2026-11-13T04:19:24.293Z"
+}

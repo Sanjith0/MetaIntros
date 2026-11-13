@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Leo wants to keep Indie Night relaxed swapping stories from Record Store Day Palo Alto, how does Jordan usually spend time between bands with them?\", \"cites\": [\"p13:events[1]\"]}, \"p03\": {\"say\": \"If Leo drifts into low-key chat about Peninsula Film Club during set breaks, what does Zoe tend to do to stay in the vibe with them?\", \"cites\": [\"p13:groups[1]\"]}, \"p05\": {\"say\": \"If Leo prefers staying near the back chatting about Bay Area Indie Shows rather than crowding forward, how does Yuki usually share the set with them?\", \"cites\": [\"p13:groups[0]\"]}, \"p11\": {\"say\": \"When Leo keeps things chill trading Mitski favorites between sets, how does Rosa usually join in with them during the night?\", \"cites\": [\"p13:music[1]\"]}, \"p12\": {\"say\": \"If Leo is in a relaxed mood swapping Letterboxd picks at Indie Night, how does Gabe usually spend downtime with them?\", \"cites\": [\"p13:likes[5]\"]}, \"p14\": {\"say\": \"When Leo wants a low-key night focused on easy conversation, how does Ben usually pace the evening alongside them?\", \"cites\": [\"p13:socialStyle\"]}, \"p15\": {\"say\": \"If Leo starts swapping Bay Area hiking stories between bands, how does Ravi usually respond during a chill Indie Night with them?\", \"cites\": [\"p13:likes[4]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3499,
+    "completionTokens": 1019
+  },
+  "savedAt": "2026-11-13T04:19:28.169Z"
+}

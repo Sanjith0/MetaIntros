@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p03\", \"members\": [\"p01\", \"p03\", \"p05\", \"p11\", \"p12\", \"p14\"], \"line\": {\"say\": \"Rosa would love a chill night trading vinyl finds and climbing stories between sets.\", \"cites\": [\"p11:likes[4]\", \"p11:likes[2]\", \"p11:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1524,
+    "completionTokens": 1109
+  },
+  "savedAt": "2026-11-13T04:17:16.918Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p15\", \"line\": {\"say\": \"Ravi would love a chill vinyl and film night with coffee with Zoe, Jordan and Rosa.\", \"cites\": [\"p15:likes[0]\", \"p15:likes[4]\", \"p15:likes[5]\", \"p15:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1348,
+    "completionTokens": 1775
+  },
+  "savedAt": "2026-11-13T04:14:47.870Z"
+}

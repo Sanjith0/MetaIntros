@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p11\", \"line\": {\"say\": \"Jordan likes that chill coffee, vinyl and indie mix.\", \"cites\": [\"p01:likes[4]\", \"p01:likes[2]\", \"p01:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1381,
+    "completionTokens": 1003
+  },
+  "savedAt": "2026-11-13T04:11:53.570Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p14\", \"line\": {\"say\": \"Zoe would love a chill vinyl browse and photo wander with Jordan, Rosa and Ben.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[6]\", \"p03:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1519,
+    "completionTokens": 1625
+  },
+  "savedAt": "2026-11-13T04:14:46.671Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Leo plans a low-key hang swapping Climbing Magazine stories, how would Jordan actually behave on that night out — chat, wander, share photos, or something else?\", \"cites\": [\"p13:likes[3]\"]}, \"p03\": {\"say\": \"If Leo suggests a chill Peninsula Film Club-style movie night, how would Zoe actually spend the evening with them?\", \"cites\": [\"p13:groups[1]\"]}, \"p05\": {\"say\": \"If Leo invites Yuki to a low-key Bay Area Indie Shows night, how would Yuki actually act — where hang, how chat, how keep it chill?\", \"cites\": [\"p13:groups[0]\"]}, \"p11\": {\"say\": \"If Leo wants a relaxed night digging through Rasputin Music crates with Rosa, how would Rosa actually behave sharing picks together?\", \"cites\": [\"p13:likes[1]\"]}, \"p12\": {\"say\": \"If Leo puts on KEXP for a chill hang, how would Gabe actually join in — talk music, films, memes, or just vibe?\", \"cites\": [\"p13:likes[2]\"]}, \"p14\": {\"say\": \"If Leo suggests a chill Record Store Day Palo Alto browse together, how would Ben actually spend that outing with them?\", \"cites\": [\"p13:events[1]\"]}, \"p15\": {\"say\": \"If Leo plans a chill Bay Area Hiker-inspired walk plus coffee, how would Ravi actually behave on that outing together?\", \"cites\": [\"p13:likes[4]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3483,
+    "completionTokens": 1278
+  },
+  "savedAt": "2026-11-13T04:10:20.662Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p14\", \"line\": {\"say\": \"Jordan enjoys chill vinyl digging, climbing and photo walks with coffee.\", \"cites\": [\"p01:socialStyle\", \"p01:likes[5]\", \"p01:likes[1]\", \"p01:groups[0]\", \"p01:likes[7]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1332,
+    "completionTokens": 1066
+  },
+  "savedAt": "2026-11-13T04:14:39.964Z"
+}

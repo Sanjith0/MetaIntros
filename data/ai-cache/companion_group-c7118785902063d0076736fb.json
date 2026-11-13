@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan hopes for a chill squad of 6 for an event this weekend sharing climbing, vinyl and photo walks. Jordan would bring love of Bouldering Daily, Vinyl Me, Please and Fujifilm X, plus Philz Coffee chat. Jordan likes low-key, chill plans and would thrive keeping it relaxed and easygoing.\", \"cites\": [\"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:likes[7]\", \"p01:socialStyle\", \"p01:groups[0]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2822,
+    "completionTokens": 889
+  },
+  "savedAt": "2026-11-13T04:12:34.650Z"
+}

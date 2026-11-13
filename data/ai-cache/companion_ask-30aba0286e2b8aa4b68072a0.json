@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Zoe is chilling by the merch vinyl bins between bands, how does Jordan usually act — stick around chatting about finds, go explore, or pull out a camera?\", \"cites\": [\"p03:likes[3]\"]}, \"p05\": {\"say\": \"If Zoe wants a low-key corner to talk bouldering and records during Indie Night, how would Yuki join in — settle in for deep chat or drift between groups?\", \"cites\": [\"p03:likes[0]\"]}, \"p11\": {\"say\": \"When Zoe is shooting 35mm film between sets, how would Rosa hang out with them — trade photo tips quietly, people-watch together, or go mingle elsewhere?\", \"cites\": [\"p03:likes[6]\"]}, \"p12\": {\"say\": \"If Zoe starts geeking out about A24 films during a set break, how does Gabe respond in the moment — dive into quiet chat, joke around, or steer back to music?\", \"cites\": [\"p03:likes[8]\"]}, \"p13\": {\"say\": \"When Zoe is keeping things chill at the back during Indie Night, how would Leo spend that time with them — swapping recommendations or seeking a livelier spot?\", \"cites\": [\"p03:socialStyle\"]}, \"p14\": {\"say\": \"If Zoe is digging into Record Store Day finds talk at Indie Night, how would Ben hang with them — compare collections at length or keep it brief and wander?\", \"cites\": [\"p03:likes[3]\"]}, \"p15\": {\"say\": \"When Zoe wants a relaxed chat about film club favorites between bands, how does Ravi actually join — settle into long wandering conversation or keep moving?\", \"cites\": [\"p03:groups[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3682,
+    "completionTokens": 1338
+  },
+  "savedAt": "2026-11-13T04:19:19.387Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Yuki hangs back in chill mode chatting about Rasputin Music finds, what would Jordan actually do alongside them at Indie Night to keep it relaxed and fun?\", \"cites\": [\"p05:likes[0]\"]}, \"p03\": {\"say\": \"When Yuki wants a low-key night geeking out over vinyl from Record Store Day Palo Alto, how would Zoe actually spend time with them between sets?\", \"cites\": [\"p05:events[0]\"]}, \"p11\": {\"say\": \"If Yuki keeps things chill and wants to talk Pitchfork takes during Indie Night, how would Rosa actually join in while staying relaxed?\", \"cites\": [\"p05:likes[3]\"]}, \"p12\": {\"say\": \"If Yuki prefers low-key hanging and chatting about Bouldering Daily, what would Gabe actually do with them during a busy showcase night?\", \"cites\": [\"p05:likes[1]\"]}, \"p13\": {\"say\": \"When Yuki wants an easygoing night around Bay Area Indie Shows chat, how would Leo actually hang out with them at the venue?\", \"cites\": [\"p05:groups[2]\"]}, \"p14\": {\"say\": \"If Yuki chills at the back talking Wet Leg and boygenius between bands, how would Ben actually spend that time with them?\", \"cites\": [\"p05:music[0]\"]}, \"p15\": {\"say\": \"If Yuki likes low-key, chill plans and wants quiet chat between sets, how would Ravi actually share the night with them?\", \"cites\": [\"p05:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3551,
+    "completionTokens": 989
+  },
+  "savedAt": "2026-11-13T04:19:11.974Z"
+}

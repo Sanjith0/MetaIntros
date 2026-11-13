@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan hopes for a chill Indie Night Local Bands Showcase with easy conversation. They would bring shared love of vinyl, bouldering, Fujifilm photography and Bay Area concerts. The group should know Jordan does best with low-key, relaxed plans.\", \"cites\": [\"p01:likes[5]\", \"p01:likes[1]\", \"p01:likes[6]\", \"p01:likes[3]\", \"p01:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2508,
+    "completionTokens": 520
+  },
+  "savedAt": "2026-11-13T04:22:39.490Z"
+}

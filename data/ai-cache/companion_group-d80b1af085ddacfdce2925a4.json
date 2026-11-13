@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Rosa hopes for a chill squad of 5 for Indie Night: Local Bands Showcase. They would bring love of indie discovery, vinyl collecting, and climbing culture, plus 35mm film eye. Group should know they thrive with low-key, relaxed plans and easygoing chat around shared interests.\", \"cites\": [\"p11:likes[4]\", \"p11:likes[2]\", \"p11:likes[7]\", \"p11:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2658,
+    "completionTokens": 601
+  },
+  "savedAt": "2026-11-13T04:22:39.366Z"
+}

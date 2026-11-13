@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Rosa brings recent vinyl finds to a chill listening hang, how does Jordan usually act — dig through sleeves and chat pressings, or hang back and vibe?\", \"cites\": [\"p11:likes[4]\"]}, \"p03\": {\"say\": \"When Rosa brings a 35mm camera on a low-key photo walk, how does Zoe join in — swap film tips together or wander and shoot quietly nearby?\", \"cites\": [\"p11:likes[7]\"]}, \"p05\": {\"say\": \"If Rosa suggests a chill bouldering gym night followed by coffee, how does Yuki spend the time — climb and trade beta or mostly socialize on the mats?\", \"cites\": [\"p11:likes[2]\"]}, \"p12\": {\"say\": \"If Rosa puts on a new Indie Shuffle playlist at a small hang, how does Gabe react — suggest tracks and chat or just vibe quietly?\", \"cites\": [\"p11:likes[1]\"]}, \"p13\": {\"say\": \"If Rosa invites Leo to a low-key indie show with room to talk between sets, how does Leo handle the night — swap recommendations or stay focused on the music?\", \"cites\": [\"p11:groups[1]\"]}, \"p14\": {\"say\": \"If Rosa wants to dig through Rasputin bins together on a chill afternoon, how does Ben make that outing fun — compare finds or browse quietly side by side?\", \"cites\": [\"p11:likes[5]\"]}, \"p15\": {\"say\": \"If Rosa shares V-Scale Memes during a chill bouldering rest break, how does Ravi join the laugh — trade climbing stories or keep quiet with them?\", \"cites\": [\"p11:likes[6]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3640,
+    "completionTokens": 1095
+  },
+  "savedAt": "2026-11-13T04:10:20.758Z"
+}

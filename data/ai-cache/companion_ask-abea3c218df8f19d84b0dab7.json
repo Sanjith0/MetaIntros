@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p03\": {\"say\": \"When Jordan puts together a low-key vinyl digging afternoon with some photo walk stops, how does Zoe actually spend the time — chatting, digging quietly, photographing, or drifting off?\", \"cites\": [\"p01:socialStyle\"]}, \"p05\": {\"say\": \"If Jordan suggests a chill night hopping between a bouldering gym hang and browsing Rasputin Music, how does Yuki usually balance climbing, music talk, and just hanging back?\", \"cites\": [\"p01:likes[1]\"]}, \"p11\": {\"say\": \"When Jordan plans a relaxed evening around Philz Coffee then flipping through vinyl, how does Rosa actually show up — talkative about finds, quietly browsing, or steering toward something else?\", \"cites\": [\"p01:likes[7]\"]}, \"p12\": {\"say\": \"If Jordan sets up a low-key night sharing Indie Shuffle finds and climbing stories, how does Gabe tend to join in — swapping recommendations, listening, or changing the vibe?\", \"cites\": [\"p01:likes[2]\"]}, \"p13\": {\"say\": \"When Jordan keeps things chill with coffee and easy record-store wandering, how does Leo usually act in the group — swapping recommendations, quietly exploring, or wanting higher energy?\", \"cites\": [\"p01:socialStyle\"]}, \"p14\": {\"say\": \"If Jordan organizes a relaxed crawl from Philz Coffee to Record Store Day style digging, how does Ben actually move through it — lingering over records, chatting climbing, or splitting off?\", \"cites\": [\"p01:events[0]\"]}, \"p15\": {\"say\": \"When Jordan plans a low-key photo walk that ends with vinyl browsing, how does Ravi typically participate — geeking out quietly, swapping recommendations, or hanging on the edges?\", \"cites\": [\"p01:likes[6]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3490,
+    "completionTokens": 1170
+  },
+  "savedAt": "2026-11-13T04:10:24.562Z"
+}

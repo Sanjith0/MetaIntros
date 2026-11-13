@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Yuki is geeking out over Rasputin Music finds, how does Jordan usually spend downtime between bands at Indie Night — chatting low-key, wandering for photos, or something else?\", \"cites\": [\"p05:likes[0]\"]}, \"p03\": {\"say\": \"When Yuki wants a chill night around Wet Leg style sounds, how does Zoe actually hang during sets — stay put with the group, drift to chat, or explore?\", \"cites\": [\"p05:music[0]\"]}, \"p11\": {\"say\": \"If Yuki is keeping things low-key and chill, how does Rosa handle a crowded showcase room — find a quiet corner together, step out, or stay in the mix?\", \"cites\": [\"p05:socialStyle\"]}, \"p12\": {\"say\": \"If Yuki brings up Pitchfork reads between sets, how does Gabe usually join in — swap quick takes, keep wandering, or hang back quietly?\", \"cites\": [\"p05:likes[3]\"]}, \"p13\": {\"say\": \"When Yuki is in Bay Area Indie Shows mode for local bands, how does Leo spend the night — stick with the squad, trade recommendations, or drift solo?\", \"cites\": [\"p05:groups[2]\"]}, \"p14\": {\"say\": \"If Yuki chats about Bouldering Night at Peninsula Boulders before the show, how does Ben carry that into the night — easy side chat, introduce to others, or keep to themselves?\", \"cites\": [\"p05:events[1]\"]}, \"p15\": {\"say\": \"If Yuki wants a relaxed vinyl-collector hang in Peninsula Vinyl Collectors spirit, how does Ravi act with new people — warm up slowly, geek out quietly, or hang on the edge?\", \"cites\": [\"p05:groups[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3551,
+    "completionTokens": 881
+  },
+  "savedAt": "2026-11-13T04:04:12.816Z"
+}

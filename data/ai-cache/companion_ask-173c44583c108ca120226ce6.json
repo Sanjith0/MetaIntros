@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Rosa enjoys low-key hangs around vinyl and photo walks. How would Jordan spend downtime between bands with Rosa — digging into pressings, trading photo-walk shots, or wandering quietly?\", \"cites\": [\"p11:socialStyle\", \"p11:groups[0]\"]}, \"p03\": {\"say\": \"Rosa shoots 35mm film photography. When the venue gets crowded between sets, how would Zoe hang with Rosa — step out for quiet shots, chat vinyl by merch, or find a low-key corner?\", \"cites\": [\"p11:likes[7]\"]}, \"p05\": {\"say\": \"Rosa is in Bay Area Indie Shows and likes chill plans. How would Yuki experience the showcase with Rosa — arrive early for spots, hang back chatting, or drift to merch and vinyl talk?\", \"cites\": [\"p11:groups[1]\"]}, \"p12\": {\"say\": \"Rosa follows Indie Shuffle for new finds. How would Gabe share the night with Rosa — swapping band backstories between sets, geeking over vinyl finds, or just soaking in sounds quietly together?\", \"cites\": [\"p11:likes[1]\"]}, \"p13\": {\"say\": \"Rosa likes Mitski-style indie moods and chill hangs. How would Leo vibe with Rosa during openers — trading recommendations, chatting quietly at the back, or exploring the venue?\", \"cites\": [\"p11:music[1]\"]}, \"p14\": {\"say\": \"Rosa likes Philz Coffee and low-key plans. Before doors, how would Ben link up with Rosa — grab a calm coffee and vinyl chat, or head straight to the venue to settle in?\", \"cites\": [\"p11:likes[8]\"]}, \"p15\": {\"say\": \"Rosa likes low-key, chill plans. In a packed showcase room, how would Ravi stay connected with Rosa — find seating on the edge, share quiet climbing memes, or step out for air between sets?\", \"cites\": [\"p11:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3656,
+    "completionTokens": 1531
+  },
+  "savedAt": "2026-11-13T04:19:18.967Z"
+}

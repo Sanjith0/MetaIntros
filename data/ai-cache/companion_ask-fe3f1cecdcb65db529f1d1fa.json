@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Ravi starts geeking out quietly over vinyl finds from Peninsula Vinyl Collectors, how does Jordan join in during a busy Indie Night set break?\", \"cites\": [\"p15:likes[0]\"]}, \"p03\": {\"say\": \"If Ravi and Zoe step aside for a low-key chat about Peninsula Film Club favorites mid-show, how does Zoe keep it relaxed and inclusive?\", \"cites\": [\"p15:groups[0]\"]}, \"p05\": {\"say\": \"When Ravi wants a chill breather from the crowd to swap Bouldering Crew stories, how does Yuki handle stepping out with them?\", \"cites\": [\"p15:groups[1]\"]}, \"p11\": {\"say\": \"If Ravi suggests a quiet Philz Coffee debrief after Indie Night to trade Indie Shuffle discoveries, how does Rosa respond in the moment?\", \"cites\": [\"p15:likes[2]\"]}, \"p12\": {\"say\": \"When the venue gets loud and Ravi prefers wandering low-key conversation, how does Gabe adapt to keep hanging out enjoyable together?\", \"cites\": [\"p15:socialStyle\"]}, \"p13\": {\"say\": \"If Ravi and Leo compare Letterboxd notes between bands, how does Leo share recommendations without turning it into a loud debate?\", \"cites\": [\"p15:likes[4]\"]}, \"p14\": {\"say\": \"When Ravi is quietly swapping Mitski and Japanese Breakfast takes at the showcase, how does Ben join the conversation during set changes?\", \"cites\": [\"p15:music[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3521,
+    "completionTokens": 1336
+  },
+  "savedAt": "2026-11-13T04:04:18.167Z"
+}

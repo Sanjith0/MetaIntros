@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe hopes for a chill Indie Night Local Bands Showcase with this 5-person squad. They'd bring love of Vinyl Me, Please, Bouldering Daily, and 35mm film photography, plus Peninsula Vinyl Collectors and film club vibes. They thrive in low-key, relaxed hangouts and easygoing chats about music, climbing, and photos.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\", \"p03:groups[0]\", \"p03:groups[1]\", \"p03:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2684,
+    "completionTokens": 773
+  },
+  "savedAt": "2026-11-13T04:22:41.144Z"
+}

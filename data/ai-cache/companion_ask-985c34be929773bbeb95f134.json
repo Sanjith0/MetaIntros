@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Ben drifts aside to chat about vinyl finds, what does Jordan usually do to stay connected while keeping the chill indie show vibe together?\", \"cites\": [\"p14:likes[1]\"]}, \"p03\": {\"say\": \"If Ben wants a quiet moment talking Snail Mail between sets, how does Zoe usually share that low-key space together?\", \"cites\": [\"p14:music[0]\"]}, \"p05\": {\"say\": \"When Ben settles into low-key conversation during Indie Night, how does Yuki help keep things relaxed and easygoing together?\", \"cites\": [\"p14:socialStyle\"]}, \"p11\": {\"say\": \"If Ben starts swapping Blue Bottle Coffee stories before the bands start, how does Rosa join that easygoing hang?\", \"cites\": [\"p14:likes[5]\"]}, \"p12\": {\"say\": \"When Ben geeks out over Indie Shuffle finds at the show, what does Gabe usually do to make it a shared moment?\", \"cites\": [\"p14:likes[3]\"]}, \"p13\": {\"say\": \"If Ben prefers lingering back chatting rather than crowding the front, how does Leo typically spend that relaxed time with them?\", \"cites\": [\"p14:socialStyle\"]}, \"p15\": {\"say\": \"When Ben wants to wander and trade recommendations during a chill night, how does Ravi usually explore alongside them?\", \"cites\": [\"p14:events[1]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3643,
+    "completionTokens": 941
+  },
+  "savedAt": "2026-11-13T04:04:12.047Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Ravi sets up a low-key hang with coffee and record digging, how would Jordan actually spend time with them — trading vinyl picks, sharing photo walk shots, or talking climbing?\", \"cites\": [\"p15:socialStyle\"]}, \"p03\": {\"say\": \"If Ravi suggests a chill night browsing vinyl then chatting films, how would Zoe actually hang out with them in that setting?\", \"cites\": [\"p15:likes[0]\"]}, \"p05\": {\"say\": \"If Ravi invites Yuki for a relaxed bouldering crew hang followed by listening, how would Yuki actually act with them during the night?\", \"cites\": [\"p15:groups[1]\"]}, \"p11\": {\"say\": \"If Ravi plans a low-key coffee plus vinyl evening, how would Rosa actually spend time with them — digging, swapping memes, or easy chatting?\", \"cites\": [\"p15:likes[6]\"]}, \"p12\": {\"say\": \"If Ravi suggests a chill evening around indie music and film chat, how would Gabe actually hang out with them in person?\", \"cites\": [\"p15:likes[2]\"]}, \"p13\": {\"say\": \"If Ravi invites Leo to a relaxed film club style night with Letterboxd talk, how would Leo actually spend the evening with them?\", \"cites\": [\"p15:likes[4]\"]}, \"p14\": {\"say\": \"If Ravi sets up a chill Philz meet plus vinyl browsing, how would Ben actually hang out with them — wandering, chatting climbing, or digging records?\", \"cites\": [\"p15:likes[5]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3505,
+    "completionTokens": 1055
+  },
+  "savedAt": "2026-11-13T04:10:21.185Z"
+}

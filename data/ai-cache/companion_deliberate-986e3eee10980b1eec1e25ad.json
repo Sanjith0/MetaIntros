@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"line\": {\"say\": \"Gabe enjoys low-key plans swapping climbing stories, vinyl finds and A24 picks together.\", \"cites\": [\"p12:socialStyle\", \"p12:groups[2]\", \"p12:groups[1]\", \"p12:likes[8]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1541,
+    "completionTokens": 1123
+  },
+  "savedAt": "2026-11-13T04:11:52.109Z"
+}

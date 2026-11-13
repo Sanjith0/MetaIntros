@@ -1,0 +1,11 @@
+{
+  "text": "{\"welcome\": \"Hey Jordan, Zoe, Rosa and Ben! So glad you're matched for Crate-Digging & Listening Bar Night on Fri, Nov 13 · 7 PM. Let's all meet at the front entrance of Menlo record shop listening bar a few minutes early to say hi! 🎶\", \"icebreaker\": \"Since you all love vinyl records, what's the best crate-digging find you've ever scored?\", \"interestTag\": \"vinyl\"}",
+  "task": "host_welcome",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 286,
+    "completionTokens": 522
+  },
+  "savedAt": "2026-11-13T04:23:45.587Z"
+}

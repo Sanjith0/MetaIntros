@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p03\", \"line\": {\"say\": \"Yuki would love chill night trading vinyl, climbing and photo notes together.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:likes[5]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1455,
+    "completionTokens": 2071
+  },
+  "savedAt": "2026-11-13T04:17:25.825Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Ben hopes for a chill new hangout with a squad of 4. They would bring love of climbing, vinyl collecting, and indie music like Snail Mail and Alvvays. They thrive in low-key, relaxed plans with wandering conversation.\", \"cites\": [\"p14:likes[0]\", \"p14:likes[1]\", \"p14:music[0]\", \"p14:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2237,
+    "completionTokens": 617
+  },
+  "savedAt": "2026-11-13T04:15:13.888Z"
+}

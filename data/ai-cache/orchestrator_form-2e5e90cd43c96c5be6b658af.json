@@ -1,0 +1,11 @@
+{
+  "text": "{\"parties\": [{\"members\": [\"p01\", \"p03\", \"p11\", \"p14\"], \"why\": \"You all share a love for Vinyl Me, Please digging, Rasputin Music finds, Indie Shuffle, and Climbing Magazine stories — perfect for vinyl browsing and climbing coffee chat together.\"}]}",
+  "task": "orchestrator_form",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1267,
+    "completionTokens": 1140
+  },
+  "savedAt": "2026-11-13T04:15:05.721Z"
+}

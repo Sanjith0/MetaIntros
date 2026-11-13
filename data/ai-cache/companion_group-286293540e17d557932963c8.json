@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe hopes for a chill Indie Night: Local Bands Showcase with this 6. They'd bring vinyl collecting chat, bouldering memes, and 35mm film photo talk plus A24 and anime finds. They love low-key relaxed hangs and easygoing conversation around shared niche interests.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[1]\", \"p03:likes[6]\", \"p03:likes[8]\", \"p03:likes[10]\", \"p03:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3010,
+    "completionTokens": 949
+  },
+  "savedAt": "2026-11-13T04:18:23.515Z"
+}

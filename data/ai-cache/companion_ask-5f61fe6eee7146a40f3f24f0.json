@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"How does Jordan spend a low-key evening digging through vinyl then talking climbing beta? Gabe likes low-key, chill plans and is in Peninsula Vinyl Collectors.\", \"cites\": [\"p12:socialStyle\", \"p12:groups[1]\"]}, \"p03\": {\"say\": \"What does Zoe do when a chill hangout turns to A24 films and vinyl talk? Gabe is in Peninsula Film Club and enjoys low-key, chill plans.\", \"cites\": [\"p12:groups[0]\", \"p12:socialStyle\"]}, \"p05\": {\"say\": \"How does Yuki act during a relaxed bouldering night followed by chatting indie music? Gabe goes to Bouldering Night at Peninsula Boulders and prefers chill plans.\", \"cites\": [\"p12:events[2]\", \"p12:socialStyle\"]}, \"p11\": {\"say\": \"How does Rosa handle a quiet night swapping vinyl finds and climbing stories? Gabe follows Climbing Magazine and likes low-key, chill plans.\", \"cites\": [\"p12:likes[0]\", \"p12:socialStyle\"]}, \"p13\": {\"say\": \"What is Leo like hanging out low-key talking films then catching indie music? Gabe is in Peninsula Film Club and goes to Indie Night at The Guild.\", \"cites\": [\"p12:groups[0]\", \"p12:events[0]\"]}, \"p14\": {\"say\": \"How does Ben spend a chill evening of record digging and climbing chat? Gabe is in Peninsula Vinyl Collectors and Bay Area Climbers.\", \"cites\": [\"p12:groups[1]\", \"p12:groups[2]\"]}, \"p15\": {\"say\": \"How does Ravi act on a relaxed night discussing films and bouldering beta? Gabe is in Peninsula Film Club and part of Bay Area Climbers.\", \"cites\": [\"p12:groups[0]\", \"p12:groups[2]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3711,
+    "completionTokens": 1638
+  },
+  "savedAt": "2026-11-13T04:10:22.649Z"
+}

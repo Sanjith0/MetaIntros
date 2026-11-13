@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki hopes for a chill Indie Night Local Bands Showcase with this squad. Yuki would bring love of Bay Area indie shows, vinyl collecting and bouldering chat, plus faves like Wet Leg, boygenius and Alvvays. Yuki likes low-key, chill plans and would prefer to keep it relaxed and easygoing together.\", \"cites\": [\"p05:groups[2]\", \"p05:likes[1]\", \"p05:likes[0]\", \"p05:music[0]\", \"p05:music[1]\", \"p05:music[2]\", \"p05:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2879,
+    "completionTokens": 1075
+  },
+  "savedAt": "2026-11-13T04:18:27.062Z"
+}

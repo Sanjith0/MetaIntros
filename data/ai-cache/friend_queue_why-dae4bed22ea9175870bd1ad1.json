@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": \"You could join Freya for the Golden Hour Photo Walk to enjoy photography together.\"}",
+  "task": "friend_queue_why",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 132,
+    "completionTokens": 669
+  },
+  "savedAt": "2026-11-13T04:15:39.216Z"
+}

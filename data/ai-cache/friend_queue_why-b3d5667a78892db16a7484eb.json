@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": \"You could join Ari planning a new hangout around indie music, photography and hiking together.\"}",
+  "task": "friend_queue_why",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 112,
+    "completionTokens": 679
+  },
+  "savedAt": "2026-11-13T04:15:45.809Z"
+}

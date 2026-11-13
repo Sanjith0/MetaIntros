@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Zoe hopes for a chill squad of 6 this weekend sharing vinyl digging, bouldering chat and photo walks. They would bring love of Vinyl Me, Please, Bouldering Daily and 35mm film photography. Group should know Zoe thrives in low-key, relaxed hangouts over big crowds.\", \"cites\": [\"p03:likes[3]\", \"p03:likes[0]\", \"p03:likes[6]\", \"p03:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2998,
+    "completionTokens": 630
+  },
+  "savedAt": "2026-11-13T04:12:31.555Z"
+}

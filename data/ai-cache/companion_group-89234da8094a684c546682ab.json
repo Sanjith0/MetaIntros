@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Gabe hopes for a chill squad of 6 this weekend. Gabe brings love of bouldering, vinyl collecting, and indie nights plus A24 film chat. They prefer low-key relaxed plans and easygoing hangouts around shared interests.\", \"cites\": [\"p12:socialStyle\", \"p12:groups[2]\", \"p12:groups[1]\", \"p12:events[0]\", \"p12:likes[8]\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3043,
+    "completionTokens": 726
+  },
+  "savedAt": "2026-11-13T04:12:34.323Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Ben hopes for a chill squad of 6 for Indie Night: Local Bands Showcase. They would bring vinyl chat from Peninsula Vinyl Collectors and climbing stories from Stanford Climbing Club Alumni, plus love for Snail Mail and Alvvays. They prefer low-key, chill plans and easy wandering conversations.\", \"cites\": [\"p14:groups[2]\", \"p14:groups[0]\", \"p14:music[0]\", \"p14:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2971,
+    "completionTokens": 773
+  },
+  "savedAt": "2026-11-13T04:06:47.237Z"
+}

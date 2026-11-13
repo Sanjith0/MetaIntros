@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Yuki hopes for a chill Indie Night Local Bands Showcase with this squad. They bring shared love of Rasputin Music vinyl hunting, Bouldering Daily climbing chat, and Bay Area Concerts indie discovery. Group should know Yuki likes low-key chill plans and easygoing hangouts.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:likes[2]\", \"p05:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2553,
+    "completionTokens": 702
+  },
+  "savedAt": "2026-11-13T04:22:40.252Z"
+}

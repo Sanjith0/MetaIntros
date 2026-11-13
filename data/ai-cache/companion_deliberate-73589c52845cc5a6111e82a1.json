@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p01\", \"line\": {\"say\": \"Rosa would love this chill vinyl, climbing, and photo walk crew together.\", \"cites\": [\"p11:likes[5]\", \"p11:likes[2]\", \"p11:groups[2]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1508,
+    "completionTokens": 1044
+  },
+  "savedAt": "2026-11-13T04:11:51.736Z"
+}

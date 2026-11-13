@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p03\": {\"say\": \"Jordan enjoys bringing a Fujifilm X on relaxed photo walks. If they suggested a chill evening wandering and shooting with Zoe, how would Zoe actually join in and keep conversation going?\", \"cites\": [\"p01:likes[6]\"]}, \"p05\": {\"say\": \"Jordan is into vinyl through Vinyl Me, Please and Rasputin Music. If they proposed a low-key record-digging hang with Yuki, how would Yuki browse, chat, and share picks through the night?\", \"cites\": [\"p01:likes[5]\"]}, \"p11\": {\"say\": \"Jordan likes chill Philz Coffee hangouts. If they invited Rosa for a low-key evening starting with coffee then vinyl talk, how would Rosa settle in and keep things relaxed?\", \"cites\": [\"p01:likes[7]\"]}, \"p12\": {\"say\": \"Jordan follows Indie Shuffle for chill music discovery. If they suggested a relaxed night trading tracks with Gabe, how would Gabe share, listen, and hang over the evening?\", \"cites\": [\"p01:likes[2]\"]}, \"p13\": {\"say\": \"Jordan reads Climbing Magazine and likes chill plans. If they invited Leo for a low-key night swapping climbing stories, how would Leo contribute and keep the vibe easy?\", \"cites\": [\"p01:likes[0]\"]}, \"p14\": {\"say\": \"Jordan likes low-key, chill plans. If they planned a relaxed vinyl and climbing chat night with Ben, how would Ben join the wandering conversation and help keep energy mellow?\", \"cites\": [\"p01:socialStyle\"]}, \"p15\": {\"say\": \"Jordan is in Bay Area Photo Walks. If they suggested a chill evening walk with cameras plus coffee with Ravi, how would Ravi participate and chat along the way?\", \"cites\": [\"p01:groups[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3490,
+    "completionTokens": 1385
+  },
+  "savedAt": "2026-11-13T04:13:06.657Z"
+}

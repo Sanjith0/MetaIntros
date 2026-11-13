@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p05\", \"line\": {\"say\": \"Ben would enjoy chill vinyl digging and climbing chat with this crew.\", \"cites\": [\"p14:likes[0]\", \"p14:likes[1]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1521,
+    "completionTokens": 915
+  },
+  "savedAt": "2026-11-13T04:11:52.942Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-p15\", \"line\": {\"say\": \"Yuki loves chill vinyl digs and bouldering hangs with friends.\", \"cites\": [\"p05:likes[0]\", \"p05:likes[1]\", \"p05:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1439,
+    "completionTokens": 1151
+  },
+  "savedAt": "2026-11-13T04:11:51.737Z"
+}

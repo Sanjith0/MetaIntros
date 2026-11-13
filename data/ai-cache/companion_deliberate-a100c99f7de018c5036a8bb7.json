@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"proposalId\": \"prop-p13\", \"members\": [\"p01\", \"p03\", \"p11\", \"p12\", \"p13\", \"p15\"], \"line\": {\"say\": \"Leo would love chill records, films and climbing chat with this crew.\", \"cites\": [\"p13:socialStyle\", \"p13:likes[5]\", \"p13:likes[3]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1343,
+    "completionTokens": 1120
+  },
+  "savedAt": "2026-11-13T04:11:53.030Z"
+}

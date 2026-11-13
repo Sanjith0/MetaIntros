@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Gabe loves low-key Indie Night hangs. When Gabe is posted up between sets chatting about vinyl and climbing, how does Jordan actually join in — stay close and chat, wander to photograph, or something else?\", \"cites\": [\"p12:events[0]\", \"p12:socialStyle\"]}, \"p03\": {\"say\": \"Gabe keeps things chill and likes geeking out over A24 and vinyl. At a crowded showcase, where does Zoe actually settle with Gabe — hang back chatting, drift toward the stage, or step out?\", \"cites\": [\"p12:groups[0]\", \"p12:socialStyle\"]}, \"p05\": {\"say\": \"Gabe is into Bouldering Daily and chill show vibes. When the music gets loud and Gabe hangs back to talk climbing and Pitchfork finds, how does Yuki actually spend that time with Gabe?\", \"cites\": [\"p12:likes[2]\", \"p12:socialStyle\"]}, \"p11\": {\"say\": \"Gabe prefers low-key plans and swapping vinyl and climbing stories. During a long set break at Indie Night, how does Rosa actually hang with Gabe — deep chat, coffee run, people-watch?\", \"cites\": [\"p12:groups[1]\", \"p12:socialStyle\"]}, \"p13\": {\"say\": \"Gabe likes relaxed conversation and swapping recommendations. When Gabe steps to the edge for space and film-chat during a busy showcase, how does Leo actually join Gabe there?\", \"cites\": [\"p12:groups[0]\", \"p12:socialStyle\"]}, \"p14\": {\"say\": \"Gabe enjoys easygoing Indie Night hangs around vinyl and climbing. If Gabe wants to stay late but keep it mellow near the back, how does Ben actually do that time together?\", \"cites\": [\"p12:events[0]\", \"p12:socialStyle\"]}, \"p15\": {\"say\": \"Gabe likes wandering, low-pressure chat about film and vinyl. At the showcase with Gabe, how does Ravi actually balance watching bands versus geeking out quietly together between sets?\", \"cites\": [\"p12:groups[0]\", \"p12:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3727,
+    "completionTokens": 1152
+  },
+  "savedAt": "2026-11-13T04:04:19.546Z"
+}

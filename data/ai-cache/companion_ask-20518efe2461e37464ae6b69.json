@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Rosa brings recent finds from Peninsula Vinyl Collectors to a chill coffee hang, how does Jordan usually act — dig through sleeves together, swap photo-walk stories, or hang back?\", \"cites\": [\"p11:groups[0]\"]}, \"p03\": {\"say\": \"If Rosa brings a 35mm camera to a low-key hang to shoot between vinyl chat, how does Zoe usually join in — shoot alongside, geek out over film, or chat music instead?\", \"cites\": [\"p11:likes[7]\"]}, \"p05\": {\"say\": \"If Rosa wants a chill night swapping Bay Area Climbers Coalition stories and vinyl, how does Yuki usually show up — trade beta, share records, or keep conversation drifting?\", \"cites\": [\"p11:likes[2]\"]}, \"p12\": {\"say\": \"If Rosa puts on an Indie Shuffle playlist for a low-key listening night, how does Gabe usually behave — suggest deep cuts, chat climbing and film, or stay quiet?\", \"cites\": [\"p11:likes[1]\"]}, \"p13\": {\"say\": \"If Rosa suggests a chill Bay Area Indie Shows hang with coffee and record talk after, how does Leo usually participate — swap recommendations, share hiking plans, or listen more?\", \"cites\": [\"p11:groups[1]\"]}, \"p14\": {\"say\": \"If Rosa suggests grabbing Philz Coffee then a low-key vinyl browse, how does Ben usually act — linger chatting climbing and music, or keep it brief and mellow?\", \"cites\": [\"p11:likes[8]\"]}, \"p15\": {\"say\": \"Rosa likes low-key, chill plans. If the squad plans a quiet four-person hang with vinyl and wandering chat, how does Ravi usually settle in?\", \"cites\": [\"p11:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3640,
+    "completionTokens": 1039
+  },
+  "savedAt": "2026-11-13T04:13:04.900Z"
+}

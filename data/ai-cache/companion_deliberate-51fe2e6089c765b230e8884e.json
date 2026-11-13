@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\":\"back\",\"proposalId\":\"prop-p03\",\"line\":{\"say\":\"Jordan would enjoy chill night trading vinyl, climbing and photo walk stories with this crew.\",\"cites\":[\"p01:likes[5]\",\"p01:likes[1]\",\"p01:likes[6]\",\"p01:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1397,
+    "completionTokens": 1248
+  },
+  "savedAt": "2026-11-13T04:17:16.497Z"
+}

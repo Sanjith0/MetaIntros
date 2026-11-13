@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Jordan hopes for a chill new hangout with a squad of 4 and would bring shared love of bouldering, vinyl collecting, and Fujifilm photography for easy conversation. They gravitate toward low-key relaxed plans and would love swapping climbing and music finds.\", \"cites\": [\"p01:likes[1]\", \"p01:likes[5]\", \"p01:likes[6]\", \"p01:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 2100,
+    "completionTokens": 529
+  },
+  "savedAt": "2026-11-13T04:15:13.318Z"
+}

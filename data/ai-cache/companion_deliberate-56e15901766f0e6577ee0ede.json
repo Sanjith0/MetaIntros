@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"hold\", \"line\": {\"say\": \"Leo enjoys low-key chill plans with film, memes and trail stories together.\", \"cites\": [\"p13:socialStyle\", \"p13:likes[0]\", \"p13:likes[4]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1294,
+    "completionTokens": 1009
+  },
+  "savedAt": "2026-11-13T04:14:39.966Z"
+}

@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"Rosa enjoys low-key chats around vinyl via Peninsula Vinyl Collectors. If Rosa and Jordan grab coffee between sets at Indie Night, what would Jordan actually do to keep things relaxed and easygoing?\", \"cites\": [\"p11:groups[0]\"]}, \"p03\": {\"say\": \"Rosa shoots 35mm film photography. If Rosa and Zoe wander outside during a loud set at Indie Night, how would Zoe spend that downtime chatting with Rosa?\", \"cites\": [\"p11:likes[7]\"]}, \"p05\": {\"say\": \"Rosa follows Pitchfork for new finds. If the headliner runs late at Indie Night, how would Yuki and Rosa pass the time together while keeping the vibe chill?\", \"cites\": [\"p11:likes[0]\"]}, \"p12\": {\"say\": \"Rosa discovers music through Indie Shuffle. If Rosa and Gabe disagree on a band at Indie Night, how would Gabe handle it while keeping the night low-key?\", \"cites\": [\"p11:likes[1]\"]}, \"p13\": {\"say\": \"Rosa is in Bay Area Indie Shows. If the venue gets crowded at Indie Night, where would Leo and Rosa go and what would Leo talk about to keep it chill?\", \"cites\": [\"p11:groups[1]\"]}, \"p14\": {\"say\": \"Rosa likes Philz Coffee meetups before shows. If Rosa and Ben arrive early to Indie Night, how would Ben use that waiting time with Rosa?\", \"cites\": [\"p11:likes[8]\"]}, \"p15\": {\"say\": \"Rosa laughs at V-Scale Memes. If there is a lull between bands at Indie Night, how would Ravi and Rosa fill that gap together?\", \"cites\": [\"p11:likes[6]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3656,
+    "completionTokens": 1434
+  },
+  "savedAt": "2026-11-13T04:04:16.748Z"
+}

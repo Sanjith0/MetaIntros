@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"When Zoe suggests a chill night around Vinyl Me, Please digging and photo chat, how does Jordan actually hang out — stick together browsing, wander off, or keep easy conversation going?\", \"cites\": [\"p03:likes[3]\"]}, \"p05\": {\"say\": \"If Zoe wants a low-key bouldering hang followed by vinyl talk, how does Yuki pace the night — climb and chat together, take breaks, or shift between groups?\", \"cites\": [\"p03:likes[0]\"]}, \"p11\": {\"say\": \"When Zoe brings 35mm film photography to a relaxed hang, how does Rosa actually spend the evening — swapping shots together, exploring solo, or chatting over coffee?\", \"cites\": [\"p03:likes[6]\"]}, \"p12\": {\"say\": \"If Zoe plans a chill evening around A24 films and vinyl, how does Gabe usually join in — watch and discuss together, dip in and out, or keep side chats going?\", \"cites\": [\"p03:likes[8]\"]}, \"p13\": {\"say\": \"When Zoe wants a low-key hang sharing music and film recommendations, how does Leo actually act — trade picks together, listen quietly, or mingle around?\", \"cites\": [\"p03:socialStyle\"]}, \"p14\": {\"say\": \"If Zoe suggests relaxed vinyl digging plus bouldering stories, how does Ben spend time with others — stay together, browse solo then regroup, or keep wandering chat?\", \"cites\": [\"p03:likes[3]\"]}, \"p15\": {\"say\": \"When Zoe wants a chill film club style night with vinyl talk, how does Ravi actually hang out — geek out together over details, listen more, or drift between conversations?\", \"cites\": [\"p03:socialStyle\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3666,
+    "completionTokens": 1052
+  },
+  "savedAt": "2026-11-13T04:13:07.310Z"
+}

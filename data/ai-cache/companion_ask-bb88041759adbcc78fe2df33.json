@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"p01\": {\"say\": \"If Zoe brings a film camera to Indie Night to grab 35mm shots between bands, how would Jordan actually spend that time with them — chatting nearby, exploring together, or drifting off?\", \"cites\": [\"p03:likes[6]\"]}, \"p05\": {\"say\": \"When the crowd gets loud between sets at Indie Night, what does Yuki usually do with Zoe, who follows Bay Area Concerts — find a quieter spot, step outside, or stay in the mix?\", \"cites\": [\"p03:likes[5]\"]}, \"p11\": {\"say\": \"If Zoe shares V-Scale Memes jokes while waiting for the next band at Indie Night, how does Rosa respond in the moment — trade jokes, laugh politely, or change topic?\", \"cites\": [\"p03:likes[1]\"]}, \"p12\": {\"say\": \"If Zoe starts chatting about A24 films during a set break at Indie Night, how does Gabe keep the conversation going with them — swap favorites, ask questions, or move on?\", \"cites\": [\"p03:likes[8]\"]}, \"p13\": {\"say\": \"If Zoe talks about a recent Rasputin Music dig before the bands start, how does Leo engage with them at Indie Night — swap picks, listen briefly, or wander off?\", \"cites\": [\"p03:likes[2]\"]}, \"p14\": {\"say\": \"If Zoe geeks out about Vinyl Me, Please pressings between sets at Indie Night, what does Ben actually do — dig into details together, nod along, or steer elsewhere?\", \"cites\": [\"p03:likes[3]\"]}, \"p15\": {\"say\": \"If Zoe brings up Bouldering Daily training stories while waiting for bands at Indie Night, how does Ravi spend that time — ask for details, share own stories, or let it pass?\", \"cites\": [\"p03:likes[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.3",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 3682,
+    "completionTokens": 1861
+  },
+  "savedAt": "2026-11-13T04:04:31.189Z"
+}
