@@ -5,6 +5,7 @@ import { ChatThread } from "@/components/chat/ChatThread";
 import { now } from "@/lib/server/clock";
 import { getSquadHeader } from "@/lib/server/squadChat";
 import { sweepExpiredChats } from "@/lib/server/expiry";
+import { getRatingState } from "@/lib/server/ratings";
 
 export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,5 +15,6 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
   if (!chat) notFound();
   await markChatRead(userId, id, await now());
   const squad = chat.type === "squad" ? await getSquadHeader(id) : null;
-  return <ChatThread chat={JSON.parse(JSON.stringify(chat))} meId={userId} squad={squad} />;
+  const rating = chat.type === "squad" && chat.partyId ? await getRatingState(chat.partyId, userId) : null;
+  return <ChatThread chat={JSON.parse(JSON.stringify(chat))} meId={userId} squad={squad} rating={rating} />;
 }

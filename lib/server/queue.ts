@@ -17,6 +17,19 @@ import { weekendRange } from "./events";
 import { nowMs } from "@/lib/clock";
 import { groupmates, leaveGroup, myGroupState, startGroupQueue } from "./groups";
 import { PULSE_MIN } from "./pulse";
+import { applyAvoids, ratingAwareScorer } from "@/lib/match/ratings";
+import { ratingSignals } from "./ratings";
+
+/**
+ * Post-event ratings as matching signals: "not again" keeps a pair apart (except people queuing
+ * together), "again" lifts a pair's score. Anonymous: nothing here is shown to anyone.
+ */
+async function withRatings(people: Map<string, Person>, items: Pick<QueueItem, "userId" | "groupId">[] = []) {
+  const signals = await ratingSignals([...people.keys()]);
+  const groupOf = new Map(items.filter((i) => i.groupId).map((i) => [i.userId, i.groupId!]));
+  applyAvoids(people, signals, (a, b) => Boolean(groupOf.get(a)) && groupOf.get(a) === groupOf.get(b));
+  return { signals, score: ratingAwareScorer(makePairScorer(), signals) };
+}
 
 // ───────────────────────── join / leave ─────────────────────────
 
@@ -164,10 +177,11 @@ export async function getQueueStatus(userId: string): Promise<QueueStatus> {
   ensureTicker();
   const waiting = await waitingItems();
   const people = await loadPeople(prisma, waiting.map((w) => w.userId));
+  const { score } = await withRatings(people, waiting);
   const landmarks = await landmarkMap();
   const problems = await entryProblems(waiting);
   const anchor = waiting.find((w) => w.entryId === entry.id);
-  const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: nowMs(), fillMode: await getFillMode() }) : { found: 1, userIds: [userId] };
+  const pf = anchor ? playersFound(anchor, waiting, people, landmarks, { now: nowMs(), fillMode: await getFillMode() }, score) : { found: 1, userIds: [userId] };
   const users = await prisma.user.findMany({ where: { id: { in: pf.userIds } }, select: { id: true, name: true, avatarColor: true } });
   const searchArea = anchor ? searchAreaFor(anchor, waiting, people, landmarks, await getFillMode()) : undefined;
   return {
@@ -280,10 +294,10 @@ export async function tick(): Promise<number> {
     for (const w of all.filter((x) => problems.has(x.entryId) && !x.isSimulated)) publish("queue", { type: "problem" }, [w.userId]);
     if (waiting.length < 2) return 0;
     const people = await loadPeople(prisma, waiting.map((w) => w.userId));
+    const { score } = await withRatings(people, waiting);
     const landmarks = await landmarkMap();
     const fillMode = await getFillMode();
     const mixedFillDelayMs = Number(await getSetting("mixedFillDelayMs", "12000"));
-    const score = makePairScorer();
     const formed = await runTickAsync(
       waiting,
       people,
@@ -377,7 +391,8 @@ export async function scheduleSimulatedFill(entryId: string, opts: { immediate?:
     const people = await loadPeople(prisma, [entry.userId, ...mates, ...sims.map((s) => s.id)]);
     const me = people.get(entry.userId)!;
     const crew = mates.map((id) => people.get(id)).filter(Boolean) as Person[];
-    const score = makePairScorer();
+    // fillers respect your ratings too: never someone you said "not again" to, and people you'd squad up with again first
+    const { score } = await withRatings(people, [entry.userId, ...mates].map((u) => ({ userId: u, groupId: fresh.groupId })));
     const pool = [...people.values()].filter((p) => p.isSimulated && !busy.has(p.id) && pairAllowed(me, p) && crew.every((c) => pairAllowed(c, p)));
     // greedy: most compatible with the joiner *and* with already-picked fillers
     const picked: Person[] = [];
