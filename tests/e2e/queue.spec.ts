@@ -116,8 +116,7 @@ test("live mode: four real people pick size 4 and land in the same squad", async
 
 test("new hangout queue: Events → Plan a hangout → squad gets a squad-only hangout at a public spot", async ({ page, browser }) => {
   await gotoReady(page, "/events");
-  await page.getByTestId("queue-entry-open").click(); // one entry point; the three modes are rows in its sheet
-  await page.getByTestId("queue-hangout").click();
+  await page.getByTestId("queue-entry-hangout").click(); // its own button; "Find a squad for an event" is for existing events
   await expect(page.getByTestId("queue-title")).toHaveText("Plan a new hangout");
   await page.getByTestId("size-4").click();
   await page.getByTestId("choose-area").click();
