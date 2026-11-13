@@ -1,9 +1,13 @@
 /**
  * Keeps bursts of live model calls inside a provider's rate limit: a cap on how many run at
- * once, and retry with backoff when the provider answers 429. Only rate-limit errors are retried;
- * every other failure (offline, timeout, bad output) still fails fast so the demo never hangs.
+ * once, and retry with backoff when the provider answers 429. A dropped connection or a 502/503/504
+ * is retried too, but only twice and quickly. Every other failure (offline, timeout, bad output)
+ * still fails fast so the demo never hangs.
  */
 export const isRateLimit = (e: unknown) => /\b429\b|rate.?limit/i.test((e as Error)?.message ?? "");
+/** A connection the provider dropped (Node's fetch says "fetch failed") or a gateway error: worth one more try. */
+export const isTransient = (e: unknown) => /fetch failed|ECONNRESET|socket hang up|UND_ERR_SOCKET|HTTP 50[234]\b/i.test((e as Error)?.message ?? "");
+const TRANSIENT_RETRIES = 2;
 
 export function makeLimiter(max: number) {
   let active = 0;
@@ -25,6 +29,10 @@ export async function withRateLimitRetry<T>(fn: () => Promise<T>, delaysMs: numb
     try {
       return await fn();
     } catch (e) {
+      if (attempt < TRANSIENT_RETRIES && isTransient(e)) {
+        await sleep(1000 * (attempt + 1));
+        continue;
+      }
       if (!isRateLimit(e) || attempt >= delaysMs.length) throw e;
       await sleep(delaysMs[attempt]);
     }
