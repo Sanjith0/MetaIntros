@@ -247,6 +247,13 @@ brew install xcodegen
 cd ios-glasses-live && xcodegen generate && open GlanceGlassesLive.xcodeproj
 ```
 
+### Meta glasses inside Link
+
+Link's own Glance screen (`src/app/glance-embed.tsx`) can use the glasses too, through the `modules/glance-glasses` native module. Two things it needs:
+
+- **A development build, not Expo Go.** Run `scripts/fetch-meta-dat.sh` once, then `npx expo run:ios --device`. Expo Go has no glasses module, so it shows no Glasses button.
+- **A paid Apple developer team.** The glasses send video over a Wi-Fi link they host, and joining it needs Apple's Hotspot Configuration capability (`ios.entitlements` in `app.json`). Free Personal Teams cannot sign that capability: with one, the build fails at signing. Without the capability the glasses connect but never send video.
+
 ## Build the Meta glasses version
 
 Use [the complete iPhone and glasses guide](docs/IOS-GLASSES.md). It includes the native project, developer-mode setup, signing and Meta registration fields, private recorder-account handoff, real camera-capability checks and physical-device acceptance tests.

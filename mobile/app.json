@@ -13,6 +13,9 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.metaintros.link",
+      "entitlements": {
+        "com.apple.developer.networking.HotspotConfiguration": true
+      },
       "infoPlist": {
         "NSCameraUsageDescription": "Take your attendee portrait and detect the optional three-finger end gesture during a consented conversation.",
         "NSMicrophoneUsageDescription": "Record a conversation only after both participants agree. Either person can stop.",
