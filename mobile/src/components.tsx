@@ -28,8 +28,8 @@ export function Button({ children, onPress, icon, tone = 'primary', disabled = f
 }
 export function Portrait({ person, size = 52 }: { person: Profile; size?: number }) {
   return person.photoUrl ? <Image accessibilityLabel={`${person.name}'s profile portrait`} source={{ uri: person.photoUrl }}
-    style={[s.avatar, { width: size, height: size, borderRadius: size * 0.3 }]} /> :
-    <View style={[s.avatar, s.avatarFallback, { width: size, height: size }]}><Text style={s.heading}>{person.name[0]}</Text></View>;
+    style={[s.avatar, { width: size, height: size, borderRadius: size / 2 }]} /> :
+    <View style={[s.avatar, s.avatarFallback, { width: size, height: size, borderRadius: size / 2 }]}><Text style={s.heading}>{person.name[0]}</Text></View>;
 }
 export function Badge({ children, green = false }: { children: string; green?: boolean }) {
   return <View style={[s.badge, green && { backgroundColor: colors.greenLight }]}><Text style={[s.badgeText, green && { color: colors.green }]}>{children}</Text></View>;
@@ -43,10 +43,10 @@ export function Notice({ children, error = false }: { children: React.ReactNode;
     <Text style={[s.small, error && { color: colors.danger }]}>{children}</Text>
   </View>;
 }
-export function Page({ children, back, title, footer }: { children: React.ReactNode; back?: boolean; title?: string; footer?: React.ReactNode }) {
+export function Page({ children, back, onBack, title, footer }: { children: React.ReactNode; back?: boolean; onBack?: () => void; title?: string; footer?: React.ReactNode }) {
   return <View style={s.page}><ScrollView style={s.page} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
     {back && <View style={s.row}><Pressable accessibilityRole="button" accessibilityLabel="Go back"
-      onPress={() => router.canGoBack() ? router.back() : router.replace('/glance/events')}
+      onPress={onBack ?? (() => router.canGoBack() ? router.back() : router.replace('/glance/connections'))}
       style={{ width: 44, height: 44, marginLeft: -10, alignItems: 'center', justifyContent: 'center' }}>
       <Icon name="arrow-left" />
     </Pressable><Text style={[s.label, { flex: 1 }]}>{title}</Text></View>}
@@ -56,7 +56,7 @@ export function Page({ children, back, title, footer }: { children: React.ReactN
 }
 export function Empty({ icon, title, text }: { icon: IconName; title: string; text: string }) {
   return <View style={[s.card, { alignItems: 'center', paddingVertical: 32 }]}>
-    <View style={{ padding: 14, borderRadius: 18, backgroundColor: colors.blueLight }}><Icon name={icon} color={colors.blue} size={26} /></View>
+    <View style={{ padding: 14, borderRadius: 999, backgroundColor: colors.blueLight }}><Icon name={icon} color={colors.blue} size={26} /></View>
     <Text style={s.heading}>{title}</Text><Text style={[s.muted, { textAlign: 'center' }]}>{text}</Text>
   </View>;
 }

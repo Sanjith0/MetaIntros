@@ -49,7 +49,6 @@ export default function EventsScreen() {
       {data.mySquads.length ? <MySquads squads={data.mySquads} /> : null}
       {data.showEntry ? <QueueEntry pulse={data.pulse} events={data.pickable} landmarks={data.landmarks} shareDefault={data.shareDefault} again={data.again} also={data.also} autoOpen={params.queue === '1'} /> : null}
       <FriendQueues queues={data.friendQueues} nowMs={data.nowMs} />
-      <GlanceEntry />
       <Section title={heading}>
         <View style={{ gap: 12 }} testID="event-feed">
           {data.feed.map(e => <EventCard key={e.id} e={e} />)}
@@ -60,11 +59,13 @@ export default function EventsScreen() {
   </Screen>;
 }
 
-/** Glance lives inside this app now: one quiet row on Events, beside the event page's "Join with Glance". */
+/** Glance lives inside this app now: one quiet row on Events, beside the event page's "Join with Glance".
+ * Hidden for now (not rendered); put <GlanceEntry /> back above the feed to show it. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function GlanceEntry() {
-  return <Pressable testID="glance-entry" onPress={() => openGlance('/glance/events')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.surface, paddingHorizontal: 16, paddingVertical: 12 }}>
+  return <Pressable testID="glance-entry" onPress={() => openGlance('/glance/connections')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.surface, paddingHorizontal: 16, paddingVertical: 12 }}>
     <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: c.control, alignItems: 'center', justifyContent: 'center' }}><Icon name="eye" /></View>
-    <View style={{ flex: 1 }}><Text style={t.bodyBold}>Glance</Text><Text style={t.meta}>See who turned on Glance at events you join</Text></View>
+    <View style={{ flex: 1 }}><Text style={t.bodyBold}>Glance</Text><Text style={t.meta}>People you met with Glance</Text></View>
     <Icon name="chevron-right" color={c.muted} />
   </Pressable>;
 }

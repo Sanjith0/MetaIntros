@@ -7,7 +7,7 @@ import { useDiscover } from '../../../discover/store';
 import { deploymentURL } from '../../../state';
 import { TapCounter } from '../../../secretTaps';
 
-export const unstable_settings = { initialRouteName: 'events' };
+export const unstable_settings = { initialRouteName: 'connections' };
 
 export default function TabsLayout() {
   // The same three tabs carry both faces of the app; only their labels and icons change.
@@ -23,7 +23,9 @@ export default function TabsLayout() {
     tabBarStyle: { borderTopColor: colors.line, backgroundColor: colors.paper, height: 82, paddingTop: 8, paddingBottom: 12 },
     tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16, flexShrink: 0, marginTop: 4 },
   }}>
-    <Tabs.Screen name="events" options={tab('Events', 'Discover', 'calendar', 'compass')} />
+    {/* Glance opens on one event from Link's "Join with Glance", so it has no Events tab. The route stays for the
+        sample walkthrough and the Discover face; its Glance button is hidden by style (see Dev tools below). */}
+    <Tabs.Screen name="events" options={{ ...tab('Events', 'Discover', 'calendar', 'compass'), tabBarItemStyle: events ? undefined : { display: 'none' } }} />
     <Tabs.Screen name="connections" options={tab('Connections', 'Going', 'users', 'check-circle')}
       listeners={{ tabPress: () => { if (deploymentURL && devTaps.tap(Date.now())) router.push('/glance/dev'); } }} />
     <Tabs.Screen name="profile" options={tab('You', 'Signals', 'user', 'sliders')} />

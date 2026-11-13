@@ -1,27 +1,24 @@
-import React from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { Stack, router, useGlobalSearchParams, usePathname } from 'expo-router';
-import Feather from '@expo/vector-icons/Feather';
-import { glanceOrigin, setGlanceOrigin } from '../../qu/glanceOrigin';
+import React, { useEffect } from 'react';
+import { Platform, View } from 'react-native';
+import { Stack, useGlobalSearchParams, usePathname } from 'expo-router';
+import { setGlanceOrigin } from '../../qu/glanceOrigin';
+import { hasWebView, redirectToGlanceEmbed } from '../../qu/glanceLaunch';
 
 /**
- * Glance runs inside Link. Every Glance screen gets one bar on top that leads back to where you came
- * from: the Link event you pressed "Join with Glance" on, or Events.
+ * Glance runs inside Link. It has no bar of its own: the event screen's back arrow leads back to the Link event
+ * you pressed "Join with Glance" on (leaveGlance in qu/glanceOrigin.ts).
  */
 export default function GlanceLayout() {
   const path = usePathname();
   const params = useGlobalSearchParams<{ source?: string; id?: string; title?: string }>();
-  // Remember the Link event a join came from, so the bar can lead straight back to it.
+  // Remember the Link event a join came from, so the back arrow can lead straight back to it.
   if (path.startsWith('/glance/join') && params.source === 'metaintros' && typeof params.id === 'string') setGlanceOrigin({ id: params.id, title: String(params.title ?? '') });
-  const origin = glanceOrigin();
-  const back = () => router.navigate((origin ? `/events/${origin.id}` : '/events') as never);
-  return <View style={{ flex: 1 }}>
-    <Pressable testID="glance-back" accessibilityRole="button" accessibilityLabel={origin ? `Back to ${origin.title || 'the event'} in Link` : 'Back to Link'} onPress={back}
-      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 6, height: 44, paddingHorizontal: 12, backgroundColor: pressed ? '#e4e6eb' : '#ffffff', borderBottomWidth: 1, borderBottomColor: '#ced0d4' })}>
-      <Feather name="chevron-left" size={24} color="#0866ff" />
-      <Text numberOfLines={1} style={{ flex: 1, fontFamily: 'Inter_600SemiBold', fontSize: 15, color: '#0866ff' }}>{origin ? `Back to ${origin.title || 'the event'}` : 'Back to Link'}</Text>
-      <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#65676b' }}>Glance</Text>
-    </Pressable>
-    <Stack screenOptions={{ headerShown: false, animation: 'fade' }} />
-  </View>;
+  // Phones never mount Glance's native screens (their capture needs the browser's face model): a deep link or any
+  // other route into /glance goes to the embedded screen instead.
+  const toEmbed = Platform.OS !== 'web' && hasWebView();
+  const query = new URLSearchParams(Object.entries(params).flatMap(([k, v]) => typeof v === 'string' ? [[k, v]] : [])).toString();
+  const target = query ? `${path}?${query}` : path;
+  useEffect(() => { if (toEmbed) redirectToGlanceEmbed(target); }, [toEmbed, target]);
+  if (toEmbed) return <View style={{ flex: 1, backgroundColor: '#ffffff' }} />;
+  return <View style={{ flex: 1 }}><Stack screenOptions={{ headerShown: false, animation: 'fade' }} /></View>;
 }

@@ -11,6 +11,7 @@ import { ModeSwitch } from './discover/ModeSwitch';
 import { MatchStatus, SharedWith, byShared, useAutoMatch } from './discover/PeopleMatch';
 import { matchPeople } from './discover/api';
 import { externalJoinHref, peekPendingJoin } from './externalJoin';
+import { leaveGlance } from './qu/glanceOrigin';
 import { MatchName } from './PersonCards';
 const firstName = (name: string) => name.split(' ')[0];
 import { samplePeople } from './demo';
@@ -250,7 +251,7 @@ export function EventScreen() {
     setRematching(true);
     void run(() => matchPeople(deploymentURL, token, id, true)).catch(() => {}).finally(() => setRematching(false));
   };
-  return <Page back title="Your event">
+  return <Page back onBack={leaveGlance} title="Your event">
     <DemoBanner /><GlobalStatus />
     {event ? <>
       <View style={{ gap: 12 }}><Badge>YOU’RE IN</Badge><Text style={s.title}>{event.title}</Text>
@@ -303,7 +304,7 @@ export function ConnectionsScreen() {
     <DemoBanner /><GlobalStatus />
     {conversations.map(c => <ConversationLink key={c.id} conversation={c} />)}
     {!conversations.length && <><Empty icon="message-circle" title="Your next connection starts in person." text="Enter an event, have a conversation, and finish with the three-finger gesture. Your shared chat will be right here." />
-      <Button onPress={() => router.push('/glance/events')} icon="arrow-right">Find your event</Button></>}
+      <Button onPress={leaveGlance} icon="arrow-right">Find your event</Button></>}
   </Page>;
 }
 
@@ -375,7 +376,7 @@ export function EnrollmentScreen() {
       await app.saveProfile({ name: name.trim(), role: role.trim(), photoUrl: photo });
       // Someone who signed up in order to join an event goes on to that event.
       const pending = peekPendingJoin();
-      router.replace(pending ? externalJoinHref(pending) : '/glance/events');
+      if (pending) router.replace(externalJoinHref(pending)); else leaveGlance();
     })}>Save your introduction</Button>
   </Page>;
 }
@@ -674,7 +675,7 @@ export function ConversationScreen() {
       <Button tone="ghost" onPress={backToEvent}>Back to your event</Button>
     </View>}
     {conversation.status === 'cancelled' && <><Empty icon="shield" title="No connection shared." text="This conversation was cancelled or event permission was withdrawn. Return to the event when you’re ready." />
-      <Button onPress={() => router.replace('/glance/events')}>Back to your events</Button></>}
+      <Button onPress={backToEvent}>Back to your event</Button></>}
   </Page>
     {confirming && <View testID="connection-green-confirmation" accessibilityRole="alert"
       style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(20,107,85,0.91)',
