@@ -57,8 +57,8 @@ export function setAiMode(mode: AiMode | undefined) {
 }
 
 export const MAX_LIVE_CALLS = Number(process.env.AI_MAX_CALLS ?? 400);
-/** The Companion engine fires a dozen calls per round; stay inside the provider's rate limit. */
-const limit = makeLimiter(Number(process.env.AI_CONCURRENCY) || 6);
+/** The Companion engine fires one call per Companion per round (a room holds up to 8): run a whole round at once, within the provider's rate limit (429s are retried with backoff). */
+const limit = makeLimiter(Number(process.env.AI_CONCURRENCY) || 8);
 const RETRY_DELAYS_MS = (process.env.AI_RETRY_MS ?? "3000,8000,15000,30000,30000").split(",").map(Number).filter((n) => n >= 0);
 
 function extractJson(text: string): unknown {

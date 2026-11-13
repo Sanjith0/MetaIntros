@@ -171,4 +171,46 @@ describe("orchestrator", () => {
     expect(only.map((p) => p.members)).toEqual([[m[4], m[5], m[6]]]);
     expect(orc.composeParties({ ...base, priority: [m[6]], onlyPriority: true, exclude: [[m[4], m[5], m[6]]] })).toEqual([]);
   });
+
+  it("composeParties ranks by the weakest pair after the conversations, not just by who backed what", () => {
+    const m = adults.slice(0, 5);
+    const vs = verdicts(m, 80);
+    // m1 and m2 scored each other low after talking; m3 and m4 get along with everyone
+    vs.get(m[1])!.set(m[2], v(40));
+    vs.get(m[2])!.set(m[1], v(45));
+    // the backed proposal pairs m1 with m2, but m0's Companion also wanted m3 and m4
+    const table = [{ id: "prop-" + m[0], by: m[0], members: [m[0], m[1], m[2]], line: "", backers: [m[1]] }];
+    const want = new Map([[m[0], new Set(m.slice(1))], [m[1], new Set([m[0], m[2]])]]);
+    const out = orc.composeParties({ circle: { id: "c1", theme: "", members: m }, table, want, verdicts: vs, people, targetSize: 3, exclude: [], priority: [m[0]], onlyPriority: true, floor: 61 });
+    expect(out).toHaveLength(1);
+    expect(out[0].members.includes(m[1]) && out[0].members.includes(m[2])).toBe(false);
+    // when nobody scored anyone low, the group the Companions backed wins
+    const even = orc.composeParties({ circle: { id: "c1", theme: "", members: m }, table, want, verdicts: verdicts(m, 80), people, targetSize: 3, exclude: [], priority: [m[0]], onlyPriority: true, floor: 61 });
+    expect(even[0].members).toEqual([m[0], m[1], m[2]].sort());
+  });
+
+  it("code overrules an Orchestrator squad with a pair below the floor when the Companions offered better", async () => {
+    const m = adults.slice(0, 5);
+    const vs = verdicts(m, 75);
+    vs.get(m[1])!.set(m[2], v(20));
+    const table = [
+      { id: "prop-" + m[0], by: m[0], members: [m[0], m[1], m[2]], line: "", backers: [] },
+      { id: "prop-" + m[3], by: m[3], members: [m[0], m[3], m[4]], line: "", backers: [m[4]] },
+    ];
+    const want = orc.wanted(table, new Map([[m[4], { action: "back", proposalId: "prop-" + m[3] }]]));
+    mockProvider().on("orchestrator_form", () => JSON.stringify({ parties: [{ members: [m[0], m[1], m[2]], why: "Big fans of the same things." }] }));
+    const out = await orc.formParties({ circle: { id: "c1", theme: "", members: m }, table, want, verdicts: vs, briefs: briefs(m), people, targetSize: 3, exclude: [], attempt: 1, useModel: true, priority: [m[0]], onlyPriority: true, floor: 53 });
+    expect(out.parties.map((p) => p.members)).toEqual([[m[0], m[3], m[4]].sort()]);
+    // the floor is a preference, not a wall: with no better option the squad still forms
+    mockProvider().reset();
+    mockProvider().on("orchestrator_form", () => JSON.stringify({ parties: [{ members: [m[0], m[1], m[2]], why: "Big fans of the same things." }] }));
+    const only = await orc.formParties({ circle: { id: "c1", theme: "", members: m.slice(0, 3) }, table: table.slice(0, 1), want, verdicts: vs, briefs: briefs(m), people, targetSize: 3, exclude: [], attempt: 1, useModel: true, priority: [m[0]], onlyPriority: true, floor: 53 });
+    expect(only.parties.map((p) => p.members)).toEqual([[m[0], m[1], m[2]].sort()]);
+  });
+
+  it("pair floors relax with wait time on the same scale as the queue engine", () => {
+    expect(orc.PAIR_FLOORS.map((_, i) => orc.pairFloorFor(i))).toEqual([61, 53, 45, 37, 25]);
+    expect(orc.pairFloorFor(99)).toBe(25);
+    expect(orc.SIGN_OFF_FLOOR).toBe(orc.pairFloorFor(3));
+  });
 });

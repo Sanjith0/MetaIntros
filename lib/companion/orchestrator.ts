@@ -24,12 +24,26 @@ export const GAP = 25;
  */
 export const SIMILARITY_GATE = 0.65;
 /**
- * Below this pair score the deterministic (fallback) Companion declines a squad at sign-off (see
- * rounds.groupRound). It matches the widest level of the queue engine's search (minPairwise 0.15
- * in lib/match/engine.ts LEVELS), so the stand-in never refuses a pair the baseline matcher accepts.
- * Real Muse Companions decide for themselves.
+ * Rooms this small skip the gate: every allowed pair talks. A Companion makes one call per round
+ * whoever it talks to, so this costs no extra calls, and it lets the Companions find a match the
+ * profile vectors missed. (Only 12% of seeded pairs clear the gate.)
  */
-export const SIGN_OFF_FLOOR = 15;
+export const ALL_TALK_MAX = 8;
+/**
+ * Below this pair score the deterministic (fallback) Companion declines a squad at sign-off (see
+ * rounds.groupRound). It is the widest level of the queue engine's search (minPairwise 0.15 in
+ * lib/match/engine.ts LEVELS) on the verdict scale (rounds.verdictScale: 25 + 80 x 0.15), so the
+ * stand-in never refuses a pair the baseline matcher accepts. Real Muse Companions decide for themselves.
+ */
+export const SIGN_OFF_FLOOR = 37;
+/**
+ * The weakest pair a squad should have, by how long its anchor has waited: the queue engine's
+ * minPairwise per search level (strict, then relaxing), on the verdict scale. A squad above the
+ * floor always beats one below it; below it a squad still forms when nothing better exists, so
+ * nobody is stranded.
+ */
+export const PAIR_FLOORS = [61, 53, 45, 37, 25] as const;
+export const pairFloorFor = (level: number) => PAIR_FLOORS[Math.max(0, Math.min(PAIR_FLOORS.length - 1, level))];
 
 export interface Verdict {
   score: number;
@@ -92,6 +106,13 @@ export function pairScore(v: Verdicts, a: string, b: string): number {
   const ab = v.get(a)?.get(b)?.score, ba = v.get(b)?.get(a)?.score;
   if (ab === undefined || ba === undefined) return 0;
   return Math.min(ab, ba);
+}
+
+/** The lowest pair score in a group (100 for a group of one). */
+export function weakestPair(g: string[], v: Verdicts): number {
+  let min = 100;
+  for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) min = Math.min(min, pairScore(v, g[i], g[j]));
+  return min;
 }
 
 function chunkEvenly(ids: string[], max: number): string[][] {
@@ -299,6 +320,8 @@ export interface FormInput {
   unitOf?: (id: string) => string[];
   /** how many pairs in a group said they'd squad up again after a past night out (ratings) */
   againPairs?: (members: string[]) => number;
+  /** the weakest pair score a squad should have right now (relaxes with wait time; see PAIR_FLOORS) */
+  floor?: number;
 }
 
 /**
@@ -307,13 +330,14 @@ export interface FormInput {
  * (b) a group grown one member at a time, always adding someone a current member wanted.
  * Every result still goes through validateParties.
  */
-export function composeParties(input: Pick<FormInput, "circle" | "table" | "want" | "verdicts" | "people" | "targetSize" | "exclude" | "priority" | "onlyPriority" | "feasible" | "unitOf" | "againPairs">): ProposedParty[] {
+export function composeParties(input: Pick<FormInput, "circle" | "table" | "want" | "verdicts" | "people" | "targetSize" | "exclude" | "priority" | "onlyPriority" | "feasible" | "unitOf" | "againPairs" | "floor">): ProposedParty[] {
   const { table, want, verdicts, people, targetSize } = input;
   const members = [...input.circle.members].sort();
   const inCircle = new Set(members);
   const excluded = new Set(input.exclude.map(setKey));
   const priority = (input.priority ?? []).filter((id) => inCircle.has(id)).sort();
   const feasible = input.feasible ?? (() => true);
+  const floor = input.floor ?? SIGN_OFF_FLOOR;
   const wants = (a: string, b: string) => (want.get(a)?.has(b) ? 1 : 0);
   const ok = (a: string, b: string) => pairAllowed(people.get(a)!, people.get(b)!);
   const links = (g: string[]) => {
@@ -328,15 +352,19 @@ export function composeParties(input: Pick<FormInput, "circle" | "table" | "want
   };
   const support = new Map<string, number>();
   for (const row of table) support.set(setKey(row.members), (support.get(setKey(row.members)) ?? 0) + 1 + row.backers.length);
-  const weakest = (g: string[]) => {
-    let min = 100;
-    for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) min = Math.min(min, pairScore(verdicts, g[i], g[j]));
-    return min;
-  };
-  // A squad nobody will sign off on is worth less than any squad everyone can live with.
+  const weakest = (g: string[]) => weakestPair(g, verdicts);
   const unitOf = input.unitOf ?? ((id: string) => [id]);
   const again = input.againPairs ?? (() => 0);
-  const quality = (g: string[]) => (weakest(g) >= SIGN_OFF_FLOOR ? 1_000_000 : 0) + links(g) * 10 + again(g) * 8 + (support.get(setKey(g)) ?? 0) * 5 + mean(g) / 100;
+  const pairsIn = targetSize * (targetSize - 1);
+  // Tiers first: a squad whose weakest pair clears the floor beats any squad that doesn't, and one
+  // nobody will sign off on comes last. Within a tier, how well everyone gets along (the weakest
+  // pair and the average, from the Companions' scores after their conversations) carries as much
+  // weight as how strongly the Companions chose each other (want links, backed proposals, ratings).
+  const quality = (g: string[]) => {
+    const w = weakest(g);
+    const tier = (w >= floor ? 2 : 0) + (w >= SIGN_OFF_FLOOR ? 1 : 0);
+    return tier * 1_000_000 + 0.5 * w + 0.5 * mean(g) + 25 * (links(g) / Math.max(1, pairsIn)) + 4 * (support.get(setKey(g)) ?? 0) + 6 * again(g);
+  };
   const valid = (g: string[], used: Set<string>) =>
     g.length === targetSize && g.every((id) => inCircle.has(id) && !used.has(id)) && !excluded.has(setKey(g)) &&
     validateParty(g.map((id) => people.get(id)!)).ok && g.every((id) => chosen(id, g, want)) && feasible(g) && g.every((id) => unitOf(id).every((u) => g.includes(u)));
@@ -352,9 +380,32 @@ export function composeParties(input: Pick<FormInput, "circle" | "table" | "want
         const unit = unitOf(c);
         if (unit.some((u) => used.has(u) || g.includes(u)) || g.length + unit.length > targetSize) continue;
         if (!unit.every((u) => g.every((x) => ok(x, u))) || !unit.some((u) => g.some((x) => wants(x, u))) || !feasible([...g, ...unit])) continue;
-        if (strict && unit.some((u) => g.some((x) => pairScore(verdicts, x, u) < SIGN_OFF_FLOOR))) continue;
+        if (strict && unit.some((u) => g.some((x) => pairScore(verdicts, x, u) < floor))) continue;
         const score = unit.reduce((n, u) => n + g.reduce((m, x) => m + wants(x, u) + wants(u, x), 0) * 1000 + g.reduce((m, x) => m + pairScore(verdicts, x, u), 0) / g.length, 0) / unit.length;
         if (!best || score > best.score) best = { unit, score };
+      }
+      if (!best) return null;
+      g.push(...best.unit);
+    }
+    return g.sort();
+  };
+
+  // Like grow, but always adds whoever keeps the squad's weakest pair highest (the queue engine's
+  // rule), still only from people a current member's Companion wanted.
+  const growWeakest = (seed: string, used: Set<string>): string[] | null => {
+    const g = [...unitOf(seed)];
+    if (g.some((x) => used.has(x)) || g.length > targetSize) return null;
+    while (g.length < targetSize) {
+      let best: { unit: string[]; min: number; avg: number } | null = null;
+      for (const c of members) {
+        if (used.has(c) || g.includes(c)) continue;
+        const unit = unitOf(c);
+        if (unit.some((u) => used.has(u) || g.includes(u)) || g.length + unit.length > targetSize) continue;
+        if (!unit.every((u) => g.every((x) => ok(x, u))) || !unit.some((u) => g.some((x) => wants(x, u))) || !feasible([...g, ...unit])) continue;
+        let min = 100, sum = 0, n = 0;
+        for (const u of unit) for (const x of g) { const s = pairScore(verdicts, x, u); min = Math.min(min, s); sum += s; n++; }
+        const avg = sum / n;
+        if (!best || min > best.min || (min === best.min && avg > best.avg)) best = { unit, min, avg };
       }
       if (!best) return null;
       g.push(...best.unit);
@@ -367,7 +418,7 @@ export function composeParties(input: Pick<FormInput, "circle" | "table" | "want
   const seeds = [...priority, ...(input.onlyPriority ? [] : members.filter((m) => !priority.includes(m)))];
   for (const seed of seeds) {
     if (used.has(seed)) continue;
-    const options = [...table.filter((r) => r.members.includes(seed)).map((r) => [...r.members].sort()), grow(seed, used, true), grow(seed, used, false)]
+    const options = [...table.filter((r) => r.members.includes(seed)).map((r) => [...r.members].sort()), grow(seed, used, true), grow(seed, used, false), growWeakest(seed, used)]
       .filter((g): g is string[] => Boolean(g) && valid(g as string[], used));
     const best = options.sort((a, b) => quality(b) - quality(a) || setKey(a).localeCompare(setKey(b)))[0];
     if (!best) continue;
@@ -397,7 +448,7 @@ export async function formParties(input: FormInput): Promise<{ parties: Proposed
     const ai = await runAi({
       task: "orchestrator_form",
       system:
-        `You are the Orchestrator inside Facebook Events' Queue Up. Each person's Companion agent has talked to the others, proposed a squad for its person, and backed or amended other proposals. Form the final squads. Rules: every squad has exactly ${targetSize} people; a person is in at most one squad; a person may only be in a squad if another member's Companion proposed or backed a group containing them, or if their own Companion proposed that group; prefer groups the Companions converged on and avoid low pair scores; you may combine people from different proposals when the Companions' choices overlap; if a good squad exists for someone in \"placeFirst\", form that squad first${input.onlyPriority ? ", and only form squads that include at least one of them" : ""}; leave people out rather than force a weak squad; never use a listed excluded group. For each squad write "why": one or two friendly sentences to that squad, citing concrete shared interests, naming nobody outside it. Never mention or infer politics, religion, health or sexuality. Use the ids given. JSON only: {"parties": [{"members": ["<id>", ...], "why": "..."}]}.`,
+        `You are the Orchestrator inside Facebook Events' Queue Up. Each person's Companion agent has talked to the others, proposed a squad for its person, and backed or amended other proposals. Form the final squads. Rules: every squad has exactly ${targetSize} people; a person is in at most one squad; a person may only be in a squad if another member's Companion proposed or backed a group containing them, or if their own Companion proposed that group; prefer groups the Companions converged on; pair scores are each pair's lower score after their conversations, so judge a squad by its weakest pair first and its average second, and avoid any squad with a pair below ${input.floor ?? SIGN_OFF_FLOOR} unless nothing else is possible; you may combine people from different proposals when the Companions' choices overlap; if a good squad exists for someone in \"placeFirst\", form that squad first${input.onlyPriority ? ", and only form squads that include at least one of them" : ""}; leave people out rather than force a weak squad; never use a listed excluded group. For each squad write "why": one or two friendly sentences to that squad, citing concrete shared interests, naming nobody outside it. Never mention or infer politics, religion, health or sexuality. Use the ids given. JSON only: {"parties": [{"members": ["<id>", ...], "why": "..."}]}.`,
       user: JSON.stringify({
         squadSize: targetSize,
         attempt: input.attempt,
@@ -424,6 +475,17 @@ export async function formParties(input: FormInput): Promise<{ parties: Proposed
     });
     parties = validateParties(keep(proposed), members, want, people, targetSize, exclude, input.feasible, input.unitOf);
     if (!parties.length) source = "fallback";
+    // Code checks the Orchestrator: a squad with a pair below the floor is only kept when the
+    // Companions' own choices offer nothing better.
+    const floor = input.floor ?? SIGN_OFF_FLOOR;
+    if (parties.some((p) => weakestPair(p.members, verdicts) < floor)) {
+      const alt = fallback();
+      const low = (ps: ProposedParty[]) => ps.filter((p) => weakestPair(p.members, verdicts) < floor).length;
+      if (alt.length >= parties.length && low(alt) < low(parties)) {
+        parties = alt;
+        source = "fallback";
+      }
+    }
   }
   if (!parties.length) parties = fallback();
   const used = new Set(parties.flatMap((p) => p.members));

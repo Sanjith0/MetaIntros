@@ -41,7 +41,9 @@ describe("companion room", () => {
       expect(sparksFor(p.members[0], p.members[1], r).length).toBeGreaterThan(0);
     }
     expect(stages).toEqual(["circles", "mingling", "deep", "deliberating", "forming", "group", "done"]);
-    expect(r.calls).toBeGreaterThan(0);
+    // no mock handlers: every model call fell back to templates, and a fallback is not counted as a model call
+    expect(mockProvider().calls.length).toBeGreaterThan(0);
+    expect(r.calls).toBe(0);
     expect([...used, ...r.heldBack].sort()).toEqual(pool.slice(0, 12).sort());
   });
 
@@ -180,5 +182,34 @@ describe("companion room", () => {
     mockProvider().reset();
     await runRoom(input(8));
     expect(mockProvider().calls.map((c) => c.task + c.messages[1].content)).toEqual(promptsA);
+  });
+
+  it("in a room of 8 or fewer every allowed pair talks, whatever the similarity score", async () => {
+    const r = await runRoom(input(8));
+    const m = r.circles[0].members;
+    for (let i = 0; i < m.length; i++) for (let j = i + 1; j < m.length; j++) expect(r.threads.has(pairKey(m[i], m[j]))).toBe(true);
+  });
+
+  it("what a Companion hears changes its scores: every partner is re-scored after the answers, not just deep pairs", async () => {
+    const ids = pool.slice(0, 8);
+    const disliked = ids[7];
+    mockProvider()
+      .on("companion_answer", (req) => {
+        const me = owner(req);
+        const others = ids.filter((i) => i !== me);
+        return JSON.stringify({ answers: {}, picks: [], verdicts: Object.fromEntries(others.map((i) => [i, { score: 80 }])) });
+      })
+      .on("companion_close", (req) => {
+        const body = JSON.parse(req.messages[1].content);
+        const me = owner(req);
+        // re-judged after reading the answers: the Companion now rates `disliked` low (and sees every conversation)
+        expect(body.conversations.length).toBe(7);
+        const others = ids.filter((i) => i !== me);
+        return JSON.stringify({ says: {}, verdicts: Object.fromEntries(others.map((i) => [i, { score: i === disliked || me === disliked ? 20 : 85 }])), proposal: { members: [] } });
+      });
+    const r = await runRoom({ ids, people, briefs: new Map(ids.map((i) => [i, templateBrief(people.get(i)!, qctx)])), targetSize: 4, floor: 61 });
+    expect(r.verdicts.get(ids[0])!.get(disliked)!.score).toBe(20);
+    expect(r.parties.length).toBeGreaterThan(0);
+    for (const p of r.parties) expect(p.members.includes(disliked)).toBe(false);
   });
 });
