@@ -53,8 +53,11 @@ async function main() {
       await new Promise((r) => setTimeout(r, 1000));
     }
     // The room is decided; now wait for the squad to be committed (event pick or hangout plan, host, talk cards).
+    const { acceptParty } = await import("../lib/server/readyCheck");
     for (let i = 0; i < 300; i++) {
       await new Promise((r) => setTimeout(r, 1000));
+      // The ready check waits for Jordan's "I'm in"; tap it, or the host and talk cards never run.
+      for (const c of await prisma.party.findMany({ where: { status: "confirming", members: { some: { userId: "p01" } } }, select: { id: true } })) await acceptParty("p01", c.id);
       const forming = await prisma.party.count({ where: { status: "forming" } });
       const confirmed = await prisma.party.count({ where: { status: "confirmed" } });
       if (!forming && (confirmed ? (await prisma.talkCard.count()) > 0 : i >= 5)) break;
