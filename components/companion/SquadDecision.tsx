@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Bot, Calculator, CheckCircle2, ChevronDown, MessagesSquare, Sparkles } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { CompanionThread, ScorePill, type ThreadLine } from "./CompanionThread";
+import { stripCitations } from "@/lib/companion/text";
 
 interface Notes {
   score: number;
@@ -80,7 +81,7 @@ export function SquadDecision({ partyId }: { partyId: string }) {
                 {isOpen && (
                   <div className="space-y-2 px-2.5 pb-3">
                     <CompanionThread lines={s.thread} otherName={name(s.id)} />
-                    {s.notes?.wouldEnjoy[0] && <p className="rounded-lg bg-black/25 p-2 text-xs">👍 Your Companion&apos;s read: {s.notes.wouldEnjoy[0]}</p>}
+                    {s.notes?.wouldEnjoy[0] && <p className="rounded-lg bg-black/25 p-2 text-xs">👍 Your Companion&apos;s read: {stripCitations(s.notes.wouldEnjoy[0])}</p>}
                   </div>
                 )}
               </li>
@@ -92,7 +93,7 @@ export function SquadDecision({ partyId }: { partyId: string }) {
             <p className="flex items-center gap-1.5 text-sm font-bold"><MessagesSquare size={15} /> The squad&apos;s Companions talked it over</p>
             <ul className="mt-1.5 space-y-1">
               {recap.groupChat.map((l, i) => (
-                <li key={i} className="text-xs"><span className="font-semibold">{l.from === me ? "Your Companion" : `${name(l.from)}'s`}:</span> {l.say}</li>
+                <li key={i} className="text-xs"><span className="font-semibold">{l.from === me ? "Your Companion" : `${name(l.from)}'s`}:</span> {stripCitations(l.say)}</li>
               ))}
             </ul>
             <p className="mt-2 flex items-center gap-1 text-xs font-semibold text-emerald-200" data-testid="decision-signed">
@@ -129,13 +130,13 @@ export function SquadDecision({ partyId }: { partyId: string }) {
             {n.passedOver.map((x) => (
               <li key={x.id} className="rounded-xl bg-rose-400/10 p-2 ring-1 ring-rose-300/20" data-testid="passed-over">
                 <p className="font-semibold">{name(x.id)}: {x.similarity}% similar, but not in your squad</p>
-                <p className="text-[#ffe4e6]">{x.reason}</p>
+                <p className="text-[#ffe4e6]">{stripCitations(x.reason)}</p>
               </li>
             ))}
             {n.chosenAnyway.map((x) => (
               <li key={x.id} className="rounded-xl bg-emerald-400/10 p-2 ring-1 ring-emerald-300/20" data-testid="chosen-anyway">
                 <p className="font-semibold">{name(x.id)}: only {x.similarity}% similar, but in your squad</p>
-                <p className="text-[#d1fae5]">{x.reason}</p>
+                <p className="text-[#d1fae5]">{stripCitations(x.reason)}</p>
               </li>
             ))}
           </ul>

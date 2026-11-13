@@ -5,6 +5,7 @@ import { Bot, ChevronDown, Lock, MessagesSquare, Users } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { useLiveEvents } from "@/components/useLiveEvents";
 import { CompanionThread, ScorePill, type ThreadLine } from "./CompanionThread";
+import { stripCitations } from "@/lib/companion/text";
 
 interface Notes {
   score: number;
@@ -80,7 +81,7 @@ export function CompanionFeed({ meId }: { meId?: string }) {
                     {name(c.with)}&apos;s Companion
                     {c.deep && <span className="rounded bg-[#a855f7]/30 px-1.5 text-[9px] font-bold uppercase tracking-wide" data-testid="feed-deep">going deeper</span>}
                   </span>
-                  {!isOpen && last && <span className="block truncate text-xs text-[#c7d2fe]">{last.from === "me" ? "You: " : ""}{last.say}</span>}
+                  {!isOpen && last && <span className="block truncate text-xs text-[#c7d2fe]">{last.from === "me" ? "You: " : ""}{stripCitations(last.say)}</span>}
                 </span>
                 {c.notes && <ScorePill score={c.notes.score} />}
                 <ChevronDown size={16} className={`shrink-0 transition ${isOpen ? "rotate-180" : ""}`} />
@@ -91,9 +92,9 @@ export function CompanionFeed({ meId }: { meId?: string }) {
                   {c.notes && (
                     <div className="rounded-xl bg-black/25 p-2.5 text-xs" data-testid="feed-notes">
                       <p className="font-semibold text-[#c4b5fd]">Your Companion&apos;s private read</p>
-                      {c.notes.wouldEnjoy[0] && <p className="mt-1">👍 {c.notes.wouldEnjoy[0]}</p>}
-                      {c.notes.concerns[0] && <p className="mt-0.5">⚠️ {c.notes.concerns[0]}</p>}
-                      {c.notes.needs[0] && <p className="mt-0.5">🙏 {c.notes.needs[0]}</p>}
+                      {c.notes.wouldEnjoy[0] && <p className="mt-1">👍 {stripCitations(c.notes.wouldEnjoy[0])}</p>}
+                      {c.notes.concerns[0] && <p className="mt-0.5">⚠️ {stripCitations(c.notes.concerns[0])}</p>}
+                      {c.notes.needs[0] && <p className="mt-0.5">🙏 {stripCitations(c.notes.needs[0])}</p>}
                     </div>
                   )}
                 </div>
@@ -112,7 +113,7 @@ export function CompanionFeed({ meId }: { meId?: string }) {
                 <span className="font-semibold">{p.by === meId ? "Your Companion" : `${name(p.by)}'s Companion`}:</span>{" "}
                 {p.members.map((m) => (m === meId ? "you" : name(m))).join(", ")}
                 {p.backers > 0 && <span className="text-[#a5b4fc]"> · backed by {p.backers}</span>}
-                {p.line && <span className="block text-[#c7d2fe]">&ldquo;{p.line}&rdquo;</span>}
+                {p.line && <span className="block text-[#c7d2fe]">&ldquo;{stripCitations(p.line)}&rdquo;</span>}
               </li>
             ))}
           </ul>
@@ -127,7 +128,7 @@ export function CompanionFeed({ meId }: { meId?: string }) {
           {g.status !== "didnt_work" && (
             <ul className="mt-2 space-y-1">
               {g.lines.map((l, j) => (
-                <li key={j} className="text-xs"><span className="font-semibold">{l.from === meId ? "Your Companion" : `${name(l.from)}'s`}:</span> {l.say}</li>
+                <li key={j} className="text-xs"><span className="font-semibold">{l.from === meId ? "Your Companion" : `${name(l.from)}'s`}:</span> {stripCitations(l.say)}</li>
               ))}
             </ul>
           )}

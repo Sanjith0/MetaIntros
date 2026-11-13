@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Adi is hoping for a chill squad of 2 for something low-key this weekend. They'd bring easygoing vibes and love connecting over climbing, indie music like Phoebe Bridgers, vinyl digging, and film photo walks. They really like low-key, chill plans where you can actually talk.\", \"cites\": [\"live-1dfe7bd8:socialStyle\", \"live-1dfe7bd8:likes[2]\", \"live-1dfe7bd8:music[0]\", \"live-1dfe7bd8:groups[0]\", \"live-1dfe7bd8:likes[7]\"]}}",
+  "task": "companion_group1",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1669,
+    "completionTokens": 549
+  },
+  "savedAt": "2026-11-13T00:13:53.380Z"
+}

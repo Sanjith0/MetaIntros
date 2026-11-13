@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Adi is down for a chill 2-person hang and stoked Kansh also loves climbing. They'd enjoy a low-key bouldering session or coffee after, keeping it relaxed and easy to chat.\", \"cites\": [\"live-1dfe7bd8:likes[2]\", \"live-1dfe7bd8:socialStyle\"]}, \"decision\": \"yes\", \"need\": \"\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1423,
+    "completionTokens": 376
+  },
+  "savedAt": "2026-11-13T00:13:55.157Z"
+}

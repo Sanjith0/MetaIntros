@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { stripCitations } from "@/lib/companion/text";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Bot, CalendarCheck, Copy, Heart, MessageSquareQuote, Sparkles, Users, Zap } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
@@ -75,7 +76,7 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
                       <li key={i} className="flex gap-2" data-testid="claim" data-kind={cl.kind}>
                         <Icon size={18} className="mt-0.5 shrink-0 text-queue-glow" />
                         <span>
-                          <span className="block leading-snug">{cl.text}</span>
+                          <span className="block leading-snug">{stripCitations(cl.text)}</span>
                           <span className="mt-0.5 flex flex-wrap gap-1">
                             {cl.sources.map((s) => (
                               <span key={s} className="rounded bg-fb-bg px-1.5 text-[10px] text-fb-muted" data-testid="claim-source">{humanSource(s, meId)}</span>
@@ -92,9 +93,9 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
                   <ul className="space-y-1.5" data-testid="card-openers">
                     {c.content.openers.map((o) => (
                       <li key={o}>
-                        <button type="button" onClick={() => { navigator.clipboard?.writeText(o).catch(() => {}); setCopied(o); }}
+                        <button type="button" onClick={() => { navigator.clipboard?.writeText(stripCitations(o)).catch(() => {}); setCopied(o); }}
                           className="flex w-full items-center justify-between gap-2 rounded-xl bg-[#f3f0ff] px-3 py-2 text-left text-sm">
-                          <span>“{o}”</span>
+                          <span>“{stripCitations(o)}”</span>
                           <Copy size={14} className={`shrink-0 ${copied === o ? "text-emerald-500" : "text-fb-muted"}`} />
                         </button>
                       </li>
@@ -115,13 +116,13 @@ export function TalkCardDeck({ cards, meId, initialMember, chatId, eventTitle }:
                         return (
                           <li key={i} className={`flex ${mine ? "justify-end" : ""}`}>
                             <span className={`max-w-[80%] rounded-xl px-2 py-1 text-xs italic ${mine ? "bg-[#ddd6fe]" : "bg-white ring-1 ring-[#e9e3ff]"}`}>
-                              <span className="not-italic font-semibold">{mine ? "Your AI" : `${c.subject.name.split(" ")[0]}'s AI`}: </span>{t.text}
+                              <span className="not-italic font-semibold">{mine ? "Your AI" : `${c.subject.name.split(" ")[0]}'s AI`}: </span>{stripCitations(t.text)}
                             </span>
                           </li>
                         );
                       })}
                     </ul>
-                    <p className="mt-1.5 text-xs"><Sparkles size={12} className="mr-1 inline text-queue-glow" />Sparks: {c.preChat.sparks.join(" · ")}</p>
+                    <p className="mt-1.5 text-xs"><Sparkles size={12} className="mr-1 inline text-queue-glow" />Sparks: {c.preChat.sparks.map(stripCitations).join(" · ")}</p>
                   </details>
                 )}
                 <p className="text-[10px] leading-snug text-fb-muted">AI-assisted · every fact cites the Facebook data it came from · politics, religion, health &amp; sexuality are never shown</p>

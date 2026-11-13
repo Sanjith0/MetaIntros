@@ -1,6 +1,7 @@
 "use client";
 
 import { Bot, ShieldCheck } from "lucide-react";
+import { stripCitations } from "@/lib/companion/text";
 
 export interface ThreadLine {
   from: "me" | "them";
@@ -29,7 +30,7 @@ export function CompanionThread({ lines, otherName }: { lines: ThreadLine[]; oth
               <p className="mb-0.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-[#c4b5fd]">
                 <Bot size={11} /> {mine ? "Your Companion" : `${otherName}'s Companion`} · {KIND[l.kind]}
               </p>
-              <p>{l.say}</p>
+              <p>{stripCitations(l.say)}</p>
               {l.blocked && (
                 <p className="mt-1 flex items-center gap-1 text-[10px] text-amber-200" data-testid="line-blocked">
                   <ShieldCheck size={11} /> Safety check replaced a line that would have shared something private

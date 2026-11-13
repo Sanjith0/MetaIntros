@@ -1,0 +1,11 @@
+{
+  "text": "{\"asks\": {\"live-1dfe7bd8\": {\"say\": \"Kansh loves getting out and doing something active like climbing at Peninsula Boulders. If you two met this weekend, how would Adi want to spend the time - actually moving and climbing together, or keeping it chill and chatting over coffee?\", \"cites\": [\"live-dbe3dba0:likes[0]\"]}}}",
+  "task": "companion_ask",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1442,
+    "completionTokens": 449
+  },
+  "savedAt": "2026-11-13T00:13:35.761Z"
+}

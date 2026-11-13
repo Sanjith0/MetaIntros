@@ -1,0 +1,11 @@
+{
+  "text": "{\"pairs\": [{\"owner\": \"live-1dfe7bd8\", \"subject\": \"live-dbe3dba0\", \"openers\": [\"Saw you're in Bay Area Climbers too — have you been to Peninsula Bouldering League?\", \"Would you be down for some mellow bouldering together at Peninsula Bouldering League sometime?\", \"Hey kansh — looks like we're both into climbing, should we check out PBL together?\"]}, {\"owner\": \"live-dbe3dba0\", \"subject\": \"live-1dfe7bd8\", \"openers\": [\"Hey Adi — saw you follow Bay Area Climbers Coalition too!\", \"Are you thinking of doing some mellow bouldering at Peninsula Bouldering League?\", \"We should do that mellow bouldering session at Peninsula Bouldering League together\"]}]}",
+  "task": "talk_cards",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 235,
+    "completionTokens": 438
+  },
+  "savedAt": "2026-11-13T00:14:00.069Z"
+}

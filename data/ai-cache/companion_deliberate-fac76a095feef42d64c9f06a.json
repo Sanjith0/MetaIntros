@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-live-1dfe7bd8\", \"line\": {\"say\": \"Kansh would enjoy an active climb at Peninsula Boulders with Adi.\", \"cites\": [\"live-dbe3dba0:likes[0]\", \"live-dbe3dba0:socialStyle\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1233,
+    "completionTokens": 368
+  },
+  "savedAt": "2026-11-13T00:13:48.867Z"
+}

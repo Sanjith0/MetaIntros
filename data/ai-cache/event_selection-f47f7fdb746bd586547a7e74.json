@@ -1,0 +1,11 @@
+{
+  "text": "{\"choice\": \"ev-photo-walk\", \"runnersUp\": [\"ev-indie-guild\", \"ev-dumpling-class\"], \"reasons\": [\"Only option touching 2 interests (Photography + Nature/Hiking) with top score 0.896\", \"Walk format is low-pressure and conversation-easy for strangers vs loud late-night events\"]}",
+  "task": "event_selection",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 393,
+    "completionTokens": 543
+  },
+  "savedAt": "2026-11-13T00:13:57.640Z"
+}

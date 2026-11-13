@@ -1,0 +1,11 @@
+{
+  "text": "{\"action\": \"back\", \"proposalId\": \"prop-live-1dfe7bd8\", \"members\": [\"live-1dfe7bd8\", \"live-dbe3dba0\"], \"line\": {\"say\": \"Adi would enjoy chill bouldering and coffee with Kansh to chat vinyl and climbs.\", \"cites\": [\"live-1dfe7bd8:socialStyle\", \"live-1dfe7bd8:events[1]\", \"live-1dfe7bd8:likes[8]\", \"live-1dfe7bd8:groups[0]\"]}}",
+  "task": "companion_deliberate",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1447,
+    "completionTokens": 672
+  },
+  "savedAt": "2026-11-13T00:13:49.610Z"
+}

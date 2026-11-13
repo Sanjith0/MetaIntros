@@ -1,0 +1,11 @@
+{
+  "text": "{\"line\": {\"say\": \"Kansh is excited Adi also loves climbing. They like getting out and doing something active and would prefer something physically active for the weekend if Adi is up for it.\", \"cites\": [\"live-dbe3dba0:likes[0]\", \"live-dbe3dba0:socialStyle\"]}, \"decision\": \"yes_if\", \"need\": \"something physically active\", \"privateReason\": \"\"}",
+  "task": "companion_group2",
+  "model": "muse-spark-1.1",
+  "provider": "muse",
+  "usage": {
+    "promptTokens": 1210,
+    "completionTokens": 400
+  },
+  "savedAt": "2026-11-13T00:13:55.848Z"
+}
