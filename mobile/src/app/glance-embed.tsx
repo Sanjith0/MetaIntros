@@ -4,11 +4,15 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Feather from '@expo/vector-icons/Feather';
 import type { WebViewMessageEvent, WebViewProps } from 'react-native-webview';
+import Constants from 'expo-constants';
 import glasses, { type GlassesState } from '../../modules/glance-glasses';
 import { WEB_APP, glanceEmbedPath, hasWebView } from '../qu/glanceLaunch';
 import { glanceOrigin } from '../qu/glanceOrigin';
 import { GLASSES_SHIM } from '../qu/glassesShim';
 import { c, font } from '../qu/ui';
+
+/** Whether this build has Apple's Hotspot entitlement (app.config.js, LINK_GLASSES_HOTSPOT=1), which the glasses video needs. */
+const HAS_HOTSPOT = (Constants.expoConfig?.extra as { linkGlassesHotspot?: boolean } | undefined)?.linkGlassesHotspot === true;
 
 /** At most this many glasses frames a second go into the page; the shim drops any it can't draw in time. */
 const FRAME_INTERVAL_MS = 1000 / 12;
@@ -37,13 +41,29 @@ export default function GlanceEmbed() {
   // Glasses frames, failures and pauses go straight into the page's shim.
   useEffect(() => {
     if (!glasses) return;
-    let last = 0;
+    let last = 0, frames = 0, videoPending = false;
     const subs = [
       glasses.addListener('onFrame', ({ data }) => {
+        frames += 1;
+        videoPending = false;
+        if (frames === 1 || frames % 150 === 0) console.log(`[glasses] frame ${frames} (${Math.round(data.length / 1024)} KB)`);
         const now = Date.now();
         if (now - last < FRAME_INTERVAL_MS) return;
         last = now;
         run(`window.__glanceGlassesCamera && window.__glanceGlassesCamera.frame('${data}')`);
+      }),
+      glasses.addListener('onFailure', ({ message }) => { console.log(`[glasses] failure: ${message}`); }),
+      // The page shows the glasses' own status when they send no video, instead of a generic timeout.
+      glasses.addListener('onState', state => {
+        console.log(`[glasses] state: ${state.status} (registered ${state.registered}, camera ${state.cameraAllowed}, streaming ${state.streaming})`);
+        if (state.status.startsWith('Starting glasses video')) videoPending = true;
+        if (state.streaming) videoPending = false;
+        // The session started but video never came: Meta's SDK carries video over Wi-Fi (the glasses' own hotspot),
+        // and joining it needs Apple's Hotspot entitlement, which a free Apple developer team cannot sign.
+        const status = !(videoPending && !state.streaming) ? state.status
+          : HAS_HOTSPOT ? 'the glasses connected, but their video link did not start. Video goes over the glasses\' Wi-Fi: check Wi-Fi is on, keep the glasses close, and retry'
+          : 'the glasses connected, but their video link did not start. Video goes over the glasses\' Wi-Fi, which this build of Link cannot join without Apple\'s Hotspot permission (needs a paid Apple developer team; see mobile/docs/GLASSES.md)';
+        run(`window.__linkGlassesStatus = ${JSON.stringify(status)}`);
       }),
       glasses.addListener('onFailure', ({ message }) => run(`window.__glanceGlassesCamera && window.__glanceGlassesCamera.failed(${JSON.stringify(message)})`)),
       glasses.addListener('onPause', ({ paused }) => run(`window.__glanceGlassesCamera && window.__glanceGlassesCamera.paused && window.__glanceGlassesCamera.paused(${paused ? 'true' : 'false'})`)),
@@ -61,7 +81,8 @@ export default function GlanceEmbed() {
     let message: { type?: string; channel?: string };
     try { message = JSON.parse(data) as typeof message; } catch { return; }
     if (message.channel === 'glasses') {
-      if (message.type === 'start') void glasses?.start();
+      console.log(`[glasses] page asked to ${message.type}`);
+      if (message.type === 'start') void glasses?.start().catch((e: unknown) => console.log(`[glasses] start threw: ${String(e)}`));
       if (message.type === 'stop') glasses?.stop();
       return;
     }
