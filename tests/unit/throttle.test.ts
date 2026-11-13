@@ -40,4 +40,16 @@ describe("live-call throttle", () => {
     expect(peak).toBe(3);
     expect(done).toBe(12);
   });
+
+  it("retries a dropped connection twice, quickly, but never an offline block", async () => {
+    const { isTransient } = await import("@/lib/ai/throttle");
+    expect(isTransient(new Error("fetch failed"))).toBe(true);
+    expect(isTransient(new Error("muse HTTP 503: unavailable"))).toBe(true);
+    expect(isTransient(new Error("network disabled (blocked api.meta.ai)"))).toBe(false);
+    let n = 0;
+    expect(await withRateLimitRetry(async () => { if (++n < 3) throw new Error("fetch failed"); return "ok"; }, [], async () => {})).toBe("ok");
+    n = 0;
+    await expect(withRateLimitRetry(async () => { n++; throw new Error("fetch failed"); }, [], async () => {})).rejects.toThrow("fetch failed");
+    expect(n).toBe(3);
+  });
 });
